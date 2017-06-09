@@ -1,0 +1,879 @@
+---
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: Cloudformation for OpenShift Admin Test Drive 
+
+Parameters:
+
+  PublicHostedZone:
+    Type: String
+    ConstraintDescription: DNS zone for Instances and OpenShift
+
+  InfraInstanceType:
+    Type: String
+    Default: m4.large
+    AllowedValues:
+      - m4.large
+      - m4.xlarge
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  WorkerInstanceType:
+    Type: String
+    Default: m4.large
+    AllowedValues:
+      - m4.large
+      - m4.xlarge
+
+  MasterInstanceType:
+    Type: String
+    Default: m4.large
+    AllowedValues:
+      - m4.large
+      - m4.xlarge
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  IdmInstanceType:
+    Type: String
+    Default: t2.small
+    AllowedValues:
+      - t2.small
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: OSE-key
+    ConstraintDescription: Must be the name of an existing EC2 key pair.
+
+Mappings:
+
+  AWSRegion2AMI:
+    us-east-1:
+      ami: ami-b63769a1
+    us-east-2:
+      ami: ami-0932686c
+    us-west-1:
+      ami: ami-2cade64c
+    us-west-2:
+      ami: ami-6f68cf0f
+    eu-west-1:
+      ami: ami-02ace471
+    eu-central-1:
+      ami: ami-e4c63e8b
+    ap-northeast-1:
+      ami: ami-5de0433c
+    ap-northeast-2:
+      ami: ami-6447930a
+    ap-southeast-1:
+      ami: ami-2c95344f
+    ap-southeast-2:
+      ami: ami-39ac915a
+    sa-east-1:
+      ami: ami-7de77b11
+
+  Subnet2Cidr:
+    vpc:
+      cidr: 10.0.0.0/16
+    public1:
+      cidr: 10.0.1.0/24
+    public2:
+      cidr: 10.0.3.0/24
+    public3:
+      cidr: 10.0.4.0/24
+
+  DNSMapping:
+      us-east-1:
+        domain: ec2.internal
+      us-west-1:
+        domain: us-west-1.compute.internal
+      us-west-2:
+        domain: us-west-2.compute.internal
+      eu-west-1:
+        domain: eu-west-1.compute.internal
+      eu-central-1:
+        domain: eu-central-1.compute.internal
+      ap-northeast-1:
+        domain: ap-northeast-1.compute.internal
+      ap-northeast-2:
+        domain: ap-northeast-2.compute.internal
+      ap-southeast-1:
+        domain: ap-southeast-1.compute.internal
+      ap-southeast-2:
+        domain: ap-southeast-2.compute.internal
+      sa-east-1:
+        domain: sa-east-1.compute.internal
+
+Resources:
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock:
+        Fn::FindInMap:
+        - Subnet2Cidr
+        - vpc
+        - cidr
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  InternetGatewayAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: VPC
+      InternetGatewayId:
+        Ref: InternetGateway
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  PublicRouteTableDefaultRoute1:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachement
+    Properties:
+      RouteTableId:
+        Ref: PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: InternetGateway
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock:
+        Fn::FindInMap:
+        - Subnet2Cidr
+        - public1
+        - cidr
+      MapPublicIpOnLaunch: 'true'
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  PublicSubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet1
+      RouteTableId:
+        Ref: PublicRouteTable
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock:
+        Fn::FindInMap:
+        - Subnet2Cidr
+        - public2
+        - cidr
+      MapPublicIpOnLaunch: 'true'
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ""
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  PublicSubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet2
+      RouteTableId:
+        Ref: PublicRouteTable
+
+  PublicSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock:
+        Fn::FindInMap:
+        - Subnet2Cidr
+        - public3
+        - cidr
+      MapPublicIpOnLaunch: 'true'
+      AvailabilityZone:
+        Fn::Select:
+          - 2
+          - Fn::GetAZs: ""
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  PublicSubnetRouteTableAssociation3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet3
+      RouteTableId:
+        Ref: PublicRouteTable
+
+  NodeSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Ref: VPC
+      GroupDescription: Firewall definition for OpenShift Node
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 4789
+        ToPort: 4789
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 4789
+        ToPort: 4789
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 10250
+        ToPort: 10250
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 10250
+        ToPort: 10250
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 2222
+        ToPort: 2222
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 24007
+        ToPort: 24008
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 49152
+        ToPort: 49664
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: icmp
+        FromPort: -1
+        ToPort: -1
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      SecurityGroupEgress:
+      - IpProtocol: -1
+        FromPort: 0
+        ToPort: 65535
+        CidrIp: 0.0.0.0/0
+
+  MasterSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Ref: VPC
+      GroupDescription: Firewall definition for OpenShift Master and Heketi
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 4789
+        ToPort: 4789
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 4789
+        ToPort: 4789
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 2049
+        ToPort: 2049
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 8053
+        ToPort: 8053
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 8053
+        ToPort: 8053
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8080
+        ToPort: 8080
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: icmp
+        FromPort: -1
+        ToPort: -1
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: -1
+        FromPort: 0
+        ToPort: 65535
+        CidrIp: 0.0.0.0/0
+
+  Route53Records:
+    Type: AWS::Route53::RecordSetGroup
+    DependsOn:
+      - Master1
+      - InfraNode1
+      - IdmNode1
+      - WorkerNode1
+      - WorkerNode2
+      - WorkerNode3
+    Properties:
+      HostedZoneName: !Join ['', [!Ref 'PublicHostedZone', .]]
+      RecordSets:
+        - Name: !Join ['', [master., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt Master1.PublicIp
+
+        - Name: !Join ['', [openshift., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt Master1.PublicIp
+
+        - Name: !Join ['', [infra., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt InfraNode1.PublicIp
+
+        - Name: !Join ['', [\*\.apps., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt InfraNode1.PublicIp
+
+        - Name: !Join ['', [idm., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt IdmNode1.PublicIp
+
+        - Name: !Join ['', [node01., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode1.PublicIp
+
+        - Name: !Join ['', [node02., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode2.PublicIp
+
+        - Name: !Join ['', [node03., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode3.PublicIp
+
+  Master1:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegion2AMI
+        - Ref: AWS::Region
+        - ami
+      InstanceType:
+        Ref: MasterInstanceType
+      SubnetId:
+        Ref: PublicSubnet1
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds:
+        - !GetAtt MasterSecurityGroup.GroupId
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+      - Key: Name
+        Value: !Join [ ., [master, !Ref 'PublicHostedZone' ] ]
+      BlockDeviceMappings:
+      - DeviceName: /dev/sda1
+        Ebs:
+          VolumeSize: '10'
+          VolumeType: 'gp2'
+          DeleteOnTermination: 'true'
+      - DeviceName: /dev/xvdb
+        Ebs:
+          VolumeSize: '5'
+          VolumeType: 'gp2'
+          DeleteOnTermination: 'true'
+      - DeviceName: /dev/xvdc
+        Ebs:
+          VolumeSize: '20'
+          VolumeType: 'gp2'
+          DeleteOnTermination: 'true'
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #cloud-config
+            cloud_config_modules:
+            - disk_setup
+            - mounts
+
+            fs_setup:
+            - label: etcd_storage
+              filesystem: xfs
+              device: /dev/xvdc
+              partition: auto
+
+            runcmd:
+            - mkdir -p /var/lib/etcd
+
+            fqdn: master.${PublicHostedZone}
+
+            mounts:
+            - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
+
+
+            write_files:
+            - content: |
+                DEVS='/dev/xvdb'
+                VG=docker_vol
+                DATA_SIZE=95%VG
+                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
+              path: /etc/sysconfig/docker-storage-setup
+              owner: root:root
+
+            users:
+            - default
+
+            system_info:
+              default_user:
+                name: ec2-user
+
+            write_files:
+              - content: |
+                  [OSEv3:children]
+                  masters
+                  nodes
+
+                  [OSEv3:vars]
+                  ansible_ssh_user=ec2-user
+                  ansible_ssh_private_key_file=/home/ec2-user/.ssh/id_rsa
+                  ansible_ssh_extra_args="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=false"
+                  ansible_become=true
+                  deployment_type=openshift-enterprise
+                  containerized=true
+                  console_port=443
+                  openshift_image_tag=v3.5.5.15
+                  openshift_pkg_version=-3.5.5.15
+                  openshift_master_default_subdomain='*.apps.${PublicHostedZone}'
+                  openshift_router_selector='region=infra'
+                  openshift_registry_selector='region=infra'
+                  osm_default_node_selector='region=apps'
+                  openshift_examples_modify_imagestreams=true
+                  openshift_metrics_install_metrics=false
+                  openshift_hosted_logging_deploy=false
+
+                  [masters]
+                  master.${PublicHostedZone}
+
+                  [nodes]
+                  master.${PublicHostedZone}
+                  infra.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
+                  node01.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  node02.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  node03.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                path: /etc/ansible/hosts
+
+
+  InfraNode1:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegion2AMI
+        - Ref: AWS::Region
+        - ami
+      InstanceType:
+        Ref: InfraInstanceType
+      SubnetId:
+        Ref: PublicSubnet1
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds:
+        - !GetAtt NodeSecurityGroup.GroupId
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdb
+          Ebs:
+            VolumeSize: '20'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+      - Key: Name
+        Value: !Join [ ., [infra, !Ref 'PublicHostedZone' ] ]
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #cloud-config
+            
+            fqdn: infra.${PublicHostedZone}
+
+            write_files:
+            - content: |
+                DEVS='/dev/xvdb'
+                VG=docker_vol
+                DATA_SIZE=95%VG
+                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
+              path: /etc/sysconfig/docker-storage-setup
+              owner: root:root
+
+            users:
+            - default
+
+            system_info:
+              default_user:
+                name: ec2-user
+
+  IdmNode1:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegion2AMI
+        - Ref: AWS::Region
+        - ami
+      InstanceType:
+        Ref: IdmInstanceType
+      SubnetId:
+        Ref: PublicSubnet1
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds:
+        - !GetAtt NodeSecurityGroup.GroupId
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+      - Key: Name
+        Value: !Join [ ., [idm, !Ref 'PublicHostedZone' ] ]
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #cloud-config
+
+            fqdn: idm.${PublicHostedZone}
+
+
+  WorkerNode1:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegion2AMI
+        - Ref: AWS::Region
+        - ami
+      InstanceType:
+        Ref: WorkerInstanceType
+      SubnetId:
+        Ref: PublicSubnet1
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds:
+        - !GetAtt NodeSecurityGroup.GroupId
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdb
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdc
+          Ebs:
+            VolumeSize: '20'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdd
+          Ebs:
+            VolumeSize: '50'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+      - Key: Name
+        Value: !Join [ ., [node01, !Ref 'PublicHostedZone' ] ]
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #cloud-config
+            cloud_config_modules:
+            - disk_setup
+            - mounts
+
+            fqdn: node01.${PublicHostedZone}
+
+            fs_setup:
+            - label: emptydir
+              filesystem: xfs
+              device: /dev/xvdc
+              partition: auto
+
+            runcmd:
+            - mkdir -p /var/lib/origin/openshift.local.volumes
+
+            mounts:
+            - [ /dev/xvdb, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+            
+            write_files:
+            - content: |
+                DEVS='/dev/xvdc'
+                VG=docker_vol
+                DATA_SIZE=95%VG
+                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
+              path: /etc/sysconfig/docker-storage-setup
+              owner: root:root
+
+            users:
+            - default
+
+            system_info:
+              default_user:
+                name: ec2-user
+
+  WorkerNode2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegion2AMI
+        - Ref: AWS::Region
+        - ami
+      InstanceType:
+        Ref: WorkerInstanceType
+      SubnetId:
+        Ref: PublicSubnet2
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds:
+        - !GetAtt NodeSecurityGroup.GroupId
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdb
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdc
+          Ebs:
+            VolumeSize: '20'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdd
+          Ebs:
+            VolumeSize: '50'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+      - Key: Name
+        Value: !Join [ ., [node02, !Ref 'PublicHostedZone' ] ]
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #cloud-config
+            cloud_config_modules:
+            - disk_setup
+            - mounts
+
+            fqdn: node02.${PublicHostedZone}
+
+            fs_setup:
+            - label: emptydir
+              filesystem: xfs
+              device: /dev/xvdc
+              partition: auto
+
+            runcmd:
+            - mkdir -p /var/lib/origin/openshift.local.volumes
+
+            mounts:
+            - [ /dev/xvdb, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+            
+            write_files:
+            - content: |
+                DEVS='/dev/xvdc'
+                VG=docker_vol
+                DATA_SIZE=95%VG
+                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
+              path: /etc/sysconfig/docker-storage-setup
+              owner: root:root
+
+            users:
+            - default
+
+            system_info:
+              default_user:
+                name: ec2-user
+
+  WorkerNode3:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegion2AMI
+        - Ref: AWS::Region
+        - ami
+      InstanceType:
+        Ref: WorkerInstanceType
+      SubnetId:
+        Ref: PublicSubnet3
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds:
+        - !GetAtt NodeSecurityGroup.GroupId
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdb
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdc
+          Ebs:
+            VolumeSize: '20'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdd
+          Ebs:
+            VolumeSize: '50'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+      - Key: Name
+        Value: !Join [ ., [node03, !Ref 'PublicHostedZone' ] ]
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #cloud-config
+            cloud_config_modules:
+            - disk_setup
+            - mounts
+
+            fqdn: node03.${PublicHostedZone}
+
+            fs_setup:
+            - label: emptydir
+              filesystem: xfs
+              device: /dev/xvdb
+              partition: auto
+
+            runcmd:
+            - mkdir -p /var/lib/origin/openshift.local.volumes
+
+            mounts:
+            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+            
+            write_files:
+            - content: |
+                DEVS='/dev/xvdc'
+                VG=docker_vol
+                DATA_SIZE=95%VG
+                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
+              path: /etc/sysconfig/docker-storage-setup
+              owner: root:root
+
+            users:
+            - default
+
+            system_info:
+              default_user:
+                name: ec2-user
+
+Outputs:
+   UserName:
+      Description: "OpenShift Node Login"
+      Value: "admin"
+
+   Password:
+      Description: "OpenShift Node Login Password"
+      Value: "r3dh4t"
+
+   SSHLoginUser:
+      Description: "User name on the Master node to connect via SSH and PEM file"
+      Value: "ec2-user"

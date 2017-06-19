@@ -646,12 +646,12 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdb
           Ebs:
-            VolumeSize: '10'
+            VolumeSize: '20'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdc
           Ebs:
-            VolumeSize: '20'
+            VolumeSize: '10'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdd
@@ -678,18 +678,18 @@ Resources:
             fs_setup:
             - label: emptydir
               filesystem: xfs
-              device: /dev/xvdc
+              device: /dev/xvdb
               partition: auto
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
 
             mounts:
-            - [ /dev/xvdb, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
             
             write_files:
             - content: |
-                DEVS='/dev/xvdc'
+                DEVS='/dev/xvdb'
                 VG=docker_vol
                 DATA_SIZE=95%VG
                 EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
@@ -727,12 +727,12 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdb
           Ebs:
-            VolumeSize: '10'
+            VolumeSize: '20'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdc
           Ebs:
-            VolumeSize: '20'
+            VolumeSize: '10'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdd
@@ -766,11 +766,11 @@ Resources:
             - mkdir -p /var/lib/origin/openshift.local.volumes
 
             mounts:
-            - [ /dev/xvdb, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
             
             write_files:
             - content: |
-                DEVS='/dev/xvdc'
+                DEVS='/dev/xvdb'
                 VG=docker_vol
                 DATA_SIZE=95%VG
                 EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
@@ -808,12 +808,12 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdb
           Ebs:
-            VolumeSize: '10'
+            VolumeSize: '20'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdc
           Ebs:
-            VolumeSize: '20'
+            VolumeSize: '10'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdd
@@ -840,7 +840,7 @@ Resources:
             fs_setup:
             - label: emptydir
               filesystem: xfs
-              device: /dev/xvdb
+              device: /dev/xvdc
               partition: auto
 
             runcmd:
@@ -851,7 +851,7 @@ Resources:
             
             write_files:
             - content: |
-                DEVS='/dev/xvdc'
+                DEVS='/dev/xvdb'
                 VG=docker_vol
                 DATA_SIZE=95%VG
                 EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"

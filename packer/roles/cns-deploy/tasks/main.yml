@@ -1,0 +1,7 @@
+---
+- name: install CNS deployment tools
+  yum: name={{ item }} state=present
+  with_items:
+    - cns-deploy
+    - heketi-client
+...

@@ -48,7 +48,7 @@ Mappings:
 
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-e8614ffe 
+      ami: ami-555d7343 
     us-east-2:
       ami: ami-0932686c
     us-west-1:
@@ -387,7 +387,7 @@ Resources:
           ResourceRecords:
           - !GetAtt InfraNode1.PublicIp
 
-        - Name: !Join ['', [\*\.apps., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', ["*", .,  apps., !Ref 'PublicHostedZone', .]] 
           Type: A
           TTL: '900'
           ResourceRecords:
@@ -499,6 +499,7 @@ Resources:
                   [OSEv3:children]
                   masters
                   nodes
+                  etcd
 
                   [OSEv3:vars]
                   ansible_ssh_user=ec2-user
@@ -507,16 +508,21 @@ Resources:
                   ansible_become=true
                   deployment_type=openshift-enterprise
                   containerized=true
-                  console_port=443
-                  openshift_image_tag=v3.5.5.26-1
+                  openshift_master_api_port=443
+                  openshift_master_console_port=443
+                  openshift_image_tag=v3.5.5.26
                   openshift_pkg_version=-3.5.5.26-1
-                  openshift_master_default_subdomain='*.apps.${PublicHostedZone}'
+                  openshift_master_default_subdomain=apps.${PublicHostedZone}
+                  openshift_master_cluster_public_hostname=openshift.${PublicHostedZone}
                   openshift_router_selector='region=infra'
                   openshift_registry_selector='region=infra'
                   osm_default_node_selector='region=apps'
                   openshift_examples_modify_imagestreams=true
                   openshift_metrics_install_metrics=false
                   openshift_hosted_logging_deploy=false
+
+                  [etcd]
+                  master.${PublicHostedZone}
 
                   [masters]
                   master.${PublicHostedZone}

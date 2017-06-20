@@ -447,12 +447,12 @@ Resources:
           DeleteOnTermination: 'true'
       - DeviceName: /dev/xvdb
         Ebs:
-          VolumeSize: '5'
+          VolumeSize: '20'
           VolumeType: 'gp2'
           DeleteOnTermination: 'true'
       - DeviceName: /dev/xvdc
         Ebs:
-          VolumeSize: '20'
+          VolumeSize: '5'
           VolumeType: 'gp2'
           DeleteOnTermination: 'true'
       UserData:

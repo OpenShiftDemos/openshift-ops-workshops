@@ -13,8 +13,8 @@
       - bash-completion
       - atomic-openshift-clients
       - atomic-openshift-utils
-      - atomic-openshift-excluder
-      - atomic-openshift-docker-excluder
+      - atomic-openshift-excluder-3.5.5.26-1.git.0.276cbb4.el7
+      - atomic-openshift-docker-excluder-3.5.5.26-1.git.0.276cbb4.el7
 
   - name: install ose storage packages
     yum: name={{ item }} state=present

@@ -8,6 +8,7 @@
       - git
       - net-tools
       - bind-utils
+      - etcd
       - iptables-services
       - bridge-utils
       - bash-completion

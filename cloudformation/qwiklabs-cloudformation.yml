@@ -282,6 +282,14 @@ Resources:
         FromPort: 22
         ToPort: 22
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
       - IpProtocol: icmp
         FromPort: -1
         ToPort: -1
@@ -327,10 +335,6 @@ Resources:
         FromPort: 8053
         ToPort: 8053
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
-      - IpProtocol: tcp
-        FromPort: 443
-        ToPort: 443
-        CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
         FromPort: 8080
         ToPort: 8080
@@ -510,6 +514,8 @@ Resources:
                   containerized=true
                   openshift_master_api_port=443
                   openshift_master_console_port=443
+                  openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+                  openshift_master_htpasswd_users={'openshift': '$apr1$Mr5ZCJzb$mvaXu2UMOZ47pnQqNrLEi.'}
                   openshift_image_tag=v3.5.5.26
                   openshift_pkg_version=-3.5.5.26-1
                   openshift_master_default_subdomain=apps.${PublicHostedZone}

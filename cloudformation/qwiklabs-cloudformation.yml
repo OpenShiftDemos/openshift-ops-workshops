@@ -48,7 +48,7 @@ Mappings:
 
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-b63769a1
+      ami: ami-555d7343 
     us-east-2:
       ami: ami-0932686c
     us-west-1:
@@ -282,6 +282,14 @@ Resources:
         FromPort: 22
         ToPort: 22
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
       - IpProtocol: icmp
         FromPort: -1
         ToPort: -1
@@ -327,10 +335,6 @@ Resources:
         FromPort: 8053
         ToPort: 8053
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
-      - IpProtocol: tcp
-        FromPort: 443
-        ToPort: 443
-        CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
         FromPort: 8080
         ToPort: 8080
@@ -387,7 +391,7 @@ Resources:
           ResourceRecords:
           - !GetAtt InfraNode1.PublicIp
 
-        - Name: !Join ['', [\*\.apps., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', ["*", .,  apps., !Ref 'PublicHostedZone', .]] 
           Type: A
           TTL: '900'
           ResourceRecords:
@@ -447,12 +451,12 @@ Resources:
           DeleteOnTermination: 'true'
       - DeviceName: /dev/xvdb
         Ebs:
-          VolumeSize: '5'
+          VolumeSize: '20'
           VolumeType: 'gp2'
           DeleteOnTermination: 'true'
       - DeviceName: /dev/xvdc
         Ebs:
-          VolumeSize: '20'
+          VolumeSize: '5'
           VolumeType: 'gp2'
           DeleteOnTermination: 'true'
       UserData:
@@ -499,6 +503,7 @@ Resources:
                   [OSEv3:children]
                   masters
                   nodes
+                  etcd
 
                   [OSEv3:vars]
                   ansible_ssh_user=ec2-user
@@ -507,16 +512,23 @@ Resources:
                   ansible_become=true
                   deployment_type=openshift-enterprise
                   containerized=true
-                  console_port=443
-                  openshift_image_tag=v3.5.5.15
-                  openshift_pkg_version=-3.5.5.15
-                  openshift_master_default_subdomain='*.apps.${PublicHostedZone}'
+                  openshift_master_api_port=443
+                  openshift_master_console_port=443
+                  openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+                  openshift_master_htpasswd_users={'openshift': '$apr1$Mr5ZCJzb$mvaXu2UMOZ47pnQqNrLEi.'}
+                  openshift_image_tag=v3.5.5.26
+                  openshift_pkg_version=-3.5.5.26-1
+                  openshift_master_default_subdomain=apps.${PublicHostedZone}
+                  openshift_master_cluster_public_hostname=openshift.${PublicHostedZone}
                   openshift_router_selector='region=infra'
                   openshift_registry_selector='region=infra'
                   osm_default_node_selector='region=apps'
                   openshift_examples_modify_imagestreams=true
                   openshift_metrics_install_metrics=false
                   openshift_hosted_logging_deploy=false
+
+                  [etcd]
+                  master.${PublicHostedZone}
 
                   [masters]
                   master.${PublicHostedZone}
@@ -646,12 +658,12 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdb
           Ebs:
-            VolumeSize: '10'
+            VolumeSize: '20'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdc
           Ebs:
-            VolumeSize: '20'
+            VolumeSize: '10'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdd
@@ -678,18 +690,18 @@ Resources:
             fs_setup:
             - label: emptydir
               filesystem: xfs
-              device: /dev/xvdc
+              device: /dev/xvdb
               partition: auto
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
 
             mounts:
-            - [ /dev/xvdb, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
             
             write_files:
             - content: |
-                DEVS='/dev/xvdc'
+                DEVS='/dev/xvdb'
                 VG=docker_vol
                 DATA_SIZE=95%VG
                 EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
@@ -727,12 +739,12 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdb
           Ebs:
-            VolumeSize: '10'
+            VolumeSize: '20'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdc
           Ebs:
-            VolumeSize: '20'
+            VolumeSize: '10'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdd
@@ -766,11 +778,11 @@ Resources:
             - mkdir -p /var/lib/origin/openshift.local.volumes
 
             mounts:
-            - [ /dev/xvdb, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
             
             write_files:
             - content: |
-                DEVS='/dev/xvdc'
+                DEVS='/dev/xvdb'
                 VG=docker_vol
                 DATA_SIZE=95%VG
                 EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
@@ -808,12 +820,12 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdb
           Ebs:
-            VolumeSize: '10'
+            VolumeSize: '20'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdc
           Ebs:
-            VolumeSize: '20'
+            VolumeSize: '10'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdd
@@ -840,7 +852,7 @@ Resources:
             fs_setup:
             - label: emptydir
               filesystem: xfs
-              device: /dev/xvdb
+              device: /dev/xvdc
               partition: auto
 
             runcmd:
@@ -851,7 +863,7 @@ Resources:
             
             write_files:
             - content: |
-                DEVS='/dev/xvdc'
+                DEVS='/dev/xvdb'
                 VG=docker_vol
                 DATA_SIZE=95%VG
                 EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"

@@ -1,0 +1,12 @@
+---
+
+disable_rhui: true
+
+rhsm_repos:
+  - rhel-7-server-rpms
+  - rhel-7-server-extras-rpms
+  - rhel-7-fast-datapath-rpms
+  - rhel-7-server-ose-3.5-rpms
+  - rh-gluster-3-for-rhel-7-server-rpms
+
+...

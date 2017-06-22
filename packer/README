@@ -1,0 +1,17 @@
+# New AMI
+
+The following items must be exported before launching Packer
+
+```
+ORG_ID=8675309
+ACT_KEY=openshift_admin
+VPC_ID=vpc-432dbae5
+SUBNET_ID=subnet-823va32
+GLUSTER_POOL=2a25f92256981319015966f0783a253c
+```
+
+## Launching Packer
+
+```
+packer build ocp-cns-aio.json
+```

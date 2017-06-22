@@ -1,0 +1,16 @@
+---
+id: ocp-cns-testdrive
+name: OpenShift for Operators with Container Native Storage
+
+content:
+  url: https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/production/labguide
+
+vars:
+  ENVIRONMENT: "Amazon Web Services"
+  MASTERS: "1"
+  INFRA: "1"
+  NODES: "3"
+
+modules:
+  activate:
+  - environment

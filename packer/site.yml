@@ -1,0 +1,20 @@
+---
+
+- hosts: default
+
+  roles:
+    - { role: registered-host, tags: ['registered-host']}
+    - { role: aws-host, tags: ['aws-host']}
+    - { role: docker-host, tags: ['docker-host']}
+    - { role: registry-mirror, tags: ['registry-mirror']}
+    - { role: ansible-host, tags: ['ansible-host']}
+    - { role: ocp-installer, tags: ['ocp-installer']}
+    - { role: cns-deploy, tags: ['cns-deploy']}
+    - { role: authorized-key, tags: ['authorized-key']}
+
+  tasks:
+
+    - name: unsubscribe system
+      redhat_subscription: state=absent
+
+...

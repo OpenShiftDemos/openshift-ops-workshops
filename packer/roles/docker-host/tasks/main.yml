@@ -1,0 +1,12 @@
+---
+
+  - name: install docker
+    yum: name=docker state=present
+
+  - name: create docker storage config
+    copy: src=docker-storage-setup dest=/etc/sysconfig/
+
+  - name: start docker
+    service: name=docker state=started enabled=yes
+
+...

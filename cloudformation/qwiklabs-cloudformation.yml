@@ -364,10 +364,11 @@ Resources:
 
   HostedZone:
     Type: AWS::Route53::HostedZone
-    Name: !Ref 'PublicHostedZone'
-    VPCs:
-      -
-        VPCId: !Ref VPC
+    Properties:
+      Name: !Ref 'PublicHostedZone'
+      VPCs:
+        -
+          VPCId: !Ref VPC
 
   Route53Records:
     Type: AWS::Route53::RecordSetGroup

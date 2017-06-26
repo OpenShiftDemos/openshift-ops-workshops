@@ -363,7 +363,7 @@ Resources:
         CidrIp: 0.0.0.0/0
 
   HostedZone:
-    Type:: AWS::Route53::HostedZone
+    Type: AWS::Route53::HostedZone
     Name: !Ref 'PublicHostedZone'
     VPCs:
       -

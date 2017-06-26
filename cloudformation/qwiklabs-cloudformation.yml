@@ -1,12 +1,13 @@
 ---
 
 AWSTemplateFormatVersion: 2010-09-09
-Description: Cloudformation for OpenShift Admin Test Drive 
+Description: Cloudformation for OpenShift Admin Test Drive
 
 Parameters:
 
   PublicHostedZone:
     Type: String
+    Default: "ocp-admin.aws.openshifttestdrive.com."
     ConstraintDescription: DNS zone for Instances and OpenShift
 
   InfraInstanceType:
@@ -48,7 +49,7 @@ Mappings:
 
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-555d7343 
+      ami: ami-555d7343
     us-east-2:
       ami: ami-0932686c
     us-west-1:
@@ -391,7 +392,7 @@ Resources:
           ResourceRecords:
           - !GetAtt InfraNode1.PublicIp
 
-        - Name: !Join ['', ["*", .,  apps., !Ref 'PublicHostedZone', .]] 
+        - Name: !Join ['', ["*", .,  apps., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
@@ -579,7 +580,7 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            
+
             fqdn: infra.${PublicHostedZone}
 
             write_files:
@@ -698,7 +699,7 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-            
+
             write_files:
             - content: |
                 DEVS='/dev/xvdb'
@@ -779,7 +780,7 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-            
+
             write_files:
             - content: |
                 DEVS='/dev/xvdb'
@@ -860,7 +861,7 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-            
+
             write_files:
             - content: |
                 DEVS='/dev/xvdb'

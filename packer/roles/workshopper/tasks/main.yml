@@ -1,0 +1,6 @@
+# vim: set ft=ansible:
+---
+
+# pull workshopper image (prereq of docker role)
+# put systemctl script in /usr/lib/systemd/system
+# put config file in /etc/sysconfig/workshopper

@@ -1,0 +1,5 @@
+# vim: set ft=ansible:
+---
+
+# put systemctl script in /usr/lib/systemd/system
+# put config file in /etc/sysconfig/workshopper

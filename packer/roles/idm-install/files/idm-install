@@ -1,0 +1,117 @@
+#!/bin/bash
+# get IP address
+myip=`ip -4 -o addr show eth0 | awk '-F[/ ]+' '{ print $4 }'`
+hostname=`hostname -s`
+mydomain=`hostname -d`
+myrealm=$(echo $mydomain | tr [a-z] [A-Z])
+publicip=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
+sed -i "s/PEERDNS=\"yes\"/PEERDNS=no/g" /etc/sysconfig/network-scripts/ifcfg-eth0
+echo "oseftw2014" | passwd --stdin root
+
+echo -e "Fixing cloud.cfg...\n"
+sed -i -e '/ - set_hostname/d' -e '/ - update_hostname/d' \
+        -e '/disable_root/d' -e '/ssh_pwauth/d' /etc/cloud/cloud.cfg
+
+echo -e "Fixing SSHD...\n"
+sed -i -e '/PasswordAuthentication no/d' /etc/ssh/sshd_config
+
+echo -e "Miscellaneous software...\n"
+cd; git init; git remote add origin https://github.com/thoraxe/homedir.git; git pull origin master
+
+echo -e "Disable NetworkManager and chronyd, enable NTP...\n"
+systemctl stop NetworkManager
+systemctl mask NetworkManager
+systemctl stop chronyd
+systemctl disable chronyd
+systemctl start ntpd
+systemctl enable ntpd
+
+echo -e "Iptables and firewalld configuration...\n"
+systemctl stop iptables
+systemctl mask iptables
+systemctl stop ip6tables
+systemctl mask ip6tables
+firewall-cmd --permanent --direct --add-chain ipv4 filter ipa-server-chain 
+firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT 0 -m conntrack --ctstate NEW -j ipa-server-chain 
+firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 80 --jump ACCEPT 
+firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 80 --jump ACCEPT 
+firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 443 --jump ACCEPT 
+firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 389 --jump ACCEPT 
+firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 636 --jump ACCEPT 
+firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 88 --jump ACCEPT 
+firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 464 --jump ACCEPT 
+firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto udp --destination-port 88 --jump ACCEPT 
+firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto udp --destination-port 464 --jump ACCEPT 
+firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0 --proto tcp --destination-port 53 --jump ACCEPT 
+firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0 --proto udp --destination-port 53 --jump ACCEPT 
+firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0 --proto udp --destination-port 123 --jump ACCEPT 
+firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0 --proto tcp --destination-port 7389 --jump ACCEPT 
+firewall-cmd --reload 
+# may want to skip this next line
+# firewall-cmd --permanent --direct --get-all-rules
+
+echo -e "Installing IDM software...\n"
+yum -y install ipa-server bind bind-dyndb-ldap
+# cd /etc/puppet/modules
+# git clone https://github.com/purpleidea/puppet-ipa.git ipa
+ipa-server-install --setup-dns --domain="$mydomain" --hostname="$myhostname" \
+--admin-password=ldapadmin --ds-password=ldapadmin --ip-address="$myip" \
+--realm="$myrealm" --no-forwarders --no-ntp -U
+
+echo -e "Fixing IDM's DNS entries...\n"
+echo -e ldapadmin | kinit admin
+ipa dnsrecord-mod "$mydomain" idm --a-rec="$publicip"
+ipa dnsrecord-mod "$mydomain" ipa-ca --a-rec="$publicip"
+
+echo -e "Creating DNS zones...\n"
+for i in {0..20}
+  do ipa dnszone-add --admin-email="root@$myhostname" --dynamic-update \
+    --name-server="$myhostname" --ip-address="$publicip" "user$i.$mydomain"
+done
+
+echo -e "Creating user groups...\n"
+ipa group-add ose-user --desc="Users with OpenShift access"
+ipa group-add ose-normal-dev --desc="Normal OpenShift users"
+ipa group-add ose-fancy-dev --desc="Fancy OpenShift users"
+ipa group-add ose-teamed-app --desc="Teamed app users"
+
+echo -e "Creating users...\n"
+for user in normaluser1 fancyuser1 fancyuser2 teamuser1 teamuser2; 
+do
+  kdestroy
+  echo -e ldapadmin | kinit admin
+  userpw=$(ipa user-add --first=OpenShift --last=User \
+  --displayname="OpenShift User" --random $user | grep \
+  -i password | awk '{print $3}')
+  newpw="openshift"
+  # add user to OSE group
+  ipa group-add-member ose-user --users=$user
+  kdestroy
+  expect -c '
+    spawn kinit '"$user"'
+    expect {
+      -re ".*COM:" {
+        send "'"$userpw"'\r"
+        exp_continue
+      }
+      -re ".*password:" {
+        send "'"$newpw"'\r"
+        exp_continue
+      }
+      -re ".*again:" {
+        send "'"$newpw"'\r"
+      }
+    }
+  expect eof '
+done
+
+kdestroy
+echo -e ldapadmin | kinit admin
+echo -e "Putting users in their appropriate group(s)...\n"
+ipa group-add-member ose-normal-dev --users normaluser1
+ipa group-add-member ose-normal-dev --users teamuser1
+ipa group-add-member ose-normal-dev --users teamuser2
+ipa group-add-member ose-fancy-dev --users fancyuser1
+ipa group-add-member ose-fancy-dev --users fancyuser2
+ipa group-add-member ose-teamed-app --users teamuser1
+ipa group-add-member ose-teamed-app --users teamuser2

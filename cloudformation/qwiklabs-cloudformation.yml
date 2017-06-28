@@ -40,6 +40,13 @@ Parameters:
       - t2.small
     ConstraintDescription: Must be a valid EC2 instance type.
 
+  GuideInstanceType:
+    Type: String
+    Default: t2.small
+    AllowedValues:
+      - t2.small
+    ConstraintDescription: Must be a valid EC2 instance type.
+
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Default: generic-qwiklab 
@@ -418,6 +425,12 @@ Resources:
           ResourceRecords:
           - !GetAtt IdmNode1.PublicIp
 
+        - Name: !Join ['', [guide., !Ref QwiklabId, ., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt GuideNode.PublicIp
+
         - Name: !Join ['', [node01., !Ref QwiklabId, ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
@@ -549,7 +562,7 @@ Resources:
                   master.${QwiklabId}.${PublicHostedZone}
 
                   [nodes]
-                  master.${PublicHostedZone}
+                  master.${QwiklabId}.${PublicHostedZone}
                   infra.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
                   node01.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
@@ -647,6 +660,73 @@ Resources:
             #cloud-config
 
             fqdn: idm.${QwiklabId}.${PublicHostedZone}
+
+            runcmd:
+            - /usr/local/bin/idm-install 
+
+            power_state:
+	     mode: poweroff
+	     timeout: 30
+             condition: true
+
+  GuideNode:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegion2AMI
+        - Ref: AWS::Region
+        - ami
+      InstanceType:
+        Ref: GuideInstanceType
+      SubnetId:
+        Ref: PublicSubnet1
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds:
+        - !GetAtt NodeSecurityGroup.GroupId
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdb
+          Ebs:
+            VolumeSize: '20'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+      - Key: Name
+        Value: !Join [ ., [node01, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #cloud-config
+            cloud_config_modules:
+            - disk_setup
+            - mounts
+
+            fqdn: guide.${QwiklabId}.${PublicHostedZone}
+
+            write_files:
+            - content: |
+                DEVS='/dev/xvdb'
+                VG=docker_vol
+                DATA_SIZE=95%VG
+                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
+              path: /etc/sysconfig/docker-storage-setup
+              owner: root:root
+
+            users:
+            - default
+
+            system_info:
+              default_user:
+                name: ec2-user
 
 
   WorkerNode1:

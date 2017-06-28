@@ -9,5 +9,5 @@
       - tmux
       - openssh-clients
       - expect 
-      - ntpd
+      - ntp
 ...

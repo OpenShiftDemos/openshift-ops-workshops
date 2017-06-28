@@ -3,8 +3,10 @@
 myip=`ip -4 -o addr show eth0 | awk '-F[/ ]+' '{ print $4 }'`
 hostname=`hostname -s`
 mydomain=`hostname -d`
+longname=`hostname`
 myrealm=$(echo $mydomain | tr [a-z] [A-Z])
 publicip=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
+echo "$myip  $longname" >> /etc/hosts
 sed -i "s/PEERDNS=\"yes\"/PEERDNS=no/g" /etc/sysconfig/network-scripts/ifcfg-eth0
 echo "oseftw2014" | passwd --stdin root
 
@@ -31,9 +33,11 @@ systemctl stop iptables
 systemctl mask iptables
 systemctl stop ip6tables
 systemctl mask ip6tables
+systemctl start firewalld
+systemctl disabled iptables
+systemctl enable firewalld
 firewall-cmd --permanent --direct --add-chain ipv4 filter ipa-server-chain 
 firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT 0 -m conntrack --ctstate NEW -j ipa-server-chain 
-firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 80 --jump ACCEPT 
 firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 80 --jump ACCEPT 
 firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 443 --jump ACCEPT 
 firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 389 --jump ACCEPT 
@@ -50,10 +54,6 @@ firewall-cmd --reload
 # may want to skip this next line
 # firewall-cmd --permanent --direct --get-all-rules
 
-echo -e "Installing IDM software...\n"
-yum -y install ipa-server bind bind-dyndb-ldap
-# cd /etc/puppet/modules
-# git clone https://github.com/purpleidea/puppet-ipa.git ipa
 ipa-server-install --setup-dns --domain="$mydomain" --hostname="$myhostname" \
 --admin-password=ldapadmin --ds-password=ldapadmin --ip-address="$myip" \
 --realm="$myrealm" --no-forwarders --no-ntp -U

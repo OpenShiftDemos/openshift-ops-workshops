@@ -664,11 +664,6 @@ Resources:
             runcmd:
             - /usr/local/bin/idm-install 
 
-            power_state:
-	     mode: poweroff
-	     timeout: 30
-             condition: true
-
   GuideNode:
     Type: AWS::EC2::Instance
     Properties:

@@ -11,6 +11,7 @@
     - { role: ocp-installer, tags: ['ocp-installer']}
     - { role: cns-deploy, tags: ['cns-deploy']}
     - { role: authorized-key, tags: ['authorized-key']}
+    - { role: workshopper, tags: ['workshopper']}
 
   tasks:
 

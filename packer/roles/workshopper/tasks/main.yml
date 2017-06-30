@@ -11,7 +11,7 @@
     copy: src=workshopper.service dest=/etc/systemd/system/multi-user.target.wants/
 
   - name: copy the config file containing environment variables and URLs 
-    copy: src=workshopper dest=/etc/sysconfig/workshopper/
+    copy: src=workshopper dest=/etc/sysconfig/
 
   - name: put the systemd-docker binary file at /usr/bin
     copy: src=systemd-docker dest=/usr/bin/

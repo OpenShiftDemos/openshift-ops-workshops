@@ -63,12 +63,6 @@ echo -e ldapadmin | kinit admin
 ipa dnsrecord-mod "$mydomain" idm --a-rec="$publicip"
 ipa dnsrecord-mod "$mydomain" ipa-ca --a-rec="$publicip"
 
-echo -e "Creating DNS zones...\n"
-for i in {0..20}
-  do ipa dnszone-add --admin-email="root@$myhostname" --dynamic-update \
-    --name-server="$myhostname" --ip-address="$publicip" "user$i.$mydomain"
-done
-
 echo -e "Creating user groups...\n"
 ipa group-add ose-user --desc="Users with OpenShift access"
 ipa group-add ose-normal-dev --desc="Normal OpenShift users"

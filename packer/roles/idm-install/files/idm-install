@@ -34,26 +34,25 @@ systemctl stop iptables
 systemctl mask iptables
 systemctl stop ip6tables
 systemctl mask ip6tables
+firewall-offline-cmd --direct --add-chain ipv4 filter ipa-server-chain 
+firewall-offline-cmd --direct --add-rule ipv4 filter INPUT 0 -m conntrack --ctstate NEW -j ipa-server-chain 
+firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 80 --jump ACCEPT 
+firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 443 --jump ACCEPT 
+firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 389 --jump ACCEPT 
+firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 636 --jump ACCEPT 
+firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 88 --jump ACCEPT 
+firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 464 --jump ACCEPT 
+firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto udp --destination-port 88 --jump ACCEPT 
+firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto udp --destination-port 464 --jump ACCEPT 
+firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0 --proto tcp --destination-port 53 --jump ACCEPT 
+firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0 --proto udp --destination-port 53 --jump ACCEPT 
+firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0 --proto udp --destination-port 123 --jump ACCEPT 
+firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0 --proto tcp --destination-port 7389 --jump ACCEPT 
 systemctl start firewalld
 systemctl disabled iptables
 systemctl enable firewalld
-firewall-cmd --permanent --direct --add-chain ipv4 filter ipa-server-chain 
-firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT 0 -m conntrack --ctstate NEW -j ipa-server-chain 
-firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 80 --jump ACCEPT 
-firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 443 --jump ACCEPT 
-firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 389 --jump ACCEPT 
-firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 636 --jump ACCEPT 
-firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 88 --jump ACCEPT 
-firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 464 --jump ACCEPT 
-firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto udp --destination-port 88 --jump ACCEPT 
-firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0  --proto udp --destination-port 464 --jump ACCEPT 
-firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0 --proto tcp --destination-port 53 --jump ACCEPT 
-firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0 --proto udp --destination-port 53 --jump ACCEPT 
-firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0 --proto udp --destination-port 123 --jump ACCEPT 
-firewall-cmd --permanent --direct --add-rule ipv4 filter ipa-server-chain 0 --proto tcp --destination-port 7389 --jump ACCEPT 
-firewall-cmd --reload 
 # may want to skip this next line
-# firewall-cmd --permanent --direct --get-all-rules
+# firewall-offline-cmd --direct --get-all-rules
 
 ipa-server-install --setup-dns --domain="$mydomain" --hostname="$myhostname" \
 --admin-password=ldapadmin --ds-password=ldapadmin --ip-address="$myip" \

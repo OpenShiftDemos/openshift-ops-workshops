@@ -764,10 +764,11 @@ Resources:
                 name: ec2-user
 
             runcmd:
-            - systemctl start firewalld
-            - systemctl start workershopper
-            - firewall-cmd --zone=public --add-service=http --permanent
-            - firewall-cmd --zone=public --add-service=http
+            - [ systemctl, start, firewalld ]
+            - [ systemctl, daemon-reload ]
+            - [ systemctl, start, workershopper ]
+            - [ firewall-cmd, --zone=public, --add-service=http, --permanent ]
+            - [ firewall-cmd, --zone=public, --add-service=http ]
 
 
   WorkerNode1:

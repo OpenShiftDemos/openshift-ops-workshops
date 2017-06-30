@@ -293,6 +293,38 @@ Resources:
         ToPort: 49664
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
+        FromPort: 389 
+        ToPort: 389
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 88 
+        ToPort: 88
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp 
+        FromPort: 88 
+        ToPort: 88
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp 
+        FromPort: 123 
+        ToPort: 123
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp 
+        FromPort: 464 
+        ToPort: 464
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp 
+        FromPort: 464 
+        ToPort: 464
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp 
+        FromPort: 749
+        ToPort: 749
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 636 
+        ToPort: 636
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
@@ -344,6 +376,14 @@ Resources:
       - IpProtocol: tcp
         FromPort: 8053
         ToPort: 8053
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 53
+        ToPort: 53
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 53
+        ToPort: 53
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: udp
         FromPort: 8053

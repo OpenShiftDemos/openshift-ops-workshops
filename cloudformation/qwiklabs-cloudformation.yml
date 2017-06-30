@@ -763,6 +763,12 @@ Resources:
               default_user:
                 name: ec2-user
 
+            runcmd:
+            - systemctl start firewalld
+            - systemctl start workershopper
+            - firewall-cmd --zone=public --add-service=http --permanent
+            - firewall-cmd --zone=public --add-service=http
+
 
   WorkerNode1:
     Type: AWS::EC2::Instance

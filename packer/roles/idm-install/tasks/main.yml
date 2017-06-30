@@ -1,0 +1,19 @@
+---
+  - name: create docker storage config
+    copy: src=idm-install dest=/usr/local/bin/ mode=770
+
+  - name: install idm base packages
+    yum: name={{ item }} state=present
+    with_items:
+      - vim-enhanced
+      - tmux
+      - openssh-clients
+      - expect 
+      - ntp
+      - firewalld
+      - ipa-server-dns
+      - ipa-server
+      - bind 
+      - bind-dyndb-ldap
+      - haveged
+...

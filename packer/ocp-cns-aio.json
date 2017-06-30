@@ -21,7 +21,7 @@
     "vpc_id": "{{user `vpc_id`}}",
     "subnet_id": "{{user `subnet_id`}}",
     "source_ami": "{{user `aws_ami`}}",
-    "instance_type": "t2.small",
+    "instance_type": "t2.medium",
     "launch_block_device_mappings": [
     {
       "device_name": "/dev/xvdb",

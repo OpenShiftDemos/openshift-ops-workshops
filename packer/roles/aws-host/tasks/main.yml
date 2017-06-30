@@ -9,14 +9,4 @@
       - python-pip
       - python-setuptools
 
-  - name: disable hostname control in cloud-init
-    lineinfile:
-      regexp: '^ - {{ item }}'
-      line: "{{ item }}"
-      dest: /etc/cloud/cloud.cfg
-      state: absent
-    with_items:
-      - set_hostname
-      - update_hostname
-
 ...

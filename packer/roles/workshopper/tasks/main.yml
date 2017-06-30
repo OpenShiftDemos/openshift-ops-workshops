@@ -8,16 +8,19 @@
 
 
   - name: copy the systemctl script at the required location on the host
-    copy: src=workshopper.service dest=/etc/systemd/system/multi-user.target.wants/
+    copy:
+      src: workshopper.service 
+      dest: /etc/systemd/system/multi-user.target.wants/
 
   - name: copy the config file containing environment variables and URLs 
-<<<<<<< HEAD
-    copy: src=workshopper dest=/etc/sysconfig/
-=======
-    copy: src=workshopper dest=/etc/sysconfig/workshopper/
->>>>>>> 139a74a823cebcc4dabf03a251d229b87efdff99
+    copy: 
+      src: workshopper 
+      dest: /etc/sysconfig/
+
 
   - name: put the systemd-docker binary file at /usr/bin
-    copy: src=systemd-docker dest=/usr/bin/
+    copy: 
+      src: systemd-docker 
+      dest: /usr/bin/
 
 ...

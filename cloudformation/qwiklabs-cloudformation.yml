@@ -62,7 +62,7 @@ Mappings:
 
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-555d7343
+      ami: ami-b97549af 
     us-east-2:
       ami: ami-0932686c
     us-west-1:

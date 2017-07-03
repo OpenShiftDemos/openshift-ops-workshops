@@ -11,11 +11,15 @@ You will be installing OpenShift Container Platform v3.5 by using Ansible playbo
 
 
 The nodes are named as -
+
 1) Master Node - Master1
+
 2) Infrastructure Node - InfraNode1
+
 3) Application Nodes - WorkerNode1, WorkerNode2, WorkerNode3
 
 You will be using the Master node to install OpenShift and verify the installation. 
+Qwiklabs will be used to start the lab and the instances can be used to log in via AWS platform.
 
 
 

@@ -42,14 +42,14 @@ Parameters:
 
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
-    Default: generic-qwiklab 
+    Default: generic-qwiklab
     ConstraintDescription: Must be the name of an existing EC2 key pair.
 
   QwiklabId:
     Type: String
     Default: lab-8675309
     ConstraintDescription: qwikLAB lab identifier
-   
+
 
 Mappings:
 
@@ -406,7 +406,7 @@ Resources:
           ResourceRecords:
           - !GetAtt InfraNode1.PublicIp
 
-        - Name: !Join ['', ["*", .,  apps., !Ref 'QwiklabId', ., !Ref 'PublicHostedZone', .]] 
+        - Name: !Join ['', ["*", .,  apps., !Ref 'QwiklabId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
@@ -594,7 +594,7 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            
+
             fqdn: infra.${QwiklabId}.${PublicHostedZone}
 
             write_files:

@@ -5,3 +5,17 @@ You will be interacting with an OpenShift environment that is running on {{ ENVI
 * {{ MASTERS }} master nodes
 * {{ INFRA }} infrastructure nodes
 * {{ NODES }} "application" nodes
+
+You will be installing OpenShift Container Platform v3.5 by using Ansible playbooks. The inventory file has alreayd been configured and you can view the contents of the file in the first lab module. It will give you information on how the hosts are configured and other information like cluster variables and platform variables.
+
+
+
+The nodes are named as -
+1) Master Node - Master1
+2) Infrastructure Node - InfraNode1
+3) Application Nodes - WorkerNode1, WorkerNode2, WorkerNode3
+
+You will be using the Master node to install OpenShift and verify the installation. 
+
+
+

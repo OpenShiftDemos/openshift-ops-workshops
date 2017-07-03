@@ -1,0 +1,66 @@
+The method of installation that you shall be using for this session would be the 'Advanced Installation' method which uses Ansible playbooks for automating the installation of OpenShift Container Platform cluster (version 3.5). 
+The host preparation and prerequisites needed for the installation have already been done.
+
+
+*Step 1. Examining the provided Ansible inventory file -*
+Let us start by examining the Ansible inventory files which contains the host information.
+1) Check the /etc/ansible/hosts to view the configurations done for clouster variables and host variables:
+
+ # cat /etc/ansible/hosts
+
+
+The variables are defined on separate,single lines within the '[OSEv3:vars]' section.
+
+Ensure the deployment_type parameter in your inventory file’s [OSEv3:vars] section is set to openshift-enterprise to install the OpenShift Container Platform variant:
+
+[literal]
+[OSEv3:vars]
+deployment_type=openshift-enterprise
+
+If you want a detailed list of all the cluster variables, you can refer the following page - 
+
+*https://docs.openshift.com/container-platform/3.5/install_config/install/advanced_install.html#configuring-cluster-variables*
+
+2) To configure host variables, indicate the defined variables under [master] or [nodes] section.
+
+3) You can assign labels to node hosts during the Ansible installation.
+To assign labels to a node host during an Ansible install, use the openshift_node_labels variable with the desired labels added to the desired node host entry in the [nodes] section. 
+In the following example, labels are set for a region called primary and a zone called east:
+
+[literal]
+[nodes]
+node1.example.com openshift_node_labels="{'region': 'primary', 'zone': 'east'}"
+
+
+*Step 2. Running the Advanced Installation -*
+ # ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+
+The above command runs the ansible playbook to start the advanced installation.
+
+
+*Step 3. Verifying the Installation -*
+
+1) Run as 'root' user on the master node :
+ # oc get nodes
+
+Using the above command verify that the master is started and the nodes are in Ready status.
+The result should be similar to -
+
+[literal]
+NAME                        STATUS                     AGE
+master.example.com          Ready,SchedulingDisabled   165d
+node1.example.com           Ready                      165d
+node2.example.com           Ready                      165d
+
+2) Verify that the web console is installed correctly :
+Use the master host name and web console port number to access the web console using a web browser.For example, master host with name 'master.openshift.com' and which is using the default port '8443', should be reachable at https://master.openshift.com:8443/console .
+
+3) Now that the installation has been verified, run the following command on each master and node host to add the atomic-openshift packages back to the list of yum excludes on the host:
+
+ # atomic-openshift-excluder exclude
+
+
+
+
+
+

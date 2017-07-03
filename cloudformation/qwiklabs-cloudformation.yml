@@ -49,20 +49,20 @@ Parameters:
 
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
-    Default: generic-qwiklab 
+    Default: generic-qwiklab
     ConstraintDescription: Must be the name of an existing EC2 key pair.
 
   QwiklabId:
     Type: String
     Default: lab-8675309
     ConstraintDescription: qwikLAB lab identifier
-   
+
 
 Mappings:
 
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-b97549af 
+      ami: ami-b97549af
     us-east-2:
       ami: ami-0932686c
     us-west-1:
@@ -293,35 +293,35 @@ Resources:
         ToPort: 49664
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
-        FromPort: 389 
+        FromPort: 389
         ToPort: 389
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
-        FromPort: 88 
+        FromPort: 88
         ToPort: 88
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
-      - IpProtocol: udp 
-        FromPort: 88 
+      - IpProtocol: udp
+        FromPort: 88
         ToPort: 88
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
-      - IpProtocol: udp 
-        FromPort: 123 
+      - IpProtocol: udp
+        FromPort: 123
         ToPort: 123
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
-      - IpProtocol: udp 
-        FromPort: 464 
+      - IpProtocol: udp
+        FromPort: 464
         ToPort: 464
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
-      - IpProtocol: tcp 
-        FromPort: 464 
+      - IpProtocol: tcp
+        FromPort: 464
         ToPort: 464
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
-      - IpProtocol: tcp 
+      - IpProtocol: tcp
         FromPort: 749
         ToPort: 749
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
-        FromPort: 636 
+        FromPort: 636
         ToPort: 636
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
@@ -422,6 +422,7 @@ Resources:
       VPCs:
         -
           VPCId: !Ref VPC
+          VPCRegion: !Ref AWS::Region
 
   Route53Records:
     Type: AWS::Route53::RecordSetGroup
@@ -453,7 +454,7 @@ Resources:
           ResourceRecords:
           - !GetAtt InfraNode1.PublicIp
 
-        - Name: !Join ['', ["*", .,  apps., !Ref 'QwiklabId', ., !Ref 'PublicHostedZone', .]] 
+        - Name: !Join ['', ["*", .,  apps., !Ref 'QwiklabId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
@@ -647,7 +648,7 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            
+
             fqdn: infra.${QwiklabId}.${PublicHostedZone}
 
             write_files:
@@ -702,7 +703,7 @@ Resources:
             fqdn: idm.${QwiklabId}.${PublicHostedZone}
 
             runcmd:
-            - /usr/local/bin/idm-install 
+            - /usr/local/bin/idm-install
 
   GuideNode:
     Type: AWS::EC2::Instance

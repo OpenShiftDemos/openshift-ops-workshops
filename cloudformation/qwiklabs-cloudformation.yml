@@ -422,6 +422,7 @@ Resources:
       VPCs:
         -
           VPCId: !Ref VPC
+          VPCRegion: !Ref AWS::Region
 
   Route53Records:
     Type: AWS::Route53::RecordSetGroup

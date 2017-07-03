@@ -3,6 +3,8 @@ The host preparation and prerequisites needed for the installation have already 
 
 
 *Step 1. Examining the provided Ansible inventory file -*
+
+
 Let us start by examining the Ansible inventory files which contains the host information.
 1) Check the /etc/ansible/hosts to view the configurations done for clouster variables and host variables:
 
@@ -41,6 +43,9 @@ The above command runs the ansible playbook to start the advanced installation.
 *Step 3. Verifying the Installation -*
 
 1) Run as 'root' user on the master node :
+
+
+
  # oc get nodes
 
 Using the above command verify that the master is started and the nodes are in Ready status.

@@ -7,7 +7,7 @@ Parameters:
 
   PublicHostedZone:
     Type: String
-    Default: "ocp-admin.aws.openshifttestdrive.com."
+    Default: "ocp-admin.aws.openshifttestdrive.com"
     ConstraintDescription: DNS zone for Instances and OpenShift
 
   InfraInstanceType:
@@ -40,16 +40,29 @@ Parameters:
       - t2.small
     ConstraintDescription: Must be a valid EC2 instance type.
 
+  GuideInstanceType:
+    Type: String
+    Default: t2.small
+    AllowedValues:
+      - t2.small
+    ConstraintDescription: Must be a valid EC2 instance type.
+
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
-    Default: OSE-key
+    Default: generic-qwiklab
     ConstraintDescription: Must be the name of an existing EC2 key pair.
+
+  QwiklabId:
+    Type: String
+    Default: lab-8675309
+    ConstraintDescription: qwikLAB lab identifier
+
 
 Mappings:
 
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-555d7343
+      ami: ami-b97549af
     us-east-2:
       ami: ami-0932686c
     us-west-1:
@@ -280,6 +293,38 @@ Resources:
         ToPort: 49664
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
+        FromPort: 389
+        ToPort: 389
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 88
+        ToPort: 88
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 88
+        ToPort: 88
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 123
+        ToPort: 123
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 464
+        ToPort: 464
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 464
+        ToPort: 464
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 749
+        ToPort: 749
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 636
+        ToPort: 636
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
@@ -332,6 +377,14 @@ Resources:
         FromPort: 8053
         ToPort: 8053
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 53
+        ToPort: 53
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 53
+        ToPort: 53
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: udp
         FromPort: 8053
         ToPort: 8053
@@ -362,6 +415,14 @@ Resources:
         ToPort: 65535
         CidrIp: 0.0.0.0/0
 
+  HostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Ref 'PublicHostedZone'
+      VPCs:
+        -
+          VPCId: !Ref VPC
+
   Route53Records:
     Type: AWS::Route53::RecordSetGroup
     DependsOn:
@@ -374,49 +435,55 @@ Resources:
     Properties:
       HostedZoneName: !Join ['', [!Ref 'PublicHostedZone', .]]
       RecordSets:
-        - Name: !Join ['', [master., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [master., !Ref 'QwiklabId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt Master1.PublicIp
 
-        - Name: !Join ['', [openshift., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [openshift., !Ref 'QwiklabId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt Master1.PublicIp
 
-        - Name: !Join ['', [infra., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [infra., !Ref 'QwiklabId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt InfraNode1.PublicIp
 
-        - Name: !Join ['', ["*", .,  apps., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', ["*", .,  apps., !Ref 'QwiklabId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt InfraNode1.PublicIp
 
-        - Name: !Join ['', [idm., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [idm., !Ref QwiklabId, ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt IdmNode1.PublicIp
 
-        - Name: !Join ['', [node01., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [guide., !Ref QwiklabId, ., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt GuideNode.PublicIp
+
+        - Name: !Join ['', [node01., !Ref QwiklabId, ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt WorkerNode1.PublicIp
 
-        - Name: !Join ['', [node02., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [node02., !Ref QwiklabId, ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt WorkerNode2.PublicIp
 
-        - Name: !Join ['', [node03., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [node03., !Ref QwiklabId, ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
@@ -443,7 +510,7 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [master, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [master, !Ref 'QwiklabId', !Ref 'PublicHostedZone' ] ]
       BlockDeviceMappings:
       - DeviceName: /dev/sda1
         Ebs:
@@ -477,7 +544,7 @@ Resources:
             runcmd:
             - mkdir -p /var/lib/etcd
 
-            fqdn: master.${PublicHostedZone}
+            fqdn: master.${QwiklabId}.${PublicHostedZone}
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
@@ -519,8 +586,8 @@ Resources:
                   openshift_master_htpasswd_users={'openshift': '$apr1$Mr5ZCJzb$mvaXu2UMOZ47pnQqNrLEi.'}
                   openshift_image_tag=v3.5.5.26
                   openshift_pkg_version=-3.5.5.26-1
-                  openshift_master_default_subdomain=apps.${PublicHostedZone}
-                  openshift_master_cluster_public_hostname=openshift.${PublicHostedZone}
+                  openshift_master_default_subdomain=apps.${QwiklabId}.${PublicHostedZone}
+                  openshift_master_cluster_public_hostname=openshift.${QwiklabId}.${PublicHostedZone}
                   openshift_router_selector='region=infra'
                   openshift_registry_selector='region=infra'
                   osm_default_node_selector='region=apps'
@@ -529,17 +596,17 @@ Resources:
                   openshift_hosted_logging_deploy=false
 
                   [etcd]
-                  master.${PublicHostedZone}
+                  master.${QwiklabId}.${PublicHostedZone}
 
                   [masters]
-                  master.${PublicHostedZone}
+                  master.${QwiklabId}.${PublicHostedZone}
 
                   [nodes]
-                  master.${PublicHostedZone}
-                  infra.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
-                  node01.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node02.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node03.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  master.${QwiklabId}.${PublicHostedZone}
+                  infra.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
+                  node01.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  node03.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                 path: /etc/ansible/hosts
 
 
@@ -575,13 +642,13 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [infra, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [infra, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
           !Sub |
             #cloud-config
 
-            fqdn: infra.${PublicHostedZone}
+            fqdn: infra.${QwiklabId}.${PublicHostedZone}
 
             write_files:
             - content: |
@@ -626,13 +693,82 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [idm, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [idm, !Ref 'QwiklabId', !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
           !Sub |
             #cloud-config
 
-            fqdn: idm.${PublicHostedZone}
+            fqdn: idm.${QwiklabId}.${PublicHostedZone}
+
+            runcmd:
+            - /usr/local/bin/idm-install
+
+  GuideNode:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegion2AMI
+        - Ref: AWS::Region
+        - ami
+      InstanceType:
+        Ref: GuideInstanceType
+      SubnetId:
+        Ref: PublicSubnet1
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds:
+        - !GetAtt NodeSecurityGroup.GroupId
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdb
+          Ebs:
+            VolumeSize: '20'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+      - Key: Name
+        Value: !Join [ ., [node01, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #cloud-config
+            cloud_config_modules:
+            - disk_setup
+            - mounts
+
+            fqdn: guide.${QwiklabId}.${PublicHostedZone}
+
+            write_files:
+            - content: |
+                DEVS='/dev/xvdb'
+                VG=docker_vol
+                DATA_SIZE=95%VG
+                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
+              path: /etc/sysconfig/docker-storage-setup
+              owner: root:root
+
+            users:
+            - default
+
+            system_info:
+              default_user:
+                name: ec2-user
+
+            runcmd:
+            - [ systemctl, start, firewalld ]
+            - [ systemctl, daemon-reload ]
+            - [ systemctl, start, workershopper ]
+            - [ firewall-cmd, --zone=public, --add-service=http, --permanent ]
+            - [ firewall-cmd, --zone=public, --add-service=http ]
 
 
   WorkerNode1:
@@ -677,7 +813,7 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [node01, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [node01, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
           !Sub |
@@ -686,7 +822,7 @@ Resources:
             - disk_setup
             - mounts
 
-            fqdn: node01.${PublicHostedZone}
+            fqdn: node01.${QwiklabId}.${PublicHostedZone}
 
             fs_setup:
             - label: emptydir
@@ -758,7 +894,7 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [node02, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [node02, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
           !Sub |
@@ -767,7 +903,7 @@ Resources:
             - disk_setup
             - mounts
 
-            fqdn: node02.${PublicHostedZone}
+            fqdn: node02.${QwiklabId}.${PublicHostedZone}
 
             fs_setup:
             - label: emptydir
@@ -839,7 +975,7 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [node03, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [node03, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
           !Sub |
@@ -848,7 +984,7 @@ Resources:
             - disk_setup
             - mounts
 
-            fqdn: node03.${PublicHostedZone}
+            fqdn: node03.${QwiklabId}.${PublicHostedZone}
 
             fs_setup:
             - label: emptydir

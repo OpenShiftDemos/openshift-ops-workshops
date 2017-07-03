@@ -1,0 +1,2 @@
+WORKSHOPS_URLS="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/production/labguide/_cns_testdrive.yaml" 
+CONTENT_URL_PREFIX="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/production/labguide/"

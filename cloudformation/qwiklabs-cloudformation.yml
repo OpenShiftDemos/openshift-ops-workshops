@@ -1,3 +1,4 @@
+# vim: set ft=yaml:
 ---
 
 AWSTemplateFormatVersion: 2010-09-09
@@ -1027,3 +1028,27 @@ Outputs:
    SSHLoginUser:
       Description: "User name on the Master node to connect via SSH and PEM file"
       Value: "ec2-user"
+
+   MasterPublicIP:
+      Description: "The public IP address of the master"
+      Value: !GetAtt Master1.PublicIp
+
+   InfraPublicIP:
+      Description: "The public IP address of the infra node"
+      Value: !GetAtt InfraNode1.PublicIp
+
+   Worker1PublicIP:
+      Description: "The public IP address of worker node 1"
+      Value: !GetAtt WorkerNode1.PublicIp
+
+   Worker2PublicIP:
+      Description: "The public IP address of worker node 2"
+      Value: !GetAtt WorkerNode2.PublicIp
+
+   Worker3PublicIP:
+      Description: "The public IP address of worker node 3"
+      Value: !GetAtt WorkerNode3.PublicIp
+
+   GuidePublicIP:
+      Description: "The public IP address of the lab guide"
+      Value: !GetAtt GuideNode.PublicIp

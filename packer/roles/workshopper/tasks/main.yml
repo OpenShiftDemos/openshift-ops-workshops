@@ -1,11 +1,9 @@
----
-  
 # vim: set ft=ansible:
+---
 
   - name: Pulling the workshopper docker image
     docker_image:
       name: osevg/workshopper:0.1
-
 
   - name: copy the systemctl script at the required location on the host
     copy:
@@ -16,7 +14,6 @@
     copy: 
       src: workshopper 
       dest: /etc/sysconfig/
-
 
   - name: put the systemd-docker binary file at /usr/bin
     copy: 

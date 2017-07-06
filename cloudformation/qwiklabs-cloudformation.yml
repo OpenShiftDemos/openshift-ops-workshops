@@ -72,7 +72,7 @@ Mappings:
     eu-west-1:
       ami: ami-02ace471
     eu-central-1:
-      ami: ami-e4c63e8b
+      ami: ami-2e72d241
     ap-northeast-1:
       ami: ami-5de0433c
     ap-northeast-2:

@@ -10,3 +10,6 @@ modules:
       ETHERPAD_ENABLED:
       NUM_USERS:
       ETHERPAD_URL_PREFIX:
+   
+  installation:
+    name: OCP Installation and Verification 

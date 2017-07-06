@@ -1027,3 +1027,11 @@ Outputs:
    SSHLoginUser:
       Description: "User name on the Master node to connect via SSH and PEM file"
       Value: "ec2-user"
+
+   MasterIPAddress:
+     Description: "Public IP of the OpenShift Master node"
+     Value: !GetAtt Master1.PublicIp
+
+   OpenShiftURL:
+     Description: "Public IP of the OpenShift Master node"
+     Value: !Sub "https://${Master1.PublicIp}.nip.io:8443/"

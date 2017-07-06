@@ -12,4 +12,4 @@ modules:
       ETHERPAD_URL_PREFIX:
    
   installation:
-    name: OCP Installation and Verification 
+    name: Installation and Verification

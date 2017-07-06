@@ -1,3 +1,5 @@
+## Installation and Verification
+
 The method of installation that you shall be using for this session would be the 'Advanced Installation' method which uses Ansible playbooks for automating the installation of OpenShift Container Platform cluster (version 3.5). 
 The host preparation and prerequisites needed for the installation have already been done.
 

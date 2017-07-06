@@ -15,7 +15,7 @@ To get the private key, download from the Qwiklabs page that pops up right after
 
 When you will log into the Fleet console and go to Services -> EC2 -> Instances. Click on the master host instance and look for the `Public DNS`. It should show a page with details -
 
-image::images/ec21.png[]
+image::ec21.png[]
 
 Use this command to SSH into the master host -
 

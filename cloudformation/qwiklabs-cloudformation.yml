@@ -567,6 +567,10 @@ Resources:
               default_user:
                 name: ec2-user
 
+            runcmd:
+              - [ systemctl enable workshopper ]
+              - [ systemctl start workshopper ]
+
             write_files:
               - content: |
                   [OSEv3:children]

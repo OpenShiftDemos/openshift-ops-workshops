@@ -28,7 +28,7 @@
     systemd:
       daemon_reload: yes
       name: workshopper
-      enabled: yes
+      enabled: no
       state: started
 
 ...

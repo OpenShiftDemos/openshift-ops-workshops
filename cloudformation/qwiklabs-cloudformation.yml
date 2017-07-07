@@ -567,10 +567,6 @@ Resources:
               default_user:
                 name: ec2-user
 
-            runcmd:
-              - [ systemctl enable workshopper ]
-              - [ systemctl start workshopper ]
-
             write_files:
               - content: |
                   [OSEv3:children]
@@ -741,7 +737,7 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [node01, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [labguide, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
           !Sub |
@@ -771,7 +767,8 @@ Resources:
             runcmd:
             - [ systemctl, start, firewalld ]
             - [ systemctl, daemon-reload ]
-            - [ systemctl, start, workershopper ]
+            - [ systemctl, enable, workshopper ]
+            - [ systemctl, start, workshopper ]
             - [ firewall-cmd, --zone=public, --add-service=http, --permanent ]
             - [ firewall-cmd, --zone=public, --add-service=http ]
 
@@ -1031,6 +1028,10 @@ Outputs:
    SSHLoginUser:
       Description: "User name on the Master node to connect via SSH and PEM file"
       Value: "ec2-user"
+
+   LabguideURL:
+     Description: "Student Lab Guide"
+     Value: !Sub "http://${GuideNode.PublicIp}.nip.io/"
 
    MasterIPAddress:
      Description: "Public IP of the OpenShift Master node"

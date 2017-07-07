@@ -1,26 +1,34 @@
 ---
-  
+
 # vim: set ft=ansible:
 
   - name: Pulling the workshopper docker image
     docker_image:
       name: osevg/workshopper:0.1
 
-
-  - name: copy the systemctl script at the required location on the host
+  - name: put the systemd-docker binary file at /usr/bin
     copy:
-      src: workshopper.service 
-      dest: /etc/systemd/system/multi-user.target.wants/
+      src: systemd-docker
+      dest: /usr/local/sbin/
+      mode: u+x,g=r,o=r
+      owner: root
+      group: root
 
-  - name: copy the config file containing environment variables and URLs 
-    copy: 
-      src: workshopper 
+  - name: create workshopper systemd service
+    copy:
+      src: workshopper.service
+      dest: /etc/systemd/system/
+
+  - name: copy the config file containing environment variables and URLs
+    copy:
+      src: workshopper
       dest: /etc/sysconfig/
 
-
-  - name: put the systemd-docker binary file at /usr/bin
-    copy: 
-      src: systemd-docker 
-      dest: /usr/bin/
+  - name: enable workshopper systemd service
+    systemd:
+      daemon_reload: yes
+      name: workshopper
+      enabled: yes
+      state: started
 
 ...

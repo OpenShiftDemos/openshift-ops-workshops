@@ -745,6 +745,7 @@ Resources:
             cloud_config_modules:
             - disk_setup
             - mounts
+            - runcmd
 
             fqdn: guide.${QwiklabId}.${PublicHostedZone}
 

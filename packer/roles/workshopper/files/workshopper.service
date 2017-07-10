@@ -5,7 +5,7 @@ Requires=docker.service
 
 [Service]
 EnvironmentFile=/etc/sysconfig/workshopper
-ExecStart=/usr/bin/systemd-docker --env run --rm --name %n -p 80:8080 docker.io/osevg/workshopper:0.1
+ExecStart=/usr/local/sbin/systemd-docker --env --cgroups name=systemd run --rm --name %n -p 80:8080 docker.io/osevg/workshopper:0.1
 Restart=always
 RestartSec=10s
 Type=notify
@@ -15,4 +15,3 @@ TimeoutStopSec=15
 
 [Install]
 WantedBy=multi-user.target
-

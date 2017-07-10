@@ -1,0 +1,196 @@
+## Application Management Basics
+
+
+*Topic 1 - To deploy a sample application*
+
+In this module,you would deploy a sample application using the web console.
+
+
+1) Use your browser to go to the OpenShift web console at https://master.unset.ocp-admin.aws.openshifttestdrive.com:443 . Use the following credentials to log into the console :-
+[literal]
+Username: admin
+Password: r3dh4t
+
+2) Create New Project:-
+
+Click `New Project` in the top right corner.
+Give the new project a name, display name, and description:
+
+[literal]
+Name: my-ruby-project
+Display Name: My Ruby Example Project
+Description: An explanation of your choice
+
+Click `Create`.
+Once the project is in place, the `Select Image or Template` screen is displayed.
+
+
+3) Create a new sample application :-
+
+1. In the Select Image or Template screen, type `ruby` in the search field to filter the available instant apps, templates, and builder images.
+2. Select the `ruby:2.3` builder image.
+3. Specify the name and Git repository URL:
+[literal]
+Name: my-ruby-hello-world.
+Git Repository URL: https://github.com/openshift/ruby-hello-world.
+
+4. Click `Show advanced build and deployment options` and select the following options:
+5. Decide if you want a route for your application.
+6. Optionally, define the triggers and environment variables for the deployment.
+7. Create a label called environment with the value dev.
+8. Accept and create the application.
+   Review the information that is displayed.
+9. Click `Go to Overview` to go to the application’s Overview screen.
+8. Click `View Logs` to verify that a build is in progress.
+   Review the log as the build progresses.
+
+
+Pod, Services, Routes, DCs, BCs, PV, PVCs
+
+
+
+*i) Pods :-*
+
+Pods are 'one or more containers deployed together on host'. A pod is the smallest compute unit you can define, deploy and manage. Each pod has ben allocated its own internal IP address and will own the entire port range. The containers within pods can share local storage space and networking resources. 
+
+Pods are treated as `static` objects by OpenShift, i.e., one cannot change the pod definition while running. 
+
+You can run a pod using the CLI tool `oc`.
+
+Login by using :
+[literal]
+oc login -u admin --insecure-skip-tls-verify --server= https://master.unset.ocp-admin.aws.openshifttestdrive.com:443
+
+Create the hello-pod.json pod definition file:
+
+[literal]
+[admin@master1 ~]$ cat <<EOF > hello-pod.json
+{
+  "kind": "Pod",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "hello-openshift",
+    "creationTimestamp": null,
+    "labels": {
+      "name": "hello-openshift"
+    }
+  },
+  "spec": {
+    "containers": [
+      {
+        "name": "hello-openshift",
+        "image": "openshift/hello-openshift:v1.2.1",
+        "ports": [
+          {
+            "containerPort": 8080,
+            "protocol": "TCP"
+          }
+        ],
+        "resources": {
+        },
+        "terminationMessagePath": "/dev/termination-log",
+        "imagePullPolicy": "IfNotPresent",
+        "capabilities": {},
+        "securityContext": {
+          "capabilities": {},
+          "privileged": false
+        }
+      }
+    ],
+    "restartPolicy": "Always",
+    "dnsPolicy": "ClusterFirst",
+    "serviceAccount": ""
+  },
+  "status": {}
+}
+EOF
+
+
+Run pod :-
+ $ oc create -f hello-pod.json
+
+Output would look something like -
+[literal]
+pod "hello-openshift" created
+
+Verify that the pod exists:
+[literal]
+[admin@master ~]$ oc get pods
+
+When container creation is finished:
+[literal]
+NAME              READY     STATUS    RESTARTS   AGE
+hello-openshift   1/1       Running   0          8s
+
+Run oc describe to get pod details:
+[admin@master ~]$ oc describe pod hello-openshift
+
+*ii) Services :-*
+Service represents group of pods and provides permanent IP and hostname for other applications to use. Service layer connects application components together.
+Services allow simple internal load balancing across application components.
+
+To learn about creating services, make a new project 'serviceslab' :
+[literal]
+$ oc new-project serviceslab --display-name="Services Lab" \
+--description="This is a project to learn about services"
+
+Create the hello-service.json file:
+[literal]
+[admin@master ~]$  cat <<EOF > hello-service.json
+{
+  "kind": "Service",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "hello-service",
+    "labels": {
+      "name": "hello-openshift"
+    }
+  },
+  "spec": {
+    "selector": {
+      "name":"hello-openshift"
+    },
+    "ports": [
+      {
+        "protocol": "TCP",
+        "port": 8888,
+        "targetPort": 8080
+      }
+    ]
+  }
+}
+EOF
+ 
+Create the hello-service service:
+ [admin@master ~]$ oc create -f hello-service.json
+
+The output looks like this:
+[literal]
+service "hello-service" created
+
+To display the services running in the current project - run :-
+ $ oc describe service hello-service
+
+
+To examine the details of the service :-
+ $ oc describe service hello-service
+
+
+*Topic 2 - Test Liveliness and Readiness Probes*
+
+Container Health Checks Using Probes:
+
+A probe is a Kubernetes action that periodically performs diagnostics on a running container. Currently, two types of probes exist, each serving a different purpose:
+
+Liveness Probe-
+
+A liveness probe checks if the container in which it is configured is still running. If the liveness probe fails, the kubelet kills the container, which will be subjected to its restart policy. Set a liveness check by configuring the `template.spec.containers.livenessprobe` stanza of a pod configuration.
+
+Readiness Probe-
+
+A readiness probe determines if a container is ready to service requests. If the readiness probe fails a container, the endpoints controller ensures the container has its IP address removed from the endpoints of all services. A readiness probe can be used to signal to the endpoints controller that even though a container is running, it should not receive any traffic from a proxy. Set a readiness check by configuring the `template.spec.containers.readinessprobe` stanza of a pod configuration.
+
+
+
+
+

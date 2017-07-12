@@ -14,7 +14,7 @@ done
 
 mkdir -p /etc/origin/master
 
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q ec2-user@${idm} -i /home/ec2-user/.ssh/id_rsa "sudo cp /etc/ipa/ca.crt /tmp && sudo chmod 755 /tmp/ca.crt"
-scp -i /home/ec2-user/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q  ec2-user@${idm}:/tmp/ca.crt /etc/origin/master/
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q ec2-user@${idm} -i /home/ec2-user/.ssh/id_rsa "sudo cp /etc/ipa/ca.crt /tmp/ipa-ca.crt && sudo chmod 755 /tmp/ca.crt"
+scp -i /home/ec2-user/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q  ec2-user@${idm}:/tmp/ipa-ca.crt /etc/origin/master/
 
 echo "Certificate acquired"

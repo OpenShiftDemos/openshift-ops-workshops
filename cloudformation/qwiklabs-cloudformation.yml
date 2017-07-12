@@ -568,7 +568,7 @@ Resources:
                   containerized=true
                   openshift_master_api_port=443
                   openshift_master_console_port=443
-                  openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=admin,cn=users,cn=accounts,<DC>', 'bindPassword': 'ldapadmin', 'ca': '/etc/origin/master/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://idm.lab-8675309.rcook-aws.sysdeseng.com/cn=users,cn=accounts,<DC>?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,<DC>)'}]
+                  openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=admin,cn=users,cn=accounts,<DC>', 'bindPassword': 'ldapadmin', 'ca': '/etc/origin/master/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://IDM/cn=users,cn=accounts,<DC>?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,<DC>)'}]
                   openshift_image_tag=v3.5.5.26
                   openshift_pkg_version=-3.5.5.26-1
                   openshift_master_default_subdomain=apps.${QwiklabId}.${PublicHostedZone}

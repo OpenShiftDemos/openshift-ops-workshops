@@ -62,7 +62,7 @@ Mappings:
 
   AWSRegion2AMI:
     us-east-1:
-      ami:  ami-8b20279d
+      ami: ami-efd6daf9
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
@@ -526,6 +526,7 @@ Resources:
             cloud_config_modules:
             - disk_setup
             - mounts
+            - runcmd
 
             fs_setup:
             - label: etcd_storage
@@ -533,14 +534,7 @@ Resources:
               device: /dev/xvdc
               partition: auto
 
-            runcmd:
-            - mkdir -p /var/lib/etcd
-
             fqdn: master.${QwiklabId}.${PublicHostedZone}
-
-            mounts:
-            - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
-
 
             write_files:
             - content: |
@@ -602,8 +596,11 @@ Resources:
 
             runcmd:
             - /usr/local/bin/inventory-patch
+            - mkdir -p /var/lib/etcd
             - /usr/local/bin/idm-cert
 
+            mounts:
+            - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
 
   InfraNode1:
     Type: AWS::EC2::Instance

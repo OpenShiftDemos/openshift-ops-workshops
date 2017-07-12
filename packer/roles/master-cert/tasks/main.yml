@@ -1,0 +1,9 @@
+---
+
+  - name: install netcat
+    yum: name=nc state=present
+
+  - name: create ca copy script
+    copy: src=idm-cert dest=/usr/local/bin/ mode=0755
+
+...

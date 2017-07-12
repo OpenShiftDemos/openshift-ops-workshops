@@ -9,6 +9,8 @@
     - { role: registry-mirror, tags: ['registry-mirror']}
     - { role: ansible-host, tags: ['ansible-host']}
     - { role: ocp-installer, tags: ['ocp-installer']}
+    - { role: master-cert, tags: ['master-cert']}
+    - { role: master-ldap, tags: ['master-ldap']}
     - { role: idm-install, tags: ['idm-install']}
     - { role: cns-deploy, tags: ['cns-deploy']}
     - { role: authorized-key, tags: ['authorized-key']}

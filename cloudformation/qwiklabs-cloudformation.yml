@@ -295,7 +295,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: 389
         ToPort: 389
-        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+        CidrIp: 0.0.0.0/0 
       - IpProtocol: tcp
         FromPort: 88
         ToPort: 88
@@ -414,15 +414,6 @@ Resources:
         FromPort: 0
         ToPort: 65535
         CidrIp: 0.0.0.0/0
-
-  HostedZone:
-    Type: AWS::Route53::HostedZone
-    Properties:
-      Name: !Ref 'PublicHostedZone'
-      VPCs:
-        -
-          VPCId: !Ref VPC
-          VPCRegion: !Ref AWS::Region
 
   Route53Records:
     Type: AWS::Route53::RecordSetGroup
@@ -583,8 +574,7 @@ Resources:
                   containerized=true
                   openshift_master_api_port=443
                   openshift_master_console_port=443
-                  openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
-                  openshift_master_htpasswd_users={'openshift': '$apr1$Mr5ZCJzb$mvaXu2UMOZ47pnQqNrLEi.'}
+                  openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=admin,cn=users,cn=accounts,<DC>', 'bindPassword': 'ldapadmin', 'ca': '/etc/origin/master/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://idm.lab-8675309.rcook-aws.sysdeseng.com/cn=users,cn=accounts,<DC>?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,<DC>)'}]
                   openshift_image_tag=v3.5.5.26
                   openshift_pkg_version=-3.5.5.26-1
                   openshift_master_default_subdomain=apps.${QwiklabId}.${PublicHostedZone}
@@ -600,15 +590,19 @@ Resources:
                   master.${QwiklabId}.${PublicHostedZone}
 
                   [masters]
-                  master.${QwiklabId}.${PublicHostedZone} openshift_public_hostname=master.${QwiklabId}.${PublicHostedZone}
+                  master.${QwiklabId}.${PublicHostedZone} openshift_hostname=master.${QwiklabId}.${PublicHostedZone}
 
                   [nodes]
-                  master.${QwiklabId}.${PublicHostedZone} openshift_public_hostname=master.${QwiklabId}.${PublicHostedZone}
-                  infra.${QwiklabId}.${PublicHostedZone} openshift_public_hostname=infra.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
-                  node01.${QwiklabId}.${PublicHostedZone} openshift_public_hostname=node01.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node02.${QwiklabId}.${PublicHostedZone} openshift_public_hostname=node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node03.${QwiklabId}.${PublicHostedZone} openshift_public_hostname=node03.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  master.${QwiklabId}.${PublicHostedZone} openshift_hostname=master.${QwiklabId}.${PublicHostedZone}
+                  infra.${QwiklabId}.${PublicHostedZone} openshift_hostname=infra.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
+                  node01.${QwiklabId}.${PublicHostedZone} openshift_hostname=node01.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  node02.${QwiklabId}.${PublicHostedZone} openshift_hostname=node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  node03.${QwiklabId}.${PublicHostedZone} openshift_hostname=node03.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                 path: /etc/ansible/hosts
+
+            runcmd:
+            - /usr/local/bin/inventory-patch
+            - /usr/local/bin/idm-cert
 
 
   InfraNode1:
@@ -704,6 +698,7 @@ Resources:
 
             runcmd:
             - /usr/local/bin/idm-install
+            - [ firewall-cmd, --reload ]
 
   GuideNode:
     Type: AWS::EC2::Instance

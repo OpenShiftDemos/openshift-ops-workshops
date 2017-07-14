@@ -1,0 +1,19 @@
+---
+  
+
+- hosts: localhost
+
+
+  tasks:
+
+    - name: Running the Ansible PLyabook to kickstart the OCP installation
+      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+
+
+
+
+...
+      
+
+
+

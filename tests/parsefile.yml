@@ -1,0 +1,20 @@
+---
+
+
+- hosts: master.unset.ocp-admin.aws.openshifttestdrive.com 
+
+
+
+  tasks: 
+
+    - name: get list of nodes
+      command: oc get -o json nodes
+      register: result
+
+
+
+    - debug: msg={{ (result.stdout|from_json).apiVersion }}
+
+
+
+

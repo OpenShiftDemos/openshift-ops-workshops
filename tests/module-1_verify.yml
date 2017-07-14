@@ -1,0 +1,47 @@
+---
+  
+
+- hosts: localhost
+
+
+  tasks:
+
+    - name: Verifying installation by checking the oc version
+      command: oc version
+      register: version_value
+
+
+    - name: Verifying 'oc version'
+      shell: echo "version installed is correct"
+      when: version_value.stdout.find('oc v3.5.5.26\nkubernetes v1.5.2+43a9be4') != -1
+      register: output
+   
+    
+    - debug:
+        var: output.stdout
+
+
+
+    - name: Verifying installation by listing all the nodes
+      command: oc get nodes -o json
+      register: node_list
+    
+    - debug: 
+        msg: "{{ (node_list.stdout | from_json) }}" 
+   
+    
+    - name: Verifying list of nodes
+      shell: echo "status of first node is Ready"
+      when: node_list.stdout_lines[1].find('Ready') != -1
+      register: outputs
+            
+    - debug:
+        var: outputs.stdout   
+     
+
+
+...
+      
+
+
+

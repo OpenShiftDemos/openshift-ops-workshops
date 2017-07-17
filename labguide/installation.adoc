@@ -3,10 +3,7 @@
 The method of installation that you shall be using for this session would be the 'Advanced Installation' method which uses Ansible playbooks for automating the installation of OpenShift Container Platform cluster (version 3.5). 
 The host preparation and prerequisites needed for the installation have already been done.
 
-
 *Step 1. Examining the provided Ansible inventory file -*
-
-
 Let us start by examining the Ansible inventory files which contains the host information.
 To perform the further steps, you will need to run the commands on the 'master' host.
 The master and other nodes are running as AWS EC-2 RHEL instances. 
@@ -24,11 +21,9 @@ $ ssh -i <path/private_key.pem> ec2-user@<Public_DNS>
 
 Replace `path`by the path where you have stored the private keyand replace <Public_DNS> by the information shown on instance page.
 
-
 1) Check the /etc/ansible/hosts to view the configurations done for clouster variables and host variables:
 
  # cat /etc/ansible/hosts
-
 
 The variables are defined on separate,single lines within the '[OSEv3:vars]' section.
 
@@ -57,17 +52,13 @@ node1.example.com openshift_node_labels="{'region': 'primary', 'zone': 'east'}"
 
 *Step 2. Running the Advanced Installation -*
 
-
  # ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
 
 The above command runs the ansible playbook to start the advanced installation.
 
 
 *Step 3. Verifying the Installation -*
-
 1) Run as 'root' user on the master node :
-
-
 
  # oc get nodes
 
@@ -82,7 +73,6 @@ node2.example.com           Ready                      165d
 
 You should be able to see a list of all the hosts mentioned in the inventory file - i.e. 1 master node, 1 infrastructure node and 3 application nodes. 
 
-
 2) Verify that the web console is installed correctly :
 Use the master host name and web console port number to access the web console using a web browser.For example, master host with name 'master.openshift.com' and which is using the default port '8443', should be reachable at https://master.openshift.com:8443/console .
 
@@ -90,49 +80,7 @@ Use the master host name and web console port number to access the web console u
 
  # atomic-openshift-excluder exclude
 
-
-4) oadm tool :
-
-Let us now introduce you to some administrator CLI operations that are performed by using the *oadm* commands. The *oadm* command can be used as it is if the host has the *openshift* binary. Else, *oc adm* is used in place of *oadm*, provided *oc* is available.
-
-
-The basic syntax of the *oadm* tool is as shown :
-
-[literal]
-$ oc adm <action> <option>
-
-
-The <action> could be *new-project* and <option> would be a list of all supported options along with that action.
-
-
-To display help about any command, type this in the terminal -
-[literal]
-$ oc adm help <command>
-
-Some basic CLI operations would be -
-
-i) To create a new project :-
-[literal]
-$ oc adm new-project <project_name>
-
-ii) To manage authorization policies :-
-[literal]
-$ oc adm policy
-
-iii) To manage groups:
-[literal]
-$ oc adm groups 
-
-iv) To remove older versions of resources from the server :-
-[literal]
-$ oc adm prune
-
-v) To display the version of any indicated object :-
-[literal]
-$ oc adm version
-
-
-5) *Diagnostics Tool* :
+4) *Diagnostics Tool* :
 OpenShift also provides a diagnostics tool to verify the cluster and run a series of checks for any errors in the host or cluster.
 
 The diagnostics were added to the 'openshift' binary so that wherever there is an OpenShift Origin server or client, the diagnostics can run in the exact same environment.
@@ -146,16 +94,6 @@ To run selective diagnostics, you can include names in the command -
 [literal]
 $ oc adm diagnostics NodeConfigCheck UnitStatus
 
-
 To run diagnostics where the master and node configurations are not in the expected locations, use the following command to specify the location - 
 [literal]
 $ oc adm diagnostics --master-config=<file_path> --node-config=<file_path>
-
-
-
-
-
-
-
-
-

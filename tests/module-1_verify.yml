@@ -27,5 +27,4 @@
     - name: Running diagnostics test and display errors if any found
       command: oc adm diagnostics
       become_user: root
-
 ...

@@ -607,6 +607,10 @@ Resources:
             - /usr/local/bin/inventory-patch
             - mkdir -p /var/lib/etcd
             - /usr/local/bin/idm-cert
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
@@ -836,6 +840,11 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
+
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
@@ -917,6 +926,10 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
@@ -998,6 +1011,10 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]

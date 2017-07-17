@@ -10,6 +10,8 @@ modules:
       ETHERPAD_ENABLED:
       NUM_USERS:
       ETHERPAD_URL_PREFIX:
+  installation:
+    name: Installation and Verification
   cns-deploy:
     name: Deploying Container-native Storage
     vars:

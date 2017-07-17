@@ -612,6 +612,10 @@ Resources:
             - /usr/local/bin/inventory-patch
             - mkdir -p /var/lib/etcd
             - /usr/local/bin/idm-cert
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
@@ -639,6 +643,11 @@ Resources:
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdb
+          Ebs:
+            VolumeSize: '20'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdc
           Ebs:
             VolumeSize: '20'
             VolumeType: 'gp2'
@@ -671,6 +680,17 @@ Resources:
             system_info:
               default_user:
                 name: ec2-user
+
+            runcmd:
+            - mkdir -p /var/lib/origin/openshift.local.volumes
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
+
+            mounts:
+            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+
 
   IdmNode1:
     Type: AWS::EC2::Instance
@@ -841,6 +861,10 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
@@ -922,6 +946,10 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
@@ -1003,6 +1031,10 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]

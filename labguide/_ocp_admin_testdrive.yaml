@@ -1,6 +1,6 @@
 ---
-id: ocp-cns-testdrive
-name: OpenShift for Operators with Container Native Storage
+id: ocp-admin-testdrive
+name: OpenShift for Administrators
 
 content:
   url: https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/production/labguide

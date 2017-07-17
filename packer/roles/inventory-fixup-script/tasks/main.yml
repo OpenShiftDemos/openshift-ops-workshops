@@ -1,0 +1,6 @@
+---
+
+  - name: Modify the inventory 
+    copy: src=inventory-patch dest=/usr/local/bin/ mode=0755
+
+...

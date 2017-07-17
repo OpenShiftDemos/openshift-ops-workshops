@@ -14,4 +14,4 @@ vars:
 modules:
   activate:
   - environment
-  - cns_deploy
+  - cns-deploy

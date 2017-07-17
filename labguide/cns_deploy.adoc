@@ -1,0 +1,390 @@
+Container-native Storage for Red Hat OpenShift Container Platform
+=================================================================
+Daniel Messer <dmesser@redhat.com>
+v1.0, 2017-06
+
+
+This is a section covering the setup and usage of the Container-native storage extension for Red Hat OpenShift Container Platform.
+
+
+:numbered!:
+[abstract]
+Overview
+--------
+In this section you will set up container-native storage (CNS) in your environment. You will use this to dynamically provision storage for containerized applications. It is provided by GlusterFS running in containers. +
+GlusterFS in turn is backed by local storage available to the OpenShift nodes.
+
+NOTE: All of the following tasks are carried out as root from the master node. All files created can be stored in root's home directory unless a particular path is specified. At the end of this section you will have 3 GlusterFS pods running together with the heketi API frontend properly integrated into OpenShift.
+
+
+:numbered:
+
+Deploying Container-native Storage
+----------------------------------
+Make sure you are logged on to the master node.
+
+....
+[root@master ~]# hostname
+master.example.com
+....
+
+First, as the root user, install the CNS deployment tool. +
+We will also install ansible. Though not needed for CNS in this lab it will help us simplify an otherwise tedious manual configuration step.
+
+ [root@master ~]# yum -y install cns-deploy ansible
+
+'''
+==== Configure OpenShift Node firewall with Ansible
+
+NOTE: In the following section we will configure Ansible. We will use it's configuration management capabilities in order to make sure all the OpenShift nodes have the right firewall settings.
+
+.Ansible setup
+====
+Replace the content of the Ansible inventory in `/etc/ansible/hosts` with the following
+
+[source,ini]
+./etc/ansible/hosts
+----
+[master]
+master.example.com
+
+[nodes]
+node1.example.com
+node2.example.com
+node3.example.com
+----
+
+You should now be able to ping all hosts using Ansible
+....
+[root@master ~]# ansible nodes -m ping
+
+node3.example.com | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+node2.example.com | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+node1.example.com | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+....
+
+Create a file called `configure-firewall.yml` and copy&paste the following contents:
+[source,yaml]
+.configure-firewall.yml
+----
+---
+
+- hosts: nodes
+
+  tasks:
+
+    - name: insert iptables rules required for GlusterFS
+      blockinfile:
+        dest: /etc/sysconfig/iptables
+        block: |
+          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT
+          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
+          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
+          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
+        insertbefore: "^COMMIT"
+
+    - name: reload iptables
+      systemd:
+        name: iptables
+        state: reloaded
+
+...
+----
+
+Done. This little helper construct will save us some work in configuring the firewall. Run it with the following command:
+
+ [root@master ~]# ansible-playbook configure-firewall.yml
+
+Your output should look like this.
+
+....
+PLAY [nodes] *******************************************************************
+
+TASK [setup] *******************************************************************
+ok: [node2.example.com]
+ok: [node1.example.com]
+ok: [node3.example.com]
+
+TASK [insert iptables rules required for GlusterFS] ****************************
+changed: [node3.example.com]
+changed: [node2.example.com]
+changed: [node1.example.com]
+
+TASK [reload iptables] *********************************************************
+changed: [node2.example.com]
+changed: [node1.example.com]
+changed: [node3.example.com]
+
+PLAY RECAP *********************************************************************
+node1.example.com          : ok=3    changed=2    unreachable=0    failed=0
+node2.example.com          : ok=3    changed=2    unreachable=0    failed=0
+node3.example.com          : ok=3    changed=2    unreachable=0    failed=0
+....
+====
+
+'''
+With this we checked the requirement for additional firewall ports to be opened on the OpenShift app nodes.
+
+==== Prepare OpenShift for CNS
+
+Next we will create a namespace (also referred to as a _Project_) in OpenShift. It will be used to group the GlusterFS pods.
+For this you need to be logged as an admin user in OpenShift.
+
+....
+[root@master ~]# oc whoami
+system:admin
+....
+
+If you are for some reason not an admin, login as system admin like this:
+
+ [root@master ~]# oc login -u system:admin -n default
+
+Create a namespace with a designation of your choice. In this example we will use `container-native-storage`.
+
+ [root@master ~]# oc new-project container-native-storage
+
+GlusterFS pods need access to the physical block devices on the host. Hence they need elevated permissions. Enable containers to run in privileged mode.
+
+ [root@master ~]# oadm policy add-scc-to-user privileged -z default
+
+==== Describe Container-native Storage Topology
+
+CNS will virtualize locally attached block storage on the OpenShift App nodes. In order to deploy you will need to supply the installer with information about where to find these nodes and what network and which block devices to use. +
+This is done using JSON file describing the topology of your OpenShift deployment.
+
+For this purpose, create the file topology.json with the following content:
+[source,json]
+.topology.json
+----
+{
+    "clusters": [
+        {
+            "nodes": [
+                {
+                    "node": {
+                        "hostnames": {
+                            "manage": [
+                                "node1.example.com"
+                            ],
+                            "storage": [
+                                "192.168.0.102"
+                            ]
+                        },
+                        "zone": 1
+                    },
+                    "devices": [
+                        "/dev/vdc"
+                    ]
+                },
+                {
+                    "node": {
+                        "hostnames": {
+                            "manage": [
+                                "node2.example.com"
+                            ],
+                            "storage": [
+                                "192.168.0.103"
+                            ]
+                        },
+                        "zone": 2
+                    },
+                    "devices": [
+                        "/dev/vdc"
+                    ]
+                },
+                {
+                    "node": {
+                        "hostnames": {
+                            "manage": [
+                                "node3.example.com"
+                            ],
+                            "storage": [
+                                "192.168.0.104"
+                            ]
+                        },
+                        "zone": 3
+                    },
+                    "devices": [
+                        "/dev/vdc"
+                    ]
+                }
+            ]
+        }
+    ]
+}
+----
+
+This file contains an additional property called `zone` per node. This identifies the failure domain. In CNS data is always replicated 3 times. Failure domains make sure that two copies are never stored on nodes in the same failure domain.
+
+==== Deploy Container-native Storage
+
+You are now ready to deploy CNS. Alongside GlusterFS pods the API front-end known as *heketi* is deployed. This protects the API from unauthorized access we will define passwords for the `admin` and `user` role in heketi like below.
+
+.CNS passwords
+[width="60%",options="header"]
+|==============================================
+| Heketi Role     | Password
+| admin           | myS3cr3tpassw0rd
+| user            | mys3rs3cr3tpassw0rd
+|==============================================
+
+Next start the deployment routine with the following command:
+
+ [root@master ~]# cns-deploy -n container-native-storage -g topology.json --admin-key 'myS3cr3tpassw0rd' --user-key 'mys3rs3cr3tpassw0rd'
+
+Answer the interactive prompt with *Y*.
+
+The deployment will take several minutes to complete (especially waiting for the GlusterFS pods will take 2-3 minutes). +
+You may want to monitor the progress in parallel also in the OpenShift UI in the `container-native-storage` project. +
+On the command line the output should look like this:
+
+----
+Welcome to the deployment tool for GlusterFS on Kubernetes and OpenShift.
+
+Before getting started, this script has some requirements of the execution
+environment and of the container platform that you should verify.
+
+The client machine that will run this script must have:
+ * Administrative access to an existing Kubernetes or OpenShift cluster
+ * Access to a python interpreter 'python'
+ * Access to the heketi client 'heketi-cli'
+
+Each of the nodes that will host GlusterFS must also have appropriate firewall
+rules for the required GlusterFS ports:
+ * 2222  - sshd (if running GlusterFS in a pod)
+ * 24007 - GlusterFS Daemon
+ * 24008 - GlusterFS Management
+ * 49152 to 49251 - Each brick for every volume on the host requires its own
+   port. For every new brick, one new port will be used starting at 49152. We
+   recommend a default range of 49152-49251 on each host, though you can adjust
+   this to fit your needs.
+
+In addition, for an OpenShift deployment you must:
+ * Have 'cluster_admin' role on the administrative account doing the deployment
+ * Add the 'default' and 'router' Service Accounts to the 'privileged' SCC
+ * Have a router deployed that is configured to allow apps to access services
+   running in the cluster
+
+Do you wish to proceed with deployment?
+
+[Y]es, [N]o? [Default: Y]: <1>
+Using OpenShift CLI.
+NAME                       STATUS    AGE
+container-native-storage   Active    28m
+Using namespace "container-native-storage".
+Checking that heketi pod is not running ... OK
+template "deploy-heketi" created
+serviceaccount "heketi-service-account" created
+template "heketi" created
+template "glusterfs" created
+role "edit" added: "system:serviceaccount:container-native-storage:heketi-service-account"
+node "node1.example.com" labeled <2>
+node "node2.example.com" labeled <2>
+node "node3.example.com" labeled <2>
+daemonset "glusterfs" created
+Waiting for GlusterFS pods to start ... OK <3>
+service "deploy-heketi" created
+route "deploy-heketi" created
+deploymentconfig "deploy-heketi" created
+Waiting for deploy-heketi pod to start ... OK
+Creating cluster ... ID: 307f708621f4e0c9eda962b713272e81
+Creating node node1.example.com ... ID: f60a225a16e8678d5ef69afb4815e417 <4>
+Adding device /dev/vdc ... OK <5>
+Creating node node2.example.com ... ID: 13b7c17c541069862d7e66d142ab789e <4>
+Adding device /dev/vdc ... OK <5>
+Creating node node3.example.com ... ID: 5a6fbe5eb1864e711f8bd9b0cb5946ea <4>
+Adding device /dev/vdc ... OK <5>
+heketi topology loaded.
+Saving heketi-storage.json
+secret "heketi-storage-secret" created
+endpoints "heketi-storage-endpoints" created
+service "heketi-storage-endpoints" created
+job "heketi-storage-copy-job" created
+deploymentconfig "deploy-heketi" deleted
+route "deploy-heketi" deleted
+service "deploy-heketi" deleted
+job "heketi-storage-copy-job" deleted
+pod "deploy-heketi-1-599rc" deleted
+secret "heketi-storage-secret" deleted
+service "heketi" created
+route "heketi" created
+deploymentconfig "heketi" created <6>
+Waiting for heketi pod to start ... OK
+heketi is now running.
+Ready to create and provide GlusterFS volumes.
+----
+<1> Enter *Y* and press Enter.
+<2> OpenShift nodes are labeled. Label is referred to in a DaemonSet.
+<3> GlusterFS daemonset is started. DaemonSet means: start exactly *one* pod per node.
+<4> All nodes will be referenced in heketi's database by a UUID.
+<5> Node block devices are formatted for mounting by GlusterFS.
+<6> heketi is deployed in a pod as well.
+
+
+==== Verifying the deployment
+
+You now have deployed CNS. Let's verify all components are in place. While still in the `container-native-storage` project on the CLI list all running pods.
+
+----
+[root@master ~]# oc get pods -o wide
+NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
+glusterfs-37vn8   1/1       Running   0          3m       192.168.0.102   node1.example.com <1>
+glusterfs-cq68l   1/1       Running   0          3m       192.168.0.103   node2.example.com <1>
+glusterfs-m9fvl   1/1       Running   0          3m       192.168.0.104   node3.example.com <1>
+heketi-1-cd032    1/1       Running   0          1m       10.130.0.4      node3.example.com <2>
+----
+<1> GlusterFS pods, notice how all designated nodes run exactly one pod.
+<2> heketi API frontend pod
+
+NOTE: The exact pod names will be different in your environment, since they are auto-generated.
+
+The GlusterFS pods use the hosts network and disk devices to run the software-defined storage system. Hence they attached to the host's network. See schematic below for a visualization.
+
+.GlusterFS pods in CNS in detail.
+image::cns_diagram_pod.svg[]
+
+heketi is a component that will expose an API for GlusterFS to OpenShift. This allows OpenShift to dynamically allocate storage from CNS in a programmatic fashion. See below for a visualization. Note that for simplicity, in our example heketi runs on the OpenShift App nodes, not on the Infra node.
+
+.heketi pod running in CNS
+image::cns_diagram_heketi.svg[]
+
+To expose heketi's API a `service` named _heketi_ has been generated in OpenShift.
+
+----
+[root@master ~]# oc get service/heketi
+NAME      CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+heketi    172.30.5.231   <none>        8080/TCP   31m
+----
+
+To also use heketi outside of OpenShift in addition to the service a route has been deployed:
+
+[source,options="nowrap"]
+----
+[root@master ~]# oc get route/heketi
+NAME      HOST/PORT                                               PATH      SERVICES   PORT      TERMINATION   WILDCARD
+heketi    heketi-container-native-storage.cloudapps.example.com             heketi     <all>                   None
+----
+
+Hence, heketi will be available via:
+
+Heketi Service URL:: http://heketi-container-native-storage.cloudapps.example.com
+
+You may verify this with a trivial health check:
+
+----
+[root@master ~]# curl http://heketi-container-native-storage.cloudapps.example.com/hello
+Hello from Heketi
+----
+
+That's it. You have successfully provided shared storage to pods throughout the entire system, therefore avoiding the need for data to be replicated at the application level to each pod.
+
+With CNS this is available wherever OpenShift is deployed with no external dependency.

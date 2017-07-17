@@ -1,18 +1,10 @@
-Container-native Storage for Red Hat OpenShift Container Platform
-=================================================================
-Daniel Messer <dmesser@redhat.com>
-v1.0, 2017-06
-
-
-This is a section covering the setup and usage of the Container-native storage extension for Red Hat OpenShift Container Platform.
-
-
 :numbered!:
 [abstract]
 Overview
 --------
-In this section you will set up container-native storage (CNS) in your environment. You will use this to dynamically provision storage for containerized applications. It is provided by GlusterFS running in containers. +
-GlusterFS in turn is backed by local storage available to the OpenShift nodes.
+In this section you will set up container-native storage (CNS) in your environment. You will use this in link:cns-usage["Container-native Storage Management"] lab to dynamically provision storage for containerized applications. It is provided by GlusterFS running in containers. +
+GlusterFS in turn is backed by local storage devices available to the OpenShift nodes.+
+This lab requires that you completed OpenShift installation in the previous module.
 
 NOTE: All of the following tasks are carried out as root from the master node. All files created can be stored in root's home directory unless a particular path is specified. At the end of this section you will have 3 GlusterFS pods running together with the heketi API frontend properly integrated into OpenShift.
 
@@ -24,14 +16,22 @@ Deploying Container-native Storage
 Make sure you are logged on to the master node.
 
 ....
-[root@master ~]# hostname
-master.example.com
+[ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# hostname
+{{MASTER_HOSTNAME_FQDN}}
 ....
 
-First, as the root user, install the CNS deployment tool. +
-We will also install ansible. Though not needed for CNS in this lab it will help us simplify an otherwise tedious manual configuration step.
+First, verify that the CNS deployment tool is installed. +
+We will also use ansible and verify it's presence. Though not needed for CNS in this lab it will help us simplify an otherwise tedious manual configuration step.
 
- [root@master ~]# yum -y install cns-deploy ansible
+  [ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# yum list installed cns-deploy
+
+The command should return the following:
+
+  [ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]$ yum list installed cns-deploy ansible
+  Loaded plugins: product-id, search-disabled-repos, subscription-manager
+  Installed Packages
+  ansible.noarch        2.3.1.0-1.el7           @epel
+  cns-deploy.x86_64     4.0.0-19.el7rhgs        @rh-gluster-3-for-rhel-7-server-rpms
 
 '''
 ==== Configure OpenShift Node firewall with Ansible
@@ -40,33 +40,20 @@ NOTE: In the following section we will configure Ansible. We will use it's confi
 
 .Ansible setup
 ====
-Replace the content of the Ansible inventory in `/etc/ansible/hosts` with the following
 
-[source,ini]
-./etc/ansible/hosts
-----
-[master]
-master.example.com
-
-[nodes]
-node1.example.com
-node2.example.com
-node3.example.com
-----
-
-You should now be able to ping all hosts using Ansible
+You should be able to ping all hosts using Ansible
 ....
-[root@master ~]# ansible nodes -m ping
+[ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# ansible cns -m ping
 
-node3.example.com | SUCCESS => {
+{{NODE1_HOSTNAME_FQDN}} | SUCCESS => {
     "changed": false,
     "ping": "pong"
 }
-node2.example.com | SUCCESS => {
+{{NODE2_HOSTNAME_FQDN}} | SUCCESS => {
     "changed": false,
     "ping": "pong"
 }
-node1.example.com | SUCCESS => {
+{{NODE3_HOSTNAME_FQDN}} | SUCCESS => {
     "changed": false,
     "ping": "pong"
 }
@@ -78,7 +65,7 @@ Create a file called `configure-firewall.yml` and copy&paste the following conte
 ----
 ---
 
-- hosts: nodes
+- hosts: cns
 
   tasks:
 
@@ -100,39 +87,38 @@ Create a file called `configure-firewall.yml` and copy&paste the following conte
 ...
 ----
 
-Done. This little helper construct will save us some work in configuring the firewall. Run it with the following command:
+This short Ansible playbook will configure the firewall on all OpenShift worker nodes to allow GlusterFS-related traffic, required for CNS. Run it with the following command:
 
- [root@master ~]# ansible-playbook configure-firewall.yml
+ [ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# ansible-playbook configure-firewall.yml
 
-Your output should look like this.
+Your output should look like this:
 
 ....
 PLAY [nodes] *******************************************************************
 
 TASK [setup] *******************************************************************
-ok: [node2.example.com]
-ok: [node1.example.com]
-ok: [node3.example.com]
+ok: [{{NODE1_HOSTNAME_FQDN}}]
+ok: [{{NODE2_HOSTNAME_FQDN}}]
+ok: [{{NODE3_HOSTNAME_FQDN}}]
 
 TASK [insert iptables rules required for GlusterFS] ****************************
-changed: [node3.example.com]
-changed: [node2.example.com]
-changed: [node1.example.com]
+changed: [{{NODE1_HOSTNAME_FQDN}}]
+changed: [{{NODE2_HOSTNAME_FQDN}}]
+changed: [{{NODE3_HOSTNAME_FQDN}}]
 
 TASK [reload iptables] *********************************************************
-changed: [node2.example.com]
-changed: [node1.example.com]
-changed: [node3.example.com]
+changed: [{{NODE1_HOSTNAME_FQDN}}]
+changed: [{{NODE2_HOSTNAME_FQDN}}]
+changed: [{{NODE3_HOSTNAME_FQDN}}]
 
 PLAY RECAP *********************************************************************
-node1.example.com          : ok=3    changed=2    unreachable=0    failed=0
-node2.example.com          : ok=3    changed=2    unreachable=0    failed=0
-node3.example.com          : ok=3    changed=2    unreachable=0    failed=0
+{{NODE1_HOSTNAME_FQDN}}          : ok=3    changed=2    unreachable=0    failed=0
+{{NODE2_HOSTNAME_FQDN}}          : ok=3    changed=2    unreachable=0    failed=0
+{{NODE3_HOSTNAME_FQDN}}          : ok=3    changed=2    unreachable=0    failed=0
 ....
 ====
 
 '''
-With this we checked the requirement for additional firewall ports to be opened on the OpenShift app nodes.
 
 ==== Prepare OpenShift for CNS
 
@@ -140,21 +126,21 @@ Next we will create a namespace (also referred to as a _Project_) in OpenShift. 
 For this you need to be logged as an admin user in OpenShift.
 
 ....
-[root@master ~]# oc whoami
+[ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# oc whoami
 system:admin
 ....
 
 If you are for some reason not an admin, login as system admin like this:
 
- [root@master ~]# oc login -u system:admin -n default
+ [ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# oc login -u system:admin -n default
 
 Create a namespace with a designation of your choice. In this example we will use `container-native-storage`.
 
- [root@master ~]# oc new-project container-native-storage
+ [ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# oc new-project container-native-storage
 
 GlusterFS pods need access to the physical block devices on the host. Hence they need elevated permissions. Enable containers to run in privileged mode.
 
- [root@master ~]# oadm policy add-scc-to-user privileged -z default
+ [ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# oadm policy add-scc-to-user privileged -z default
 
 ==== Describe Container-native Storage Topology
 
@@ -173,48 +159,48 @@ For this purpose, create the file topology.json with the following content:
                     "node": {
                         "hostnames": {
                             "manage": [
-                                "node1.example.com"
+                                "{{NODE1_HOSTNAME_FQDN}}"
                             ],
                             "storage": [
-                                "192.168.0.102"
+                                "{{NODE1_INTERNAL_IP}}"
                             ]
                         },
                         "zone": 1
                     },
                     "devices": [
-                        "/dev/vdc"
+                        "{{NODE_BRICK_DEVICE}}"
                     ]
                 },
                 {
                     "node": {
                         "hostnames": {
                             "manage": [
-                                "node2.example.com"
+                                "{{NODE2_HOSTNAME_FQDN}}"
                             ],
                             "storage": [
-                                "192.168.0.103"
+                                "{{NODE2_INTERNAL_IP}}"
                             ]
                         },
                         "zone": 2
                     },
                     "devices": [
-                        "/dev/vdc"
+                        "{{NODE_BRICK_DEVICE}}"
                     ]
                 },
                 {
                     "node": {
                         "hostnames": {
                             "manage": [
-                                "node3.example.com"
+                                "{{NODE3_HOSTNAME_FQDN}}"
                             ],
                             "storage": [
-                                "192.168.0.104"
+                                "{{NODE3_INTERNAL_IP}}"
                             ]
                         },
                         "zone": 3
                     },
                     "devices": [
-                        "/dev/vdc"
+                        "{{NODE_BRICK_DEVICE}}"
                     ]
                 }
             ]

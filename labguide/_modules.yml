@@ -10,3 +10,14 @@ modules:
       ETHERPAD_ENABLED:
       NUM_USERS:
       ETHERPAD_URL_PREFIX:
+  cns_deploy:
+    name: Deploying Container-native Storage
+    vars:
+      MASTERS:
+      INFRA:
+      NODES:
+      NFS_ENABLED:
+      LOGGING_ENABLED:
+      ETHERPAD_ENABLED:
+      NUM_USERS:
+      ETHERPAD_URL_PREFIX:

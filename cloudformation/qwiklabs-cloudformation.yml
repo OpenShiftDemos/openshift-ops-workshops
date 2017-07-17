@@ -295,7 +295,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: 389
         ToPort: 389
-        CidrIp: 0.0.0.0/0 
+        CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
         FromPort: 88
         ToPort: 88
@@ -594,10 +594,15 @@ Resources:
 
                   [masters]
                   master.${QwiklabId}.${PublicHostedZone}
-                  
+
                   [nodes]
                   master.${QwiklabId}.${PublicHostedZone}
                   infra.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
+                  node01.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  node03.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+
+                  [cns]
                   node01.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node03.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"

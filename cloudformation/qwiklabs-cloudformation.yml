@@ -642,6 +642,11 @@ Resources:
             VolumeSize: '20'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdc
+          Ebs:
+            VolumeSize: '20'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
       Tags:
       - Key: Application
         Value:
@@ -670,6 +675,17 @@ Resources:
             system_info:
               default_user:
                 name: ec2-user
+
+            runcmd:
+            - mkdir -p /var/lib/origin/openshift.local.volumes
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
+
+            mounts:
+            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+
 
   IdmNode1:
     Type: AWS::EC2::Instance
@@ -844,7 +860,6 @@ Resources:
             - [ systemctl, disable, firewalld ]
             - [ systemctl, enable, iptables ]
             - [ systemctl, restart, iptables ]
-
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]

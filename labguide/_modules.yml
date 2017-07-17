@@ -13,11 +13,15 @@ modules:
   cns-deploy:
     name: Deploying Container-native Storage
     vars:
-      MASTERS:
-      INFRA:
-      NODES:
-      NFS_ENABLED:
-      LOGGING_ENABLED:
-      ETHERPAD_ENABLED:
-      NUM_USERS:
-      ETHERPAD_URL_PREFIX:
+      MASTER_HOSTNAME: "master"
+      MASTER_HOSTNAME_FQDN: "master.example.com"
+      NODE1_HOSTNAME: "node1"
+      NODE1_HOSTNAME_FQDN: "node1.example.com"
+      NODE1_INTERNAL_IP: "192.168.0.100"
+      NODE2_HOSTNAME: "node2"
+      NODE2_HOSTNAME_FQDN: "node2.example.com"
+      NODE2_INTERNAL_IP: "192.168.0.101"
+      NODE3_HOSTNAME: "node3"
+      NODE3_HOSTNAME_FQDN: "node3.example.com"
+      NODE3_INTERNAL_IP: "192.168.0.102"
+      NODE_BRICK_DEVICE: "/dev/xvdc"

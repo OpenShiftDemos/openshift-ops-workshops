@@ -2,8 +2,8 @@
   "variables": {
     "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
-    "aws_region": "eu-central-1",
-    "aws_ami": "ami-5cc53d33",
+    "aws_region": "us-east-1",
+    "aws_ami": "ami-563ca440",
     "org_id": "{{env `ORG_ID`}}",
     "gluster_pool": "{{env `GLUSTER_POOL`}}",
     "activation_key": "{{env `ACT_KEY`}}",

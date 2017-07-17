@@ -2,7 +2,7 @@
 
 - block:
 
-  - name: Use RHUI while its still attached
+  - name: Update using RHUI while its still attached
     yum:
       name: '*'
       state: latest
@@ -25,22 +25,19 @@
   fail:
     msg: "You must supply an RHSM organization ID"
   when:
-    - rhsm_org_id is not defined
-    - rhsm_org_id == ""
+    - (rhsm_org_id is not defined or rhsm_org_id == "")
 
 - name: ensure activation key is supplied
   fail:
     msg: "You must supply an RHSM activation key"
   when:
-    - rhsm_act_key is not defined
-    - rhsm_act_key == ""
+    - (rhsm_act_key is not defined or rhsm_act_key == "" )
 
 - name: ensure repositories are supplied
   fail:
     msg: "You must supply at least one RHSM repository"
   when:
-    - rhsm_repos is not defined
-    - rhsm_repos|length == 0
+    - (rhsm_repos is not defined or rhsm_repos|length == 0)
 
 - name: registering system with CDN
   redhat_subscription:

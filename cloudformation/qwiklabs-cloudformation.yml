@@ -40,42 +40,49 @@ Parameters:
       - t2.small
     ConstraintDescription: Must be a valid EC2 instance type.
 
+  GuideInstanceType:
+    Type: String
+    Default: t2.small
+    AllowedValues:
+      - t2.small
+    ConstraintDescription: Must be a valid EC2 instance type.
+
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
-    Default: generic-qwiklab 
+    Default: generic-qwiklab
     ConstraintDescription: Must be the name of an existing EC2 key pair.
 
   QwiklabId:
     Type: String
     Default: lab-8675309
     ConstraintDescription: qwikLAB lab identifier
-   
+
 
 Mappings:
 
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-555d7343
+      ami: ami-47464851
     us-east-2:
-      ami: ami-0932686c
+      ami: NOT_SUPPORTED
     us-west-1:
-      ami: ami-2cade64c
+      ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-6f68cf0f
+      ami: ami-0e081477
     eu-west-1:
-      ami: ami-02ace471
+      ami: ami-d37597aa
     eu-central-1:
-      ami: ami-e4c63e8b
+      ami: ami-8a2686e5
     ap-northeast-1:
-      ami: ami-5de0433c
+      ami: NOT_SUPPORTED
     ap-northeast-2:
-      ami: ami-6447930a
+      ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-2c95344f
+      ami: NOT_SUPPORTED
     ap-southeast-2:
-      ami: ami-39ac915a
+      ami: NOT_SUPPORTED
     sa-east-1:
-      ami: ami-7de77b11
+      ami: NOT_SUPPORTED
 
   Subnet2Cidr:
     vpc:
@@ -286,6 +293,38 @@ Resources:
         ToPort: 49664
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
+        FromPort: 389
+        ToPort: 389
+        CidrIp: 0.0.0.0/0 
+      - IpProtocol: tcp
+        FromPort: 88
+        ToPort: 88
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 88
+        ToPort: 88
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 123
+        ToPort: 123
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 464
+        ToPort: 464
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 464
+        ToPort: 464
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 749
+        ToPort: 749
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 636
+        ToPort: 636
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
@@ -338,6 +377,14 @@ Resources:
         FromPort: 8053
         ToPort: 8053
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 53
+        ToPort: 53
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 53
+        ToPort: 53
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: udp
         FromPort: 8053
         ToPort: 8053
@@ -375,6 +422,7 @@ Resources:
       VPCs:
         -
           VPCId: !Ref VPC
+          VPCRegion: !Ref AWS::Region
 
   Route53Records:
     Type: AWS::Route53::RecordSetGroup
@@ -406,7 +454,7 @@ Resources:
           ResourceRecords:
           - !GetAtt InfraNode1.PublicIp
 
-        - Name: !Join ['', ["*", .,  apps., !Ref 'QwiklabId', ., !Ref 'PublicHostedZone', .]] 
+        - Name: !Join ['', ["*", .,  apps., !Ref 'QwiklabId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
@@ -417,6 +465,12 @@ Resources:
           TTL: '900'
           ResourceRecords:
           - !GetAtt IdmNode1.PublicIp
+
+        - Name: !Join ['', [guide., !Ref QwiklabId, ., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt GuideNode.PublicIp
 
         - Name: !Join ['', [node01., !Ref QwiklabId, ., !Ref 'PublicHostedZone', .]]
           Type: A
@@ -481,6 +535,7 @@ Resources:
             cloud_config_modules:
             - disk_setup
             - mounts
+            - runcmd
 
             fs_setup:
             - label: etcd_storage
@@ -488,14 +543,7 @@ Resources:
               device: /dev/xvdc
               partition: auto
 
-            runcmd:
-            - mkdir -p /var/lib/etcd
-
             fqdn: master.${QwiklabId}.${PublicHostedZone}
-
-            mounts:
-            - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
-
 
             write_files:
             - content: |
@@ -529,8 +577,7 @@ Resources:
                   containerized=true
                   openshift_master_api_port=443
                   openshift_master_console_port=443
-                  openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
-                  openshift_master_htpasswd_users={'openshift': '$apr1$Mr5ZCJzb$mvaXu2UMOZ47pnQqNrLEi.'}
+                  openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=admin,cn=users,cn=accounts,<DC>', 'bindPassword': 'ldapadmin', 'ca': '/etc/origin/master/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://IDM/cn=users,cn=accounts,<DC>?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,<DC>)'}]
                   openshift_image_tag=v3.5.5.26
                   openshift_pkg_version=-3.5.5.26-1
                   openshift_master_default_subdomain=apps.${QwiklabId}.${PublicHostedZone}
@@ -547,15 +594,26 @@ Resources:
 
                   [masters]
                   master.${QwiklabId}.${PublicHostedZone}
-
+                  
                   [nodes]
-                  master.${PublicHostedZone}
+                  master.${QwiklabId}.${PublicHostedZone}
                   infra.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
                   node01.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node03.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                 path: /etc/ansible/hosts
 
+            runcmd:
+            - /usr/local/bin/inventory-patch
+            - mkdir -p /var/lib/etcd
+            - /usr/local/bin/idm-cert
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
+
+            mounts:
+            - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
 
   InfraNode1:
     Type: AWS::EC2::Instance
@@ -584,6 +642,11 @@ Resources:
             VolumeSize: '20'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdc
+          Ebs:
+            VolumeSize: '20'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
       Tags:
       - Key: Application
         Value:
@@ -594,7 +657,7 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            
+
             fqdn: infra.${QwiklabId}.${PublicHostedZone}
 
             write_files:
@@ -612,6 +675,17 @@ Resources:
             system_info:
               default_user:
                 name: ec2-user
+
+            runcmd:
+            - mkdir -p /var/lib/origin/openshift.local.volumes
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
+
+            mounts:
+            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+
 
   IdmNode1:
     Type: AWS::EC2::Instance
@@ -647,6 +721,78 @@ Resources:
             #cloud-config
 
             fqdn: idm.${QwiklabId}.${PublicHostedZone}
+
+            runcmd:
+            - /usr/local/bin/idm-install
+            - [ firewall-cmd, --reload ]
+
+  GuideNode:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegion2AMI
+        - Ref: AWS::Region
+        - ami
+      InstanceType:
+        Ref: GuideInstanceType
+      SubnetId:
+        Ref: PublicSubnet1
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds:
+        - !GetAtt NodeSecurityGroup.GroupId
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdb
+          Ebs:
+            VolumeSize: '20'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+      - Key: Name
+        Value: !Join [ ., [labguide, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #cloud-config
+            cloud_config_modules:
+            - disk_setup
+            - mounts
+            - runcmd
+
+            fqdn: guide.${QwiklabId}.${PublicHostedZone}
+
+            write_files:
+            - content: |
+                DEVS='/dev/xvdb'
+                VG=docker_vol
+                DATA_SIZE=95%VG
+                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
+              path: /etc/sysconfig/docker-storage-setup
+              owner: root:root
+
+            users:
+            - default
+
+            system_info:
+              default_user:
+                name: ec2-user
+
+            runcmd:
+            - [ systemctl, start, firewalld ]
+            - [ systemctl, daemon-reload ]
+            - [ systemctl, enable, workshopper ]
+            - [ systemctl, start, workshopper ]
+            - [ firewall-cmd, --zone=public, --add-service=http, --permanent ]
+            - [ firewall-cmd, --zone=public, --add-service=http ]
 
 
   WorkerNode1:
@@ -710,6 +856,10 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
@@ -791,6 +941,10 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
@@ -872,6 +1026,10 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
+            - [ systemctl, stop, firewalld ]
+            - [ systemctl, disable, firewalld ]
+            - [ systemctl, enable, iptables ]
+            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
@@ -904,3 +1062,15 @@ Outputs:
    SSHLoginUser:
       Description: "User name on the Master node to connect via SSH and PEM file"
       Value: "ec2-user"
+
+   LabguideURL:
+     Description: "Student Lab Guide"
+     Value: !Sub "http://${GuideNode.PublicIp}.nip.io/"
+
+   MasterIPAddress:
+     Description: "Public IP of the OpenShift Master node"
+     Value: !GetAtt Master1.PublicIp
+
+   OpenShiftURL:
+     Description: "Public IP of the OpenShift Master node"
+     Value: !Sub "https://${Master1.PublicIp}.nip.io:8443/"

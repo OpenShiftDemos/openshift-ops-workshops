@@ -325,10 +325,10 @@ You now have deployed CNS. Let's verify all components are in place. While still
 ----
 [root@master ~]# oc get pods -o wide
 NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
-glusterfs-37vn8   1/1       Running   0          3m       192.168.0.102   node1.example.com <1>
-glusterfs-cq68l   1/1       Running   0          3m       192.168.0.103   node2.example.com <1>
-glusterfs-m9fvl   1/1       Running   0          3m       192.168.0.104   node3.example.com <1>
-heketi-1-cd032    1/1       Running   0          1m       10.130.0.4      node3.example.com <2>
+glusterfs-37vn8   1/1       Running   0          3m       {{NODE1_INTERNAL_IP}}   {{NODE1_HOSTNAME_FQDN}} <1>
+glusterfs-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}   {{NODE2_HOSTNAME_FQDN}}m <1>
+glusterfs-m9fvl   1/1       Running   0          3m       {{NODE3_INTERNAL_IP}}   {{NODE3_HOSTNAME_FQDN}} <1>
+heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}}      {{NODE3_HOSTNAME_FQDN}} <2>
 ----
 <1> GlusterFS pods, notice how all designated nodes run exactly one pod.
 <2> heketi API frontend pod
@@ -369,7 +369,7 @@ Heketi Service URL:: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
 You may verify this with a trivial health check:
 
 ----
-[root@master ~]# curl http://heketi-{{CNS_NAMESPACE}}.cloudapps.example.com/hello
+[ec2-user@{{MASTER_HOSTNAME}} ~]# curl http://heketi-{{CNS_NAMESPACE}}.cloudapps.example.com/hello
 Hello from Heketi
 ----
 

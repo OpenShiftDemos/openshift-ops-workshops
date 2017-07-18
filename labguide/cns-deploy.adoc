@@ -369,7 +369,7 @@ Heketi Service URL:: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
 You may verify this with a trivial health check:
 
 ----
-[ec2-user@{{MASTER_HOSTNAME}} ~]# curl http://heketi-{{CNS_NAMESPACE}}.cloudapps.example.com/hello
+[ec2-user@{{MASTER_HOSTNAME}} ~]# curl http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}/hello
 Hello from Heketi
 ----
 

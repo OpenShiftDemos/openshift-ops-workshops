@@ -1,6 +1,8 @@
-vars:
-  OCP_ROUTING_SUFFIX: "apps.example.com"
-  
+config:
+  vars:
+    - name: OCP_ROUTING_SUFFIX
+      value: "apps.example.com"
+
 modules:
   environment:
     name: Environment Overview

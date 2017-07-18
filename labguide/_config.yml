@@ -1,0 +1,2 @@
+vars:
+  OCP_ROUTING_SUFFIX: "apps.example.com"

@@ -335,7 +335,7 @@ heketi-1-cd032    1/1       Running   0          1m       10.130.0.4      node3.
 
 NOTE: The exact pod names will be different in your environment, since they are auto-generated.
 
-The GlusterFS pods use the hosts network and disk devices to run the software-defined storage system. Hence they attached to the host's network. See schematic below for a visualization.
+The GlusterFS pods use the hosts network and disk devices to run the software-defined storage system. Hence they are attached to the host's network. See schematic below for a visualization.
 
 .GlusterFS pods in CNS in detail.
 image::images/cns_diagram_pod.svg[]
@@ -348,7 +348,7 @@ image::images/cns_diagram_heketi.svg[]
 To expose heketi's API a `service` named _heketi_ has been generated in OpenShift.
 
 ----
-[root@master ~]# oc get service/heketi
+[ec2-user@{{MASTER_HOSTNAME}} ~]# oc get service/heketi
 NAME      CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
 heketi    172.30.5.231   <none>        8080/TCP   31m
 ----
@@ -357,14 +357,14 @@ To also use heketi outside of OpenShift in addition to the service a route has b
 
 [source,options="nowrap"]
 ----
-[root@master ~]# oc get route/heketi
+[ec2-user@{{MASTER_HOSTNAME}} ~]# oc get route/heketi
 NAME      HOST/PORT                                               PATH      SERVICES   PORT      TERMINATION   WILDCARD
-heketi    heketi-{{CNS_NAMESPACE}}.cloudapps.example.com             heketi     <all>                   None
+heketi    heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}             heketi     <all>                   None
 ----
 
 Hence, heketi will be available via:
 
-Heketi Service URL:: http://heketi-{{CNS_NAMESPACE}}.cloudapps.example.com
+Heketi Service URL:: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
 
 You may verify this with a trivial health check:
 
@@ -373,6 +373,6 @@ You may verify this with a trivial health check:
 Hello from Heketi
 ----
 
-That's it. You have successfully provided shared storage to pods throughout the entire system, therefore avoiding the need for data to be replicated at the application level to each pod.
+That's it. You have successfully provisioned Container-native Storage on OpenShift. This is the basis to provide persistent storage to applications, as demonstrated in the link:cns-usage["Container-native Storage Management"] module.
 
-With CNS this is available wherever OpenShift is deployed with no external dependency.
+CNS is available wherever OpenShift is deployed with no external dependency.

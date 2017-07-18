@@ -1,0 +1,94 @@
+---
+
+  - hosts: localhost
+
+    tasks:
+
+      - name: create firewall-playbook
+        blockinfile:
+          create: yes
+          dest: configure-firewall.yml
+          state: present
+          block: |
+            - hosts: cns
+
+              tasks:
+
+                - name: insert iptables rules required for GlusterFS
+                  blockinfile:
+                    dest: /etc/sysconfig/iptables
+                    block: |
+                      -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT
+                      -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
+                      -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
+                      -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
+                    insertbefore: "^COMMIT"
+
+                - name: reload iptables
+                  systemd:
+                    name: iptables
+                    state: reloaded
+
+            ...
+
+      - name: run firewall-playbook
+        shell: ansible-playbook configure-firewall.yml
+
+      - name: login via oc as system:admin to default namespace
+        shell: oc login -u system:admin -n default
+
+      - name: create new project
+        shell: oc new-project {{ lookup('env','CNS_NAMESPACE') | default('container-native-storage') }}
+
+      - name: add privileges to default service account
+        shell: oadm policy add-scc-to-user privileged -z default
+
+      - name: delete topology file
+        file: name=topology.json state=absent
+
+      - set_fact:
+          topology:
+            clusters:
+            - nodes:
+              - node:
+                  hostnames:
+                    manage:
+                    - "{{ lookup('env','NODE1_HOSTNAME_FQDN') | default('node1.example.com') }}"
+                    storage:
+                    - "{{ lookup('env','NODE1_INTERNAL_IP') | default('192.168.0.100') }}"
+                  zone: 1
+                devices:
+                - "{{ lookup('env','NODE_BRICK_DEVICE') | default('/dev/xvdc') }}"
+              - node:
+                  hostnames:
+                    manage:
+                    - "{{ lookup('env','NODE2_HOSTNAME_FQDN') | default('node2.example.com') }}"
+                    storage:
+                    - "{{ lookup('env','NODE2_INTERNAL_IP') | default('192.168.0.101') }}"
+                  zone: 2
+                devices:
+                - "{{ lookup('env','NODE_BRICK_DEVICE') | default('/dev/xvdc') }}"
+              - node:
+                  hostnames:
+                    manage:
+                    - "{{ lookup('env','NODE3_HOSTNAME_FQDN') | default('node3.example.com') }}"
+                    storage:
+                    - "{{ lookup('env','NODE3_INTERNAL_IP') | default('192.168.0.102') }}"
+                  zone: 3
+                devices:
+                - "{{ lookup('env','NODE_BRICK_DEVICE') | default('/dev/xvdc') }}"
+
+
+      - name: create topology file
+        blockinfile:
+          create: yes
+          dest: topology.json
+          state: present
+          marker: ""
+          block: |
+            {{ topology | to_nice_json }}
+
+
+      - name: run cns-deploy
+        shell: cns-deploy --yes -n {{ lookup('env','CNS_NAMESPACE') | default('container-native-storage') }} -g topology.json --admin-key '{{ lookup('env','HEKETI_ADMIN_PW') | default('myS3cr3tpassw0rd') }}' --user-key '{{ lookup('env','HEKETI_USER_PW') | default('mys3rs3cr3tpassw0rd') }}'
+...

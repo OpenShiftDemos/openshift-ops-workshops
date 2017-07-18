@@ -544,6 +544,7 @@ Resources:
               partition: auto
 
             fqdn: master.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             write_files:
             - content: |
@@ -664,6 +665,7 @@ Resources:
             #cloud-config
 
             fqdn: infra.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             write_files:
             - content: |
@@ -726,6 +728,7 @@ Resources:
             #cloud-config
 
             fqdn: idm.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             runcmd:
             - /usr/local/bin/idm-install
@@ -774,6 +777,7 @@ Resources:
             - runcmd
 
             fqdn: guide.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             write_files:
             - content: |
@@ -874,6 +878,7 @@ Resources:
             - mounts
 
             fqdn: node01.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             fs_setup:
             - label: emptydir
@@ -959,6 +964,7 @@ Resources:
             - mounts
 
             fqdn: node02.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             fs_setup:
             - label: emptydir
@@ -1044,6 +1050,7 @@ Resources:
             - mounts
 
             fqdn: node03.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             fs_setup:
             - label: emptydir

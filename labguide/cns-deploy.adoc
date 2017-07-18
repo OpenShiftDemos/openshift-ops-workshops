@@ -333,17 +333,17 @@ heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}} 
 <1> GlusterFS pods, notice how all designated nodes run exactly one pod.
 <2> heketi API frontend pod
 
-NOTE: The exact pod names will be different in your environment, since they are auto-generated.
+NOTE: The exact pod names will be different in your environment, since they are auto-generated. Also the heketi pod might run on any node.
 
 The GlusterFS pods use the hosts network and disk devices to run the software-defined storage system. Hence they are attached to the host's network. See schematic below for a visualization.
 
 .GlusterFS pods in CNS in detail.
-image::images/cns_diagram_pod.svg[]
+image::cns_diagram_pod.svg[]
 
 heketi is a component that will expose an API for GlusterFS to OpenShift. This allows OpenShift to dynamically allocate storage from CNS in a programmatic fashion. See below for a visualization. Note that for simplicity, in our example heketi runs on the OpenShift App nodes, not on the Infra node.
 
 .heketi pod running in CNS
-image::images/cns_diagram_heketi.svg[]
+image::cns_diagram_heketi.svg[]
 
 To expose heketi's API a `service` named _heketi_ has been generated in OpenShift.
 

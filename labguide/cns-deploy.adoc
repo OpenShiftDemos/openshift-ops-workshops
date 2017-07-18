@@ -9,10 +9,8 @@ This lab requires that you completed OpenShift installation in the previous modu
 NOTE: All of the following tasks are carried out as root from the master node. All files created can be stored in root's home directory unless a particular path is specified. At the end of this section you will have 3 GlusterFS pods running together with the heketi API frontend properly integrated into OpenShift.
 
 
-:numbered:
+# Deploying Container-native Storage
 
-Deploying Container-native Storage
-----------------------------------
 Make sure you are logged on to the master node.
 
 
@@ -34,7 +32,7 @@ The command should return the following:
   cns-deploy.x86_64     4.0.0-19.el7rhgs        @rh-gluster-3-for-rhel-7-server-rpms
 
 '''
-==== Configure OpenShift Node firewall with Ansible
+### Configure OpenShift Node firewall with Ansible
 
 NOTE: In the following section we will configure Ansible. We will use it's configuration management capabilities in order to make sure all the OpenShift nodes have the right firewall settings for CNS.
 
@@ -120,7 +118,7 @@ PLAY RECAP *********************************************************************
 
 '''
 
-==== Prepare OpenShift for CNS
+### Prepare OpenShift for CNS
 
 Next we will create a namespace (also referred to as a _Project_) in OpenShift. It will be used to group the GlusterFS pods.
 For this you need to be logged as an admin user in OpenShift.
@@ -142,7 +140,7 @@ GlusterFS pods need access to the physical block devices on the host. Hence they
 
   [ec2-user@{{MASTER_HOSTNAME}} ~]# oadm policy add-scc-to-user privileged -z default
 
-==== Describe Container-native Storage Topology
+### Describe Container-native Storage Topology
 
 CNS will virtualize locally attached block storage on the OpenShift App nodes. In order to deploy you will need to supply the installer with information about where to find these nodes and what network and which block devices to use. +
 This is done using JSON file describing the topology of your OpenShift deployment.
@@ -212,7 +210,7 @@ For this purpose, create the file topology.json with the following content:
 This file contains an additional property called `zone` per node. This identifies the failure domain this host resides in.
 In CNS data is always replicated 3 times. By exposing information about the failure domains we can make sure that two copies are never stored on nodes in the same failure domain. The `zone` definitions are simply arbitrary, but unique integer values.
 
-==== Deploy Container-native Storage
+### Deploy Container-native Storage
 
 You are now ready to deploy CNS. Alongside GlusterFS pods the API front-end known as *heketi* is deployed. To protect this API from unauthorized access we will define passwords for the `admin` and `user` role in heketi like below.
 
@@ -318,17 +316,17 @@ Ready to create and provide GlusterFS volumes.
 
 NOTE: Some of the output contains auto-generated data, so references to UUIDs and pod names might be slightly different for you.
 
-==== Verifying the deployment
+### Verifying the deployment
 
 You now have deployed CNS. Let's verify all components are in place. While still in the `{{CNS_NAMESPACE}}` project on the CLI list all running pods.
 
 ----
 [root@master ~]# oc get pods -o wide
 NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
-glusterfs-37vn8   1/1       Running   0          3m       {{NODE1_INTERNAL_IP}}   {{NODE1_HOSTNAME_FQDN}} <1>
-glusterfs-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}   {{NODE2_HOSTNAME_FQDN}}m <1>
-glusterfs-m9fvl   1/1       Running   0          3m       {{NODE3_INTERNAL_IP}}   {{NODE3_HOSTNAME_FQDN}} <1>
-heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}}      {{NODE3_HOSTNAME_FQDN}} <2>
+glusterfs-37vn8   1/1       Running   0          3m       {{NODE1_INTERNAL_IP}}         {{NODE1_HOSTNAME_FQDN}} <1>
+glusterfs-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}         {{NODE2_HOSTNAME_FQDN}}m <1>
+glusterfs-m9fvl   1/1       Running   0          3m       {{NODE3_INTERNAL_IP}}         {{NODE3_HOSTNAME_FQDN}} <1>
+heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}}         {{NODE3_HOSTNAME_FQDN}} <2>
 ----
 <1> GlusterFS pods, notice how all designated nodes run exactly one pod.
 <2> heketi API frontend pod

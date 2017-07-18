@@ -591,17 +591,17 @@ Resources:
                   openshift_hosted_logging_deploy=false
 
                   [etcd]
-                  master.${QwiklabId}.${PublicHostedZone}
+                  master.${QwiklabId}.${PublicHostedZone} openshift_hostname=master.${QwiklabId}.${PublicHostedZone}
 
                   [masters]
-                  master.${QwiklabId}.${PublicHostedZone}
+                  master.${QwiklabId}.${PublicHostedZone} openshift_hostname=master.${QwiklabId}.${PublicHostedZone}
 
                   [nodes]
-                  master.${QwiklabId}.${PublicHostedZone}
-                  infra.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
-                  node01.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node03.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  master.${QwiklabId}.${PublicHostedZone} openshift_hostname=master.${QwiklabId}.${PublicHostedZone}
+                  infra.${QwiklabId}.${PublicHostedZone} openshift_hostname=infra.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
+                  node01.${QwiklabId}.${PublicHostedZone} openshift_hostname=node01.${QwiklabId}.${PublicHostedZone}  openshift_node_labels="{'region': 'apps'}"
+                  node02.${QwiklabId}.${PublicHostedZone} openshift_hostname=node02.${QwiklabId}.${PublicHostedZone}  openshift_node_labels="{'region': 'apps'}"
+                  node03.${QwiklabId}.${PublicHostedZone} openshift_hostname=node03.${QwiklabId}.${PublicHostedZone}  openshift_node_labels="{'region': 'apps'}"
 
                   [cns]
                   node01.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"

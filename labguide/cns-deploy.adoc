@@ -16,18 +16,18 @@ Deploying Container-native Storage
 Make sure you are logged on to the master node.
 
 ....
-[ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# hostname
+[ec2-user@{{MASTER_HOSTNAME}} ~]# hostname
 {{MASTER_HOSTNAME_FQDN}}
 ....
 
 First, verify that the CNS deployment tool is installed. +
 We will also use ansible and verify it's presence. Though not needed for CNS in this lab it will help us simplify an otherwise tedious manual configuration step.
 
-  [ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# yum list installed cns-deploy
+  [ec2-user@{{MASTER_HOSTNAME}} ~]# yum list installed cns-deploy
 
 The command should return the following:
 
-  [ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]$ yum list installed cns-deploy ansible
+  [ec2-user@{{MASTER_HOSTNAME}} ~]$ yum list installed cns-deploy ansible
   Loaded plugins: product-id, search-disabled-repos, subscription-manager
   Installed Packages
   ansible.noarch        2.3.1.0-1.el7           @epel
@@ -43,7 +43,7 @@ NOTE: In the following section we will configure Ansible. We will use it's confi
 
 You should be able to ping all hosts using Ansible
 ....
-[ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# ansible cns -m ping
+[ec2-user@{{MASTER_HOSTNAME}} ~]# ansible cns -m ping
 
 {{NODE1_HOSTNAME_FQDN}} | SUCCESS => {
     "changed": false,
@@ -89,7 +89,7 @@ Create a file called `configure-firewall.yml` and copy&paste the following conte
 
 This short Ansible playbook will configure the firewall on all OpenShift worker nodes to allow GlusterFS-related traffic, required for CNS. Run it with the following command:
 
- [ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# ansible-playbook configure-firewall.yml
+ [ec2-user@{{MASTER_HOSTNAME}} ~]# ansible-playbook configure-firewall.yml
 
 Your output should look like this:
 
@@ -126,21 +126,21 @@ Next we will create a namespace (also referred to as a _Project_) in OpenShift. 
 For this you need to be logged as an admin user in OpenShift.
 
 ....
-[ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# oc whoami
+[ec2-user@{{MASTER_HOSTNAME}} ~]# oc whoami
 system:admin
 ....
 
 If you are for some reason not an admin, login as system admin like this:
 
- [ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# oc login -u system:admin -n default
+ [ec2-user@{{MASTER_HOSTNAME}} ~]# oc login -u system:admin -n default
 
 Create a namespace with a designation of your choice. In this example we will use `container-native-storage`.
 
- [ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# oc new-project container-native-storage
+ [ec2-user@{{MASTER_HOSTNAME}} ~]# oc new-project container-native-storage
 
 GlusterFS pods need access to the physical block devices on the host. Hence they need elevated permissions. Enable containers to run in privileged mode.
 
- [ec2-user@{{MASTER_HOSTNAME_SHORT}} ~]# oadm policy add-scc-to-user privileged -z default
+ [ec2-user@{{MASTER_HOSTNAME}} ~]# oadm policy add-scc-to-user privileged -z default
 
 ==== Describe Container-native Storage Topology
 

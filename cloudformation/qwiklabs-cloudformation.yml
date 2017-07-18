@@ -783,6 +783,28 @@ Resources:
                 EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
               path: /etc/sysconfig/docker-storage-setup
               owner: root:root
+            - content: |
+                WORKSHOPS_URLS="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/production/labguide/_cns_testdrive.yaml"
+                CONTENT_URL_PREFIX="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/production/labguide/"
+                OCP_ROUTING_SUFFIX="apps.${QwiklabId}.${PublicHostedZone}"
+                MASTER_HOSTNAME="master"
+                MASTER_HOSTNAME_FQDN: "master.${QwiklabId}.${PublicHostedZone}"
+                NODE1_HOSTNAME: "node01"
+                NODE1_HOSTNAME_FQDN: "node01.${QwiklabId}.${PublicHostedZone}"
+                NODE1_INTERNAL_IP: "${WorkerNode1.PrivateIp}"
+                NODE2_HOSTNAME: "node02"
+                NODE2_HOSTNAME_FQDN: "node02.${QwiklabId}.${PublicHostedZone}"
+                NODE2_INTERNAL_IP: "${WorkerNode2.PrivateIp}"
+                NODE3_HOSTNAME: "node03"
+                NODE3_HOSTNAME_FQDN: "node03.${QwiklabId}.${PublicHostedZone}"
+                NODE3_INTERNAL_IP: "${WorkerNode3.PrivateIp}"
+                NODE_BRICK_DEVICE: "/dev/xvdc"
+                CNS_NAMESPACE: "container-native-storage"
+                HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
+                HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
+              path: /etc/sysconfig/workshopper
+              owner: root:root
+
 
             users:
             - default

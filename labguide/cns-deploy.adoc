@@ -274,9 +274,9 @@ serviceaccount "heketi-service-account" created
 template "heketi" created
 template "glusterfs" created
 role "edit" added: "system:serviceaccount:{{CNS_NAMESPACE}}:heketi-service-account"
-node "{{NODE1_HOSTNAME_FQDN}}" labeled <2>
-node "{{NODE2_HOSTNAME_FQDN}}" labeled <2>
-node "{{NODE3_HOSTNAME_FQDN}}" labeled <2>
+node "{{NODE1_INTERNAL_FQDN}}" labeled <2>
+node "{{NODE2_INTERNAL_FQDN}}" labeled <2>
+node "{{NODE3_INTERNAL_FQDN}}" labeled <2>
 daemonset "glusterfs" created
 Waiting for GlusterFS pods to start ... OK <3>
 service "deploy-heketi" created
@@ -284,11 +284,11 @@ route "deploy-heketi" created
 deploymentconfig "deploy-heketi" created
 Waiting for deploy-heketi pod to start ... OK
 Creating cluster ... ID: 307f708621f4e0c9eda962b713272e81
-Creating node {{NODE1_HOSTNAME_FQDN}} ... ID: f60a225a16e8678d5ef69afb4815e417 <4>
+Creating node {{NODE1_INTERNAL_FQDN}} ... ID: f60a225a16e8678d5ef69afb4815e417 <4>
 Adding device {{NODE_BRICK_DEVICE}} ... OK <5>
-Creating node {{NODE2_HOSTNAME_FQDN}} ... ID: 13b7c17c541069862d7e66d142ab789e <4>
+Creating node {{NODE2_INTERNAL_FQDN}} ... ID: 13b7c17c541069862d7e66d142ab789e <4>
 Adding device {{NODE_BRICK_DEVICE}} ... OK <5>
-Creating node {{NODE3_HOSTNAME_FQDN}} ... ID: 5a6fbe5eb1864e711f8bd9b0cb5946ea <4>
+Creating node {{NODE3_INTERNAL_FQDN}} ... ID: 5a6fbe5eb1864e711f8bd9b0cb5946ea <4>
 Adding device {{NODE_BRICK_DEVICE}} ... OK <5>
 heketi topology loaded.
 Saving heketi-storage.json
@@ -325,10 +325,10 @@ You now have deployed CNS. Let's verify all components are in place. While still
 ----
 [root@master ~]# oc get pods -o wide
 NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
-glusterfs-37vn8   1/1       Running   0          3m       {{NODE1_INTERNAL_IP}}         {{NODE1_HOSTNAME_FQDN}} <1>
-glusterfs-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}         {{NODE2_HOSTNAME_FQDN}}m <1>
-glusterfs-m9fvl   1/1       Running   0          3m       {{NODE3_INTERNAL_IP}}         {{NODE3_HOSTNAME_FQDN}} <1>
-heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}}         {{NODE3_HOSTNAME_FQDN}} <2>
+glusterfs-37vn8   1/1       Running   0          3m       {{NODE1_INTERNAL_IP}}         {{NODE1_INTERNAL_FQDN}} <1>
+glusterfs-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}         {{NODE2_INTERNAL_FQDN}}m <1>
+glusterfs-m9fvl   1/1       Running   0          3m       {{NODE3_INTERNAL_IP}}         {{NODE3_INTERNAL_FQDN}} <1>
+heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}}         {{NODE3_INTERNAL_FQDN}} <2>
 ----
 <1> GlusterFS pods, notice how all designated nodes run exactly one pod.
 <2> heketi API frontend pod

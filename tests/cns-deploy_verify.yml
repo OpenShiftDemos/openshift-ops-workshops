@@ -9,14 +9,34 @@
 
   - hosts: localhost
 
+
     tasks:
 
+      - set_fact:
+          cns_namespace: {{ lookup('env','CNS_NAMESPACE') | default('container-native-storage') }}
+
       - name: check if CNS namespace exists
-        shell: oc get projects -o jsonpath='{$.items[?(@.metadata.name=="{{ lookup('env','CNS_NAMESPACE') | default('container-native-storage') }}")]..name}'
+        shell: oc get projects -o jsonpath='{$.items[?(@.metadata.name=="{{cns_namespace}}")]..name}'
         register: check_namespace
 
       - fail:
-          msg: "CNS namespace called {{ lookup('env','CNS_NAMESPACE') | default('container-native-storage') }} does not exist"
-        when: check_namespace.stdout is not '{{ lookup('env','CNS_NAMESPACE') | default('container-native-storage') }}'
+          msg: "CNS namespace called {{cns_namespace}} does not exist"
+        when: check_namespace.stdout != '{{cns_namespace}}'
+
+      - name: check daemonset in namespace
+        shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.numberReady}' -n {{cns_namespace}}
+        register: check_daemonset
+
+      - fail:
+          msg: "DaemonSet called glusterfs not found or not healthy"
+        when: check_daemonset.stdout!= "3"
+
+      - name: check if 3 running glusterfs pods exist in namespace
+        shell: oc get pods -n {{cns_namespace}} -o jsonpath='{$.items[?(@.status.phase=="Running")]..metadata.name}' | awk '{print gsub(/glusterfs-/,"")}'
+        register: check_pods
+
+      - fail:
+          msg: "Could not find 3 running GlusterFS pods in namespace {{cns_namespace}}"
+        when: check_pods.stdout != "3"
 
 ...

@@ -15,7 +15,7 @@ Make sure you are logged on to the master node.
 
 
   [ec2-user@{{MASTER_HOSTNAME}} ~]# hostname
-  {{MASTER_HOSTNAME_FQDN}}
+  {{MASTER_INTERNAL_FQDN}}
 
 
 First, verify that the CNS deployment tool is installed. +
@@ -157,7 +157,7 @@ For this purpose, create the file topology.json with the following content:
                     "node": {
                         "hostnames": {
                             "manage": [
-                                "{{NODE1_HOSTNAME_FQDN}}"
+                                "{{NODE1_INTERNAL_FQDN}}"
                             ],
                             "storage": [
                                 "{{NODE1_INTERNAL_IP}}"
@@ -173,7 +173,7 @@ For this purpose, create the file topology.json with the following content:
                     "node": {
                         "hostnames": {
                             "manage": [
-                                "{{NODE2_HOSTNAME_FQDN}}"
+                                "{{NODE2_INTERNAL_FQDN}}"
                             ],
                             "storage": [
                                 "{{NODE2_INTERNAL_IP}}"
@@ -189,7 +189,7 @@ For this purpose, create the file topology.json with the following content:
                     "node": {
                         "hostnames": {
                             "manage": [
-                                "{{NODE3_HOSTNAME_FQDN}}"
+                                "{{NODE3_INTERNAL_FQDN}}"
                             ],
                             "storage": [
                                 "{{NODE3_INTERNAL_IP}}"

@@ -21,7 +21,7 @@ modules:
     name: Deploying Container-native Storage
     vars:
       MASTER_HOSTNAME: "master"
-      MASTER_HOSTNAME_FQDN: "master.example.com"
+      MASTER_INTERNAL_FQDN: "master.example.com"
       NODE1_HOSTNAME: "node1"
       NODE1_HOSTNAME_FQDN: "node1.example.com"
       NODE1_INTERNAL_IP: "192.168.0.100"

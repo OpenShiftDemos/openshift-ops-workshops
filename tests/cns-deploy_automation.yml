@@ -53,7 +53,7 @@
               - node:
                   hostnames:
                     manage:
-                    - "{{ lookup('env','NODE1_HOSTNAME_FQDN') | default('node1.example.com') }}"
+                    - "{{ lookup('env','NODE1_INTERNAL_FQDN') | default('node1.example.com') }}"
                     storage:
                     - "{{ lookup('env','NODE1_INTERNAL_IP') | default('192.168.0.100') }}"
                   zone: 1
@@ -62,7 +62,7 @@
               - node:
                   hostnames:
                     manage:
-                    - "{{ lookup('env','NODE2_HOSTNAME_FQDN') | default('node2.example.com') }}"
+                    - "{{ lookup('env','NODE2_INTERNAL_FQDN') | default('node2.example.com') }}"
                     storage:
                     - "{{ lookup('env','NODE2_INTERNAL_IP') | default('192.168.0.101') }}"
                   zone: 2
@@ -71,7 +71,7 @@
               - node:
                   hostnames:
                     manage:
-                    - "{{ lookup('env','NODE3_HOSTNAME_FQDN') | default('node3.example.com') }}"
+                    - "{{ lookup('env','NODE3_INTERNAL_FQDN') | default('node3.example.com') }}"
                     storage:
                     - "{{ lookup('env','NODE3_INTERNAL_IP') | default('192.168.0.102') }}"
                   zone: 3

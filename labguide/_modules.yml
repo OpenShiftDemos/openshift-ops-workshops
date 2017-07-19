@@ -50,7 +50,7 @@ modules:
   cns-deploy:
     name: Deploying Container-native Storage
     vars:
-      NODE_BRICK_DEVICE: "/dev/xvdc"
+      NODE_BRICK_DEVICE: "/dev/xvdd"
       CNS_NAMESPACE: "container-native-storage"
       HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
       HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"

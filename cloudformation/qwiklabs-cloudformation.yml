@@ -627,7 +627,7 @@ Resources:
                                           "zone": 1
                                       },
                                       "devices": [
-                                          "/dev/xvdc"
+                                          "/dev/xvdd"
                                       ]
                                   },
                                   {
@@ -643,7 +643,7 @@ Resources:
                                           "zone": 2
                                       },
                                       "devices": [
-                                          "/dev/xvdc"
+                                          "/dev/xvdd"
                                       ]
                                   },
                                   {
@@ -659,7 +659,7 @@ Resources:
                                           "zone": 3
                                       },
                                       "devices": [
-                                          "/dev/xvdc"
+                                          "/dev/xvdd"
                                       ]
                                   }
                               ]
@@ -668,6 +668,7 @@ Resources:
                   }
                 path: /home/ec2-user/topology.json
                 owner: ec2-user
+                group: ec2-user
 
             runcmd:
             - /usr/local/bin/inventory-patch
@@ -866,7 +867,7 @@ Resources:
                 NODE3_EXTERNAL_FQDN="node03.${QwiklabId}.${PublicHostedZone}"
                 NODE3_INTERNAL_FQDN="${WorkerNode3.PrivateDnsName}"
                 NODE3_INTERNAL_IP="${WorkerNode3.PrivateIp}"
-                NODE_BRICK_DEVICE="/dev/xvdc"
+                NODE_BRICK_DEVICE="/dev/xvdd"
                 CNS_NAMESPACE="container-native-storage"
                 HEKETI_ADMIN_PW="myS3cr3tpassw0rd"
                 HEKETI_USER_PW="mys3rs3cr3tpassw0rd"

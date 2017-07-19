@@ -53,5 +53,5 @@
         when: not topology_file.stat.isreg
 
       - name: run cns-deploy
-        shell: cns-deploy --yes -n {{ lookup('env','CNS_NAMESPACE') | default('container-native-storage') }} -g topology.json --admin-key '{{ lookup('env','HEKETI_ADMIN_PW') | default('myS3cr3tpassw0rd') }}' --user-key '{{ lookup('env','HEKETI_USER_PW') | default('mys3rs3cr3tpassw0rd') }}'
+        shell: cns-deploy --yes -n {{ lookup('env','CNS_NAMESPACE') | default('container-native-storage') }} -g /home/ec2-user/topology.json --admin-key '{{ lookup('env','HEKETI_ADMIN_PW') | default('myS3cr3tpassw0rd') }}' --user-key '{{ lookup('env','HEKETI_USER_PW') | default('mys3rs3cr3tpassw0rd') }}'
 ...

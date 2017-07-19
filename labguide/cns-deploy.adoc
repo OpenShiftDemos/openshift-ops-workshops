@@ -15,7 +15,7 @@ Make sure you are logged on to the master node.
 
 
   [ec2-user@{{MASTER_HOSTNAME}} ~]# hostname
-  {{MASTER_INTERNAL_FQDN}}
+  {{MASTER_EXTERNAL_FQDN}}
 
 
 First, verify that the CNS deployment tool is installed. +
@@ -43,15 +43,15 @@ You should be able to ping all hosts using Ansible
 ....
 [ec2-user@{{MASTER_HOSTNAME}} ~]# ansible cns -m ping
 
-{{NODE1_HOSTNAME_FQDN}} | SUCCESS => {
+{{NODE1_EXTERNAL_FQDN}} | SUCCESS => {
     "changed": false,
     "ping": "pong"
 }
-{{NODE2_HOSTNAME_FQDN}} | SUCCESS => {
+{{NODE2_EXTERNAL_FQDN}} | SUCCESS => {
     "changed": false,
     "ping": "pong"
 }
-{{NODE3_HOSTNAME_FQDN}} | SUCCESS => {
+{{NODE3_EXTERNAL_FQDN}} | SUCCESS => {
     "changed": false,
     "ping": "pong"
 }
@@ -95,24 +95,24 @@ When the playbooks completes successfully, your output should look like this:
 PLAY [nodes] *******************************************************************
 
 TASK [setup] *******************************************************************
-ok: [{{NODE1_HOSTNAME_FQDN}}]
-ok: [{{NODE2_HOSTNAME_FQDN}}]
-ok: [{{NODE3_HOSTNAME_FQDN}}]
+ok: [{{NODE1_EXTERNAL_FQDN}}]
+ok: [{{NODE2_EXTERNAL_FQDN}}]
+ok: [{{NODE3_EXTERNAL_FQDN}}]
 
 TASK [insert iptables rules required for GlusterFS] ****************************
-changed: [{{NODE1_HOSTNAME_FQDN}}]
-changed: [{{NODE2_HOSTNAME_FQDN}}]
-changed: [{{NODE3_HOSTNAME_FQDN}}]
+changed: [{{NODE1_EXTERNAL_FQDN}}]
+changed: [{{NODE2_EXTERNAL_FQDN}}]
+changed: [{{NODE3_EXTERNAL_FQDN}}]
 
 TASK [reload iptables] *********************************************************
-changed: [{{NODE1_HOSTNAME_FQDN}}]
-changed: [{{NODE2_HOSTNAME_FQDN}}]
-changed: [{{NODE3_HOSTNAME_FQDN}}]
+changed: [{{NODE1_EXTERNAL_FQDN}}]
+changed: [{{NODE2_EXTERNAL_FQDN}}]
+changed: [{{NODE3_EXTERNAL_FQDN}}]
 
 PLAY RECAP *********************************************************************
-{{NODE1_HOSTNAME_FQDN}}          : ok=3    changed=2    unreachable=0    failed=0
-{{NODE2_HOSTNAME_FQDN}}          : ok=3    changed=2    unreachable=0    failed=0
-{{NODE3_HOSTNAME_FQDN}}          : ok=3    changed=2    unreachable=0    failed=0
+{{NODE1_EXTERNAL_FQDN}}          : ok=3    changed=2    unreachable=0    failed=0
+{{NODE2_EXTERNAL_FQDN}}          : ok=3    changed=2    unreachable=0    failed=0
+{{NODE3_EXTERNAL_FQDN}}          : ok=3    changed=2    unreachable=0    failed=0
 ....
 ====
 
@@ -145,9 +145,9 @@ GlusterFS pods need access to the physical block devices on the host. Hence they
 CNS will virtualize locally attached block storage on the OpenShift App nodes. In order to deploy you will need to supply the installer with information about where to find these nodes and what network and which block devices to use. +
 This is done using JSON file describing the topology of your OpenShift deployment.
 
-For this purpose, create the file topology.json with the following content:
+For this purpose, the file topology.json has been created in the home directory of `ec2-user` on the master node. Verify it has following content:
 [source,json]
-.topology.json
+./home/ec2-user/topology.json
 ----
 {
     "clusters": [
@@ -206,6 +206,8 @@ For this purpose, create the file topology.json with the following content:
     ]
 }
 ----
+
+NOTE: The topology references the worker nodes by their hostnames as they are known to OpenShift.
 
 This file contains an additional property called `zone` per node. This identifies the failure domain this host resides in.
 In CNS data is always replicated 3 times. By exposing information about the failure domains we can make sure that two copies are never stored on nodes in the same failure domain. The `zone` definitions are simply arbitrary, but unique integer values.

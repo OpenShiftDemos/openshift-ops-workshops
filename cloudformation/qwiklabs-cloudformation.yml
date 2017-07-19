@@ -863,7 +863,7 @@ Resources:
                 NODE2_INTERNAL_IP: "${WorkerNode2.PrivateIp}"
                 NODE3_HOSTNAME: "node03"
                 NODE3_EXTERNAL_FQDN: "node03.${QwiklabId}.${PublicHostedZone}"
-                NODE3_INTERNAL_FQDN: "${WorkerNode4.PrivateDnsName}"
+                NODE3_INTERNAL_FQDN: "${WorkerNode3.PrivateDnsName}"
                 NODE3_INTERNAL_IP: "${WorkerNode3.PrivateIp}"
                 NODE_BRICK_DEVICE: "/dev/xvdc"
                 CNS_NAMESPACE: "container-native-storage"

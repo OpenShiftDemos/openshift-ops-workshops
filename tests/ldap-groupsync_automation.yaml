@@ -1,0 +1,38 @@
+---
+
+- name: Automation of module 3.3 (if user wants to skip)
+  hosts: masters
+  become_user: root
+  
+  tasks: 
+    - name: syncing all the groups using 'oc adm' CLI tool and applying changes to the system
+      command: oc adm groups sync --sync-config=groupsync.yaml --confirm
+      
+    - name: Changing policy of the group - 'ose-normal-dev' to 'cluster-admin'
+      command: oc adm policy add-cluster-role-to-group cluster-admin ose-normal-dev
+      
+    - name: Logging in as 'teamuser1' of group 'ose-normal-dev'
+      command: oc login -u teamuser1 -p openshift
+      
+    - name: Creating new projects using 'oc adm new-project' command
+      command: oc adm new-project app-dev --display-name="Application Development"
+      
+    - name: Creating new projects using 'oc adm new-project' command
+      command: oc adm new-project app-test --display-name="Application Testing"
+      
+    - name: Creating new projects using 'oc adm new-project' command
+      command: oc adm new-project app-prod --display-name="Application Production"
+      
+    - name: Granting group 'ose-normal-dev' admin rights in the app-dev project
+      command: oc adm policy add-role-to-group admin ose-normal-dev -n app-dev
+      
+    - name: Granting group 'ose-normal-dev' admin rights in the app-test project
+      command: oc adm policy add-role-to-group admin ose-normal-dev -n app-test
+      
+    - name: Granting group 'ose-fancy-dev' admin rights in the app-prod project
+      command: oc adm policy add-role-to-group admin ose-fancy-dev -n app-prod
+      
+    - name: Logging in as 'teamuser2' to list projects - app-dev and app-test
+      command: oc login -u teamuser2 -p openshift
+           
+...

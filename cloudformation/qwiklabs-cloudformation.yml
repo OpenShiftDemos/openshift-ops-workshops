@@ -870,7 +870,7 @@ Resources:
                 CNS_NAMESPACE="container-native-storage"
                 HEKETI_ADMIN_PW="myS3cr3tpassw0rd"
                 HEKETI_USER_PW="mys3rs3cr3tpassw0rd"
-              path=/etc/sysconfig/workshopper
+              path: /etc/sysconfig/workshopper
               owner: root:root
 
 

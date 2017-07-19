@@ -1,3 +1,38 @@
+config:
+  vars:
+    - name: OCP_ROUTING_SUFFIX
+      value: "apps.example.com"
+    - name: MASTER_HOSTNAME
+      value: "master"
+    - name: MASTER_EXTERNAL_FQDN
+      value: "master.example.com"
+    - name: MASTER_INTERNAL_FQDN
+      value: "master.internal.example.com"
+    - name: NODE1_HOSTNAME
+      value: "node01"
+    - name: NODE1_EXTERNAL_FQDN
+      value: "node01.example.com"
+    - name: NODE1_INTERNAL_FQDN
+      value: "node01.internal.example.com"
+    - name: NODE1_INTERNAL_IP
+      value: "192.168.0.101"
+    - name: NODE1_HOSTNAME
+      value: "node02"
+    - name: NODE2_EXTERNAL_FQDN
+      value: "node02.example.com"
+    - name: NODE2_INTERNAL_FQDN
+      value: "node02.internal.example.com"
+    - name: NODE2_INTERNAL_IP
+      value: "192.168.0.102"
+    - name: NODE3_HOSTNAME
+      value: "node03"
+    - name: NODE3_EXTERNAL_FQDN
+      value: "node03.example.com"
+    - name: NODE3_INTERNAL_FQDN
+      value: "node03.internal.example.com"
+    - name: NODE3_INTERNAL_IP
+      value: "192.168.0.103"
+
 modules:
   environment:
     name: Environment Overview
@@ -10,6 +45,12 @@ modules:
       ETHERPAD_ENABLED:
       NUM_USERS:
       ETHERPAD_URL_PREFIX:
-   
   installation:
     name: Installation and Verification
+  cns-deploy:
+    name: Deploying Container-native Storage
+    vars:
+      NODE_BRICK_DEVICE: "/dev/xvdd"
+      CNS_NAMESPACE: "container-native-storage"
+      HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
+      HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"

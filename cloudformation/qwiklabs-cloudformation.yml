@@ -295,7 +295,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: 389
         ToPort: 389
-        CidrIp: 0.0.0.0/0 
+        CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
         FromPort: 88
         ToPort: 88
@@ -544,6 +544,7 @@ Resources:
               partition: auto
 
             fqdn: master.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             write_files:
             - content: |
@@ -594,14 +595,80 @@ Resources:
 
                   [masters]
                   master.${QwiklabId}.${PublicHostedZone}
-                  
+
                   [nodes]
                   master.${QwiklabId}.${PublicHostedZone}
                   infra.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
                   node01.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node03.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+
+                  [cns]
+                  node01.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  node03.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                 path: /etc/ansible/hosts
+
+              - content: |
+                  {
+                      "clusters": [
+                          {
+                              "nodes": [
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "${WorkerNode1.PrivateDnsName}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode1.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 1
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  },
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "${WorkerNode2.PrivateDnsName}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode2.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 2
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  },
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "${WorkerNode3.PrivateDnsName}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode3.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 3
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  }
+                              ]
+                          }
+                      ]
+                  }
+                path: /home/ec2-user/topology.json
+                owner: ec2-user
+                group: ec2-user
 
             runcmd:
             - /usr/local/bin/inventory-patch
@@ -659,6 +726,7 @@ Resources:
             #cloud-config
 
             fqdn: infra.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             write_files:
             - content: |
@@ -721,6 +789,7 @@ Resources:
             #cloud-config
 
             fqdn: idm.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             runcmd:
             - /usr/local/bin/idm-install
@@ -770,6 +839,7 @@ Resources:
             - runcmd
 
             fqdn: guide.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             write_files:
             - content: |
@@ -779,6 +849,32 @@ Resources:
                 EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
               path: /etc/sysconfig/docker-storage-setup
               owner: root:root
+            - content: |
+                WORKSHOPS_URLS="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/production/labguide/_ocp_admin_testdrive.yaml"
+                CONTENT_URL_PREFIX="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/production/labguide"
+                OCP_ROUTING_SUFFIX="apps.${QwiklabId}.${PublicHostedZone}"
+                MASTER_HOSTNAME="master"
+                MASTER_EXTERNAL_FQDN="master.${QwiklabId}.${PublicHostedZone}"
+                MASTER_INTERNAL_FQDN="${Master1.PrivateDnsName}"
+                NODE1_HOSTNAME="node01"
+                NODE1_EXTERNAL_FQDN="node01.${QwiklabId}.${PublicHostedZone}"
+                NODE1_INTERNAL_FQDN="${WorkerNode1.PrivateDnsName}"
+                NODE1_INTERNAL_IP="${WorkerNode1.PrivateIp}"
+                NODE2_HOSTNAME="node02"
+                NODE2_EXTERNAL_FQDN="node02.${QwiklabId}.${PublicHostedZone}"
+                NODE2_INTERNAL_FQDN="${WorkerNode2.PrivateDnsName}"
+                NODE2_INTERNAL_IP="${WorkerNode2.PrivateIp}"
+                NODE3_HOSTNAME="node03"
+                NODE3_EXTERNAL_FQDN="node03.${QwiklabId}.${PublicHostedZone}"
+                NODE3_INTERNAL_FQDN="${WorkerNode3.PrivateDnsName}"
+                NODE3_INTERNAL_IP="${WorkerNode3.PrivateIp}"
+                NODE_BRICK_DEVICE="/dev/xvdd"
+                CNS_NAMESPACE="container-native-storage"
+                HEKETI_ADMIN_PW="myS3cr3tpassw0rd"
+                HEKETI_USER_PW="mys3rs3cr3tpassw0rd"
+              path: /etc/sysconfig/workshopper
+              owner: root:root
+
 
             users:
             - default
@@ -848,6 +944,7 @@ Resources:
             - mounts
 
             fqdn: node01.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             fs_setup:
             - label: emptydir
@@ -933,6 +1030,7 @@ Resources:
             - mounts
 
             fqdn: node02.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             fs_setup:
             - label: emptydir
@@ -1018,6 +1116,7 @@ Resources:
             - mounts
 
             fqdn: node03.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
 
             fs_setup:
             - label: emptydir

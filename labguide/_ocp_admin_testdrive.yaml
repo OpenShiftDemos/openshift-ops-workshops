@@ -3,7 +3,7 @@ id: ocp-admin-testdrive
 name: OpenShift for Administrators
 
 content:
-  url: https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/production/labguide
+  url: https://raw.githubusercontent.com/dmesser/openshift-cns-testdrive/master/labguide
 
 vars:
   ENVIRONMENT: "Amazon Web Services"

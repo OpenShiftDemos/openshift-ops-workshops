@@ -39,4 +39,12 @@
           msg: "Could not find 3 running GlusterFS pods in namespace {{cns_namespace}}"
         when: check_pods.stdout != "3"
 
+      - name: check heketi deployment
+        shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="heketi")]..status.readyReplicas}'
+        register: check_heketi_dc
+
+      - fail:
+          msg: "heketi deployment unhealthy"
+        when: check_heketi_dc.stdout != "1"
+
 ...

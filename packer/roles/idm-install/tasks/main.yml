@@ -15,5 +15,4 @@
       - ipa-server
       - bind 
       - bind-dyndb-ldap
-      - haveged
 ...

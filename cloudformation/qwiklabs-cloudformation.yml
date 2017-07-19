@@ -667,6 +667,7 @@ Resources:
                       ]
                   }
                 path: /home/ec2-user/topology.json
+                owner: ec2-user
 
             runcmd:
             - /usr/local/bin/inventory-patch

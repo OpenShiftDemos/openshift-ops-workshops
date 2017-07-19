@@ -19,7 +19,6 @@ multi_inventory.yaml
 .vagrant
 .tags*
 *.ini
-*ocp-installer
 add-node.json
 infrastructure.json
 ansible.log

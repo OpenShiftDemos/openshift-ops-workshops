@@ -415,15 +415,6 @@ Resources:
         ToPort: 65535
         CidrIp: 0.0.0.0/0
 
-  HostedZone:
-    Type: AWS::Route53::HostedZone
-    Properties:
-      Name: !Ref 'PublicHostedZone'
-      VPCs:
-        -
-          VPCId: !Ref VPC
-          VPCRegion: !Ref AWS::Region
-
   Route53Records:
     Type: AWS::Route53::RecordSetGroup
     DependsOn:
@@ -674,10 +665,6 @@ Resources:
             - /usr/local/bin/inventory-patch
             - mkdir -p /var/lib/etcd
             - /usr/local/bin/idm-cert
-            - [ systemctl, stop, firewalld ]
-            - [ systemctl, disable, firewalld ]
-            - [ systemctl, enable, iptables ]
-            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
@@ -746,10 +733,6 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
-            - [ systemctl, stop, firewalld ]
-            - [ systemctl, disable, firewalld ]
-            - [ systemctl, enable, iptables ]
-            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
@@ -791,38 +774,7 @@ Resources:
             fqdn: idm.${QwiklabId}.${PublicHostedZone}
             manage_etc_hosts: true
 
-            write_files:
-            - content: |
-                *filter
-                :INPUT ACCEPT [0:0]
-                :FORWARD ACCEPT [0:0]
-                :OUTPUT ACCEPT [0:0]
-                -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-                -A INPUT -p icmp -j ACCEPT
-                -A INPUT -i lo -j ACCEPT
-                -A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
-                -A INPUT -p tcp -m state --state NEW -m tcp --dport 389 -j ACCEPT
-                -A INPUT -p tcp -m state --state NEW -m tcp --dport 636 -j ACCEPT
-                -A INPUT -p tcp -m state --state NEW -m tcp --dport 7389 -j ACCEPT
-                -A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-                -A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
-                -A INPUT -p tcp -m state --state NEW -m tcp --dport 88 -j ACCEPT
-                -A INPUT -p udp -m state --state NEW -m udp --dport 88 -j ACCEPT
-                -A INPUT -p tcp -m state --state NEW -m tcp --dport 464 -j ACCEPT
-                -A INPUT -p udp -m state --state NEW -m udp --dport 464 -j ACCEPT
-                -A INPUT -p tcp -m state --state NEW -m tcp --dport 53 -j ACCEPT
-                -A INPUT -p udp -m state --state NEW -m udp --dport 53 -j ACCEPT
-                -A INPUT -p udp -m state --state NEW -m udp --dport 123 -j ACCEPT
-                -A INPUT -j REJECT --reject-with icmp-host-prohibited
-                -A FORWARD -j REJECT --reject-with icmp-host-prohibited
-                COMMIT
-              path: /etc/sysconfig/iptables
-
             runcmd:
-            - [ systemctl, stop, firewalld ]
-            - [ systemctl, disable, firewalld ]
-            - [ systemctl, enable, iptables ]
-            - [ systemctl, restart, iptables ]
             - /usr/local/bin/idm-install
             - reboot
 
@@ -914,12 +866,9 @@ Resources:
                 name: ec2-user
 
             runcmd:
-            - [ systemctl, start, firewalld ]
             - [ systemctl, daemon-reload ]
             - [ systemctl, enable, workshopper ]
             - [ systemctl, start, workshopper ]
-            - [ firewall-cmd, --zone=public, --add-service=http, --permanent ]
-            - [ firewall-cmd, --zone=public, --add-service=http ]
 
 
   WorkerNode1:
@@ -984,10 +933,6 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
-            - [ systemctl, stop, firewalld ]
-            - [ systemctl, disable, firewalld ]
-            - [ systemctl, enable, iptables ]
-            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
@@ -1070,10 +1015,6 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
-            - [ systemctl, stop, firewalld ]
-            - [ systemctl, disable, firewalld ]
-            - [ systemctl, enable, iptables ]
-            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
@@ -1156,10 +1097,6 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
-            - [ systemctl, stop, firewalld ]
-            - [ systemctl, disable, firewalld ]
-            - [ systemctl, enable, iptables ]
-            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]

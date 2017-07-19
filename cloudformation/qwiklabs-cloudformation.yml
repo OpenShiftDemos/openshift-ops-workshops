@@ -848,8 +848,8 @@ Resources:
               path: /etc/sysconfig/docker-storage-setup
               owner: root:root
             - content: |
-                WORKSHOPS_URLS="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/production/labguide/_cns_testdrive.yaml"
-                CONTENT_URL_PREFIX="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/production/labguide/"
+                WORKSHOPS_URLS="https://raw.githubusercontent.com/dmesser/openshift-cns-testdrive/master/labguide/_ocp_admin_testdrive.yaml"
+                CONTENT_URL_PREFIX="https://raw.githubusercontent.com/dmesser/openshift-cns-testdrive/master/labguide"
                 OCP_ROUTING_SUFFIX="apps.${QwiklabId}.${PublicHostedZone}"
                 MASTER_HOSTNAME="master"
                 MASTER_EXTERNAL_FQDN="master.${QwiklabId}.${PublicHostedZone}"

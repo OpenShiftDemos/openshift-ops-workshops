@@ -1,0 +1,22 @@
+---
+
+# this playbooks needs lab-specific information
+# to obtain this information scp /etc/sysconfig/workshopper from the guide nodes
+# run this playbook with the environment variables like this
+#
+#    env $(cat workshopper | xargs) ansible-playbook cns-deploy_verify.yml
+#
+
+  - hosts: localhost
+
+    tasks:
+
+      - name: check if CNS namespace exists
+        shell: oc get projects -o jsonpath='{$.items[?(@.metadata.name=="{{ lookup('env','CNS_NAMESPACE') | default('container-native-storage') }}")]..name}'
+        register: check_namespace
+
+      - fail:
+          msg: "CNS namespace called {{ lookup('env','CNS_NAMESPACE') | default('container-native-storage') }} does not exist"
+        when: check_namespace.stdout is not '{{ lookup('env','CNS_NAMESPACE') | default('container-native-storage') }}'
+
+...

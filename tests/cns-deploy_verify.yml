@@ -35,19 +35,37 @@
 
       - name: check daemonset in namespace
         shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.numberReady}' -n {{cns_namespace}}
-        register: check_daemonset
+        register: check_daemonset_ready
 
       - fail:
-          msg: "DaemonSet called glusterfs not found or not healthy"
-        when: check_daemonset.stdout!= "3"
+          msg: "DaemonSet called glusterfs not found"
+        when: check_daemonset_ready.stdout == ""
+
+      - set_fact:
+          daemonset_ready_pods: "{{check_daemonset_ready.stdout}}"
+
+      - name: check daemonset in namespace
+        shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.desiredNumberScheduled}' -n {{cns_namespace}}
+        register: check_daemonset_desired
+
+      - fail:
+          msg: "DaemonSet called glusterfs not found"
+        when: check_daemonset_desired.stdout == ""
+
+      - set_fact:
+          daemonset_desired_pods: "{{check_daemonset_ready.stdout}}"
+
+      - fail:
+          msg: "DaemonSet called glusterfs not healthy"
+        when: daemonset_desired_pods > daemonset_ready_pods
 
       - name: check if 3 running glusterfs pods exist in namespace
         shell: oc get pods -n {{cns_namespace}} -o jsonpath='{$.items[?(@.status.phase=="Running")]..metadata.name}' | awk '{print gsub(/glusterfs-/,"")}'
         register: check_pods
 
       - fail:
-          msg: "Could not find 3 running GlusterFS pods in namespace {{cns_namespace}}"
-        when: check_pods.stdout != "3"
+          msg: "Could not find minimum 3 running GlusterFS pods in namespace {{cns_namespace}}"
+        when: check_pods.stdout|int < 3
 
       - name: check heketi deployment
         shell: oc get rc -n {{cns_namespace}} -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="heketi")]..status.readyReplicas}'

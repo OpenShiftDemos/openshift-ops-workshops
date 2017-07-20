@@ -103,6 +103,7 @@
           url: "http://{{heketi_route}}/hello"
           return_content: yes
         register: heketi_hello
-        failed_when: "Hello from Heketi" not in heketi_hello.content
+        failed_when: "'Hello from Heketi' not in heketi_hello.content"
+        changed_when: False
 
 ...

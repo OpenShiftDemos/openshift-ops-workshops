@@ -9,7 +9,6 @@
 
   - hosts: localhost
 
-
     tasks:
 
       - set_fact:
@@ -22,6 +21,14 @@
       - fail:
           msg: "CNS namespace called {{cns_namespace}} does not exist"
         when: check_namespace.stdout != '{{cns_namespace}}'
+
+      - name: check privileged scc has been added to namespace default service account
+        shell: oc get scc privileged -o jsonpath='{$.users[?(@=="system:serviceaccount:{{cns_namespace}}:default")]}'
+        register: check_scc
+
+      - fail:
+          msg: "The default service account does not have the 'privileged' scc"
+        when: check_scc.stdout != "system:serviceaccount:{{cns_namespace}}:default"
 
       - name: check daemonset in namespace
         shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.numberReady}' -n {{cns_namespace}}
@@ -40,11 +47,55 @@
         when: check_pods.stdout != "3"
 
       - name: check heketi deployment
-        shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="heketi")]..status.readyReplicas}'
+        shell: oc get rc -n {{cns_namespace}} -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="heketi")]..status.readyReplicas}'
         register: check_heketi_dc
 
       - fail:
           msg: "heketi deployment unhealthy"
         when: check_heketi_dc.stdout != "1"
+
+      - name: check heketi service IP
+        shell: oc get service -n {{cns_namespace}} -o jsonpath='{$.items[?(@.metadata.name=="heketi")].spec.clusterIP}'
+        register: check_heketi_service_ip
+
+      - fail:
+          msg: "could not find heketi service IP"
+        when: check_heketi_service_ip.stdout == ""
+
+      - set_fact:
+          heketi_service_ip: "{{check_heketi_service_ip.stdout}}"
+
+      - name: determine heketi service port
+        shell: oc get service -n {{cns_namespace}} -o jsonpath='{$.items[?(@.metadata.name=="heketi")].spec.ports[?(@.name=="heketi")].port}}'
+        register: check_heketi_service_port
+
+      - fail:
+          msg: "could not determine heketi service port"
+        when: check_heketi_service_port.stdout == ""
+
+      - set_fact:
+          heketi_service_port: "{{check_heketi_service_port.stdout}}"
+
+      - name: check heketi responsiveness via service
+        uri:
+          url: "http://{{heketi_service_ip}}:{{heketi_service_port}}/hello"
+
+      - name: check heketi route
+        shell: oc get route -n {{cns_namespace}} -o jsonpath='{$.items[?(@.metadata.name=="heketi")].spec.host}'
+        register: check_heketi_route
+
+      - set_fact:
+          routing_suffix: {{ lookup('env','OCP_ROUTING_SUFFIX') | default('apps.unset.ocp-admin.aws.openshifttestdrive.com') }}
+
+      - set_fact:
+          heketi_route: "heketi-{{cns_namespace}}.{{routing_suffix}}"
+
+      - fail:
+          msg: "no route found for heketi using {{heketi_route}}"
+        when: check_heketi_route.stdout != "{{heketi_route}}"
+
+      - name: check heketi responsiveness via route
+        uri:
+          url: "http://{{heketi_route}}/hello"
 
 ...

@@ -95,7 +95,7 @@
 
       - fail:
           msg: "no route found for heketi using {{heketi_route}}"
-        when: check_heketi_route.stdout != "{{heketi_route}}"
+        when: check_heketi_route.stdout != heketi_route
 
       - name: check heketi responsiveness via route
         uri:

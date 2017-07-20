@@ -670,6 +670,30 @@ Resources:
                 owner: ec2-user
                 group: ec2-user
 
+              - content: |
+                  LAB_ENV:
+                    OCP_ROUTING_SUFFIX: "apps.${QwiklabId}.${PublicHostedZone}"
+                    MASTER_HOSTNAME: "master"
+                    MASTER_EXTERNAL_FQDN: "master.${QwiklabId}.${PublicHostedZone}"
+                    MASTER_INTERNAL_FQDN: "${Master1.PrivateDnsName}"
+                    NODE1_HOSTNAME: "node01"
+                    NODE1_EXTERNAL_FQDN: "node01.${QwiklabId}.${PublicHostedZone}"
+                    NODE1_INTERNAL_FQDN: "${WorkerNode1.PrivateDnsName}"
+                    NODE1_INTERNAL_IP: "${WorkerNode1.PrivateIp}"
+                    NODE2_HOSTNAME: "node02"
+                    NODE2_EXTERNAL_FQDN: "node02.${QwiklabId}.${PublicHostedZone}"
+                    NODE2_INTERNAL_FQDN: "${WorkerNode2.PrivateDnsName}"
+                    NODE2_INTERNAL_IP: "${WorkerNode2.PrivateIp}"
+                    NODE3_HOSTNAME: "node03"
+                    NODE3_EXTERNAL_FQDN: "node03.${QwiklabId}.${PublicHostedZone}"
+                    NODE3_INTERNAL_FQDN: "${WorkerNode3.PrivateDnsName}"
+                    NODE3_INTERNAL_IP: "${WorkerNode3.PrivateIp}"
+                    NODE_BRICK_DEVICE: "/dev/xvdd"
+                    CNS_NAMESPACE: "container-native-storage"
+                    HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
+                    HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
+                path: /opt/lab/environment
+                owner: root:root
             runcmd:
             - /usr/local/bin/inventory-patch
             - mkdir -p /var/lib/etcd
@@ -730,7 +754,7 @@ Resources:
 
             write_files:
             - content: |
-                DEVS='/dev/xvdb'
+                DEVS"'/dev/xvdb'
                 VG=docker_vol
                 DATA_SIZE=95%VG
                 EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"

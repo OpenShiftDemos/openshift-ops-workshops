@@ -32,7 +32,7 @@
       - name: check daemonset
         shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.desiredNumberScheduled}' -n {{cns_namespace}}
         register: check_daemonset_desired
-        failed_when: when: check_daemonset_desired.stdout == ""
+        failed_when: check_daemonset_desired.stdout == ""
         changed_when: False
 
       - name: check daemonset health

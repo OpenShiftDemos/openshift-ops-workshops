@@ -17,82 +17,58 @@
       - name: check if CNS namespace exists
         shell: oc get projects -o jsonpath='{$.items[?(@.metadata.name=="{{cns_namespace}}")]..name}'
         register: check_namespace
-
-      - fail:
-          msg: "CNS namespace called {{cns_namespace}} does not exist"
-        when: check_namespace.stdout != cns_namespace
-
-      - name: check privileged scc has been added to namespace default service account
-        shell: oc get scc privileged -o jsonpath='{$.users[?(@=="system:serviceaccount:{{cns_namespace}}:default")]}'
-        register: check_scc
+        failed_when: check_namespace.stdout != cns_namespace
+        changed_when: False
 
       - set_fact:
           cns_service_account: "system:serviceaccount:{{cns_namespace}}:default"
 
-      - fail:
-          msg: "The default service account does not have the 'privileged' scc"
-        when: check_scc.stdout != cns_service_account
+      - name: check privileged scc has been added to namespace default service account
+        shell: oc get scc privileged -o jsonpath='{$.users[?(@=="system:serviceaccount:{{cns_namespace}}:default")]}'
+        register: check_scc
+        failed_when: check_scc.stdout != cns_service_account
+        changed_when: False
 
-      - name: check daemonset in namespace
-        shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.numberReady}' -n {{cns_namespace}}
-        register: check_daemonset_ready
-
-      - fail:
-          msg: "DaemonSet called glusterfs not found"
-        when: check_daemonset_ready.stdout == ""
-
-      - set_fact:
-          daemonset_ready_pods: "{{check_daemonset_ready.stdout}}"
-
-      - name: check daemonset in namespace
+      - name: check daemonset
         shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.desiredNumberScheduled}' -n {{cns_namespace}}
         register: check_daemonset_desired
+        failed_when: when: check_daemonset_desired.stdout == ""
+        changed_when: False
 
-      - fail:
-          msg: "DaemonSet called glusterfs not found"
-        when: check_daemonset_desired.stdout == ""
+      - name: check daemonset health
+        shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.numberReady}' -n {{cns_namespace}}
+        register: check_daemonset_ready
+        failed_when:
+          - check_daemonset_ready.stdout == ""
+          - check_daemonset_ready.stdout|int < check_daemonset_desired.stdout|int
+        changed_when: False
 
-      - set_fact:
-          daemonset_desired_pods: "{{check_daemonset_ready.stdout}}"
-
-      - fail:
-          msg: "DaemonSet called glusterfs not healthy"
-        when: daemonset_desired_pods > daemonset_ready_pods
-
-      - name: check if 3 running glusterfs pods exist in namespace
+      - name: check if at least 3 running glusterfs pods exist in namespace
         shell: oc get pods -n {{cns_namespace}} -o jsonpath='{$.items[?(@.status.phase=="Running")]..metadata.name}' | awk '{print gsub(/glusterfs-/,"")}'
         register: check_pods
-
-      - fail:
-          msg: "Could not find minimum 3 running GlusterFS pods in namespace {{cns_namespace}}"
-        when: check_pods.stdout|int < 3
+        failed_when: check_pods.stdout|int < 3
+        changed_when: False
 
       - name: check heketi deployment
         shell: oc get rc -n {{cns_namespace}} -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="heketi")]..status.readyReplicas}'
         register: check_heketi_dc
-
-      - fail:
-          msg: "heketi deployment unhealthy"
-        when: check_heketi_dc.stdout != "1"
-
-      - name: check heketi admin key
-        shell: oc get dc/heketi -n {{cns_namespace}} -o jsonpath='{$.spec.template.spec.containers[?(@.name=="heketi")].env[?(@.name=="HEKETI_ADMIN_KEY")].value}'
-        register: check_heketi_admin_key
+        failed_when: check_heketi_dc.stdout != "1"
+        changed_when: False
 
       - set_fact:
           heketi_admin_key: "{{ lookup('env','HEKETI_ADMIN_PW') | default('myS3cr3tpassw0rd') }}"
 
-      - fail:
-          msg: "heketi admin key is not set to {{heketi_admin_key}}"
-        when: check_heketi_admin_key.stdout != heketi_admin_key
+      - name: check heketi admin key
+        shell: oc get dc/heketi -n {{cns_namespace}} -o jsonpath='{$.spec.template.spec.containers[?(@.name=="heketi")].env[?(@.name=="HEKETI_ADMIN_KEY")].value}'
+        register: check_heketi_admin_key
+        failed_when: check_heketi_admin_key.stdout != heketi_admin_key
+        changed_when: False
 
       - name: check heketi service IP
         shell: oc get service -n {{cns_namespace}} -o jsonpath='{$.items[?(@.metadata.name=="heketi")].spec.clusterIP}'
         register: check_heketi_service_ip
-
-      - fail:
-          msg: "could not find heketi service IP"
-        when: check_heketi_service_ip.stdout == ""
+        failed_when: check_heketi_service_ip.stdout == ""
+        changed_when: False
 
       - set_fact:
           heketi_service_ip: "{{check_heketi_service_ip.stdout}}"
@@ -100,10 +76,8 @@
       - name: determine heketi service port
         shell: oc get service -n {{cns_namespace}} -o jsonpath='{$.items[?(@.metadata.name=="heketi")].spec.ports[?(@.name=="heketi")].port}'
         register: check_heketi_service_port
-
-      - fail:
-          msg: "could not determine heketi service port"
-        when: check_heketi_service_port.stdout == ""
+        failed_when: check_heketi_service_port.stdout == ""
+        changed_when: False
 
       - set_fact:
           heketi_service_port: "{{check_heketi_service_port.stdout}}"
@@ -112,19 +86,17 @@
         uri:
           url: "http://{{heketi_service_ip}}:{{heketi_service_port}}/hello"
 
-      - name: check heketi route
-        shell: oc get route -n {{cns_namespace}} -o jsonpath='{$.items[?(@.metadata.name=="heketi")].spec.host}'
-        register: check_heketi_route
-
       - set_fact:
           routing_suffix: "{{ lookup('env','OCP_ROUTING_SUFFIX') | default('apps.unset.ocp-admin.aws.openshifttestdrive.com') }}"
 
       - set_fact:
           heketi_route: "heketi-{{cns_namespace}}.{{routing_suffix}}"
 
-      - fail:
-          msg: "no route found for heketi using {{heketi_route}}"
-        when: check_heketi_route.stdout != heketi_route
+      - name: check heketi route
+        shell: oc get route -n {{cns_namespace}} -o jsonpath='{$.items[?(@.metadata.name=="heketi")].spec.host}'
+        register: check_heketi_route
+        failed_when: check_heketi_route.stdout != heketi_route
+        changed_when: False
 
       - name: check heketi responsiveness via route
         uri:

@@ -20,15 +20,18 @@
 
       - fail:
           msg: "CNS namespace called {{cns_namespace}} does not exist"
-        when: check_namespace.stdout != '{{cns_namespace}}'
+        when: check_namespace.stdout != cns_namespace
 
       - name: check privileged scc has been added to namespace default service account
         shell: oc get scc privileged -o jsonpath='{$.users[?(@=="system:serviceaccount:{{cns_namespace}}:default")]}'
         register: check_scc
 
+      - set_fact:
+          cns_service_account: "system:serviceaccount:{{cns_namespace}}:default"
+
       - fail:
           msg: "The default service account does not have the 'privileged' scc"
-        when: check_scc.stdout != "system:serviceaccount:{{cns_namespace}}:default"
+        when: check_scc.stdout != cns_service_account
 
       - name: check daemonset in namespace
         shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.numberReady}' -n {{cns_namespace}}
@@ -66,7 +69,7 @@
           heketi_service_ip: "{{check_heketi_service_ip.stdout}}"
 
       - name: determine heketi service port
-        shell: oc get service -n {{cns_namespace}} -o jsonpath='{$.items[?(@.metadata.name=="heketi")].spec.ports[?(@.name=="heketi")].port}}'
+        shell: oc get service -n {{cns_namespace}} -o jsonpath='{$.items[?(@.metadata.name=="heketi")].spec.ports[?(@.name=="heketi")].port}'
         register: check_heketi_service_port
 
       - fail:

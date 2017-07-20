@@ -75,6 +75,17 @@
           msg: "heketi deployment unhealthy"
         when: check_heketi_dc.stdout != "1"
 
+      - name: check heketi admin key
+        shell: oc get dc/heketi -n {{cns_namespace}} -o jsonpath='{$.spec.template.spec.containers[?(@.name=="heketi")].env[?(@.name=="HEKETI_ADMIN_KEY")].value}'
+        register: check_heketi_admin_key
+
+      - set_fact:
+          heketi_admin_key: "{{ lookup('env','HEKETI_ADMIN_PW') | default('myS3cr3tpassw0rd') }}"
+
+      - fail:
+          msg: "heketi admin key is not set to {{heketi_admin_key}}"
+        when: check_heketi_admin_key.stdout != heketi_admin_key
+
       - name: check heketi service IP
         shell: oc get service -n {{cns_namespace}} -o jsonpath='{$.items[?(@.metadata.name=="heketi")].spec.clusterIP}'
         register: check_heketi_service_ip

@@ -59,18 +59,17 @@ Parameters:
 
 
 Mappings:
-
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-daa2b4cc
+      ami: ami-212d3c37
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-105a4369
+      ami: ami-de6a73a7
     eu-west-1:
-      ami: ami-7506e90c
+      ami: ami-4f4ca336
     eu-central-1:
       ami: ami-8a2686e5
     ap-northeast-1:
@@ -674,10 +673,6 @@ Resources:
             - /usr/local/bin/inventory-patch
             - mkdir -p /var/lib/etcd
             - /usr/local/bin/idm-cert
-            - [ systemctl, stop, firewalld ]
-            - [ systemctl, disable, firewalld ]
-            - [ systemctl, enable, iptables ]
-            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
@@ -746,10 +741,6 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
-            - [ systemctl, stop, firewalld ]
-            - [ systemctl, disable, firewalld ]
-            - [ systemctl, enable, iptables ]
-            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
@@ -793,8 +784,7 @@ Resources:
 
             runcmd:
             - /usr/local/bin/idm-install
-            - [ systemctl, stop, docker ]
-            - [ firewall-cmd, --reload ]
+            - reboot
 
   GuideNode:
     Type: AWS::EC2::Instance
@@ -884,12 +874,9 @@ Resources:
                 name: ec2-user
 
             runcmd:
-            - [ systemctl, start, firewalld ]
             - [ systemctl, daemon-reload ]
             - [ systemctl, enable, workshopper ]
             - [ systemctl, start, workshopper ]
-            - [ firewall-cmd, --zone=public, --add-service=http, --permanent ]
-            - [ firewall-cmd, --zone=public, --add-service=http ]
 
 
   WorkerNode1:
@@ -954,10 +941,6 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
-            - [ systemctl, stop, firewalld ]
-            - [ systemctl, disable, firewalld ]
-            - [ systemctl, enable, iptables ]
-            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
@@ -1040,10 +1023,6 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
-            - [ systemctl, stop, firewalld ]
-            - [ systemctl, disable, firewalld ]
-            - [ systemctl, enable, iptables ]
-            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
@@ -1126,10 +1105,6 @@ Resources:
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
-            - [ systemctl, stop, firewalld ]
-            - [ systemctl, disable, firewalld ]
-            - [ systemctl, enable, iptables ]
-            - [ systemctl, restart, iptables ]
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]

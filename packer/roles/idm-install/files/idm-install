@@ -27,7 +27,6 @@ systemctl stop chronyd
 systemctl disable chronyd
 systemctl start ntpd
 systemctl enable ntpd
-systemctl start haveged
 
 echo -e "Iptables and firewalld configuration...\n"
 systemctl stop iptables

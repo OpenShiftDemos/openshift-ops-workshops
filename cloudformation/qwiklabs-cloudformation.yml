@@ -59,18 +59,17 @@ Parameters:
 
 
 Mappings:
-
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-8d0e1f9b
+      ami: ami-212d3c37
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-46776e3f
+      ami: ami-de6a73a7
     eu-west-1:
-      ami: ami-20769959
+      ami: ami-4f4ca336
     eu-central-1:
       ami: ami-8a2686e5
     ap-northeast-1:
@@ -414,6 +413,15 @@ Resources:
         FromPort: 0
         ToPort: 65535
         CidrIp: 0.0.0.0/0
+
+  HostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Ref 'PublicHostedZone'
+      VPCs:
+        -
+          VPCId: !Ref VPC
+          VPCRegion: !Ref AWS::Region
 
   Route53Records:
     Type: AWS::Route53::RecordSetGroup

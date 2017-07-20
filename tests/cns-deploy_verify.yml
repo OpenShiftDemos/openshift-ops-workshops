@@ -85,7 +85,7 @@
         register: check_heketi_route
 
       - set_fact:
-          routing_suffix: {{ lookup('env','OCP_ROUTING_SUFFIX') | default('apps.unset.ocp-admin.aws.openshifttestdrive.com') }}
+          routing_suffix: "{{ lookup('env','OCP_ROUTING_SUFFIX') | default('apps.unset.ocp-admin.aws.openshifttestdrive.com') }}"
 
       - set_fact:
           heketi_route: "heketi-{{cns_namespace}}.{{routing_suffix}}"

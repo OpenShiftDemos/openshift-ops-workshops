@@ -17,6 +17,10 @@
       - atomic-openshift-utils
       - atomic-openshift-excluder-3.5.5.26-1.git.0.276cbb4.el7
       - atomic-openshift-docker-excluder-3.5.5.26-1.git.0.276cbb4.el7
+      - haveged
+
+  - name: remove firewalld
+    yum: name=firewalld state=absent
 
   - name: install ose storage packages
     yum: name={{ item }} state=present
@@ -33,11 +37,6 @@
     copy: src=iptables dest=/etc/sysconfig/
 
   - name: restart iptables 
-    service: name=iptables state=restarted enabled=yes
-
-  - name: stop firewalld 
-    service: name=firewalld state=stopped enabled=no
-    ignore_errors: true
-
+    service: name=iptables state=started enabled=yes
 
 ...

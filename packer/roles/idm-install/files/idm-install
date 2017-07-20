@@ -27,6 +27,7 @@ systemctl stop chronyd
 systemctl disable chronyd
 systemctl start ntpd
 systemctl enable ntpd
+systemctl start haveged
 
 ipa-server-install --setup-dns --domain="$mydomain" --hostname="$myhostname" \
 --admin-password=ldapadmin --ds-password=ldapadmin --ip-address="$myip" \

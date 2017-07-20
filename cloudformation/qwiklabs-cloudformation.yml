@@ -691,12 +691,15 @@ Resources:
                     CNS_NAMESPACE: "container-native-storage"
                     HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
                     HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
-                path: /opt/lab/environment
+                path: /tmp/environment
                 owner: root:root
             runcmd:
             - /usr/local/bin/inventory-patch
             - mkdir -p /var/lib/etcd
             - /usr/local/bin/idm-cert
+            - mkdir -p /opt/lab
+            - git clone https://github.com/openshift/openshift-cns-testdrive.git /opt/lab
+            - mv /tmp/environment /opt/lab/
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]

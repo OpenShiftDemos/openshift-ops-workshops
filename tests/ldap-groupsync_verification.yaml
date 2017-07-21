@@ -1,0 +1,63 @@
+---
+
+- hosts: masters
+
+  tasks:
+   
+    - name: ssh into idm and echo tp
+      command: ldapsearch -h idm -D uid=admin,cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com -w ldapadmin
+      register: result
+      delegate_to: idm.unset.ocp-admin.aws.openshifttestdrive.com
+      
+    - debug:
+        var: result.stdout
+        
+    - name: Checking if all the groups have been created by 'oc adm groups sync'
+      command: oc get -o jsonpath='{.items[*].metadata.name}' groups
+      register: groupnames
+      failed_when: "'ose-user' not in groupnames.stdout" or "'ose-normal-dev' not in groupnames.stdout" or "'ose-fancy-dev' not in groupnames.stdout" or "'ose-teamed-app' not in groupnames.stdout"
+      
+    - name: Check if all users are present in group - 'ose-user'
+      command: oc get -o jsonpath='{.users}' group ose-user
+      register: ose_user_users
+      failed_when: "'normaluser1' not in ose_user_users" or "'teamuser1' not in ose_user_users" or "'teamuser2' not in ose_user_users" or "'fancyuser1' not in ose_user_users" or "'fancyuser2' not in ose_user_users"
+    
+    - name: Check if all users are present in group - 'ose-normal-dev'
+      command: oc get -o jsonpath='{.users}' group ose-normal-dev
+      register: normaldev_users  
+      failed_when: "'normaluser1' not in normaldev_users" or "'teamuser1' not in normaldev_users" or "'teamuser2' not in normaldev_users"
+ 
+    - name: Check if all users are present in group - 'ose-fancy-dev'
+      command: oc get -o jsonpath='{.users}' group ose-fancy-dev
+      register: fancydev_users
+      failed_when: "'fancyuser1' not in fancydev_users" or "'fancyuser2' not in fancydev_users"
+    
+    - name: Check if all users are present in group - 'ose-teamed-app'
+      command: oc get -o jsonpath='{.users}' group ose-teamed-app
+      register: teamedapp_users
+      failed_when: "'teamuser1' not in teamedapp_users" or "'teamuser2' not in teamedapp_users"   
+    
+    - name: login as fancyuser1 of group - ose-fancy-dev
+      command: oc login -u fancyuser1 -p openshift
+    
+    - name: list down projects in access of fancyuser1 
+      command: oc get -o jsonpath='{.items[*].metadata.name}' projects
+      register: fancyuser1_projects
+      failed_when: "'app-prod' not in fancyuser1_projects.stdout"
+      
+    - name: log out of fancyuser1
+      command: oc logout
+      
+    - name: Log in as teamuser2
+      command: oc login -u teamuser2 -p openshift
+
+    - name: list down projects in access of teamuser2
+      command: oc get -o jsonpath='{.items[*].metadata.name}' projects
+      register: teamuser2_projects
+      failed_when: "'app-dev' not in teamuser2_projects.stdout"
+      
+    - name: list down projects in access of teamuser2
+      command: oc get -o jsonpath='{.items[*].metadata.name}' projects
+      register: fancyuser1_projects
+      failed_when: "'app-test' not in teamuser2_projects.stdout"
+...

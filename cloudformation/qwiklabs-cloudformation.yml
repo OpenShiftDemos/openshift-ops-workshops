@@ -675,7 +675,7 @@ Resources:
                     CNS_NAMESPACE: "container-native-storage"
                     HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
                     HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
-                path: /opt/lab/environment
+                path: /opt/lab/environment.yml
                 owner: root:root
             runcmd:
             - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml

@@ -45,8 +45,8 @@
     activationkey: "{{ rhsm_act_key }}"
     state: present
 
-- name: ensure that gluster pool is attached
-  shell: subscription-manager attach --pool="{{ gluster }}"
+# - name: ensure that gluster pool is attached
+#   shell: subscription-manager attach --pool="{{ gluster }}"
 
 - name: disable all default repositories
   shell: subscription-manager repos --disable="*"

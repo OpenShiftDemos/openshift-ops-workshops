@@ -1,0 +1,122 @@
+This lab module is about using external authentication providers and LDAP is one of them. Access to resources like a project in OCP can be controlled by using authentication methods like LDAP and only the allowed privileges can be mapped to a user or a certain group.
+
+LDAP stands for Lightweight Directory Access Protocol. LDAP provides different levels of access to users based on their groups and privileges. 
+
+We have defined 4 groups for this lab :-
+
+1) ose-user                       "Users with OpenShift access"
+
+2) ose-normal-dev                 "Normal OpenShift users"
+
+3) ose-fancy-dev                  "Fancy OpenShift users"
+
+4) ose-teamed-app                 "Teamed app users"
+
+Users defined in the CloudFormation Template are as follows -
+ ose-normal-dev -> normaluser1, teamuser1, teamuser2
+ ose-fancy-dev -> fancyuser1, fancyuser2
+ ose-teamed-app -> teamuser1, teamuser2
+ ose-user -> normaluser1, teamuser1, teamuser2, fancyuser1, fancyuser2
+
+
+Step-1] Check the master-config.yaml file :
+
+After SSH-ing into the master host, go into the root mode -
+ $ sudo -i
+
+
+ # cat /etc/origin/master/master-config.yaml
+ 
+ 
+Contents will look like -
+[literal]
+oauthConfig:
+  assetPublicURL: https://openshift.unset.ocp-admin.aws.openshifttestdrive.com/console/
+  grantConfig:
+    method: auto
+  identityProviders:
+  - challenge: true
+    login: true
+    mappingMethod: claim
+    name: idm
+    provider:
+      apiVersion: v1
+      attributes:
+        email:
+        - mail
+        id:
+        - dn
+        name:
+        - cn
+        preferredUsername:
+        - uid
+      bindDN: uid=admin,cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
+      bindPassword: ldapadmin
+      ca: /etc/origin/master/ipa-ca.crt
+      insecure: false
+      kind: LDAPPasswordIdentityProvider
+      url: ldap://idm.unset.ocp-admin.aws.openshifttestdrive.com/cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com)
+  masterCA: ca-bundle.crt
+  masterPublicURL: https://openshift.unset.ocp-admin.aws.openshifttestdrive.com
+  masterURL: https://ip-10-0-1-200.ec2.internal
+
+Some notable fields under 'identityProviders:' are their meanings are -
+i) challenge:true -> When true, unauthenticated token requests from non-web clients (like the CLI) are sent a WWW-Authenticate challenge header for this provider.
+ii) login:true -> When true, unauthenticated token requests from web clients (like the web console) are redirected to a login page backed by this provider.
+iii)  mappingMethod: claim -> 
+
+Step-2 ] Make LDAP config file for group sync. This file is already configured and present in your master host. 
+View the contents of the file by typing this command -
+
+ # cat /home/ec2-user/groupsync.yaml
+
+
+Step-3] Map and sync LDAP groups :
+Run the command for LDAP groups sync to create the groups listed earlier in the master host -
+
+ # oc adm groups sync --sync-config=/home/ec2-user/groupsync.yaml --confirm
+ 
+The output will list down the four groups.
+
+Step-4] Change group policy :
+Changing policy of the group - 'ose-teamed-app' to 'cluster-admin' so that 'teamuser1' user can now create projects.
+Change the policy by using this command -
+
+ # oc adm policy add-cluster-role-to-group cluster-admin ose-teamed-app
+
+Step-5] Create projects : 
+
+Login as 'teamuser1' with the password 'openshift' to create projects as it would have admin rights.
+[literal]
+$ oc login -u teamuser1 -p openshift
+
+Use the following commands to create 3 projects named 'app-dev', 'app-test'  and 'app-prod' -
+[literal]
+$ oc adm new-project app-dev --display-name="Application Development"
+$ oc adm new-project app-test --display-name="Application Testing"
+$ oc adm new-project app-prod --display-name="Application Production"
+
+Step-6] Map groups to projects :
+
+In this step we will give admin rights to certain groups so that the users associated with these groups can have 'admin' rights to the projects.
+Use the following command to grant group 'ose-teamed-app' admin rights in the app-dev project -
+[literal]
+$ oc adm policy add-role-to-group admin ose-teamed-app -n app-dev
+
+Use the following command to grant group 'ose-teamed-app' admin rights in the app-test project -
+[literal]
+$ oc adm policy add-role-to-group admin ose-teamed-app -n app-test
+
+Use the follwing command to grant group 'ose-fancy-dev' admin rights in the app-prod project -
+[literal]
+$ oc adm policy add-role-to-group admin ose-fancy-dev -n app-prod
+
+Now, the users of groups ose-teamed-app will have admin rights on the projects 'app-dev' and 'app-test', whereas users of group ose-fancy-dev will have admin rights on the project 'app-prod'.
+
+Step-7] Test access to a project for an externally defined user:
+This step will show that 'teamuser2' can list down the projects created and 'fancyuser1' can list down projects created by 'ose-fancy-dev' group.
+
+Commands for logging in as the above mentioned users would be -
+[literal] 
+$ oc login -u teamuser2 -p openshift
+$ oc login -u fancyuser1 -p openshift

@@ -28,8 +28,7 @@
       command: oc get -o jsonpath='{.users}' group ose-fancy-dev
       register: fancydev_users
       failed_when: " {{ item }} not in fancydev_users.stdout"
-      with_items: [ 'fancyuser1', 'fancyuser2' ]
-    
+      with_items: [ 'fancyuser1', 'fancyuser2' ]    
     
     - name: Check if all users are present in group - 'ose-teamed-app'
       command: oc get -o jsonpath='{.users}' group ose-teamed-app
@@ -50,12 +49,14 @@
       
     - name: Log in as teamuser2
       command: oc login -u teamuser2 -p openshift
+
     - name: list down projects in access of teamuser2
       command: oc get -o jsonpath='{.items[*].metadata.name}' projects
       register: teamuser2_projects
       failed_when: "'app-dev' not in teamuser2_projects.stdout"
       
-      - name: list down projects in access of teamuser2
+    - name: list down projects in access of teamuser2
       command: oc get -o jsonpath='{.items[*].metadata.name}' projects
       register: fancyuser1_projects
       failed_when: "'app-test' not in teamuser2_projects.stdout"
+...

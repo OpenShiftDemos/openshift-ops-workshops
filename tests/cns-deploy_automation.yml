@@ -41,11 +41,14 @@
         - name: login via oc as system:admin to default namespace
           shell: oc login -u system:admin -n default
 
+        - set_fact:
+            cns_namespace: {{ CNS_NAMESPACE | default('container-native-storage') }}
+
         - name: create new project
-          shell: oc new-project {{ CNS_NAMESPACE | default('container-native-storage') }}
+          shell: oc new-project {{ cns_namespace }}
 
         - name: add privileges to default service account
-          shell: oc adm policy add-scc-to-user privileged -z default
+          shell: oc adm policy add-scc-to-user privileged -z default -n {{ cns_namespace }}
 
         - name: check topology file
           stat:

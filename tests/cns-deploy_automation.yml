@@ -45,7 +45,7 @@
           shell: oc new-project {{ CNS_NAMESPACE | default('container-native-storage') }}
 
         - name: add privileges to default service account
-          shell: oadm policy add-scc-to-user privileged -z default
+          shell: oc adm policy add-scc-to-user privileged -z default
 
         - name: check topology file
           stat:

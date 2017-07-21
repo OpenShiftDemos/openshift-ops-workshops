@@ -61,17 +61,17 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-212d3c37
+      ami: ami-02f9ea14
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-de6a73a7
+      ami: ami-20b0a959
     eu-west-1:
-      ami: ami-4f4ca336
+      ami: ami-2920ce50
     eu-central-1:
-      ami: ami-8a2686e5
+      ami: NOT_SUPPORTED
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
@@ -569,10 +569,6 @@ Resources:
                   etcd
 
                   [OSEv3:vars]
-                  ansible_ssh_user=ec2-user
-                  ansible_ssh_private_key_file=/home/ec2-user/.ssh/id_rsa
-                  ansible_ssh_extra_args="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=false"
-                  ansible_become=true
                   deployment_type=openshift-enterprise
                   containerized=true
                   openshift_master_api_port=443
@@ -606,6 +602,9 @@ Resources:
                   node01.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node03.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+
+                  [idm]
+                  idm.${QwiklabId}.${PublicHostedZone}
                 path: /etc/ansible/hosts
 
               - content: |
@@ -669,10 +668,20 @@ Resources:
                 owner: ec2-user
                 group: ec2-user
 
+              - content: |
+                  LAB_ENV:
+                    OCP_ROUTING_SUFFIX: "apps.${QwiklabId}.${PublicHostedZone}"
+                    NODE_BRICK_DEVICE: "/dev/xvdd"
+                    CNS_NAMESPACE: "container-native-storage"
+                    HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
+                    HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
+                path: /opt/lab/environment.yml
+                owner: root:root
             runcmd:
-            - /usr/local/bin/inventory-patch
+            - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
+            - ansible-playbook /opt/lab/helpers/inventory_ldap_auth.yml
             - mkdir -p /var/lib/etcd
-            - /usr/local/bin/idm-cert
+            - git clone https://github.com/openshift/openshift-cns-testdrive.git /opt/lab/code
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
@@ -725,7 +734,7 @@ Resources:
 
             write_files:
             - content: |
-                DEVS='/dev/xvdb'
+                DEVS"'/dev/xvdb'
                 VG=docker_vol
                 DATA_SIZE=95%VG
                 EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"

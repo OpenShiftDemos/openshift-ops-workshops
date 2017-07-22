@@ -4,54 +4,63 @@
 
     tasks:
 
-      - name: create firewall-playbook
-        blockinfile:
-          create: yes
-          dest: configure-firewall.yml
-          state: present
-          block: |
-            - hosts: cns
+      - include_vars: /opt/lab/environment.yml
 
-              tasks:
+      - block:
 
-                - name: insert iptables rules required for GlusterFS
-                  blockinfile:
-                    dest: /etc/sysconfig/iptables
-                    block: |
-                      -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT
-                      -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
-                      -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
-                      -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
-                    insertbefore: "^COMMIT"
+        - name: create firewall-playbook
+          blockinfile:
+            create: yes
+            dest: configure-firewall.yml
+            state: present
+            block: |
+              - hosts: cns
 
-                - name: reload iptables
-                  systemd:
-                    name: iptables
-                    state: reloaded
+                tasks:
 
-            ...
+                  - name: insert iptables rules required for GlusterFS
+                    blockinfile:
+                      dest: /etc/sysconfig/iptables
+                      block: |
+                        -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT
+                        -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
+                        -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
+                        -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
+                      insertbefore: "^COMMIT"
 
-      - name: run firewall-playbook
-        shell: ansible-playbook configure-firewall.yml
+                  - name: reload iptables
+                    systemd:
+                      name: iptables
+                      state: reloaded
 
-      - name: login via oc as system:admin to default namespace
-        shell: oc login -u system:admin -n default
+              ...
 
-      - name: create new project
-        shell: oc new-project {{ lookup('env','CNS_NAMESPACE') | default('container-native-storage') }}
+        - name: run firewall-playbook
+          shell: ansible-playbook configure-firewall.yml
 
-      - name: add privileges to default service account
-        shell: oadm policy add-scc-to-user privileged -z default
+        - name: login via oc as system:admin to default namespace
+          shell: oc login -u system:admin -n default
 
-      - name: check topology file
-        stat:
-          path: /home/ec2-user/topology.json
-        register: topology_file
+        - set_fact:
+            cns_namespace: {{ CNS_NAMESPACE | default('container-native-storage') }}
 
-      - fail:
-          msg: "Error! topology file not found in /home/ec2-user/topology.json"
-        when: not topology_file.stat.isreg
+        - name: create new project
+          shell: oc new-project {{ cns_namespace }}
 
-      - name: run cns-deploy
-        shell: cns-deploy --yes -n {{ lookup('env','CNS_NAMESPACE') | default('container-native-storage') }} -g /home/ec2-user/topology.json --admin-key '{{ lookup('env','HEKETI_ADMIN_PW') | default('myS3cr3tpassw0rd') }}' --user-key '{{ lookup('env','HEKETI_USER_PW') | default('mys3rs3cr3tpassw0rd') }}'
+        - name: add privileges to default service account
+          shell: oc adm policy add-scc-to-user privileged -z default -n {{ cns_namespace }}
+
+        - name: check topology file
+          stat:
+            path: /home/ec2-user/topology.json
+          register: topology_file
+
+        - fail:
+            msg: "Error! topology file not found in /home/ec2-user/topology.json"
+          when: not topology_file.stat.isreg
+
+        - name: run cns-deploy
+          shell: cns-deploy --yes -n {{ CNS_NAMESPACE | default('container-native-storage') }} -g /home/ec2-user/topology.json --admin-key '{{ HEKETI_ADMIN_PW | default('myS3cr3tpassw0rd') }}' --user-key '{{ HEKETI_USER_PW | default('mys3rs3cr3tpassw0rd') }}'
+
+        environment: "{{LAB_ENV}}"
 ...

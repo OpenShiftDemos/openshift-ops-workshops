@@ -436,7 +436,7 @@ metadata:
     storageclass.beta.kubernetes.io/is-default-class: "true"
 provisioner: kubernetes.io/glusterfs
 parameters:
-  resturl: "http://heketi-container-native-storage.cloudapps.example.com"
+  resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
   restauthenabled: "true"
   restuser: "admin"
   volumetype: "replicate:3"
@@ -449,3 +449,5 @@ Create the StorageClass in OpenShift with the following command:
  [root@master ~]# oc create -f cns-storageclass.yml
 
 With these components in place the system is ready to dynamically provision storage capacity from Container-native Storage.
+
+The StorageClass has also been setup as the system-wide default so that requests that don't specify a particular StorageClass will use CNS.

@@ -912,7 +912,7 @@ Resources:
             - ansible localhost -m wait_for -a "port=22 host=${InfraNode1.PrivateIp}"
             - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
             - ansible localhost -m wait_for -a "port=80 host=localhost"
-            - curl -X PUT -H "Content-Type:" --data-binary "{ \"Status\" : \"SUCCESS\", \"Reason\": \"Configuration Complete\", \"UniqueId\": \"GuideNode\",\"Data\": \"GuideNode has reached all instances and generated lab guide\" }" "${WaitHandle}"
+            - 'curl -X PUT -H "Content-Type:" --data-binary "{ \"Status\" : \"SUCCESS\", \"Reason\": \"Configuration Complete\", \"UniqueId\": \"GuideNode\",\"Data\": \"GuideNode has reached all instances and generated lab guide\" }" "${WaitHandle}"'
 
 
   WorkerNode1:

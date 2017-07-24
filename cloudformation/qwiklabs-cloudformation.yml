@@ -500,7 +500,7 @@ Resources:
 
   WaitCondition:
     Type: AWS::CloudFormation::WaitCondition
-    DependsOn: Master1
+    DependsOn: GuideNode
     Properties:
       Handle: !Ref WaitHandle
       Timeout: '600'
@@ -696,18 +696,10 @@ Resources:
                 owner: root:root
 
             runcmd:
-            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode1.PrivateIp}"
-            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode2.PrivateIp}"
-            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode3.PrivateIp}"
-            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode4.PrivateIp}"
-            - ansible localhost -m wait_for -a "port=22 host=${InfraNode1.PrivateIp}"
-            - ansible localhost -m wait_for -a "port=22 host=${IdmNode1.PrivateIp}"
-            - ansible localhost -m wait_for -a "port=80 host=${GuideNode.PublicIp}"
             - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
             - ansible-playbook /opt/lab/helpers/inventory_ldap_auth.yml
             - mkdir -p /var/lib/etcd
             - git clone https://github.com/openshift/openshift-cns-testdrive.git /opt/lab/code
-            - /opt/aws/bin/cfn-signal -e 0 '${WaitHandle}'
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
@@ -914,6 +906,14 @@ Resources:
             - [ systemctl, daemon-reload ]
             - [ systemctl, enable, workshopper ]
             - [ systemctl, start, workshopper ]
+            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode1.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode2.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode3.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode4.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 host=${InfraNode1.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=80 host=${GuideNode.PublicIp}"
+            - /opt/aws/bin/cfn-signal -e 0 '${WaitHandle}'
 
 
   WorkerNode1:

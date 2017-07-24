@@ -493,7 +493,7 @@ Resources:
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt WorkerNode3.PublicIp
+          - !GetAtt WorkerNode4.PublicIp
 
   WaitHandle:
     Type: AWS::CloudFormation::WaitConditionHandle
@@ -912,7 +912,7 @@ Resources:
             - ansible localhost -m wait_for -a "port=22 host=${WorkerNode4.PrivateIp}"
             - ansible localhost -m wait_for -a "port=22 host=${InfraNode1.PrivateIp}"
             - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
-            - ansible localhost -m wait_for -a "port=80 host=${GuideNode.PublicIp}"
+            - ansible localhost -m wait_for -a "port=80 host=localhost"
             - /opt/aws/bin/cfn-signal -e 0 '${WaitHandle}'
 
 

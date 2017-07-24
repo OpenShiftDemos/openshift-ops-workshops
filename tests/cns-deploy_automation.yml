@@ -70,41 +70,26 @@
         - set_fact:
             heketi_admin_pw_base64: "{{HEKETI_ADMIN_PW_BASE64 | default('bXlTM2NyM3RwYXNzdzByZA==')}}"
 
+        - name: create storage secret file from template
+          template:
+            src: ../templates/cns-secret.yml.j2
+            dest: /tmp/cns-secret.yml
+
         - name: create storage secret in default namespace
           shell: |
-            cat <<-EOF | oc create -n default -f -
-            apiVersion: v1
-            kind: Secret
-            metadata:
-              name: cns-secret
-              namespace: default
-            data:
-              key: {{heketi_admin_pw_base64}}
-            type: kubernetes.io/glusterfs
-            EOF
+            oc create -n default -f /tmp/cns-secret.yml
 
         - set_fact:
             ocp_routing_suffix: "{{ OCP_ROUTING_SUFFIX | default('apps.example.com') }}"
             cns_storageclass: "{{ CNS_STORAGECLASS | default('cns') }}"
 
+        - name: create storage class file from template
+          template:
+            src: ../templates/cns-storageclass.yml.j2
+            dest: /tmp/cns-storageclass.yml
+
         - name: create storage class
-          shell: |
-            cat <<-EOF | oc create -f -
-            apiVersion: storage.k8s.io/v1beta1
-            kind: StorageClass
-            metadata:
-              name: {{cns_storageclass}}
-              annotations:
-                storageclass.beta.kubernetes.io/is-default-class: "true"
-            provisioner: kubernetes.io/glusterfs
-            parameters:
-              resturl: "http://heketi-{{cns_namespace}}.{{ocp_routing_suffix}}"
-              restauthenabled: "true"
-              restuser: "admin"
-              volumetype: "replicate:3"
-              secretNamespace: "default"
-              secretName: "cns-secret"
-            EOF
+          shell: oc create -f /tmp/cns-storageclass.yml
 
         environment: "{{LAB_ENV}}"
 ...

@@ -99,10 +99,10 @@
             url: "http://{{heketi_service_ip}}:{{heketi_service_port}}/hello"
 
         - set_fact:
-            routing_suffix: "{{ OCP_ROUTING_SUFFIX | default('apps.unset.ocp-admin.aws.openshifttestdrive.com') }}"
+            ocp_routing_suffix: "{{ OCP_ROUTING_SUFFIX | default('apps.unset.ocp-admin.aws.openshifttestdrive.com') }}"
 
         - set_fact:
-            heketi_route: "heketi-{{cns_namespace}}.{{routing_suffix}}"
+            heketi_route: "heketi-{{cns_namespace}}.{{ocp_routing_suffix}}"
 
         - name: check heketi route
           shell: oc get route -n {{cns_namespace}} -o jsonpath='{$.items[?(@.metadata.name=="heketi")].spec.host}'
@@ -117,5 +117,57 @@
           register: heketi_hello
           failed_when: "'Hello from Heketi' not in heketi_hello.content"
           changed_when: False
+
+        - name: check secret named cns-secret in default namespace
+          shell: oc get secret/cns-secret -n default -o jsonpath='{$.items[?(@.metadata.name=="heketi")].spec.host}'
+          register: check_cns_secret
+          failed_when: check_cns_secret.stdout != ""
+          changed_when: False
+
+        - set_fact:
+            cns_storageclass: "{{ CNS_STORAGECLASS }}"
+
+        - name: check storageclass by name
+          shell: oc get storageclass/{{cns_storageclass}} -o jsonpath='{$.metadata.name}'
+          register: check_storageclass_name
+          failed_when: check_storageclass_name.stdout != "{{cns_storageclass}}"
+          changed_when: False
+
+        - name: check storageclass resturl
+          shell: oc get storageclass/{{cns_storageclass}}  -o jsonpath='{$.parameters.resturl}'
+          register: check_storageclass_resturl
+          failed_when: check_storageclass_resturl.stdout != ""
+          changed_when: False
+
+        - name: check storageclass restauth
+          shell: oc get storageclass/{{cns_storageclass}} -o jsonpath='{$.parameters.restauthenabled}'
+          register: check_storageclass_restauth
+          failed_when: check_storageclass_restauth.stdout != "true"
+          changed_when: False
+
+        - name: check storageclass restuser
+          shell: oc get storageclass/{{cns_storageclass}} -o jsonpath='{$.parameters.restuser}'
+          register: check_storageclass_restuser
+          failed_when: check_storageclass_restuser.stdout != "admin"
+          changed_when: False
+
+        - name: check storageclass volumetype
+          shell: oc get storageclass/{{cns_storageclass}} -o jsonpath='{$.parameters.volumetype}'
+          register: check_storageclass_volumetype
+          failed_when: check_storageclass_volumetype.stdout != "replicate:3"
+          changed_when: False
+
+        - name: check storageclass secretnamespace
+          shell: oc get storageclass/{{cns_storageclass}} -o jsonpath='{$.parameters.secretNamespace}'
+          register: check_storageclass_secretnamespace
+          failed_when: check_storageclass_secretnamespace.stdout != "default"
+          changed_when: False
+
+        - name: check storageclass secretname
+          shell: oc get storageclass/{{cns_storageclass}} -o jsonpath='{$.parameters.secretName}'
+          register: check_storageclass_secretname
+          failed_when: check_storageclass_secretname.stdout != "cns-secret"
+          changed_when: False
+
         environment: "{{LAB_ENV}}"
 ...

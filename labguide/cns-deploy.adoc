@@ -398,7 +398,7 @@ With these basics defined we can configure our system for CNS. First we will set
 Create an encoded value for the CNS admin user like below:
 
 ----
-[root@master ~]# echo -n "{{HEKETI_ADMIN_PW}}" | base64
+[ec2-user@{{MASTER_HOSTNAME}} ~]# echo -n "{{HEKETI_ADMIN_PW}}" | base64
 {{HEKETI_ADMIN_PW_BASE64}}
 ----
 
@@ -420,9 +420,9 @@ type: kubernetes.io/glusterfs
 
 Create the secret in OpenShift with the following command:
 
- [root@master ~]# oc create -f cns-secret.yml
+ [ec2-user@{{MASTER_HOSTNAME}} ~]# oc create -f cns-secret.yml
 
-To represent CNS as a storage provider in the system you first have to create a StorageClass.
+To represent CNS as a storage provider in the system you first have to create a `StorageClass`.
 Define by creating a file called `cns-storageclass.yml` which references the secret and the heketi URL shown earlier with the contents as below:
 
 [source,yaml]
@@ -444,10 +444,10 @@ parameters:
   secretName: "cns-secret"
 ----
 
-Create the StorageClass in OpenShift with the following command:
+Create the `StorageClass` in OpenShift with the following command:
 
- [root@master ~]# oc create -f cns-storageclass.yml
+ [ec2-user@{{MASTER_HOSTNAME}} ~]# oc create -f cns-storageclass.yml
 
 With these components in place the system is ready to dynamically provision storage capacity from Container-native Storage.
 
-The StorageClass has also been setup as the system-wide default so that requests that don't specify a particular StorageClass will use CNS.
+The `StorageClass` has also been setup as the system-wide default so that requests that don't specify a particular `StorageClass` will use CNS.

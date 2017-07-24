@@ -8,7 +8,7 @@
     - name: Checking if the 'oc version' is correctly installed
       command: oc version
       register: version
-      failed_when: version.stdout_lines[0] != "oc v3.5.5.26"  or version.stdout_lines[1] != "kubernetes v1.5.2+43a9be4"
+      failed_when: version.stdout_lines[0] != "oc v3.5.5.31"  or version.stdout_lines[1] != "kubernetes v1.5.2+43a9be4"
 
     - name: Checking status of all the nodes to be 'Ready' 
       command: oc get -o jsonpath='{.status.conditions[?(@.reason=="KubeletReady")].type}' node {{ item }}

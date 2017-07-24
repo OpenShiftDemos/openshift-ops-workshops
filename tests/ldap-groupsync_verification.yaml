@@ -5,12 +5,8 @@
   tasks:   
         
     - name: Checking if all the groups have been created by 'oc adm groups sync'
-      command: oc get -o jsonpath='{.items[*].metadata.name}' groups
-      register: groupnames
-      failed_when: " {{ item }} not in groupnames.stdout"
-      with_items:
-        - [ 'ose-user', 'ose-normal-dev', 'ose-fancy-dev', 'ose-teamed-app' ]
-      failed_when: "'ose-user' not in groupnames.stdout" and "'ose-normal-dev' not in groupnames.stdout" and "'ose-fancy-dev' not in groupnames.stdout" and "'ose-teamed-app' not in groupnames.stdout"
+      command: oc get group {{ item }}
+      with_items: [ 'ose-users', 'ose-normal-dev', 'ose-fancy-dev', 'ose-teamed-app' ]
       
     - name: Check if all users are present in group - 'ose-user'
       command: oc get -o jsonpath='{.users}' group ose-user

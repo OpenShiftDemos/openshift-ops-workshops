@@ -894,7 +894,6 @@ Resources:
               path: /etc/sysconfig/workshopper
               owner: root:root
 
-
             users:
             - default
 

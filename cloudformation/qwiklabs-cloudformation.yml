@@ -669,14 +669,13 @@ Resources:
                 group: ec2-user
 
               - content: |
-                  LAB_ENV:
-                    OCP_ROUTING_SUFFIX: "apps.${QwiklabId}.${PublicHostedZone}"
-                    NODE_BRICK_DEVICE: "/dev/xvdd"
-                    CNS_NAMESPACE: "container-native-storage"
-                    HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
-                    HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
-                    HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
-                    CNS_STORAGECLASS: "cns"
+                  OCP_ROUTING_SUFFIX: "apps.${QwiklabId}.${PublicHostedZone}"
+                  NODE_BRICK_DEVICE: "/dev/xvdd"
+                  CNS_NAMESPACE: "container-native-storage"
+                  HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
+                  HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
+                  HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
+                  CNS_STORAGECLASS: "cns"
                 path: /opt/lab/environment.yml
                 owner: root:root
             runcmd:

@@ -701,6 +701,7 @@ Resources:
             - ansible localhost -m wait_for -a "port=22 host=${WorkerNode1.PrivateIp}"
             - ansible localhost -m wait_for -a "port=22 host=${WorkerNode2.PrivateIp}"
             - ansible localhost -m wait_for -a "port=22 host=${WorkerNode3.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode.PrivateIp}"
             - ansible localhost -m wait_for -a "port=22 host=${InfraNode1.PrivateIp}"
             - ansible localhost -m wait_for -a "port=80 host=${GuideNode.PublicIp}"
             - mkdir -p /var/lib/etcd

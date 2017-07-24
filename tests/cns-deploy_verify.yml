@@ -129,13 +129,16 @@
       - name: check storageclass by name
         shell: oc get storageclass/{{cns_storageclass}} -o jsonpath='{$.metadata.name}'
         register: check_storageclass_name
-        failed_when: check_storageclass_name.stdout != "{{cns_storageclass}}"
+        failed_when: check_storageclass_name.stdout != cns_storageclass
         changed_when: False
+
+      - set_fact:
+          heketi_resturl: "http://{{ heketi_route }}"
 
       - name: check storageclass resturl
         shell: oc get storageclass/{{cns_storageclass}}  -o jsonpath='{$.parameters.resturl}'
         register: check_storageclass_resturl
-        failed_when: check_storageclass_resturl.stdout != "http://{{heketi_route}}"
+        failed_when: check_storageclass_resturl.stdout != heketi_resturl
         changed_when: False
 
       - name: check storageclass restauth

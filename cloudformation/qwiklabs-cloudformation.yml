@@ -1185,7 +1185,7 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [node03, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [node04, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
           !Sub |

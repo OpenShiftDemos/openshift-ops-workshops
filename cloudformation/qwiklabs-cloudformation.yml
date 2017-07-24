@@ -698,10 +698,10 @@ Resources:
             runcmd:
             - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
             - ansible-playbook /opt/lab/helpers/inventory_ldap_auth.yml
-            - ansible localhost -m wait_for -a "port=22 timeout=600 host=${WorkerNode1.PrivateIpAddress}"
-            - ansible localhost -m wait_for -a "port=22 timeout=600 host=${WorkerNode2.PrivateIpAddress}"
-            - ansible localhost -m wait_for -a "port=22 timeout=600 host=${WorkerNode3.PrivateIpAddress}"
-            - ansible localhost -m wait_for -a "port=22 timeout=600 host=${InfraNode1.PrivateIpAddress}"
+            - ansible localhost -m wait_for -a "port=22 timeout=600 host=${WorkerNode1.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 timeout=600 host=${WorkerNode2.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 timeout=600 host=${WorkerNode3.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 timeout=600 host=${InfraNode1.PrivateIp}"
             - ansible localhost -m wait_for -a "port=80 timeout=600 host=${GuideNode.PublicIp}"
             - mkdir -p /var/lib/etcd
             - git clone https://github.com/openshift/openshift-cns-testdrive.git /opt/lab/code

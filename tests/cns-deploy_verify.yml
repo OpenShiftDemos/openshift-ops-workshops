@@ -135,7 +135,7 @@
       - name: check storageclass resturl
         shell: oc get storageclass/{{cns_storageclass}}  -o jsonpath='{$.parameters.resturl}'
         register: check_storageclass_resturl
-        failed_when: check_storageclass_resturl.stdout != ""
+        failed_when: check_storageclass_resturl.stdout != "http://{{heketi_route}}"
         changed_when: False
 
       - name: check storageclass restauth

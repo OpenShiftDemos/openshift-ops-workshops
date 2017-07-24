@@ -59,8 +59,50 @@
             msg: "Error! topology file not found in /home/ec2-user/topology.json"
           when: not topology_file.stat.isreg
 
+        - set_fact:
+            cns_namespace: "{{ CNS_NAMESPACE | default('container-native-storage') }}"
+            heketi_admin_pw: "{{ HEKETI_ADMIN_PW | default('myS3cr3tpassw0rd') }}"
+            heketi_user_pw: "{{ HEKETI_USER_PW | default('mys3rs3cr3tpassw0rd') }}"
+
         - name: run cns-deploy
-          shell: cns-deploy --yes -n {{ CNS_NAMESPACE | default('container-native-storage') }} -g /home/ec2-user/topology.json --admin-key '{{ HEKETI_ADMIN_PW | default('myS3cr3tpassw0rd') }}' --user-key '{{ HEKETI_USER_PW | default('mys3rs3cr3tpassw0rd') }}'
+          shell: cns-deploy --yes -n {{cns_namespace}} -g /home/ec2-user/topology.json --admin-key '{{heketi_admin_pw}}' --user-key '{{heketi_user_pw}}'
+
+        - name: create storage secret in default namespace
+          shell: |
+            cat <<EOF | oc create -n default -f -
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: cns-secret
+              namespace: default
+            data:
+              key: {{heketi_admin_pw_base64}}
+            type: kubernetes.io/glusterfs
+            EOF
+
+        - set_fact:
+            heketi_admin_pw_base64: "{{HEKETI_ADMIN_PW_BASE64 | default('bXlTM2NyM3RwYXNzdzByZA==')}}"
+            ocp_routing_suffix: "{{ OCP_ROUTING_SUFFIX | default('apps.example.com') }}"
+            cns_storageclass: "{{ CNS_STORAGECLASS | default('cns') }}"
+
+        - name: create storage class
+          shell: |
+            cat <<EOF | oc create -f -
+            apiVersion: storage.k8s.io/v1beta1
+            kind: StorageClass
+            metadata:
+              name: {{cns_storageclass}}
+              annotations:
+                storageclass.beta.kubernetes.io/is-default-class: "true"
+            provisioner: kubernetes.io/glusterfs
+            parameters:
+              resturl: "http://heketi-{{cns_namespace}}.{{ocp_routing_suffix}}"
+              restauthenabled: "true"
+              restuser: "admin"
+              volumetype: "replicate:3"
+              secretNamespace: "default"
+              secretName: "cns-secret"
+            EOF
 
         environment: "{{LAB_ENV}}"
 ...

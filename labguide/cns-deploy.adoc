@@ -398,8 +398,8 @@ With these basics defined we can configure our system for CNS. First we will set
 Create an encoded value for the CNS admin user like below:
 
 ----
-[root@master ~]# echo -n "myS3cr3tpassw0rd" | base64
-bXlTM2NyM3RwYXNzdzByZA==
+[root@master ~]# echo -n "{{HEKETI_ADMIN_PW}}" | base64
+{{HEKETI_ADMIN_PW_BASE64}}
 ----
 
 We will store the encoded value the above command returns in an OpenShift secret. Create a file called `cns-secret.yml` as per below:
@@ -413,10 +413,10 @@ metadata:
   name: cns-secret
   namespace: default
 data:
-  key: bXlTM2NyM3RwYXNzdzByZA== <1>
+  key: {{HEKETI_ADMIN_PW_BASE64}} <1>
 type: kubernetes.io/glusterfs
 ----
-<1> 'key' contains base64-encoded version of 'myS3cr3tpassw0rd'
+<1> 'key' contains base64-encoded version of '{{HEKETI_ADMIN_PW}}'
 
 Create the secret in OpenShift with the following command:
 
@@ -431,7 +431,7 @@ Define by creating a file called `cns-storageclass.yml` which references the sec
 apiVersion: storage.k8s.io/v1beta1
 kind: StorageClass
 metadata:
-  name: container-native-storage
+  name: {{CNS_STORAGECLASS}}
   annotations:
     storageclass.beta.kubernetes.io/is-default-class: "true"
 provisioner: kubernetes.io/glusterfs

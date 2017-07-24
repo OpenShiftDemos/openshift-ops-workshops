@@ -674,7 +674,9 @@ Resources:
                     NODE_BRICK_DEVICE: "/dev/xvdd"
                     CNS_NAMESPACE: "container-native-storage"
                     HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
+                    HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
                     HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
+                    CNS_STORAGECLASS: "cns"
                 path: /opt/lab/environment.yml
                 owner: root:root
             runcmd:
@@ -869,7 +871,9 @@ Resources:
                 NODE3_INTERNAL_IP="${WorkerNode3.PrivateIp}"
                 NODE_BRICK_DEVICE="/dev/xvdd"
                 CNS_NAMESPACE="container-native-storage"
+                CNS_STORAGECLASS="cns"
                 HEKETI_ADMIN_PW="myS3cr3tpassw0rd"
+                HEKETI_ADMIN_PW_BASE64="bXlTM2NyM3RwYXNzdzByZA=="
                 HEKETI_USER_PW="mys3rs3cr3tpassw0rd"
               path: /etc/sysconfig/workshopper
               owner: root:root

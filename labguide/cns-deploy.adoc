@@ -145,7 +145,7 @@ GlusterFS pods need access to the physical block devices on the host. Hence they
 CNS will virtualize locally attached block storage on the OpenShift App nodes. In order to deploy you will need to supply the installer with information about where to find these nodes and what network and which block devices to use. +
 This is done using JSON file describing the topology of your OpenShift deployment.
 
-For this purpose, the file topology.json has been created in the home directory of `ec2-user` on the master node. Verify it has following content:
+For this purpose, in this lab environment, the file topology.json has been pre-created in the home directory of `ec2-user` on the master node. Verify it has following content:
 [source,json]
 ./home/ec2-user/topology.json
 ----
@@ -157,48 +157,48 @@ For this purpose, the file topology.json has been created in the home directory 
                     "node": {
                         "hostnames": {
                             "manage": [
-                                "{{NODE1_INTERNAL_FQDN}}"
+                                "{{NODE1_INTERNAL_FQDN}}" <1>
                             ],
                             "storage": [
-                                "{{NODE1_INTERNAL_IP}}"
+                                "{{NODE1_INTERNAL_IP}}" <2>
                             ]
                         },
-                        "zone": 1
+                        "zone": 1 <3>
                     },
                     "devices": [
-                        "{{NODE_BRICK_DEVICE}}"
+                        "{{NODE_BRICK_DEVICE}}" <4>
                     ]
                 },
                 {
                     "node": {
                         "hostnames": {
                             "manage": [
-                                "{{NODE2_INTERNAL_FQDN}}"
+                                "{{NODE2_INTERNAL_FQDN}}" <1>
                             ],
                             "storage": [
-                                "{{NODE2_INTERNAL_IP}}"
+                                "{{NODE2_INTERNAL_IP}}" <2>
                             ]
                         },
-                        "zone": 2
+                        "zone": 2 <3>
                     },
                     "devices": [
-                        "{{NODE_BRICK_DEVICE}}"
+                        "{{NODE_BRICK_DEVICE}}" <4>
                     ]
                 },
                 {
                     "node": {
                         "hostnames": {
                             "manage": [
-                                "{{NODE3_INTERNAL_FQDN}}"
+                                "{{NODE3_INTERNAL_FQDN}}" <1>
                             ],
                             "storage": [
-                                "{{NODE3_INTERNAL_IP}}"
+                                "{{NODE3_INTERNAL_IP}}" <2>
                             ]
                         },
-                        "zone": 3
+                        "zone": 3 <3>
                     },
                     "devices": [
-                        "{{NODE_BRICK_DEVICE}}"
+                        "{{NODE_BRICK_DEVICE}}" <4>
                     ]
                 }
             ]
@@ -206,6 +206,10 @@ For this purpose, the file topology.json has been created in the home directory 
     ]
 }
 ----
+<1> heketi uses this FQDN to identify the node in OpenShift (like oc get nodes)
+<2> the IP address of the node used for GlusterFS traffic
+<3> The failure domain of this node
+<4> The host's storage device(s) to for GlusterFS
 
 NOTE: The topology references the worker nodes by their hostnames as they are known to OpenShift.
 
@@ -376,3 +380,74 @@ Hello from Heketi
 That's it. You have successfully provisioned Container-native Storage on OpenShift. This is the basis to provide persistent storage to applications, as demonstrated in the link:cns-usage["Container-native Storage Management"] module.
 
 CNS is available wherever OpenShift is deployed with no external dependency.
+
+### Creating a StorageClass
+
+OpenShift uses Kubernetes' PersistentStorage facility to dynamically allocate storage for applications. This is a fairly simple framework in which only 3 components exists: the storage provider, the storage volume and the request for a storage volume.
+
+.OpenShift Storage Lifecycle
+image::cns_diagram_pvc.png[]
+
+OpenShift knows non-ephemeral storage as "persistent" volumes. This is storage that is decoupled from pod lifecycles.
+Users can request such storage by submitting a *PersistentVolumeClaim* to the system, which carries aspects like desired capacity or access mode (shared, single, read-only).+
+A storage provider in the system is represented by a *StorageClass* and is referenced in the claim. Upon receiving the claim it talks to the API of the actual storage system to provision the storage. +
+The storage is represented in OpenShift as a *PersistentVolume* which can directly be used by pods to mount it.
+
+With these basics defined we can configure our system for CNS. First we will set up the credentials for CNS in OpenShift.
+
+Create an encoded value for the CNS admin user like below:
+
+----
+[root@master ~]# echo -n "{{HEKETI_ADMIN_PW}}" | base64
+{{HEKETI_ADMIN_PW_BASE64}}
+----
+
+We will store the encoded value the above command returns in an OpenShift secret. Create a file called `cns-secret.yml` as per below:
+
+[source,yaml]
+.cns-secret.yml
+----
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cns-secret
+  namespace: default
+data:
+  key: {{HEKETI_ADMIN_PW_BASE64}} <1>
+type: kubernetes.io/glusterfs
+----
+<1> 'key' contains base64-encoded version of '{{HEKETI_ADMIN_PW}}'
+
+Create the secret in OpenShift with the following command:
+
+ [root@master ~]# oc create -f cns-secret.yml
+
+To represent CNS as a storage provider in the system you first have to create a StorageClass.
+Define by creating a file called `cns-storageclass.yml` which references the secret and the heketi URL shown earlier with the contents as below:
+
+[source,yaml]
+.cns-storageclass.yml
+----
+apiVersion: storage.k8s.io/v1beta1
+kind: StorageClass
+metadata:
+  name: {{CNS_STORAGECLASS}}
+  annotations:
+    storageclass.beta.kubernetes.io/is-default-class: "true"
+provisioner: kubernetes.io/glusterfs
+parameters:
+  resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+  restauthenabled: "true"
+  restuser: "admin"
+  volumetype: "replicate:3"
+  secretNamespace: "default"
+  secretName: "cns-secret"
+----
+
+Create the StorageClass in OpenShift with the following command:
+
+ [root@master ~]# oc create -f cns-storageclass.yml
+
+With these components in place the system is ready to dynamically provision storage capacity from Container-native Storage.
+
+The StorageClass has also been setup as the system-wide default so that requests that don't specify a particular StorageClass will use CNS.

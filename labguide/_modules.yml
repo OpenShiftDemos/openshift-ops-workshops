@@ -13,3 +13,6 @@ modules:
    
   installation:
     name: Installation and Verification
+  
+  cluster-mgmt-basics:
+    name: Cluster Management Basics

@@ -624,8 +624,8 @@ Resources:
                 path: /etc/ansible/hosts
 
 
-            write_files:  
-              - content: | 
+            write_files:
+              - content: |
                   kind: LDAPSyncConfig
                   apiVersion: v1
                   url: ldap://idm.unset.ocp-admin.aws.openshifttestdrive.com
@@ -648,7 +648,7 @@ Resources:
                     userUIDAttribute: dn
                     userNameAttributes:
                     - uid
-                path: /home/ec2-user/groupsync.yaml      
+                path: /home/cloud-user/groupsync.yaml      
 
               - content: |
                   {

@@ -623,6 +623,33 @@ Resources:
                   idm.${QwiklabId}.${PublicHostedZone}
                 path: /etc/ansible/hosts
 
+
+            write_files:  
+              - content: | 
+                  kind: LDAPSyncConfig
+                  apiVersion: v1
+                  url: ldap://idm.unset.ocp-admin.aws.openshifttestdrive.com
+                  ca: /etc/origin/master/ipa-ca.crt
+                  bindDN: uid=admin,cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
+                  bindPassword: ldapadmin
+                  rfc2307:
+                    groupsQuery:
+                      baseDN: cn=groups,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
+                      derefAliases: never
+                      filter: '(|(cn=ose-*))'
+                    groupUIDAttribute: dn
+                    groupNameAttributes:
+                    - cn
+                    groupMembershipAttributes:
+                    - member
+                    usersQuery:
+                      baseDN: cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
+                      derefAliases: never
+                    userUIDAttribute: dn
+                    userNameAttributes:
+                    - uid
+                path: /home/ec2-user/groupsync.yaml      
+
               - content: |
                   {
                       "clusters": [
@@ -703,6 +730,7 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
+>>>>>>> c96883e28affbde7981e82d1790c9aafd62052ae
 
   InfraNode1:
     Type: AWS::EC2::Instance

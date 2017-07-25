@@ -2,7 +2,7 @@
 [abstract]
 Overview
 --------
-In this section you will set up container-native storage (CNS) in your environment. You will use this in link:cns-usage["Container-native Storage Management"] lab to dynamically provision storage for containerized applications. It is provided by GlusterFS running in containers. +
+In this section you will set up container-native storage (CNS) in your environment. You will use this in link:cns-management["Container-native Storage Management"] lab to dynamically provision storage for containerized applications. It is provided by GlusterFS running in containers. +
 GlusterFS in turn is backed by local storage devices available to the OpenShift nodes.+
 This lab requires that you completed OpenShift installation in the previous module.
 
@@ -327,7 +327,7 @@ NOTE: Some of the output contains auto-generated data, so references to UUIDs an
 You now have deployed CNS. Let's verify all components are in place. While still in the `{{CNS_NAMESPACE}}` project on the CLI list all running pods.
 
 ----
-[root@master ~]$ oc get pods -o wide
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods -o wide
 NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
 glusterfs-37vn8   1/1       Running   0          3m       {{NODE1_INTERNAL_IP}}         {{NODE1_INTERNAL_FQDN}} <1>
 glusterfs-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}         {{NODE2_INTERNAL_FQDN}} <1>

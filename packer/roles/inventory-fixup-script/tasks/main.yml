@@ -1,0 +1,19 @@
+---
+
+  - name: Ensure lab directory exists
+    file:
+      path: /opt/lab/helpers
+      state: directory
+      owner: ec2-user
+      group: ec2-user
+      mode: "u=rwx,g=r,o=r"
+
+  - name: Copy inventory patch playbook
+    copy:
+      src: inventory_ldap_auth.yml
+      dest: /opt/lab/helpers/
+      owner: ec2-user
+      group: ec2-user
+      mode: "u=rw,g=r,o=r"
+
+...

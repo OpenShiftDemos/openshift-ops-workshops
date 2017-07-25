@@ -9,10 +9,12 @@
     dest: /etc/sudoers
     state: present
 
-- name: enable ansible pipelining
-  lineinfile:
-    line: pipelining = True
+- name: create ansible.cfg
+  copy:
+    src: ansible.cfg
     dest: /etc/ansible/ansible.cfg
-    state: present
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
 
 ...

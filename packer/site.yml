@@ -5,10 +5,12 @@
   roles:
     - { role: registered-host, tags: ['registered-host']}
     - { role: aws-host, tags: ['aws-host']}
+    - { role: ocp-installer, tags: ['ocp-installer']}
     - { role: docker-host, tags: ['docker-host']}
     - { role: registry-mirror, tags: ['registry-mirror']}
     - { role: ansible-host, tags: ['ansible-host']}
-    - { role: ocp-installer, tags: ['ocp-installer']}
+    - { role: master-cert, tags: ['master-cert']}
+    - { role: inventory-fixup-script, tags: ['inventory-fixup-script']}
     - { role: idm-install, tags: ['idm-install']}
     - { role: cns-deploy, tags: ['cns-deploy']}
     - { role: authorized-key, tags: ['authorized-key']}

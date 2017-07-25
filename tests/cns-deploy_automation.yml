@@ -1,0 +1,91 @@
+---
+
+  - hosts: localhost
+
+    tasks:
+
+      - include_vars: /opt/lab/environment.yml
+
+      - name: create firewall-playbook
+        blockinfile:
+          create: yes
+          dest: configure-firewall.yml
+          state: present
+          block: |
+            - hosts: cns
+
+              tasks:
+
+                - name: insert iptables rules required for GlusterFS
+                  blockinfile:
+                    dest: /etc/sysconfig/iptables
+                    block: |
+                      -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT
+                      -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
+                      -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
+                      -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
+                    insertbefore: "^COMMIT"
+
+                - name: reload iptables
+                  systemd:
+                    name: iptables
+                    state: reloaded
+
+            ...
+
+      - name: run firewall-playbook
+        shell: ansible-playbook configure-firewall.yml
+
+      - name: login via oc as system:admin to default namespace
+        shell: oc login -u system:admin -n default
+
+      - set_fact:
+          cns_namespace: "{{ CNS_NAMESPACE | default('container-native-storage') }}"
+
+      - name: create new project
+        shell: oc new-project {{ cns_namespace }}
+
+      - name: add privileges to default service account
+        shell: oc adm policy add-scc-to-user privileged -z default -n {{ cns_namespace }}
+
+      - name: check topology file
+        stat:
+          path: /home/ec2-user/topology.json
+        register: topology_file
+
+      - fail:
+          msg: "Error! topology file not found in /home/ec2-user/topology.json"
+        when: not topology_file.stat.isreg
+
+      - set_fact:
+          cns_namespace: "{{ CNS_NAMESPACE | default('container-native-storage') }}"
+          heketi_admin_pw: "{{ HEKETI_ADMIN_PW | default('myS3cr3tpassw0rd') }}"
+          heketi_user_pw: "{{ HEKETI_USER_PW | default('mys3rs3cr3tpassw0rd') }}"
+
+      - name: run cns-deploy
+        shell: cns-deploy --yes -n {{cns_namespace}} -g /home/ec2-user/topology.json --admin-key '{{heketi_admin_pw}}' --user-key '{{heketi_user_pw}}'
+
+      - set_fact:
+          heketi_admin_pw_base64: "{{HEKETI_ADMIN_PW_BASE64 | default('bXlTM2NyM3RwYXNzdzByZA==')}}"
+
+      - name: create storage secret file from template
+        template:
+          src: ../templates/cns-secret.yml.j2
+          dest: /tmp/cns-secret.yml
+
+      - name: create storage secret in default namespace
+        shell: |
+          oc create -n default -f /tmp/cns-secret.yml
+
+      - set_fact:
+          ocp_routing_suffix: "{{ OCP_ROUTING_SUFFIX | default('apps.example.com') }}"
+          cns_storageclass: "{{ CNS_STORAGECLASS | default('cns') }}"
+
+      - name: create storage class file from template
+        template:
+          src: ../templates/cns-storageclass.yml.j2
+          dest: /tmp/cns-storageclass.yml
+
+      - name: create storage class
+        shell: oc create -f /tmp/cns-storageclass.yml
+...

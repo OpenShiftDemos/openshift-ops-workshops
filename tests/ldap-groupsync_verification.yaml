@@ -1,6 +1,7 @@
 ---
 
-- hosts: masters
+- name: Verification tests for lab module 4.3
+  hosts: masters
 
   tasks:
 
@@ -10,17 +11,17 @@
 
     - name: Checking if all the groups have been created by 'oc adm groups sync'
       command: oc get group {{ item }}
-      with_items: [ 'ose-users', 'ose-normal-dev', 'ose-fancy-dev', 'ose-teamed-app' ]
+      with_items: [ 'ose-user', 'ose-normal-dev', 'ose-fancy-dev', 'ose-teamed-app' ]
 
     - name: Check if all users are present in group - 'ose-user'
       command: oc get -o jsonpath='{.users}' group ose-user
       register: ose_user_users
       failed_when: >
-        'normaluser1' not in ose_user_users or
-        'teamuser1' not in ose_user_users or
-        'teamuser2' nor in ose_user_users or
-        'fancyuser1' not in ose_user_users or
-        'fancyuser2' not in ose_user_users
+        'normaluser1' not in ose_user_users.stdout or
+        'teamuser1' not in ose_user_users.stdout or
+        'teamuser2' not in ose_user_users.stdout or
+        'fancyuser1' not in ose_user_users.stdout or
+        'fancyuser2' not in ose_user_users.stdout
 
     - name: Check if all users are present in group - 'ose-normal-dev'
       command: oc get -o jsonpath='{.users}' group 'ose-normal-dev'
@@ -34,8 +35,8 @@
       command: oc get -o jsonpath='{.users}' group ose-fancy-dev
       register: fancydev_users
       failed_when: >
-        'fancyuser1' not in fancydev_users or
-        'fancyuser2' not in fancydev_users
+        'fancyuser1' not in fancydev_users.stdout or
+        'fancyuser2' not in fancydev_users.stdout
 
     - name: Check if all users are present in group - 'ose-teamed-app'
       command: oc get -o jsonpath='{.users}' group ose-teamed-app
@@ -62,6 +63,7 @@
       command: oc get -o jsonpath='{.items[*].metadata.name}' projects
       register: teamuser2_projects
       failed_when: "'app-dev' not in teamuser2_projects.stdout"
+
 
     - name: list down projects in access of teamuser2
       command: oc get -o jsonpath='{.items[*].metadata.name}' projects

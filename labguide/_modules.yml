@@ -47,10 +47,8 @@ modules:
       ETHERPAD_URL_PREFIX:
   installation:
     name: Installation and Verification
-
   cluster-mgmt-basics:
     name: Cluster Management Basics
-
   cns-deploy:
     name: Deploying Container-native Storage
     requires:

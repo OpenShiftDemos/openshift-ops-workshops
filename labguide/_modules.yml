@@ -47,6 +47,10 @@ modules:
       ETHERPAD_URL_PREFIX:
   installation:
     name: Installation and Verification
+  
+  cluster-mgmt-basics:
+    name: Cluster Management Basics
+
   cns-deploy:
     name: Deploying Container-native Storage
     vars:
@@ -55,4 +59,4 @@ modules:
       HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
       HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
       HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
-      CNS_STORAGECLASS: "cns"
+      CNS_STORAGECLASS: "cns" 

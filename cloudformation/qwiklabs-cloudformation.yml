@@ -622,6 +622,31 @@ Resources:
                   [idm]
                   idm.${QwiklabId}.${PublicHostedZone}
                 path: /etc/ansible/hosts
+                
+              - content: |
+                  kind: LDAPSyncConfig
+                  apiVersion: v1
+                  url: ldap://idm.unset.ocp-admin.aws.openshifttestdrive.com
+                  ca: /etc/origin/master/ipa-ca.crt
+                  bindDN: uid=admin,cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
+                  bindPassword: ldapadmin
+                  rfc2307:
+                    groupsQuery:
+                      baseDN: cn=groups,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
+                      derefAliases: never
+                      filter: '(|(cn=ose-*))'
+                    groupUIDAttribute: dn
+                    groupNameAttributes:
+                    - cn
+                    groupMembershipAttributes:
+                    - member
+                    usersQuery:
+                      baseDN: cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
+                      derefAliases: never
+                    userUIDAttribute: dn
+                    userNameAttributes:
+                    - uid
+                path: /home/cloud-user/groupsync.yaml
 
               - content: |
                   {

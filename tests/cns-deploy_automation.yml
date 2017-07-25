@@ -48,14 +48,12 @@
       - name: add privileges to default service account
         shell: oc adm policy add-scc-to-user privileged -z default -n {{ cns_namespace }}
 
-      - name: check topology file
+      - name: check existance of topology file
         stat:
           path: /home/cloud-user/topology.json
         register: topology_file
-
-      - fail:
-          msg: "Error! topology file not found in /home/cloud-user/topology.json"
-        when: not topology_file.stat.isreg
+        changed_when: False
+        failed_when: not topology_file.stat.exists
 
       - set_fact:
           cns_namespace: "{{ CNS_NAMESPACE | default('container-native-storage') }}"

@@ -15,4 +15,6 @@ modules:
   activate:
   - environment
   - installation
+  - cluster management basics
   - cns-deploy
+

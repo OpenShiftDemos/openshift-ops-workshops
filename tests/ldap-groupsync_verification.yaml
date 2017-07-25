@@ -2,39 +2,47 @@
 
 - hosts: masters
 
-  tasks:   
+  tasks:
+   
+    - name: Login as cluster:admin so as to list all groups and projects
+      command: oc login -u teamuser1 -p openshift
+      become_user : root
         
     - name: Checking if all the groups have been created by 'oc adm groups sync'
-      command: oc get -o jsonpath='{.items[*].metadata.name}' groups
-      register: groupnames
-      failed_when: " {{ item }} not in groupnames.stdout"
-      with_items:
-        - [ 'ose-user', 'ose-normal-dev', 'ose-fancy-dev', 'ose-teamed-app' ]
-      failed_when: "'ose-user' not in groupnames.stdout" and "'ose-normal-dev' not in groupnames.stdout" and "'ose-fancy-dev' not in groupnames.stdout" and "'ose-teamed-app' not in groupnames.stdout"
-      
+      command: oc get group {{ item }}
+      with_items: [ 'ose-users', 'ose-normal-dev', 'ose-fancy-dev', 'ose-teamed-app' ]    
+   
     - name: Check if all users are present in group - 'ose-user'
       command: oc get -o jsonpath='{.users}' group ose-user
       register: ose_user_users
-      failed_when: " {{ item }} not in ose_user_users.stdout"
-      with_items: [ 'normaluser1', 'teamuser1', 'teamuser2', 'fancyuser1', 'fancyuser2' ]
+      failed_when: >
+        'normaluser1' not in ose_user_users or 
+        'teamuser1' not in ose_user_users or
+        'teamuser2' nor in ose_user_users or
+        'fancyuser1' not in ose_user_users or
+        'fancyuser2' not in ose_user_users
          
     - name: Check if all users are present in group - 'ose-normal-dev'
-      command: oc get -o jsonpath='{.users}' group ose-normal-dev
+      command: oc get -o jsonpath='{.users}' group 'ose-normal-dev'
       register: normaldev_users
-      failed_when: " {{ item }} not in normaldev_users.stdout"
-      with_items: [ 'normaluser1', 'teamuser1', 'teamuser2' ]
-    
+      failed_when: >
+        'normaluser1' not in normaldev_users.stdout or
+        'teamuser1' not in normaldev_users.stdout or
+        'teamuser2' not in normaldev_users.stdout
+
     - name: Check if all users are present in group - 'ose-fancy-dev'
       command: oc get -o jsonpath='{.users}' group ose-fancy-dev
       register: fancydev_users
-      failed_when: " {{ item }} not in fancydev_users.stdout"
-      with_items: [ 'fancyuser1', 'fancyuser2' ]    
+      failed_when: >
+        'fancyuser1' not in fancydev_users or
+        'fancyuser2' not in fancydev_users  
     
     - name: Check if all users are present in group - 'ose-teamed-app'
       command: oc get -o jsonpath='{.users}' group ose-teamed-app
       register: teamedapp_users
-      failed_when: " {{ item }} not in teamedapp_users.stdout"
-      with_items: [ 'teamuser1', 'teamuser2' ]            
+      failed_when: >
+        'teamuser1'  not in teamedapp_users.stdout or
+        'teamuser2'  not in teamedapp_users.stdout         
     
     - name: login as fancyuser1 of group - ose-fancy-dev
       command: oc login -u fancyuser1 -p openshift
@@ -49,14 +57,14 @@
       
     - name: Log in as teamuser2
       command: oc login -u teamuser2 -p openshift
-
+      
     - name: list down projects in access of teamuser2
       command: oc get -o jsonpath='{.items[*].metadata.name}' projects
       register: teamuser2_projects
       failed_when: "'app-dev' not in teamuser2_projects.stdout"
       
-    - name: list down projects in access of teamuser2
+      - name: list down projects in access of teamuser2
       command: oc get -o jsonpath='{.items[*].metadata.name}' projects
       register: fancyuser1_projects
-      failed_when: "'app-test' not in teamuser2_projects.stdout"
+      failed_when: "'app-test' not in teamuser2_projects.stdout" 
 ...

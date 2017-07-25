@@ -10,7 +10,7 @@
         
     - name: Checking if all the groups have been created by 'oc adm groups sync'
       command: oc get group {{ item }}
-      with_items: [ 'ose-users', 'ose-normal-dev', 'ose-fancy-dev', 'ose-teamed-app' ]    
+      with_items: [ 'ose-user', 'ose-normal-dev', 'ose-fancy-dev', 'ose-teamed-app' ]    
    
     - name: Check if all users are present in group - 'ose-user'
       command: oc get -o jsonpath='{.users}' group ose-user

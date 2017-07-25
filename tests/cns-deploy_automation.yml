@@ -55,7 +55,7 @@
 
       - fail:
           msg: "Error! topology file not found in /home/cloud-user/topology.json"
-        when: not topology_file.stat.isreg
+        when: not topology_file.stat.exists
 
       - set_fact:
           cns_namespace: "{{ CNS_NAMESPACE | default('container-native-storage') }}"

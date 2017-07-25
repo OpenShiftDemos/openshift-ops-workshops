@@ -68,13 +68,13 @@ iii)  mappingMethod: claim ->
 Step-2 ] Make LDAP config file for group sync. This file is already configured and present in your master host. 
 View the contents of the file by typing this command -
 
- # cat /home/ec2-user/groupsync.yaml
+ # cat /home/cloud-user/groupsync.yaml
 
 
 Step-3] Map and sync LDAP groups :
 Run the command for LDAP groups sync to create the groups listed earlier in the master host -
 
- # oc adm groups sync --sync-config=/home/ec2-user/groupsync.yaml --confirm
+ # oc adm groups sync --sync-config=/home/cloud-user/groupsync.yaml --confirm
  
 The output will list down the four groups.
 

@@ -4,16 +4,16 @@
     file:
       path: /opt/lab/helpers
       state: directory
-      owner: ec2-user
-      group: ec2-user
+      owner: cloud-user
+      group: cloud-user
       mode: "u=rwx,g=r,o=r"
 
   - name: Copy idm certificate playbook
     copy:
       src: fetch_idm_cert.yml
       dest: /opt/lab/helpers/
-      owner: ec2-user
-      group: ec2-user
+      owner: cloud-user
+      group: cloud-user
       mode: "u=rw,g=r,o=r"
 
 ...

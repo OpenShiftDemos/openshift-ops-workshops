@@ -61,15 +61,15 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-9cdb8ae7
+      ami: ami-8e6b38f5
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-d8869ea1
+      ami: ami-e9332890
     eu-west-1:
-      ami: ami-252ac35c
+      ami: ami-87b75ffe
     eu-central-1:
       ami: NOT_SUPPORTED
     ap-northeast-1:
@@ -575,7 +575,7 @@ Resources:
 
             system_info:
               default_user:
-                name: ec2-user
+                name: cloud-user
 
             write_files:
               - content: |
@@ -680,9 +680,9 @@ Resources:
                           }
                       ]
                   }
-                path: /home/ec2-user/topology.json
-                owner: ec2-user
-                group: ec2-user
+                path: /home/cloud-user/topology.json
+                owner: cloud-user
+                group: cloud-user
 
               - content: |
                   OCP_ROUTING_SUFFIX: "apps.${QwiklabId}.${PublicHostedZone}"
@@ -764,13 +764,20 @@ Resources:
 
             system_info:
               default_user:
-                name: ec2-user
+                name: cloud-user
 
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+
+            users:
+            - default
+
+            system_info:
+              default_user:
+                name: cloud-user
 
 
   IdmNode1:
@@ -805,6 +812,13 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
+
+            users:
+            - default
+
+            system_info:
+              default_user:
+                name: cloud-user
 
             fqdn: idm.${QwiklabId}.${PublicHostedZone}
             manage_etc_hosts: true
@@ -899,7 +913,7 @@ Resources:
 
             system_info:
               default_user:
-                name: ec2-user
+                name: cloud-user
 
             runcmd:
             - [ systemctl, daemon-reload ]
@@ -995,7 +1009,7 @@ Resources:
 
             system_info:
               default_user:
-                name: ec2-user
+                name: cloud-user
 
   WorkerNode2:
     Type: AWS::EC2::Instance
@@ -1077,7 +1091,7 @@ Resources:
 
             system_info:
               default_user:
-                name: ec2-user
+                name: cloud-user
 
   WorkerNode3:
     Type: AWS::EC2::Instance
@@ -1159,7 +1173,7 @@ Resources:
 
             system_info:
               default_user:
-                name: ec2-user
+                name: cloud-user
 
   WorkerNode4:
     Type: AWS::EC2::Instance
@@ -1241,7 +1255,7 @@ Resources:
 
             system_info:
               default_user:
-                name: ec2-user
+                name: cloud-user
 
 
 Outputs:
@@ -1255,7 +1269,7 @@ Outputs:
 
    SSHLoginUser:
       Description: "User name on the Master node to connect via SSH and PEM file"
-      Value: "ec2-user"
+      Value: "cloud-user"
 
    LabguideURL:
      Description: "Student Lab Guide"

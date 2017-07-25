@@ -17,7 +17,7 @@ image::ec21.png[]
 Use this command to SSH into the master host -
 
 [literal]
-$ ssh -i <path/private_key.pem> ec2-user@<Public_DNS>
+$ ssh -i <path/private_key.pem> cloud-user@<Public_DNS>
 
 Replace `path`by the path where you have stored the private keyand replace <Public_DNS> by the information shown on instance page.
 

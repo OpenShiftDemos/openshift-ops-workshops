@@ -6,7 +6,7 @@
   
   tasks: 
     - name: syncing all the groups using 'oc adm' CLI tool and applying changes to the system
-      command: oc adm groups sync --sync-config=/home/ec2-user/groupsync.yaml --confirm
+      command: oc adm groups sync --sync-config=/home/cloud-user/groupsync.yaml --confirm
       become_user: root
       
     - name: Changing policy of the group - 'ose-normal-dev' to 'cluster-admin'

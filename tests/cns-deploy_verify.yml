@@ -170,4 +170,27 @@
         register: check_storageclass_secretname
         failed_when: check_storageclass_secretname.stdout != "cns-secret"
         changed_when: False
+
+      - name: check presence of heketi-cli
+        shell: which heketi-cli
+        changed_when: False
+
+      - name: check heketi-cli version
+        shell: heketi-cli --version
+        register: check_heketi_cli_version
+        failed_when: check_heketi_cli_version.stdout.split(' ')[-1] | version_compare('4.0.0', '!=')
+        changed_when: False
+
+      - name: check for a cluster returned by heketi
+        shell: heketi-cli --user=admin --secret {{ heketi_admin_key }} --server {{ heketi_resturl }} cluster list
+        register: check_heketi_cluster_list
+        failed_when: check_heketi_cluster_list.stdout_lines|length != 2
+        changed_when: False
+
+      - set_fact:
+          heketi_cluster: check_heketi_cluster_list.stdout_lines[1]
+
+      - name: query the a cluster returned by heketi
+        shell: heketi-cli --user=admin --secret {{ heketi_admin_key }} --server {{ heketi_resturl }} cluster show {{ heketi_cluster }}
+        changed_when: False
 ...

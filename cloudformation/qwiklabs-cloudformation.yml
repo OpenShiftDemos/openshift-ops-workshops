@@ -489,6 +489,22 @@ Resources:
           ResourceRecords:
           - !GetAtt WorkerNode3.PublicIp
 
+        - Name: !Join ['', [node04., !Ref QwiklabId, ., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode4.PublicIp
+
+  WaitHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+
+  WaitCondition:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: GuideNode
+    Properties:
+      Handle: !Ref WaitHandle
+      Timeout: '600'
+
   Master1:
     Type: AWS::EC2::Instance
     Properties:
@@ -678,6 +694,7 @@ Resources:
                   CNS_STORAGECLASS: "cns"
                 path: /opt/lab/environment.yml
                 owner: root:root
+
             runcmd:
             - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
             - ansible-playbook /opt/lab/helpers/inventory_ldap_auth.yml
@@ -850,8 +867,8 @@ Resources:
               path: /etc/sysconfig/docker-storage-setup
               owner: root:root
             - content: |
-                WORKSHOPS_URLS="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/production/labguide/_ocp_admin_testdrive.yaml"
-                CONTENT_URL_PREFIX="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/production/labguide"
+                WORKSHOPS_URLS="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/master/labguide/_ocp_admin_testdrive.yaml"
+                CONTENT_URL_PREFIX="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/master/labguide"
                 OCP_ROUTING_SUFFIX="apps.${QwiklabId}.${PublicHostedZone}"
                 MASTER_HOSTNAME="master"
                 MASTER_EXTERNAL_FQDN="master.${QwiklabId}.${PublicHostedZone}"
@@ -877,7 +894,6 @@ Resources:
               path: /etc/sysconfig/workshopper
               owner: root:root
 
-
             users:
             - default
 
@@ -889,6 +905,14 @@ Resources:
             - [ systemctl, daemon-reload ]
             - [ systemctl, enable, workshopper ]
             - [ systemctl, start, workshopper ]
+            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode1.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode2.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode3.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode4.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 host=${InfraNode1.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=80 host=localhost"
+            - 'curl -X PUT -H "Content-Type:" --data-binary "{ \"Status\" : \"SUCCESS\", \"Reason\": \"Configuration Complete\", \"UniqueId\": \"GuideNode\",\"Data\": \"GuideNode has reached all instances and generated lab guide\" }" "${WaitHandle}"'
 
 
   WorkerNode1:
@@ -1136,6 +1160,89 @@ Resources:
             system_info:
               default_user:
                 name: ec2-user
+
+  WorkerNode4:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegion2AMI
+        - Ref: AWS::Region
+        - ami
+      InstanceType:
+        Ref: WorkerInstanceType
+      SubnetId:
+        Ref: PublicSubnet3
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds:
+        - !GetAtt NodeSecurityGroup.GroupId
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdb
+          Ebs:
+            VolumeSize: '20'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdc
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdd
+          Ebs:
+            VolumeSize: '50'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+      - Key: Name
+        Value: !Join [ ., [node04, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #cloud-config
+            cloud_config_modules:
+            - disk_setup
+            - mounts
+
+            fqdn: node04.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
+
+            fs_setup:
+            - label: emptydir
+              filesystem: xfs
+              device: /dev/xvdc
+              partition: auto
+
+            runcmd:
+            - mkdir -p /var/lib/origin/openshift.local.volumes
+
+            mounts:
+            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+
+            write_files:
+            - content: |
+                DEVS='/dev/xvdb'
+                VG=docker_vol
+                DATA_SIZE=95%VG
+                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
+              path: /etc/sysconfig/docker-storage-setup
+              owner: root:root
+
+            users:
+            - default
+
+            system_info:
+              default_user:
+                name: ec2-user
+
 
 Outputs:
    UserName:

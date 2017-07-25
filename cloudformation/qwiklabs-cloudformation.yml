@@ -648,7 +648,7 @@ Resources:
                     userUIDAttribute: dn
                     userNameAttributes:
                     - uid
-                path: /home/cloud-user/groupsync.yaml      
+                path: /home/cloud-user/groupsync.yaml
 
               - content: |
                   {
@@ -730,7 +730,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
->>>>>>> c96883e28affbde7981e82d1790c9aafd62052ae
 
   InfraNode1:
     Type: AWS::EC2::Instance

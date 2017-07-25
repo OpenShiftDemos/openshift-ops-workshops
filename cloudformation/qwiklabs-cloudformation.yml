@@ -622,9 +622,7 @@ Resources:
                   [idm]
                   idm.${QwiklabId}.${PublicHostedZone}
                 path: /etc/ansible/hosts
-
-
-            write_files:
+                
               - content: |
                   kind: LDAPSyncConfig
                   apiVersion: v1

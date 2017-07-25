@@ -4,6 +4,12 @@
     name: cloud-user
     password: $6$vflpEFJa6AoKkqY3$LynSFEZFY/vKWbnZVV8aGToiBlsate96LALMWSB2X1IH6diHioito09FoFj9KNl0aNDZueHjhDy76Sy322bE8/
 
+- name: create ssh directory
+  file:
+    path: /home/cloud-user/.ssh
+    state: directory
+    mode: 0700
+
 - name: create ssh key pair for internal use
   shell:
     cmd: ssh-keygen -b 2048 -t rsa -f /home/cloud-user/.ssh/id_rsa -q -N ""

@@ -14,18 +14,18 @@ NOTE: All of the following tasks are carried out as root from the master node. A
 Make sure you are logged on to the master node.
 
 
-  [ec2-user@{{MASTER_HOSTNAME}} ~]# hostname
+  [cloud-user@{{MASTER_HOSTNAME}} ~]# hostname
   {{MASTER_EXTERNAL_FQDN}}
 
 
 First, verify that the CNS deployment tool is installed. +
 We will also use Ansible and verify it's presence. Though not needed for CNS per se, in this lab it will help us simplify an otherwise tedious manual configuration step.
 
-  [ec2-user@{{MASTER_HOSTNAME}} ~]# yum list installed cns-deploy
+  [cloud-user@{{MASTER_HOSTNAME}} ~]# yum list installed cns-deploy
 
 The command should return the following:
 
-  [ec2-user@{{MASTER_HOSTNAME}} ~]$ yum list installed cns-deploy ansible
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ yum list installed cns-deploy ansible
   Loaded plugins: product-id, search-disabled-repos, subscription-manager
   Installed Packages
   ansible.noarch        2.3.1.0-1.el7           @epel
@@ -41,7 +41,7 @@ NOTE: In the following section we will configure Ansible. We will use it's confi
 
 You should be able to ping all hosts using Ansible
 ....
-[ec2-user@{{MASTER_HOSTNAME}} ~]# ansible cns -m ping
+[cloud-user@{{MASTER_HOSTNAME}} ~]# ansible cns -m ping
 
 {{NODE1_EXTERNAL_FQDN}} | SUCCESS => {
     "changed": false,
@@ -87,7 +87,7 @@ Create a file called `configure-firewall.yml` and copy&paste the following conte
 
 This short Ansible playbook will configure the firewall on all OpenShift worker nodes to allow GlusterFS-related traffic, required for CNS. Run it with the following command:
 
- [ec2-user@{{MASTER_HOSTNAME}} ~]# ansible-playbook configure-firewall.yml
+ [cloud-user@{{MASTER_HOSTNAME}} ~]# ansible-playbook configure-firewall.yml
 
 When the playbooks completes successfully, your output should look like this:
 
@@ -124,30 +124,30 @@ Next we will create a namespace (also referred to as a _Project_) in OpenShift. 
 For this you need to be logged as an admin user in OpenShift.
 
 
-  [ec2-user@{{MASTER_HOSTNAME}} ~]# oc whoami
+  [cloud-user@{{MASTER_HOSTNAME}} ~]# oc whoami
   system:admin
 
 
 If you are for some reason not an admin, login as system admin like this:
 
-  [ec2-user@{{MASTER_HOSTNAME}} ~]# oc login -u system:admin -n default
+  [cloud-user@{{MASTER_HOSTNAME}} ~]# oc login -u system:admin -n default
 
 Create a namespace with a designation of your choice. In this example we will use `{{CNS_NAMESPACE}}`.
 
-  [ec2-user@{{MASTER_HOSTNAME}} ~]# oc new-project {{CNS_NAMESPACE}}
+  [cloud-user@{{MASTER_HOSTNAME}} ~]# oc new-project {{CNS_NAMESPACE}}
 
 GlusterFS pods need access to the physical block devices on the host. Hence they need elevated permissions. Enable containers to run in privileged mode by adding this capability to the default security context constraints:
 
-  [ec2-user@{{MASTER_HOSTNAME}} ~]# oadm policy add-scc-to-user privileged -z default
+  [cloud-user@{{MASTER_HOSTNAME}} ~]# oadm policy add-scc-to-user privileged -z default
 
 ### Describe Container-native Storage Topology
 
 CNS will virtualize locally attached block storage on the OpenShift App nodes. In order to deploy you will need to supply the installer with information about where to find these nodes and what network and which block devices to use. +
 This is done using JSON file describing the topology of your OpenShift deployment.
 
-For this purpose, in this lab environment, the file topology.json has been pre-created in the home directory of `ec2-user` on the master node. Verify it has following content:
+For this purpose, in this lab environment, the file topology.json has been pre-created in the home directory of `cloud-user` on the master node. Verify it has following content:
 [source,json]
-./home/ec2-user/topology.json
+./home/cloud-user/topology.json
 ----
 {
     "clusters": [
@@ -230,7 +230,7 @@ You are now ready to deploy CNS. Alongside GlusterFS pods the API front-end know
 
 Next start the deployment routine with the following command:
 
- [ec2-user@{{MASTER_HOSTNAME}} ~]# cns-deploy -n {{CNS_NAMESPACE}} -g topology.json --admin-key '{{HEKETI_ADMIN_PW}}' --user-key '{{HEKETI_USER_PW}}'
+ [cloud-user@{{MASTER_HOSTNAME}} ~]# cns-deploy -n {{CNS_NAMESPACE}} -g topology.json --admin-key '{{HEKETI_ADMIN_PW}}' --user-key '{{HEKETI_USER_PW}}'
 
 Answer the interactive prompt with *Y*.
 
@@ -352,7 +352,7 @@ image::cns_diagram_heketi.png[]
 To expose heketi's API a `service` named _heketi_ has been generated in OpenShift.
 
 ----
-[ec2-user@{{MASTER_HOSTNAME}} ~]# oc get service/heketi
+[cloud-user@{{MASTER_HOSTNAME}} ~]# oc get service/heketi
 NAME      CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
 heketi    172.30.5.231   <none>        8080/TCP   31m
 ----
@@ -361,7 +361,7 @@ To also use heketi outside of OpenShift in addition to the service a route has b
 
 [source,options="nowrap"]
 ----
-[ec2-user@{{MASTER_HOSTNAME}} ~]# oc get route/heketi
+[cloud-user@{{MASTER_HOSTNAME}} ~]# oc get route/heketi
 NAME      HOST/PORT                                               PATH      SERVICES   PORT      TERMINATION   WILDCARD
 heketi    heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}             heketi     <all>                   None
 ----
@@ -373,7 +373,7 @@ Heketi Service URL:: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
 You may verify this with a trivial health check:
 
 ----
-[ec2-user@{{MASTER_HOSTNAME}} ~]# curl http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}/hello
+[cloud-user@{{MASTER_HOSTNAME}} ~]# curl http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}/hello
 Hello from Heketi
 ----
 
@@ -398,7 +398,7 @@ With these basics defined we can configure our system for CNS. First we will set
 Create an encoded value for the CNS admin user like below:
 
 ----
-[ec2-user@{{MASTER_HOSTNAME}} ~]# echo -n "{{HEKETI_ADMIN_PW}}" | base64
+[cloud-user@{{MASTER_HOSTNAME}} ~]# echo -n "{{HEKETI_ADMIN_PW}}" | base64
 {{HEKETI_ADMIN_PW_BASE64}}
 ----
 
@@ -420,7 +420,7 @@ type: kubernetes.io/glusterfs
 
 Create the secret in OpenShift with the following command:
 
- [ec2-user@{{MASTER_HOSTNAME}} ~]# oc create -f cns-secret.yml
+ [cloud-user@{{MASTER_HOSTNAME}} ~]# oc create -f cns-secret.yml
 
 To represent CNS as a storage provider in the system you first have to create a `StorageClass`.
 Define by creating a file called `cns-storageclass.yml` which references the secret and the heketi URL shown earlier with the contents as below:
@@ -446,7 +446,7 @@ parameters:
 
 Create the `StorageClass` in OpenShift with the following command:
 
- [ec2-user@{{MASTER_HOSTNAME}} ~]# oc create -f cns-storageclass.yml
+ [cloud-user@{{MASTER_HOSTNAME}} ~]# oc create -f cns-storageclass.yml
 
 With these components in place the system is ready to dynamically provision storage capacity from Container-native Storage.
 

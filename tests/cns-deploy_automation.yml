@@ -50,11 +50,11 @@
 
       - name: check topology file
         stat:
-          path: /home/ec2-user/topology.json
+          path: /home/cloud-user/topology.json
         register: topology_file
 
       - fail:
-          msg: "Error! topology file not found in /home/ec2-user/topology.json"
+          msg: "Error! topology file not found in /home/cloud-user/topology.json"
         when: not topology_file.stat.isreg
 
       - set_fact:
@@ -63,7 +63,7 @@
           heketi_user_pw: "{{ HEKETI_USER_PW | default('mys3rs3cr3tpassw0rd') }}"
 
       - name: run cns-deploy
-        shell: cns-deploy --yes -n {{cns_namespace}} -g /home/ec2-user/topology.json --admin-key '{{heketi_admin_pw}}' --user-key '{{heketi_user_pw}}'
+        shell: cns-deploy --yes -n {{cns_namespace}} -g /home/cloud-user/topology.json --admin-key '{{heketi_admin_pw}}' --user-key '{{heketi_user_pw}}'
 
       - set_fact:
           heketi_admin_pw_base64: "{{HEKETI_ADMIN_PW_BASE64 | default('bXlTM2NyM3RwYXNzdzByZA==')}}"

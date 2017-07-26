@@ -63,7 +63,7 @@
 
       - name: get first glusterfs pods hostIP
         shell: oc get pods -n {{ cns_namespace }} -o jsonpath='{$.items[0].metadata.name}'
-        register: glusterfs_pod
+        register: first_glusterfs_pod
         failed_when: first_glusterfs_pod.stdout == ""
 
       - set_fact:

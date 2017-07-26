@@ -7,7 +7,7 @@ Parameters:
 
   PublicHostedZone:
     Type: String
-    Default: "ocp-admin.aws.openshifttestdrive.com"
+    Default: "aws.testdrive.openshift.com"
     ConstraintDescription: DNS zone for Instances and OpenShift
 
   InfraInstanceType:
@@ -339,6 +339,15 @@ Resources:
         ToPort: 65535
         CidrIp: 0.0.0.0/0
 
+  HostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Ref 'PublicHostedZone'
+      VPCs:
+        -
+          VPCId: !Ref VPC
+          VPCRegion: !Ref AWS::Region
+
   MasterSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -408,15 +417,6 @@ Resources:
         ToPort: 65535
         CidrIp: 0.0.0.0/0
 
-  HostedZone:
-    Type: AWS::Route53::HostedZone
-    Properties:
-      Name: !Ref 'PublicHostedZone'
-      VPCs:
-        -
-          VPCId: !Ref VPC
-          VPCRegion: !Ref AWS::Region
-
   Route53Records:
     Type: AWS::Route53::RecordSetGroup
     DependsOn:
@@ -453,37 +453,37 @@ Resources:
           ResourceRecords:
           - !GetAtt InfraNode1.PublicIp
 
-        - Name: !Join ['', [idm., !Ref AWS::AccountId, ., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [idm., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt IdmNode1.PublicIp
 
-        - Name: !Join ['', [guide., !Ref AWS::AccountId, ., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [guide., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt GuideNode.PublicIp
 
-        - Name: !Join ['', [node01., !Ref AWS::AccountId, ., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [node01., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt WorkerNode1.PublicIp
 
-        - Name: !Join ['', [node02., !Ref AWS::AccountId, ., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [node02., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt WorkerNode2.PublicIp
 
-        - Name: !Join ['', [node03., !Ref AWS::AccountId, ., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [node03., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt WorkerNode3.PublicIp
 
-        - Name: !Join ['', [node04., !Ref AWS::AccountId, ., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [node04., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
@@ -760,7 +760,7 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [infra, !Ref AWS::AccountId, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [infra, !Ref 'AWS::AccountId', !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
           !Sub |
@@ -878,7 +878,7 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [labguide, !Ref AWS::AccountId, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [labguide, !Ref 'AWS::AccountId', !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
           !Sub |
@@ -990,7 +990,7 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [node01, !Ref AWS::AccountId, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [node01, !Ref 'AWS::AccountId', !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
           !Sub |
@@ -1072,7 +1072,7 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [node02, !Ref AWS::AccountId, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [node02, !Ref 'AWS::AccountId', !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
           !Sub |
@@ -1154,7 +1154,7 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [node03, !Ref AWS::AccountId, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [node03, !Ref 'AWS::AccountId', !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
           !Sub |
@@ -1236,7 +1236,7 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [node04, !Ref AWS::AccountId, !Ref 'PublicHostedZone' ] ]
+        Value: !Join [ ., [node04, !Ref 'AWS::AccountId', !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
           !Sub |

@@ -28,7 +28,7 @@
       - name: wait for app to be ready
         shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.name=="rails-pgsql-persistent")].status.readyReplicas}'
         register: app_rc_check
-        until: app_rc_check.stdout == 1
-        retries: 30
+        until: app_rc_check.stdout == "1"
+        retries: 60
         delay: 10
 ...

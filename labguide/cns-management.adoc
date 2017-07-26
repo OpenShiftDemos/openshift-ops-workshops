@@ -43,7 +43,7 @@ service "postgresql" created
 deploymentconfig "postgresql" created
 ----
 
-You can now use the OpenShift UI at https://{{ MASTER_EXTERNAL_FQDN }}:8443/ (while being logged in as _fancyuser1_ in the newly created project `my-database-app`) to follow the deployment process. Alternatively watch the containers deploy like this:
+You can now use the OpenShift UI at https://{{ MASTER_EXTERNAL_FQDN }}/ (while being logged in as _fancyuser1_ in the newly created project `my-database-app`) to follow the deployment process. Alternatively watch the containers deploy like this:
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods -w
@@ -211,7 +211,7 @@ nfs.disable: on
 ----
 <1> According to the output of `oc get pods -o wide` this is the container we are logged on to.
 
-NOTE: Identify the right brick by looking at the host IP of the pod you have just logged on to. `oc get pods -o wide` will give you this information.
+NOTE: Identify the right brick by looking at the host IP of the GlusterFS pod you have just logged on to. `oc get pods -o wide` will give you this information. The host's IP will be noted next to one of the bricks.
 
 GlusterFS created this volume as a 3-way replica set across all GlusterFS pods, in therefore across all your OpenShift App nodes running CNS. +
 Each pod/node exposes it's local storage via the GlusterFS protocol. This local storage is known as a *brick* in GlusterFS and is usually backed by a local SAS disk or NVMe device. +
@@ -341,7 +341,7 @@ file-uploader-1-k2v0d            1/1       Running     0          1m
 ...
 ----
 
-Note the name of the single pod currently running the app: *file-uploader-1-k2v0d*. The container called `file-uploader-1-build` is the builder container and is not relevant for us. A service has been created for our app but not exposed yet. Let's fix this:
+Note the name of the single pod currently running the app, in the example above  *file-uploader-1-k2v0d*. The container called `file-uploader-1-build` is the builder container and is not relevant for us. A service has been created for our app but not exposed yet. Let's fix this:
 
  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc expose svc/file-uploader
 

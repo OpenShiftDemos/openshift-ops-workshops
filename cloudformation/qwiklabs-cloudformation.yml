@@ -339,15 +339,6 @@ Resources:
         ToPort: 65535
         CidrIp: 0.0.0.0/0
 
-  HostedZone:
-    Type: AWS::Route53::HostedZone
-    Properties:
-      Name: !Ref 'PublicHostedZone'
-      VPCs:
-        -
-          VPCId: !Ref VPC
-          VPCRegion: !Ref AWS::Region
-
   MasterSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -416,6 +407,15 @@ Resources:
         FromPort: 0
         ToPort: 65535
         CidrIp: 0.0.0.0/0
+
+  HostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Ref 'PublicHostedZone'
+      VPCs:
+        -
+          VPCId: !Ref VPC
+          VPCRegion: !Ref AWS::Region
 
   Route53Records:
     Type: AWS::Route53::RecordSetGroup

@@ -58,7 +58,7 @@
         failed_when: pgsql_vol.stdout == ""
 
       - set_fact:
-          rwo_gvol: pgsql_vol.stdout
+          rwo_gvol: "{{ pgsql_vol.stdout }}"
           cns_namespace: "{{ CNS_NAMESPACE }}"
 
       - name: get first glusterfs pods hostIP

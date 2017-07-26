@@ -31,4 +31,48 @@
         until: app_rc_check.stdout == "1"
         retries: 60
         delay: 10
+
+      - name: check pvc
+        shell: oc get pvc/postgresql
+
+      - name: check route
+        shell: oc get route/rails-pgsql-persistent
+
+      - name: re-login as system:admin
+        shell: oc login -u system:admin
+
+      - name: change to project of fancyuser1
+        shell:  oc project my-database-app
+
+      - name: get pvc
+        shell: oc get pvc/postgresql -o jsonpath='{$.spec.volumeName}'
+        register: pgsql_pv
+        failed_when: pgsql_pv.stdout == ""
+
+      - set_fact:
+          rwo_pv: "{{ pgsql_pv.stdout }}"
+
+      - name: get pv
+        shell: oc get pv/{{ rwo_pv }} -o jsonpath='{$.spec.glusterfs.path}'
+        register: pgsql_vol
+        failed_when: pgsql_vol.stdout == ""
+
+      - set_fact:
+          rwo_gvol: pgsql_vol.stdout
+          cns_namespace: "{{ CNS_NAMESPACE }}"
+
+      - name: get first glusterfs pods hostIP
+        shell: oc get pods -n {{ cns_namespace }} -o jsonpath='{$.items[0].metadata.name}'
+        register: glusterfs_pod
+        failed_when: glusterfs_pod.stdout == ""
+
+      - set_fact:
+          gluster_pod: "{{ glusterfs_pod.stdout }}"
+
+      - name: search for gluster vol based on pv
+        shell: oc rsh -n {{ cns_namespace }} {{ glusterfs_pod }} gluster vol list
+        register: gluster_vol_list
+        failed_when: gluster_vol_list.rc != 0 or rwo_gvol not in gluster_vol_list.stdout
+
+      
 ...

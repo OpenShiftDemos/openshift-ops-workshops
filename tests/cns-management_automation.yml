@@ -64,15 +64,15 @@
       - name: get first glusterfs pods hostIP
         shell: oc get pods -n {{ cns_namespace }} -o jsonpath='{$.items[0].metadata.name}'
         register: glusterfs_pod
-        failed_when: glusterfs_pod.stdout == ""
+        failed_when: first_glusterfs_pod.stdout == ""
 
       - set_fact:
-          gluster_pod: "{{ glusterfs_pod.stdout }}"
+          gluster_pod: "{{ first_glusterfs_pod.stdout }}"
 
       - name: search for gluster vol based on pv
-        shell: oc rsh -n {{ cns_namespace }} {{ glusterfs_pod }} gluster vol list
+        shell: oc rsh -n {{ cns_namespace }} {{ gluster_pod }} gluster vol list
         register: gluster_vol_list
         failed_when: gluster_vol_list.rc != 0 or rwo_gvol not in gluster_vol_list.stdout
 
-      
+
 ...

@@ -15,9 +15,10 @@ The example applications ships in form of ready-to-use resource templates. Enter
 
  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc export template/rails-pgsql-persistent -n openshift -o yaml > rails-app-template.yml
 
-In the file `rails-app-template.yml` you can now review the template for this entire application stack. In essence it creates Rails Application instance which mimics a very basic blogging application. The articles are saved in a PostgreSQL database which runs in another pod. As part of the resource template a PVC is issued (line 194) to supply the PostgreSQL pod with persistent storage below the mount point /var/lib/pgsql/data (line 275). This will request a `PersistentVolume` in *RWO* mode. Storage provided this way can only be mounted by a single pod at a time.
+In the file `rails-app-template.yml` you can now review the template for this entire application stack. In essence it creates Rails Application instance which mimics a very basic weblog. The articles and comments are saved in a PostgreSQL database which runs in another pod. +
+As part of the resource template a PVC is issued (line 194) to supply the PostgreSQL pod with persistent storage with the mount point `/var/lib/pgsql/data` (line 275). This will request a `PersistentVolume` in *RWO* mode. Storage provided in this mode can only be mounted by a single pod at a time.
 
-Next we are going to create all the resources from the templates while passing in an additional parameter to override the default storage capacity requested from the PVC.
+Next we are going to render the template to a fully functional set of resource descriptors while passing in an additional parameter to override the default storage capacity requested from the PVC.
 
 TIP: To list all available parameters from this template run `oc process -f rails-app-template.yml --parameters`
 
@@ -27,7 +28,7 @@ The parameter in the template is called `VOLUME_CAPACITY`. We will process the t
 
 The `oc process` command parses the template and replaces any parameters with their default values if not supplied explicitly like we did for the volume capacity.
 
-The result `my-rails-app.yml` file contains all resources for this application ready to deploy, like so:
+The resulting `my-rails-app.yml` file contains all resources for this application ready to deploy. Deploy it like so:
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc create -f my-rails-app.yml
@@ -42,7 +43,7 @@ service "postgresql" created
 deploymentconfig "postgresql" created
 ----
 
-You can now use the OpenShift UI at https://{{ MASTER_EXTERNAL_FQDN }}:8843/ (while being logged in as _fancyuser1_ in the newly created project `my-database-app`) to follow the deployment process. Alternatively watch the containers deploy like this:
+You can now use the OpenShift UI at https://{{ MASTER_EXTERNAL_FQDN }}:8443/ (while being logged in as _fancyuser1_ in the newly created project `my-database-app`) to follow the deployment process. Alternatively watch the containers deploy like this:
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods -w
@@ -83,11 +84,11 @@ rails-pgsql-persistent-1-hook-pre   0/1       Terminating   0         1m
 rails-pgsql-persistent-1-hook-pre   0/1       Terminating   0         1m
 ----
 
-Exit out of the watch mode with kbd:[Ctrl + c]
+Exit out of the watch mode with kbd:[Ctrl + c] when you see the *-deploy and *-hook-pre pods terminating.
 
 NOTE: It may take up to 10 minutes for the deployment to complete.
 
-You should also see a PVC being issued and in the _Bound_ state.
+You should now also see a PVC that has been issued and now being in the _Bound_ state.
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pvc
@@ -128,7 +129,7 @@ postgresql   Bound     pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8   15Gi       RWO
 
 NOTE: Your PV name will be different as it's dynamically generated.
 
-Look at the details of this PV:
+Look at the details of the PV bound to the PVC, in this case `pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8`:
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc describe pv/pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8
@@ -168,7 +169,8 @@ glusterfs-m9fvl   1/1       Running   0          3m       {{NODE3_INTERNAL_IP}} 
 heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}}         {{NODE3_INTERNAL_FQDN}} <2>
 ----
 
-Remember the IP address of the pod you select, for example: *{{NODE1_INTERNAL_IP}}* of pod *glusterfs-37vn8* Log on to GlusterFS pod with a remote terminal session like so:
+Remember the IP address of the pod you select, for example: *{{NODE1_INTERNAL_IP}}* of pod *glusterfs-37vn8*. +
+Log on to the selected GlusterFS pod with a remote terminal session like so:
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc rsh glusterfs-37vn8
@@ -176,7 +178,7 @@ sh-4.2#
 ----
 
 You have now access to this container's namespace which has the GlusterFS CLI utilities installed. +
-Let's list all known volumes:
+Let's use them to list all known volumes:
 
 ----
 sh-4.2# gluster volume list
@@ -212,9 +214,11 @@ nfs.disable: on
 NOTE: Identify the right brick by looking at the host IP of the pod you have just logged on to. `oc get pods -o wide` will give you this information.
 
 GlusterFS created this volume as a 3-way replica set across all GlusterFS pods, in therefore across all your OpenShift App nodes running CNS. +
-Each pod/node exposes his local storage via the GlusterFS protocol. This local storage is known as a *brick* in GlusterFS and is usually backed by a local SAS disk or NVMe device. The brick is simply formatted with XFS and thus made available to GlusterFS.
+Each pod/node exposes it's local storage via the GlusterFS protocol. This local storage is known as a *brick* in GlusterFS and is usually backed by a local SAS disk or NVMe device. +
+The brick is simply a directory on a block device formatted with XFS and thus made available to GlusterFS.
 
-You can even look at this yourself:
+You can even look at this yourself, by listing the files in the brick directory.
+Select the brick's directory (the path starting with `/var/lib/heketi/...`) marked in the output above:
 
 ----
 sh-4.2# ls -ahl /var/lib/heketi/mounts/vg_0246fd563709384a3cbc3f3bbeeb87a9/brick_684a01f8993f241a92db02b117e0b912/brick
@@ -262,19 +266,19 @@ NOTE: The exact path name will be different in your environment as it has been a
 You are looking at the PostgreSQL internal data file structure from the perspective of the GlusterFS server side. It's a normal local filesystem here.
 
 Clients, like the OpenShift nodes and their application pods talk to this storage with the GlusterFS protocol. Which abstracts the 3-way replication behind a single FUSE mount point. +
-When a pod starts that mounts storage from a PV backed by GlusterFS OpenShift will mount the GlusterFS volume on the App Node and then _bind-mount_ this directory to the right pod. +
-This is happen transparently to the application inside the pod and looks like a normal local filesystem.
+When a pod starts that mounts storage from a PV backed by GlusterFS, OpenShift will mount the GlusterFS volume on the right app node and then _bind-mount_ this directory to the right pod. +
+This is happening transparently to the application inside the pod and looks like a normal local filesystem.
 
-You may exit your remote session to the GlusterFS pod.
+You may now exit your remote session to the GlusterFS pod.
 
  sh-4.2# exit
 
 ### Providing shared storage with CNS
 
-So far only very few options, like the basic NFS support existed, to provide a PersistentVolume to more than one container at once. The access mode used for this is *ReadWriteMany*.
+So far only very few options, like the basic NFS support, existed to provide a `PersistentVolume` to more than one container at once. The access mode used for this is *ReadWriteMany*. Traditional block-based storage solutions are not able to do this.
 
-With CNS this capabilities is now available to all OpenShift deployments, no matter where they are deployed. To demonstrate this capability with an application we will deploy a PHP file uploader that has multiple front-end instances sharing a common storage repository.+
-To demonstrate the difference this makes we will first run this application without shared storage.
+With CNS this capability is now available to all OpenShift deployments, no matter where they are deployed. To illustrate the benefit of this, we will deploy a PHP application, a file uploader that has multiple front-end instances sharing a common storage repository.+
+To highlight the difference this makes to non-shared storage we will first run this application without a PV.
 
 First log back in as `fancyuser1` and create a new project:
 
@@ -486,7 +490,7 @@ file-uploader-2-xbz24            1/1       Running     0          1m
 ...
 ----
 
-Try it out in your application: upload new files and watch them being visible from within all application pods. In the browser the application behaves fluently as it circles through the pods between browser requests.
+Try it out in your application: upload new files and watch them being visible from within all application pods. In the browser the application behaves fluently as it circles through the pods between browser sessions.
 
 
 ----

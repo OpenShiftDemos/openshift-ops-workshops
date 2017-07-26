@@ -1,25 +1,25 @@
 ---
 
-- hosts: localhost
+  - hosts: localhost
 
-  task:
+    task:
 
-    - include_vars: /opt/lab/environment.yml
+      - include_vars: /opt/lab/environment.yml
 
-    - name: login as fancyuser1
-      shell: oc login -u 'fancyuser1' -p 'openshift'
+      - name: login as fancyuser1
+        shell: oc login -u 'fancyuser1' -p 'openshift'
 
-    - name: create new project called 'my-database-app'
-      shell: oc new-project my-database-app
+      - name: create new project called 'my-database-app'
+        shell: oc new-project my-database-app
 
-    - name: export the rails-postgres-persistent template
-      shell: oc export template/rails-pgsql-persistent -n openshift -o yaml > rails-app-template.yml
-      creates: rails-app-template.yml
+      - name: export the rails-postgres-persistent template
+        shell: oc export template/rails-pgsql-persistent -n openshift -o yaml > rails-app-template.yml
+        creates: rails-app-template.yml
 
-    - name: render the rails-postgres-persistent template with custom volume capacity
-      shell: oc process -f rails-app-template.yml -o yaml -p VOLUME_CAPACITY=15Gi > my-rails-app.yml
-      creates: my-rails-app.yml
+      - name: render the rails-postgres-persistent template with custom volume capacity
+        shell: oc process -f rails-app-template.yml -o yaml -p VOLUME_CAPACITY=15Gi > my-rails-app.yml
+        creates: my-rails-app.yml
 
-    - name: deploy app
-      shell: oc create -f my-rails-app.yml
+      - name: deploy app
+        shell: oc create -f my-rails-app.yml
 ...

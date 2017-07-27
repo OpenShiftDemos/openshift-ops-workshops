@@ -25,6 +25,13 @@ Parameters:
       - m4.large
       - m4.xlarge
 
+  CNSInstanceType:
+    Type: String
+    Default: t2.medium
+    AllowedValues:
+      - t2.medium
+      - t2.large
+
   MasterInstanceType:
     Type: String
     Default: m4.large
@@ -432,6 +439,9 @@ Resources:
       - WorkerNode1
       - WorkerNode2
       - WorkerNode3
+      - WorkerNode4
+      - WorkerNode5
+      - WorkerNode6
     Properties:
       HostedZoneName: !Join ['', [!Ref 'PublicHostedZone', .]]
       RecordSets:
@@ -494,6 +504,18 @@ Resources:
           TTL: '900'
           ResourceRecords:
           - !GetAtt WorkerNode4.PublicIp
+
+        - Name: !Join ['', [node05., !Ref QwiklabId, ., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode5.PublicIp
+
+        - Name: !Join ['', [node06., !Ref QwiklabId, ., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode6.PublicIp
 
   WaitHandle:
     Type: AWS::CloudFormation::WaitConditionHandle
@@ -614,15 +636,25 @@ Resources:
                   node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node03.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
 
+                  [new_nodes]
+                  node04.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  node05.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  node06.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+
                   [cns]
-                  node01.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node03.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  node01.${QwiklabId}.${PublicHostedZone}
+                  node02.${QwiklabId}.${PublicHostedZone}
+                  node03.${QwiklabId}.${PublicHostedZone}
+
+                  [cns2]
+                  node04.${QwiklabId}.${PublicHostedZone}
+                  node05.${QwiklabId}.${PublicHostedZone}
+                  node06.${QwiklabId}.${PublicHostedZone}
 
                   [idm]
                   idm.${QwiklabId}.${PublicHostedZone}
                 path: /etc/ansible/hosts
-                
+
               - content: |
                   kind: LDAPSyncConfig
                   apiVersion: v1
@@ -708,6 +740,120 @@ Resources:
                 path: /home/cloud-user/topology.json
                 owner: cloud-user
                 group: cloud-user
+
+              - content: |
+                  {
+                      "clusters": [
+                          {
+                              "nodes": [
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "${WorkerNode1.PrivateDnsName}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode1.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 1
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  },
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "${WorkerNode2.PrivateDnsName}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode2.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 2
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  },
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "${WorkerNode3.PrivateDnsName}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode3.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 3
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  }
+                              ]
+                          },
+                          {
+                              "nodes": [
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "${WorkerNode4.PrivateDnsName}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode4.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 1
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  },
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "${WorkerNode5.PrivateDnsName}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode5.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 2
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  },
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "${WorkerNode6.PrivateDnsName}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode6.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 3
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  }
+                              ]
+                          }
+                      ]
+                  }
+                path: /home/cloud-user/topology-extended.json
+                owner: cloud-user
+                group: cloud-user
+
 
               - content: |
                   OCP_ROUTING_SUFFIX: "apps.${QwiklabId}.${PublicHostedZone}"
@@ -948,6 +1094,8 @@ Resources:
             - ansible localhost -m wait_for -a "port=22 host=${WorkerNode2.PrivateIp}"
             - ansible localhost -m wait_for -a "port=22 host=${WorkerNode3.PrivateIp}"
             - ansible localhost -m wait_for -a "port=22 host=${WorkerNode4.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode5.PrivateIp}"
+            - ansible localhost -m wait_for -a "port=22 host=${WorkerNode6.PrivateIp}"
             - ansible localhost -m wait_for -a "port=22 host=${InfraNode1.PrivateIp}"
             - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
             - ansible localhost -m wait_for -a "port=80 host=localhost"
@@ -1209,9 +1357,9 @@ Resources:
         - Ref: AWS::Region
         - ami
       InstanceType:
-        Ref: WorkerInstanceType
+        Ref: CNSInstanceType
       SubnetId:
-        Ref: PublicSubnet3
+        Ref: PublicSubnet1
       KeyName:
         Ref: KeyName
       SecurityGroupIds:
@@ -1252,6 +1400,170 @@ Resources:
             - mounts
 
             fqdn: node04.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
+
+            fs_setup:
+            - label: emptydir
+              filesystem: xfs
+              device: /dev/xvdc
+              partition: auto
+
+            runcmd:
+            - mkdir -p /var/lib/origin/openshift.local.volumes
+
+            mounts:
+            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+
+            write_files:
+            - content: |
+                DEVS='/dev/xvdb'
+                VG=docker_vol
+                DATA_SIZE=95%VG
+                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
+              path: /etc/sysconfig/docker-storage-setup
+              owner: root:root
+
+            users:
+            - default
+
+            system_info:
+              default_user:
+                name: cloud-user
+
+  WorkerNode5:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegion2AMI
+        - Ref: AWS::Region
+        - ami
+      InstanceType:
+        Ref: CNSInstanceType
+      SubnetId:
+        Ref: PublicSubnet2
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds:
+        - !GetAtt NodeSecurityGroup.GroupId
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdb
+          Ebs:
+            VolumeSize: '20'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdc
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdd
+          Ebs:
+            VolumeSize: '50'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+      - Key: Name
+        Value: !Join [ ., [node05, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #cloud-config
+            cloud_config_modules:
+            - disk_setup
+            - mounts
+
+            fqdn: node05.${QwiklabId}.${PublicHostedZone}
+            manage_etc_hosts: true
+
+            fs_setup:
+            - label: emptydir
+              filesystem: xfs
+              device: /dev/xvdc
+              partition: auto
+
+            runcmd:
+            - mkdir -p /var/lib/origin/openshift.local.volumes
+
+            mounts:
+            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
+
+            write_files:
+            - content: |
+                DEVS='/dev/xvdb'
+                VG=docker_vol
+                DATA_SIZE=95%VG
+                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
+              path: /etc/sysconfig/docker-storage-setup
+              owner: root:root
+
+            users:
+            - default
+
+            system_info:
+              default_user:
+                name: cloud-user
+
+  WorkerNode6:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegion2AMI
+        - Ref: AWS::Region
+        - ami
+      InstanceType:
+        Ref: CNSInstanceType
+      SubnetId:
+        Ref: PublicSubnet3
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds:
+        - !GetAtt NodeSecurityGroup.GroupId
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdb
+          Ebs:
+            VolumeSize: '20'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdc
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvdd
+          Ebs:
+            VolumeSize: '50'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+      - Key: Name
+        Value: !Join [ ., [node06, !Ref QwiklabId, !Ref 'PublicHostedZone' ] ]
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #cloud-config
+            cloud_config_modules:
+            - disk_setup
+            - mounts
+
+            fqdn: node06.${QwiklabId}.${PublicHostedZone}
             manage_etc_hosts: true
 
             fs_setup:

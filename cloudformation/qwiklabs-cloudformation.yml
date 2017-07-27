@@ -1391,9 +1391,14 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdd
           Ebs:
-            VolumeSize: '50'
+            VolumeSize: '10'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvde
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true
       Tags:
       - Key: Application
         Value:
@@ -1473,9 +1478,14 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdd
           Ebs:
-            VolumeSize: '50'
+            VolumeSize: '10'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvde
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true
       Tags:
       - Key: Application
         Value:
@@ -1555,9 +1565,14 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdd
           Ebs:
-            VolumeSize: '50'
+            VolumeSize: '10'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
+        - DeviceName: /dev/xvde
+          Ebs:
+            VolumeSize: '10'
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true
       Tags:
       - Key: Application
         Value:

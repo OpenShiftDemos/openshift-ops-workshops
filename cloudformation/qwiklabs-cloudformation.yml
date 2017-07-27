@@ -646,14 +646,16 @@ Resources:
                   node02.${QwiklabId}.${PublicHostedZone}
                   node03.${QwiklabId}.${PublicHostedZone}
 
-                  [cns2]
-                  node04.${QwiklabId}.${PublicHostedZone}
-                  node05.${QwiklabId}.${PublicHostedZone}
-                  node06.${QwiklabId}.${PublicHostedZone}
-
                   [idm]
                   idm.${QwiklabId}.${PublicHostedZone}
                 path: /etc/ansible/hosts
+                
+              - content: |
+                  [cns]
+                  node04.${QwiklabId}.${PublicHostedZone}
+                  node05.${QwiklabId}.${PublicHostedZone}
+                  node06.${QwiklabId}.${PublicHostedZone}
+                path: /etc/ansible/new-cns-hosts
 
               - content: |
                   kind: LDAPSyncConfig
@@ -1058,6 +1060,7 @@ Resources:
                 MASTER_HOSTNAME="master"
                 MASTER_EXTERNAL_FQDN="master.${QwiklabId}.${PublicHostedZone}"
                 MASTER_INTERNAL_FQDN="${Master1.PrivateDnsName}"
+                INFRA_INTERNAL_FQDN="${InfraNode1.PrivateDnsName}"
                 NODE1_HOSTNAME="node01"
                 NODE1_EXTERNAL_FQDN="node01.${QwiklabId}.${PublicHostedZone}"
                 NODE1_INTERNAL_FQDN="${WorkerNode1.PrivateDnsName}"

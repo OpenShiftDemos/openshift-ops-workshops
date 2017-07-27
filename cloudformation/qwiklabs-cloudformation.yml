@@ -636,7 +636,7 @@ Resources:
                   node02.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node03.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
 
-                  [new_nodes]
+                  [additional_nodes]
                   node04.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node05.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node06.${QwiklabId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"

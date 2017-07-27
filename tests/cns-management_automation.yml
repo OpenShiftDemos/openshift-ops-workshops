@@ -126,7 +126,7 @@
         shell: oc volume dc/file-uploader --add --name=shared-storage --type=persistentVolumeClaim --claim-name=my-shared-storage --mount-path=/opt/app-root/src/uploaded
 
       - name: wait for php app to be updated on all 3 pods
-        shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.name=="file-uploader")].status.updatedReplicas}'
+        shell: oc get dc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="file-uploader")].status.availableReplicas}'
         register: php_app_update_check
         until: php_app_update_check.stdout == "3"
         retries: 12

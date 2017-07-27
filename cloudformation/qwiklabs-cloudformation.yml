@@ -418,7 +418,7 @@ Resources:
       - WorkerNode2
       - WorkerNode3
     Properties:
-      HostedZoneName: !Join ['', [!Ref 'PublicHostedZone', .]]
+      HostedZoneName: !Join ['', [!Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
       RecordSets:
         - Name: !Join ['', [master., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A

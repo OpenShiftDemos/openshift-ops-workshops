@@ -8,6 +8,8 @@ config:
       value: "master.example.com"
     - name: MASTER_INTERNAL_FQDN
       value: "master.internal.example.com"
+    - name: INFRA_INTERNAL_FQDN
+      value: "infra.internal.example.com"
     - name: NODE1_HOSTNAME
       value: "node01"
     - name: NODE1_EXTERNAL_FQDN
@@ -83,5 +85,7 @@ modules:
     requires:
       - cns-deploy
     vars:
+      HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
       CNS_STORAGECLASS: "cns"
+      CNS_STORAGECLASS2: "cns-extended"
       CNS_NAMESPACE: "container-native-storage"

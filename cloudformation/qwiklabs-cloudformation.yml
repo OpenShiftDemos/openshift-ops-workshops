@@ -649,7 +649,7 @@ Resources:
                   [idm]
                   idm.${QwiklabId}.${PublicHostedZone}
                 path: /etc/ansible/hosts
-                
+
               - content: |
                   [cns]
                   node04.${QwiklabId}.${PublicHostedZone}
@@ -865,6 +865,7 @@ Resources:
                   HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
                   HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
                   CNS_STORAGECLASS: "cns"
+                  CNS_STORAGECLASS2: "cns-extended"
                 path: /opt/lab/environment.yml
                 owner: root:root
 

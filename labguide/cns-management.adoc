@@ -514,3 +514,189 @@ sh-4.2$ exit
 That's it. You have successfully provided shared storage to pods throughout the entire system, therefore avoiding the need for data to be replicated at the application level to each pod.
 
 With CNS this is available wherever OpenShift is deployed with no external dependency.
+
+### Extending the CNS Storage Pool capacity
+
+Once deployed there are two way in which to increase the storage capacity offered by CNS. Either by adding additional nodes with storage to OpenShift cluster or by adding additional storage devices to the existing nodes running CNS.
+
+#### Adding nodes to the CNS Storage Pool
+
+The pre-requisite of adding nodes to the CNS setup is that these nodes have been added to the OpenShift cluster before. That is, increasing the storage capacity of CNS this way is a two-step process:
+
+1. Extend the OpenShift cluster with additional nodes
+2. Add the newly added nodes to the CNS setup
+
+Fortunately both steps are easy thanks to automation. In the preceeding link:infra-mgmt-basics["Infrastructure Management Module"] you have already added a second set of 3 nodes to the OpenShift cluster. +
+These have an additional storage device available, so we will use those.
+
+For the second step, adding these new nodes to the CNS setup, you generally have two options:
+
+A. add the new nodes to the existing CNS storage cluster, provisioned in the module link:cns-deploy["Deploying Container-native Storage"]
+B. add the new nodes to a new, independent CNS storage cluster, still managed by the single heketi API service
+
+Option A is the straigt-forward choice when you just need more storage space. For this you can start with a single additional node. +
+Use option B when you need a net-new, independent storage cluster for the sake of tenant isolation, different geographical region or exposing different storage tiers as separate clusters. For this, you need at least 3 new nodes. +
+In this exercise we will implement Option B.
+
+The following action require elevated privileges in OpenShift, login as cluster admin and change to the CNS namespace:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc login -u system:admin
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc project {{CNS_NAMESPACE}}
+
+First, identify the newly added nodes - the easiest way is to look at their uptime:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get nodes
+NAME                         STATUS                     AGE
+{{NODE1_INTERNAL_FQDN}}   Ready                      3h
+{{NODE4_INTERNAL_FQDN}}   Ready                      50m <1>
+{{MASTER_INTERNAL_FQDN}}   Ready,SchedulingDisabled   3h
+{{NODE2_INTERNAL_FQDN}}   Ready                      3h
+{{INFRA_INTERNAL_FQDN}}   Ready                      3h
+{{NODE5_INTERNAL_FQDN}}   Ready                      50m <1>
+{{NODE3_INTERNAL_FQDN}}   Ready                      3h
+{{NODE6_INTERNAL_FQDN}}     Ready                      50m <1>
+----
+<1> The nodes added in the previous lab
+
+Now we need to make sure, that these new systems have the right firewall ports opened. For simplicity, just re-execute the `configure-firewall.yml` from the link:cns-deploy["Deploying  Container-native Storage"] module against these new systems:
+
+ [cloud-user@{{MASTER_HOSTNAME}} ~]$ ansible-playbook -i /etc/hosts/new-cns-hosts configure-firewall.yml
+
+Next, add the following label to these nodes in order have the `DaemonSet` that CNS is based upon schedule new GlusterFS pods on them:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get daemonset
+NAME        DESIRED   CURRENT   READY     NODE-SELECTOR           AGE
+glusterfs   3         3         3         storagenode=glusterfs   3h
+----
+<1> The label definition the `DaemonSet` uses to select the nodes which run a GlusterFS pod.
+
+----
+oc label node/{{NODE4_INTERNAL_FQDN}} storagenode=glusterfs
+oc label node/{{NODE5_INTERNAL_FQDN}} storagenode=glusterfs
+oc label node/{{NODE6_INTERNAL_FQDN}} storagenode=glusterfs
+----
+
+This launches the GlusterFS pods on the newly added nodes. Wait for them to be in `Ready` state.
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods -o wide
+NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
+glusterfs-3gjc5   1/1       Running   0          1m       {{NODE6_INTERNAL_IP}}         {{NODE6_INTERNAL_FQDN}}  <1>
+glusterfs-37vn8   1/1       Running   0          3h       {{NODE1_INTERNAL_IP}}         {{NODE1_INTERNAL_FQDN}}
+glusterfs-ng00k   1/1       Running   0          1m       {{NODE4_INTERNAL_IP}}         {{NODE4_INTERNAL_FQDN}}  <1>
+glusterfs-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}         {{NODE2_INTERNAL_FQDN}}
+glusterfs-zkvfl   1/1       Running   0          1m       {{NODE5_INTERNAL_IP}}         {{NODE5_INTERNAL_FQDN}}  <1>
+glusterfs-m9fvl   1/1       Running   0          3m       {{NODE3_INTERNAL_IP}}         {{NODE3_INTERNAL_FQDN}}
+heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}}         {{NODE3_INTERNAL_FQDN}}
+----
+<1> The newly spawned GlusterFS pods.
+
+The new pods run GlusterFS uninitialized. That is, they have not formed a cluster among themselves yet. This is triggered via heketi.
+
+heketi initializes vanilla GlusterFS pods as part of loading the topology file. Like during the cns-deploy phase in the link:cns-deploy["Deploying  Container-native Storage"] module it can read an additional cluster structure from the JSON file.
+This has already been prepared suitable for your environment in the `/home/cloud-user/topology-extended.json`. It contains the original 3 nodes we started with, and then newly added nodes.
+
+Initialize the heketi-cli with environment variables like so:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ export HEKETI_CLI_SERVER=http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ export HEKETI_CLI_USER=admin
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ export HEKETI_CLI_KEY={{HEKETI_ADMIN_PW}}
+----
+
+This avoids repetitive command switches with heketi-cli. Use the heketi client to load the new topology. Make sure you are currently in `/home/cloud-user`:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ pwd
+/home/cloud-user
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli topology load --json=topology-extended.json
+	Found node {{NODE1_INTERNAL_FQDN}} on cluster ec7a9c8be8327a54839236791bf7ba24
+		Found device /dev/xvdd
+	Found node {{NODE2_INTERNAL_FQDN}} on cluster ec7a9c8be8327a54839236791bf7ba24
+		Found device /dev/xvdd
+	Found node {{NODE3_INTERNAL_FQDN}} on cluster ec7a9c8be8327a54839236791bf7ba24
+		Found device /dev/xvdd
+	Creating node {{NODE4_INTERNAL_FQDN}} ... ID: 43336d05323e6003be6740dbb7477bd6
+		Adding device /dev/xvdd ... OK
+	Creating node {{NODE5_INTERNAL_FQDN}} ... ID: 6c738028f642e37b2368eca88f8c626c
+		Adding device /dev/xvdd ... OK
+	Creating node {{NODE6_INTERNAL_FQDN}} ... ID: 099b016da11a623bef37de9b85aaa2d7
+		Adding device /dev/xvdd ... OK
+----
+
+With this you've successfully initialized a second CNS storage cluster that is managed by heketi. You can query heketi for the new topology:
+
+----
+[cloud-user@master ~]$ heketi-cli topology info
+
+Cluster Id: ca777ae0285ef6d8cd7237c862bd591c <1>
+
+    Volumes:
+
+    Nodes:
+
+	Node Id: 099b016da11a623bef37de9b85aaa2d7
+	State: online
+	Cluster Id: ca777ae0285ef6d8cd7237c862bd591c
+	Zone: 3
+	Management Hostname: {{NODE6_INTERNAL_FQDN}}
+	Storage Hostname: {{NODE6_INTERNAL_FQDN}}
+	Devices:
+		Id:b65fee8350c2b4cad4fd68535aba05b7   Name:/dev/xvdd           State:online    Size (GiB):49      Used (GiB):0       Free (GiB):49
+			Bricks:
+
+	Node Id: 43336d05323e6003be6740dbb7477bd6
+	State: online
+	Cluster Id: ca777ae0285ef6d8cd7237c862bd591c
+	Zone: 1
+	Management Hostname: {{NODE4_INTERNAL_FQDN}}
+	Storage Hostname: {{NODE4_INTERNAL_IP}}
+	Devices:
+		Id:b75d8e52e6978675d599111d50e46969   Name:/dev/xvdd           State:online    Size (GiB):49      Used (GiB):0       Free (GiB):49
+			Bricks:
+
+	Node Id: 6c738028f642e37b2368eca88f8c626c
+	State: online
+	Cluster Id: ca777ae0285ef6d8cd7237c862bd591c
+	Zone: 2
+	Management Hostname: {{NODE5_INTERNAL_FQDN}}
+	Storage Hostname: {{NODE5_INTERNAL_IP}}
+	Devices:
+		Id:4330fb2333c5dfb9add3e3ea00ec82a6   Name:/dev/xvdd           State:online    Size (GiB):49      Used (GiB):0       Free (GiB):49
+			Bricks:
+
+      Cluster Id: ec7a9c8be8327a54839236791bf7ba24
+
+          Volumes:
+...
+----
+<1> The internal ID of the new cluster managed by heketi
+
+NOTE: The cluster ID will be different for you since it's automatically generated.
+
+To use this cluster specifically, you can create a separate `StorageClass` for it in OpenShift. PVCs issued against it, will only be served from this particular CNS storage cluster. For this purpose, note it's internal heketi ID - in the example above *ca777ae0285ef6d8cd7237c862bd591c*.
+
+Create the file `second-cns-storageclass.yml` like below:
+
+[source,yaml]
+.second-cns-storageclass.yml
+----
+apiVersion: storage.k8s.io/v1beta1
+kind: StorageClass
+metadata:
+  name: {{CNS_STORAGECLASS2}}
+  annotations:
+    storageclass.beta.kubernetes.io/is-default-class: "true"
+provisioner: kubernetes.io/glusterfs
+parameters:
+  resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+  restauthenabled: "true"
+  restuser: "admin"
+  volumetype: "replicate:3"
+  clusterid: "ca777ae0285ef6d8cd7237c862bd591c" <1>
+  secretNamespace: "default"
+  secretName: "cns-secret"
+----
+<1> The heketi internal ID of the new cluster is used to specifically direct requests to it. *Replace it with the ID of your cluster!*

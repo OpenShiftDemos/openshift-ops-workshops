@@ -368,7 +368,7 @@ heketi    heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}             heketi    
 
 Hence, heketi will be available via:
 
-Heketi Service URL:: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+Heketi Service URL: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
 
 You may verify this with a trivial health check:
 

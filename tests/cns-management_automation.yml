@@ -87,7 +87,7 @@
         shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="file-uploader")].status.readyReplicas}'
         register: php_app_rc_check
         until: php_app_rc_check.stdout == "1"
-        retries: 12
+        retries: 30
         delay: 10
 
       - name: expose php app service

@@ -32,6 +32,24 @@ config:
       value: "node03.internal.example.com"
     - name: NODE3_INTERNAL_IP
       value: "192.168.0.103"
+    - name: NODE4_EXTERNAL_FQDN
+      value: "node04.example.com"
+    - name: NODE4_INTERNAL_FQDN
+      value: "node04.internal.example.com"
+    - name: NODE4_INTERNAL_IP
+      value: "192.168.0.104"
+    - name: NODE5_EXTERNAL_FQDN
+      value: "node05.example.com"
+    - name: NODE5_INTERNAL_FQDN
+      value: "node05.internal.example.com"
+    - name: NODE5_INTERNAL_IP
+      value: "192.168.0.105"
+    - name: NODE6_EXTERNAL_FQDN
+      value: "node06.example.com"
+    - name: NODE6_INTERNAL_FQDN
+      value: "node06.internal.example.com"
+    - name: NODE6_INTERNAL_IP
+      value: "192.168.0.106"
 
 modules:
   environment:

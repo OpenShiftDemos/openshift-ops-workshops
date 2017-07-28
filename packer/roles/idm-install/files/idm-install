@@ -2,7 +2,7 @@
 # get IP address
 myip=`ip -4 -o addr show eth0 | awk '-F[/ ]+' '{ print $4 }'`
 hostname=`hostname -s`
-mydomain=`hostname -d`
+mydomain=auth.`hostname -d`
 longname=`hostname`
 myrealm=$(echo $mydomain | tr [a-z] [A-Z])
 publicip=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`

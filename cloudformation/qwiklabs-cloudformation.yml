@@ -845,12 +845,13 @@ Resources:
               - content: |
                   OCP_ROUTING_SUFFIX: "apps.${AWS::AccountId}.${PublicHostedZone}"
                   NODE_BRICK_DEVICE: "/dev/xvdd"
+                  NODE_BRICK_DEVICE2: "/dev/xvde"
                   CNS_NAMESPACE: "container-native-storage"
                   HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
                   HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
                   HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
-                  CNS_STORAGECLASS: "cns"
-                  CNS_STORAGECLASS2: "cns-extended"
+                  CNS_STORAGECLASS: "cns-gold"
+                  CNS_STORAGECLASS2: "cns-silver"
                 path: /opt/lab/environment.yml
                 owner: root:root
 
@@ -1387,7 +1388,7 @@ Resources:
           Ebs:
             VolumeSize: '10'
             VolumeType: 'gp2'
-            DeleteOnTermination: 'true
+            DeleteOnTermination: 'true'
       Tags:
       - Key: Application
         Value:
@@ -1474,7 +1475,7 @@ Resources:
           Ebs:
             VolumeSize: '10'
             VolumeType: 'gp2'
-            DeleteOnTermination: 'true
+            DeleteOnTermination: 'true'
       Tags:
       - Key: Application
         Value:
@@ -1561,7 +1562,7 @@ Resources:
           Ebs:
             VolumeSize: '10'
             VolumeType: 'gp2'
-            DeleteOnTermination: 'true
+            DeleteOnTermination: 'true'
       Tags:
       - Key: Application
         Value:

@@ -79,13 +79,14 @@ modules:
       HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
       HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
       HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
-      CNS_STORAGECLASS: "cns"
+      CNS_STORAGECLASS: "cns-gold"
   cns-management:
     name: Container-native Storage Management
     requires:
       - cns-deploy
     vars:
       HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
-      CNS_STORAGECLASS: "cns"
-      CNS_STORAGECLASS2: "cns-extended"
+      CNS_STORAGECLASS: "cns-gold"
+      CNS_STORAGECLASS2: "cns-silver"
       CNS_NAMESPACE: "container-native-storage"
+      NODE_BRICK_DEVICE2: "/dev/xvde"

@@ -559,9 +559,7 @@ NAME                         STATUS                     AGE
 ----
 <1> The nodes added in the previous lab
 
-Now we need to make sure, that these new systems have the right firewall ports opened. For simplicity, just re-execute the `configure-firewall.yml` from the link:cns-deploy["Deploying  Container-native Storage"] module against these new systems:
-
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ ansible-playbook -i /etc/ansible/new-cns-hosts configure-firewall.yml
+TIP: Always make sure, that these new systems also have the right firewall ports opened. In this lab this has already been done when the `configure-firewall.yml` playbook ran during link:cns-deploy["Deploying  Container-native Storage"] module.
 
 Next, add the following label to these nodes in order have the `DaemonSet` that CNS is based upon schedule new GlusterFS pods on them:
 

@@ -631,9 +631,9 @@ Resources:
                   node01.${AWS::AccountId}.${PublicHostedZone}
                   node02.${AWS::AccountId}.${PublicHostedZone}
                   node03.${AWS::AccountId}.${PublicHostedZone}
-                  node04.${AWS::AccountId}.${PublicHostedZone}
-                  node05.${AWS::AccountId}.${PublicHostedZone}
-                  node06.${AWS::AccountId}.${PublicHostedZone}
+                  # node04.${AWS::AccountId}.${PublicHostedZone}
+                  # node05.${AWS::AccountId}.${PublicHostedZone}
+                  # node06.${AWS::AccountId}.${PublicHostedZone}
 
                   [idm]
                   idm.${AWS::AccountId}.${PublicHostedZone}

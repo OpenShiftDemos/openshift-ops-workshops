@@ -590,6 +590,7 @@ Resources:
                   masters
                   nodes
                   etcd
+                  # new_nodes
 
                   [OSEv3:vars]
                   deployment_type=openshift-enterprise
@@ -621,10 +622,10 @@ Resources:
                   node02.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node03.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
 
-                  [additional_nodes]
-                  node04.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node05.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node06.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  # [new_nodes]
+                  # node04.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  # node05.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  # node06.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
 
                   [cns]
                   node01.${AWS::AccountId}.${PublicHostedZone}

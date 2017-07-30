@@ -72,7 +72,7 @@ Mappings:
     eu-west-1:
       ami: ami-d35db6aa
     eu-central-1:
-      ami: ami-d65df1b9 
+      ami: ami-d65df1b9
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
@@ -1624,12 +1624,12 @@ Outputs:
 
    LabguideURL:
      Description: "Student Lab Guide"
-     Value: !Sub "http://${GuideNode.PublicIp}.nip.io/"
+     Value: !Sub "http://guide.${AWS::AccountId}.${PublicHostedZone}/"
 
    MasterIPAddress:
      Description: "Public IP of the OpenShift Master node"
      Value: !GetAtt Master1.PublicIp
 
    OpenShiftURL:
-     Description: "Public IP of the OpenShift Master node"
-     Value: !Sub "https://${Master1.PublicIp}.nip.io:8443/"
+     Description: "OpenShift Web UI"
+     Value: !Sub "https://master.${AWS::AccountId}.${PublicHostedZone}/"

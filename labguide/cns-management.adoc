@@ -15,9 +15,10 @@ The example applications ships in form of ready-to-use resource templates. Enter
 
  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc export template/rails-pgsql-persistent -n openshift -o yaml > rails-app-template.yml
 
-In the file `rails-app-template.yml` you can now review the template for this entire application stack. In essence it creates Rails Application instance which mimics a very basic blogging application. The articles are saved in a PostgreSQL database which runs in another pod. As part of the resource template a PVC is issued (line 194) to supply the PostgreSQL pod with persistent storage below the mount point /var/lib/pgsql/data (line 275). This will request a `PersistentVolume` in *RWO* mode. Storage provided this way can only be mounted by a single pod at a time.
+In the file `rails-app-template.yml` you can now review the template for this entire application stack. In essence it creates Rails Application instance which mimics a very basic weblog. The articles and comments are saved in a PostgreSQL database which runs in another pod. +
+As part of the resource template a PVC is issued (line 194) to supply the PostgreSQL pod with persistent storage with the mount point `/var/lib/pgsql/data` (line 275). This will request a `PersistentVolume` in *RWO* mode. Storage provided in this mode can only be mounted by a single pod at a time.
 
-Next we are going to create all the resources from the templates while passing in an additional parameter to override the default storage capacity requested from the PVC.
+Next we are going to render the template to a fully functional set of resource descriptors while passing in an additional parameter to override the default storage capacity requested from the PVC.
 
 TIP: To list all available parameters from this template run `oc process -f rails-app-template.yml --parameters`
 
@@ -27,7 +28,7 @@ The parameter in the template is called `VOLUME_CAPACITY`. We will process the t
 
 The `oc process` command parses the template and replaces any parameters with their default values if not supplied explicitly like we did for the volume capacity.
 
-The result `my-rails-app.yml` file contains all resources for this application ready to deploy, like so:
+The resulting `my-rails-app.yml` file contains all resources for this application ready to deploy. Deploy it like so:
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc create -f my-rails-app.yml
@@ -42,7 +43,7 @@ service "postgresql" created
 deploymentconfig "postgresql" created
 ----
 
-You can now use the OpenShift UI at https://{{ MASTER_EXTERNAL_FQDN }}:8843/ (while being logged in as _fancyuser1_ in the newly created project `my-database-app`) to follow the deployment process. Alternatively watch the containers deploy like this:
+You can now use the OpenShift UI at https://{{ MASTER_EXTERNAL_FQDN }}/ (while being logged in as _fancyuser1_ in the newly created project `my-database-app`) to follow the deployment process. Alternatively watch the containers deploy like this:
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods -w
@@ -83,11 +84,11 @@ rails-pgsql-persistent-1-hook-pre   0/1       Terminating   0         1m
 rails-pgsql-persistent-1-hook-pre   0/1       Terminating   0         1m
 ----
 
-Exit out of the watch mode with kbd:[Ctrl + c]
+Exit out of the watch mode with kbd:[Ctrl + c] when you see the *-deploy and *-hook-pre pods terminating.
 
 NOTE: It may take up to 10 minutes for the deployment to complete.
 
-You should also see a PVC being issued and in the _Bound_ state.
+You should now also see a PVC that has been issued and now being in the _Bound_ state.
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pvc
@@ -128,7 +129,7 @@ postgresql   Bound     pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8   15Gi       RWO
 
 NOTE: Your PV name will be different as it's dynamically generated.
 
-Look at the details of this PV:
+Look at the details of the PV bound to the PVC, in this case `pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8`:
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc describe pv/pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8
@@ -168,7 +169,8 @@ glusterfs-m9fvl   1/1       Running   0          3m       {{NODE3_INTERNAL_IP}} 
 heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}}         {{NODE3_INTERNAL_FQDN}} <2>
 ----
 
-Remember the IP address of the pod you select, for example: *{{NODE1_INTERNAL_IP}}* of pod *glusterfs-37vn8* Log on to GlusterFS pod with a remote terminal session like so:
+Remember the IP address of the pod you select, for example: *{{NODE1_INTERNAL_IP}}* of pod *glusterfs-37vn8*. +
+Log on to the selected GlusterFS pod with a remote terminal session like so:
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc rsh glusterfs-37vn8
@@ -176,7 +178,7 @@ sh-4.2#
 ----
 
 You have now access to this container's namespace which has the GlusterFS CLI utilities installed. +
-Let's list all known volumes:
+Let's use them to list all known volumes:
 
 ----
 sh-4.2# gluster volume list
@@ -209,12 +211,14 @@ nfs.disable: on
 ----
 <1> According to the output of `oc get pods -o wide` this is the container we are logged on to.
 
-NOTE: Identify the right brick by looking at the host IP of the pod you have just logged on to. `oc get pods -o wide` will give you this information.
+NOTE: Identify the right brick by looking at the host IP of the GlusterFS pod you have just logged on to. `oc get pods -o wide` will give you this information. The host's IP will be noted next to one of the bricks.
 
 GlusterFS created this volume as a 3-way replica set across all GlusterFS pods, in therefore across all your OpenShift App nodes running CNS. +
-Each pod/node exposes his local storage via the GlusterFS protocol. This local storage is known as a *brick* in GlusterFS and is usually backed by a local SAS disk or NVMe device. The brick is simply formatted with XFS and thus made available to GlusterFS.
+Each pod/node exposes it's local storage via the GlusterFS protocol. This local storage is known as a *brick* in GlusterFS and is usually backed by a local SAS disk or NVMe device. +
+The brick is simply a directory on a block device formatted with XFS and thus made available to GlusterFS.
 
-You can even look at this yourself:
+You can even look at this yourself, by listing the files in the brick directory.
+Select the brick's directory (the path starting with `/var/lib/heketi/...`) marked in the output above:
 
 ----
 sh-4.2# ls -ahl /var/lib/heketi/mounts/vg_0246fd563709384a3cbc3f3bbeeb87a9/brick_684a01f8993f241a92db02b117e0b912/brick
@@ -262,19 +266,19 @@ NOTE: The exact path name will be different in your environment as it has been a
 You are looking at the PostgreSQL internal data file structure from the perspective of the GlusterFS server side. It's a normal local filesystem here.
 
 Clients, like the OpenShift nodes and their application pods talk to this storage with the GlusterFS protocol. Which abstracts the 3-way replication behind a single FUSE mount point. +
-When a pod starts that mounts storage from a PV backed by GlusterFS OpenShift will mount the GlusterFS volume on the App Node and then _bind-mount_ this directory to the right pod. +
-This is happen transparently to the application inside the pod and looks like a normal local filesystem.
+When a pod starts that mounts storage from a PV backed by GlusterFS, OpenShift will mount the GlusterFS volume on the right app node and then _bind-mount_ this directory to the right pod. +
+This is happening transparently to the application inside the pod and looks like a normal local filesystem.
 
-You may exit your remote session to the GlusterFS pod.
+You may now exit your remote session to the GlusterFS pod.
 
  sh-4.2# exit
 
 ### Providing shared storage with CNS
 
-So far only very few options, like the basic NFS support existed, to provide a PersistentVolume to more than one container at once. The access mode used for this is *ReadWriteMany*.
+So far only very few options, like the basic NFS support, existed to provide a `PersistentVolume` to more than one container at once. The access mode used for this is *ReadWriteMany*. Traditional block-based storage solutions are not able to do this.
 
-With CNS this capabilities is now available to all OpenShift deployments, no matter where they are deployed. To demonstrate this capability with an application we will deploy a PHP file uploader that has multiple front-end instances sharing a common storage repository.+
-To demonstrate the difference this makes we will first run this application without shared storage.
+With CNS this capability is now available to all OpenShift deployments, no matter where they are deployed. To illustrate the benefit of this, we will deploy a PHP application, a file uploader that has multiple front-end instances sharing a common storage repository.+
+To highlight the difference this makes to non-shared storage we will first run this application without a PV.
 
 First log back in as `fancyuser1` and create a new project:
 
@@ -337,7 +341,7 @@ file-uploader-1-k2v0d            1/1       Running     0          1m
 ...
 ----
 
-Note the name of the single pod currently running the app: *file-uploader-1-k2v0d*. The container called `file-uploader-1-build` is the builder container and is not relevant for us. A service has been created for our app but not exposed yet. Let's fix this:
+Note the name of the single pod currently running the app, in the example above  *file-uploader-1-k2v0d*. The container called `file-uploader-1-build` is the builder container and is not relevant for us. A service has been created for our app but not exposed yet. Let's fix this:
 
  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc expose svc/file-uploader
 
@@ -486,7 +490,7 @@ file-uploader-2-xbz24            1/1       Running     0          1m
 ...
 ----
 
-Try it out in your application: upload new files and watch them being visible from within all application pods. In the browser the application behaves fluently as it circles through the pods between browser requests.
+Try it out in your application: upload new files and watch them being visible from within all application pods. In the browser the application behaves fluently as it circles through the pods between browser sessions.
 
 
 ----
@@ -510,3 +514,395 @@ sh-4.2$ exit
 That's it. You have successfully provided shared storage to pods throughout the entire system, therefore avoiding the need for data to be replicated at the application level to each pod.
 
 With CNS this is available wherever OpenShift is deployed with no external dependency.
+
+### Increasing storage capacity in CNS
+
+Once deployed there are two way in which to increase the storage capacity offered by CNS. Either by adding additional nodes with storage to OpenShift cluster or by adding additional storage devices to the existing nodes running CNS.
+
+#### Adding nodes to CNS
+
+The pre-requisite of adding nodes to the CNS setup is that these nodes have been added to the OpenShift cluster before. That is, increasing the storage capacity of CNS this way is a two-step process:
+
+1. Extend the OpenShift cluster with additional nodes
+2. Add the newly added nodes to the CNS setup
+
+Fortunately both steps are easy thanks to automation. In the preceeding link:infra-mgmt-basics["Infrastructure Management Module"] you have already added a second set of 3 nodes to the OpenShift cluster. +
+These have an additional storage device available, so we will use those.
+
+For the second step, adding these new nodes to the CNS setup, you generally have two options:
+
+A. add the new nodes to the existing CNS storage cluster, provisioned in the module link:cns-deploy["Deploying Container-native Storage"]
+B. add the new nodes to a new, independent CNS storage cluster, still managed by the single heketi API service
+
+Option A is the straigt-forward choice when you just need more storage space. For this you can start with a single additional node. +
+Use option B when you need a net-new, independent storage cluster for the sake of tenant isolation, different geographical region or exposing different storage tiers as separate clusters. For this, you need at least 3 new nodes. +
+In this exercise we will implement Option B.
+
+The following action require elevated privileges in OpenShift, login as cluster admin and change to the CNS namespace:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc login -u system:admin
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc project {{CNS_NAMESPACE}}
+
+First, identify the newly added nodes - the easiest way is to look at their uptime:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get nodes
+NAME                         STATUS                     AGE
+{{NODE1_INTERNAL_FQDN}}   Ready                      3h
+{{NODE4_INTERNAL_FQDN}}   Ready                      50m <1>
+{{MASTER_INTERNAL_FQDN}}   Ready,SchedulingDisabled   3h
+{{NODE2_INTERNAL_FQDN}}   Ready                      3h
+{{INFRA_INTERNAL_FQDN}}   Ready                      3h
+{{NODE5_INTERNAL_FQDN}}   Ready                      50m <1>
+{{NODE3_INTERNAL_FQDN}}   Ready                      3h
+{{NODE6_INTERNAL_FQDN}}     Ready                      50m <1>
+----
+<1> The nodes added in the previous lab
+
+TIP: Always make sure, that these new systems also have the right firewall ports opened. In this lab this has already been done when the `configure-firewall.yml` playbook ran during link:cns-deploy["Deploying  Container-native Storage"] module.
+
+Next, add the following label to these nodes in order have the `DaemonSet` that CNS is based upon schedule new GlusterFS pods on them:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get daemonset
+NAME        DESIRED   CURRENT   READY     NODE-SELECTOR           AGE
+glusterfs   3         3         3         storagenode=glusterfs   3h
+----
+<1> The label definition the `DaemonSet` uses to select the nodes which run a GlusterFS pod.
+
+----
+oc label node/{{NODE4_INTERNAL_FQDN}} storagenode=glusterfs
+oc label node/{{NODE5_INTERNAL_FQDN}} storagenode=glusterfs
+oc label node/{{NODE6_INTERNAL_FQDN}} storagenode=glusterfs
+----
+
+This launches the GlusterFS pods on the newly added nodes. Wait for them to be in `Ready` state.
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods -o wide
+NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
+glusterfs-3gjc5   1/1       Running   0          1m       {{NODE6_INTERNAL_IP}}         {{NODE6_INTERNAL_FQDN}}  <1>
+glusterfs-37vn8   1/1       Running   0          3h       {{NODE1_INTERNAL_IP}}         {{NODE1_INTERNAL_FQDN}}
+glusterfs-ng00k   1/1       Running   0          1m       {{NODE4_INTERNAL_IP}}         {{NODE4_INTERNAL_FQDN}}  <1>
+glusterfs-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}         {{NODE2_INTERNAL_FQDN}}
+glusterfs-zkvfl   1/1       Running   0          1m       {{NODE5_INTERNAL_IP}}         {{NODE5_INTERNAL_FQDN}}  <1>
+glusterfs-m9fvl   1/1       Running   0          3m       {{NODE3_INTERNAL_IP}}         {{NODE3_INTERNAL_FQDN}}
+heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}}         {{NODE3_INTERNAL_FQDN}}
+----
+<1> The newly spawned GlusterFS pods.
+
+The new pods run GlusterFS uninitialized. That is, they have not formed a cluster among themselves yet. This is triggered via heketi.
+
+heketi initializes vanilla GlusterFS pods as part of loading the topology file. Like during the cns-deploy phase in the link:cns-deploy["Deploying  Container-native Storage"] module it can read an additional cluster structure from the JSON file.
+This has already been prepared suitable for your environment in the `/home/cloud-user/topology-extended.json`. It contains the original 3 nodes we started with, and then newly added nodes.
+
+Initialize the heketi-cli with environment variables like so:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ export HEKETI_CLI_SERVER=http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ export HEKETI_CLI_USER=admin
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ export HEKETI_CLI_KEY={{HEKETI_ADMIN_PW}}
+----
+
+This avoids repetitive command switches with heketi-cli. Use the heketi client to load the new topology. Make sure you are currently in `/home/cloud-user`:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ pwd
+/home/cloud-user
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli topology load --json=topology-extended.json
+	Found node {{NODE1_INTERNAL_FQDN}} on cluster ec7a9c8be8327a54839236791bf7ba24
+		Found device /dev/xvdd
+	Found node {{NODE2_INTERNAL_FQDN}} on cluster ec7a9c8be8327a54839236791bf7ba24
+		Found device /dev/xvdd
+	Found node {{NODE3_INTERNAL_FQDN}} on cluster ec7a9c8be8327a54839236791bf7ba24
+		Found device /dev/xvdd
+	Creating node {{NODE4_INTERNAL_FQDN}} ... ID: 43336d05323e6003be6740dbb7477bd6
+		Adding device /dev/xvdd ... OK
+	Creating node {{NODE5_INTERNAL_FQDN}} ... ID: 6c738028f642e37b2368eca88f8c626c
+		Adding device /dev/xvdd ... OK
+	Creating node {{NODE6_INTERNAL_FQDN}} ... ID: 099b016da11a623bef37de9b85aaa2d7
+		Adding device /dev/xvdd ... OK
+----
+
+With this you've successfully initialized a second CNS storage cluster that is managed by heketi. You can query heketi for the new topology:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}}  ~]$ heketi-cli topology info
+
+Cluster Id: ca777ae0285ef6d8cd7237c862bd591c <1>
+
+    Volumes:
+
+    Nodes:
+
+	Node Id: caaed3927e424b22b1a89d261f7617ad
+	State: online
+	Cluster Id: ca777ae0285ef6d8cd7237c862bd591c
+	Zone: 3
+	Management Hostname: {{NODE6_INTERNAL_FQDN}}
+	Storage Hostname: {{NODE6_INTERNAL_FQDN}}
+	Devices:
+		Id:b65fee8350c2b4cad4fd68535aba05b7   Name:/dev/xvdd           State:online    Size (GiB):49      Used (GiB):0       Free (GiB):49
+			Bricks:
+
+	Node Id: 33e0045354db4be29b18728cbe817605
+	State: online
+	Cluster Id: ca777ae0285ef6d8cd7237c862bd591c
+	Zone: 1
+	Management Hostname: {{NODE4_INTERNAL_FQDN}}
+	Storage Hostname: {{NODE4_INTERNAL_IP}}
+	Devices:
+		Id:b75d8e52e6978675d599111d50e46969   Name:/dev/xvdd           State:online    Size (GiB):49      Used (GiB):0       Free (GiB):49
+			Bricks:
+
+	Node Id: d8443e7ee8314c0c9fb4d8274a370bbd
+	State: online
+	Cluster Id: ca777ae0285ef6d8cd7237c862bd591c
+	Zone: 2
+	Management Hostname: {{NODE5_INTERNAL_FQDN}}
+	Storage Hostname: {{NODE5_INTERNAL_IP}}
+	Devices:
+		Id:4330fb2333c5dfb9add3e3ea00ec82a6   Name:/dev/xvdd           State:online    Size (GiB):49      Used (GiB):0       Free (GiB):49
+			Bricks:
+
+      Cluster Id: ec7a9c8be8327a54839236791bf7ba24
+
+          Volumes:
+...
+----
+<1> The internal ID of the new cluster managed by heketi
+
+NOTE: The cluster ID will be different for you since it's automatically generated.
+
+To use this cluster specifically, you can create a separate `StorageClass` for it in OpenShift. PVCs issued against it, will only be served from this particular CNS storage cluster. For this purpose, note it's internal heketi ID - in the example above *ca777ae0285ef6d8cd7237c862bd591c*.
+
+Create the file `second-cns-storageclass.yml` like below:
+
+[source,yaml]
+.second-cns-storageclass.yml
+----
+apiVersion: storage.k8s.io/v1beta1
+kind: StorageClass
+metadata:
+  name: {{CNS_STORAGECLASS2}}
+provisioner: kubernetes.io/glusterfs
+parameters:
+  resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+  restauthenabled: "true"
+  restuser: "admin"
+  volumetype: "replicate:3"
+  clusterid: "ca777ae0285ef6d8cd7237c862bd591c" <1>
+  secretNamespace: "default"
+  secretName: "cns-secret"
+----
+<1> The heketi internal ID of the new cluster is used to specifically direct requests to it. *Replace it with the ID of your cluster!*
+
+Create the `StorageClass`:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc create -f second-cns-storageclass.yml
+
+Next create a `PersistentVolumeClaim` like the following:
+
+[source,yaml]
+.cns-pvc-silver.yml
+----
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: my-container-storage-silver
+  annotations:
+    volume.beta.kubernetes.io/storage-class: {{CNS_STORAGECLASS2}}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+----
+
+And run it:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc create -f cns-pvc-silver.yml
+
+This PVC will now be fulfilled by the _{{CNS_STORAGECLASS2}}_ `StorageClass` which specifically directs the requests to the second cluster specified by it's UUID in the `clusterid` parameter of the `StorageClass`.
+
+#### Adding additional devices to a CNS cluster
+
+Instead of adding a net-new cluster you can also add additional devices to an existing cluster. The process is very similar to adding new nodes - loading a modified topology JSON file via the heketi client.
+
+To illustrate an alternative we are going to use `heketi-cli` tool directly.
+
+The nodes of the second cluster, have an additional, unused storage device  `{{NODE_BRICK_DEVICE2}}`. To add them we need to know their node IDs. +
+With the environment variables for `heketi-cli` still set run:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli node list | grep ca777ae0285ef6d8cd7237c862bd591c
+Id:33e0045354db4be29b18728cbe817605	Cluster:ca777ae0285ef6d8cd7237c862bd591c
+Id:d8443e7ee8314c0c9fb4d8274a370bbd	Cluster:ca777ae0285ef6d8cd7237c862bd591c
+Id:caaed3927e424b22b1a89d261f7617ad	Cluster:ca777ae0285ef6d8cd7237c862bd591c
+----
+
+IMPORTANT: `grep` for your unique cluster ID, used when creating the `StorageClass` before.
+
+Now add the device for each node:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=33e0045354db4be29b18728cbe817605
+Device added successfully
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=d8443e7ee8314c0c9fb4d8274a370bbd
+Device added successfully
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=caaed3927e424b22b1a89d261f7617ad
+Device added successfully
+----
+
+NOTE: The node UUIDs will be different for you since they are automatically generated.
+
+You can now verify the presence of these new devices by running:
+
+  [cloud-user@{{MASTER_HOSTNAME}}  ~]$ heketi-cli topology info
+
+### Replacing failed disks and nodes
+
+Despite CNS' capability to continue operating transparently to the client in face of failing disks and nodes you soon might want to replace such components to move out of degraded state.
+
+For this exercise, let's assume the device `{{NODE_BRICK_DEVICE}}` of your node {{NODE4_INTERNAL_FQDN}} failed and you need to replace it. You can do that as long as there is enough spare capacity somewhere else in the cluster, preferrable but not necessarily in the same failure domain (as specifed in the topology).
+
+The first step is to, again, determine the nodes internal UUID in heketi's database:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli topology info | grep -B4 {{NODE4_INTERNAL_FQDN}}
+	Node Id: 33e0045354db4be29b18728cbe817605
+	State: online
+	Cluster Id: ca777ae0285ef6d8cd7237c862bd591c
+	Zone: 1
+	Management Hostname: {{NODE4_INTERNAL_FQDN}}
+----
+
+Second, determine the device's UUID by querying the node:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli node info 33e0045354db4be29b18728cbe817605
+Node Id: 33e0045354db4be29b18728cbe817605
+State: online
+Cluster Id: ca777ae0285ef6d8cd7237c862bd591c
+Zone: 1
+Management Hostname: {{NODE4_INTERNAL_FQDN}}
+Storage Hostname: {{NODE4_INTERNAL_IP}}
+Devices:
+Id:01c94798bf6b1af87974573b420c4dff   Name:{{NODE_BRICK_DEVICE}}           State:online    Size (GiB):9       Used (GiB):1       Free (GiB):8
+----
+
+Notice the UUID of the device `{{NODE_BRICK_DEVICE}}` as shown:
+
+NOTE: The device ID, as well as all other UUIDs in heketi commands are automatically generated and different in your environment. Please be aware when copy&pasting.
+
+Third, mark the device as offline to stop heketi from further attempts to allocate space from it:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli device disable 01c94798bf6b1af87974573b420c4dff
+Device 01c94798bf6b1af87974573b420c4dff is now offline
+----
+
+The device is now offline but it's still part of replicated volumes. To remove it and trigger a self-healing operation in the background issue:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli device remove 01c94798bf6b1af87974573b420c4dff
+Device 01c94798bf6b1af87974573b420c4dff is now removed
+----
+
+This command can take a bit longer as it will go through the topology and search for the next available device on the same node, in the same failure domain and in the rest of the cluster (in that order) and trigger a brick-replacement operation. +
+This way data is re-replicated to another health storage device and the 3-way replicated storage volume moves out of degraded state.
+
+The device is still lurking around in _failed_ state. To finally get rid of it issue:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli device delete 01c94798bf6b1af87974573b420c4dff
+Device 01c94798bf6b1af87974573b420c4dff delete
+----
+
+NOTE: Only devices that are not used by other Gluster volumes can be deleted. If that's not the case `heketi-cli` will tell you about it. In this case you need to issue a `remove` operation before.
+
+You can now check that the device is gone from the topology by running:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli topology info
+
+Node deletion is also possible and is basically comprised of:
+
+1. successful execution of the `remove` operation on all devices of the node
+2. running `# heketi-cli node delete <node_id>` on the node in question
+
+### Running the OpenShift Registry with CNS
+
+The Registry in OpenShift is a critical component. When it's unavailable no new pods can be spawned nor can new build be triggered.
+It runs as one or more containers in specific Infrastructure Nodes or Master Nodes in OpenShift.
+
+By default the registry uses a hosts local storage which makes it prone to outages. Also, multiple registry pods need shared storage.
+
+This can be achieved with CNS simply by making the registry pods refer to a PVC in access mode *RWX* based on CNS. This way a highly-available scale-out registry can be provided without external dependencies on NFS or Cloud Provider storage.
+
+IMPORTANT: The following method will be disruptive. All data stored in the registry so far will become unavailable. Migration scenarios exist but are beyond the scope of this lab.
+
+Make sure you are logged in as `system:admin` in the `default` namespace:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc login -u system:admin -n default
+
+Create a PVC for shared storage with thefile `cns-registry-pvc.yml` below:
+
+[source,yaml]
+.cns-registry-pvc.yml
+----
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: registry-storage
+  annotations:
+    volume.beta.kubernetes.io/storage-class: {{CNS_STORAGECLASS}}
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+----
+
+Create the PVC and ensure it's *BOUND*
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc create -f cns-registry-pvc.yml
+
+In your environment a registry is already running. This will be the case for most environments. So the existing registry configuration needs to be adjusted to include a PVC and make the pods mount it's volume.
+This is done by modifying the `DeploymentConfig` of the registry.
+
+TIP: In the next release of OpenShift Container Platform the openshift-ansible installer will provide an option to deploy the Registry on CNS-backed storage right from the start.
+
+Update the registry's `DeploymentConfig` to refer to the PVC created before:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc volume deploymentconfigs/docker-registry --add --name=registry-storage -t pvc  --claim-name=registry-storage --overwrite
+
+The registry will now redeploy.
+
+Observe the registry deployment get updated:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc logs -f dc/docker-registry
+
+After a couple of seconds a new deployment of the registry should be available.
+Verify a new version of the registry's `DeploymentConfig` is running:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get dc/docker-registry
+  NAME              REVISION   DESIRED   CURRENT   TRIGGERED BY
+  docker-registry   2          1         1         config
+
+With this the OpenShift Registry is based on persistent storage provided by CNS. Since this is shared storage this also allows to scale out the registry pods.
+
+You can scale the registry like this:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc scale dc/docker-registry --replicas=3
+
+After a short while you should see 3 healthy registry pods in the default namespace:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods
+  NAME                       READY     STATUS    RESTARTS   AGE
+  docker-registry-2-5rszg    1/1       Running   0          1m
+  docker-registry-2-7s3tm    1/1       Running   0          14s
+  docker-registry-2-g3l70    1/1       Running   0          14s
+  registry-console-1-b47jt   1/1       Running   0          6h
+  router-1-hs9wp             1/1       Running   0          6h

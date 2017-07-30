@@ -1,0 +1,141 @@
+---
+
+  - hosts: localhost
+
+    tasks:
+
+      - include_vars: /opt/lab/environment.yml
+
+      - name: login as fancyuser1
+        shell: oc login -u 'fancyuser1' -p 'openshift'
+
+      - name: create new project called 'my-database-app'
+        shell: oc new-project my-database-app
+
+      - name: export the rails-postgres-persistent template
+        shell: oc export template/rails-pgsql-persistent -n openshift -o yaml > rails-app-template.yml
+        args:
+          creates: rails-app-template.yml
+
+      - name: render the rails-postgres-persistent template with custom volume capacity
+        shell: oc process -f rails-app-template.yml -o yaml -p VOLUME_CAPACITY=15Gi > my-rails-app.yml
+        args:
+          creates: my-rails-app.yml
+
+      - name: deploy app
+        shell: oc create -f my-rails-app.yml
+
+      - name: wait for postgres app to be ready
+        shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.name=="rails-pgsql-persistent")].status.readyReplicas}'
+        register: pgsql_app_rc_check
+        until: pgsql_app_rc_check.stdout == "1"
+        retries: 60
+        delay: 10
+
+      - name: check pvc
+        shell: oc get pvc/postgresql
+
+      - name: check route
+        shell: oc get route/rails-pgsql-persistent
+
+      - name: re-login as system:admin
+        shell: oc login -u system:admin
+
+      - name: change to project of fancyuser1
+        shell:  oc project my-database-app
+
+      - name: get pvc
+        shell: oc get pvc/postgresql -o jsonpath='{$.spec.volumeName}'
+        register: pgsql_pv
+        failed_when: pgsql_pv.stdout == ""
+
+      - set_fact:
+          rwo_pv: "{{ pgsql_pv.stdout }}"
+
+      - name: get pv
+        shell: oc get pv/{{ rwo_pv }} -o jsonpath='{$.spec.glusterfs.path}'
+        register: pgsql_vol
+        failed_when: pgsql_vol.stdout == ""
+
+      - set_fact:
+          rwo_gvol: "{{ pgsql_vol.stdout }}"
+          cns_namespace: "{{ CNS_NAMESPACE }}"
+
+      - name: get first glusterfs pods hostIP
+        shell: oc get pods -n {{ cns_namespace }} -o jsonpath='{$.items[0].metadata.name}'
+        register: first_glusterfs_pod
+        failed_when: first_glusterfs_pod.stdout == ""
+
+      - set_fact:
+          gluster_pod: "{{ first_glusterfs_pod.stdout }}"
+
+      - name: search for gluster vol based on pv
+        shell: oc rsh -n {{ cns_namespace }} {{ gluster_pod }} gluster vol list
+        register: gluster_vol_list
+        failed_when: gluster_vol_list.rc != 0 or rwo_gvol not in gluster_vol_list.stdout
+
+      - name: log back in as fancyuser1
+        shell: oc login -u 'fancyuser1' -p 'openshift'
+
+      - name: create new project called 'my-shared-storage'
+        shell: oc new-project my-shared-storage
+
+      - name: deploy file-uploader app
+        shell: oc new-app openshift/php:7.0~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
+
+      - name: wait for php app to be ready
+        shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="file-uploader")].status.readyReplicas}'
+        register: php_app_rc_check
+        until: php_app_rc_check.stdout == "1"
+        retries: 30
+        delay: 10
+
+      - name: expose php app service
+        shell: oc expose svc/file-uploader
+
+      - name: scale php app
+        shell: oc scale dc/file-uploader --replicas=3
+
+      - name: wait for php app to be scaled to 3 pods
+        shell: oc get dc -o jsonpath='{$.items[?(@.metadata.name=="file-uploader")].status.availableReplicas}'
+        register: php_app_scale_check
+        until: php_app_scale_check.stdout == "3"
+        retries: 12
+        delay: 10
+
+      - set_fact:
+          cns_storageclass: "{{ CNS_STORAGECLASS }}"
+
+      - name: create rwx pvc file from template
+        template:
+          src: ../templates/cns-rwx-pvc.yml.j2
+          dest: /tmp/cns-rwx-pvc.yml
+
+      - name: create rwx pvc
+        shell: |
+          oc create -f /tmp/cns-rwx-pvc.yml
+
+      - name: wait for pvc to be bound
+        shell: oc get pvc/my-shared-storage -o jsonpath='{$.status.phase}'
+        register: rwx_pvc
+        until: rwx_pvc.stdout == "Bound"
+        retries: 6
+        delay: 5
+
+      - name: add pvc to app deploymentconfig
+        shell: oc volume dc/file-uploader --add --name=shared-storage --type=persistentVolumeClaim --claim-name=my-shared-storage --mount-path=/opt/app-root/src/uploaded
+
+      - name: wait for php app replication controller to be updated
+        shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="file-uploader")].spec.template.spec.volumes[?(@.persistentVolumeClaim.claimName=="my-shared-storage")].name}'
+        register: php_app_update_rc_check
+        until: php_app_update_rc_check.stdout == "shared-storage"
+        retries: 12
+        delay: 10
+
+      - name: wait for php app to be updated on all 3 pods
+        shell: oc get dc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="file-uploader")].status.updatedReplicas}'
+        register: php_app_update_check
+        until: php_app_update_check.stdout == "3"
+        retries: 12
+        delay: 10
+...

@@ -212,6 +212,9 @@
       - set_fact:
           cns_clusterid: "{{heketi_output.clusters|last}}"
 
+      - set_fact:
+          cns_storageclass2: "{{CNS_STORAGECLASS2}}"
+
       - name: create storage class file from template
         template:
           src: ../templates/cns-storageclass-silver.yml.j2

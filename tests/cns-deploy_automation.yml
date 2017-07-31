@@ -85,7 +85,7 @@
         register: heketi_cluster_list
 
       - set_fact:
-          heketi_output: "{{heketi_cluster_list|from_json}}"
+          heketi_output: "{{heketi_cluster_list.stdout|from_json}}"
 
       - set_fact:
           cns_clusterid: "{{heketi_output.clusters.first}}"

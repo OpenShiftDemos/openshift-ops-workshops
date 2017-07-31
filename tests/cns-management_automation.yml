@@ -159,8 +159,8 @@
         lineinfile:
           line: "{{ item }}"
           path: /etc/ansible/hosts
-          insertafter: "^\[cns\]"
-          regex: "^ # {{ item }}"
+          insertafter: "^\\[cns\\]"
+          regexp: "^ # {{ item }}"
         with_items: "{{ new_cns_nodes_external_fqdn }}"
 
       - name: insert iptables rules required for GlusterFS

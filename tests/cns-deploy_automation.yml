@@ -77,6 +77,7 @@
 
       - set_fact:
           ocp_routing_suffix: "{{ OCP_ROUTING_SUFFIX | default('apps.example.com') }}"
+          heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
           cns_storageclass: "{{ CNS_STORAGECLASS | default('cns') }}"
 
       - name: get cluster-id from heketi

@@ -207,10 +207,10 @@
         register: heketi_cluster_list
 
       - set_fact:
-          heketi_output: "{{heketi_cluster_list|from_json}}"
+          heketi_output: "{{heketi_cluster_list.stdout|from_json}}"
 
       - set_fact:
-          cns_clusterid: "{{heketi_output.clusters.last}}"
+          cns_clusterid: "{{heketi_output.clusters|last}}"
 
       - name: create storage class file from template
         template:

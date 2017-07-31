@@ -86,6 +86,8 @@
 
       - set_fact:
           heketi_output: "{{heketi_cluster_list|from_json}}"
+
+      - set_fact:
           cns_clusterid: "{{heketi_output.clusters.first}}"
 
       - name: create storage class file from template

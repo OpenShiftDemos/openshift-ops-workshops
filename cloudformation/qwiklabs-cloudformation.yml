@@ -849,6 +849,12 @@ Resources:
                   HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
                   CNS_STORAGECLASS: "cns-gold"
                   CNS_STORAGECLASS2: "cns-silver"
+                  NODE4_EXTERNAL_FQDN: "node4.${AWS::AccountId}.${PublicHostedZone}"
+                  NODE5_EXTERNAL_FQDN: "node5.${AWS::AccountId}.${PublicHostedZone}"
+                  NODE6_EXTERNAL_FQDN: "node6.${AWS::AccountId}.${PublicHostedZone}"
+                  NODE4_INTERNAL_FQDN: "${WorkerNode4.PrivateDnsName}"
+                  NODE5_INTERNAL_FQDN: "${WorkerNode5.PrivateDnsName}"
+                  NODE6_INTERNAL_FQDN: "${WorkerNode6.PrivateDnsName}"
                 path: /opt/lab/environment.yml
                 owner: root:root
 

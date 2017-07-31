@@ -214,6 +214,7 @@
 
       - set_fact:
           cns_storageclass2: "{{CNS_STORAGECLASS2}}"
+          ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
 
       - name: create storage class file from template
         template:

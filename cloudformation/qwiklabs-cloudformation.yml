@@ -622,18 +622,18 @@ Resources:
                   node02.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
                   node03.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
 
-                  # [new_nodes]
-                  # node04.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  # node05.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  # node06.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  #[new_nodes]
+                  #node04.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  #node05.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  #node06.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
 
                   [cns]
                   node01.${AWS::AccountId}.${PublicHostedZone}
                   node02.${AWS::AccountId}.${PublicHostedZone}
                   node03.${AWS::AccountId}.${PublicHostedZone}
-                  # node04.${AWS::AccountId}.${PublicHostedZone}
-                  # node05.${AWS::AccountId}.${PublicHostedZone}
-                  # node06.${AWS::AccountId}.${PublicHostedZone}
+                  #node04.${AWS::AccountId}.${PublicHostedZone}
+                  #node05.${AWS::AccountId}.${PublicHostedZone}
+                  #node06.${AWS::AccountId}.${PublicHostedZone}
 
                   [idm]
                   idm.${AWS::AccountId}.${PublicHostedZone}
@@ -837,7 +837,6 @@ Resources:
                 path: /home/cloud-user/topology-extended.json
                 owner: cloud-user
                 group: cloud-user
-
 
               - content: |
                   OCP_ROUTING_SUFFIX: "apps.${AWS::AccountId}.${PublicHostedZone}"

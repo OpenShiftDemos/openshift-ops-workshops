@@ -160,7 +160,7 @@
           line: "{{ item }}"
           path: /etc/ansible/hosts
           insertafter: "^\\[cns\\]"
-          regexp: "^# {{ item }}"
+          regexp: "^#{{ item }}"
         with_items: "{{ new_cns_nodes_external_fqdn }}"
 
       - name: insert iptables rules required for GlusterFS
@@ -208,7 +208,7 @@
 
       - set_fact:
           heketi_output: "{{heketi_cluster_list.stdout|from_json}}"
-          
+
       - set_fact:
           cns_clusterid: "{{heketi_output.clusters|last}}"
           cns_storageclass2: "{{CNS_STORAGECLASS2}}"

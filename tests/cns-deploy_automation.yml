@@ -83,7 +83,7 @@
       - name: get cluster-id from heketi
         shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} --json cluster list
         register: heketi_cluster_list
-        failed_when: heketi_cluster_list.stdout_lines.stdout_lines|length <= 1
+        failed_when: heketi_cluster_list.stdout_lines|length <= 1
 
       - set_fact:
           heketi_output: "{{heketi_cluster_list|from_json}}"

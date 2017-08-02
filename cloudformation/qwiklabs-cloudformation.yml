@@ -146,7 +146,7 @@ Resources:
       VpcId:
         Ref: VPC
       DhcpOptionsId:
-        Ref: DHCPOptions
+        Ref: DhcpOptions
 
 
   InternetGateway:

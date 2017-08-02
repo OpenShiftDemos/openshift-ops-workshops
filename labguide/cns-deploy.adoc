@@ -317,7 +317,7 @@ Ready to create and provide GlusterFS volumes.
 <2> OpenShift nodes are labeled. Label is referred to in a DaemonSet.
 <3> GlusterFS daemonset is started. DaemonSet means: start exactly *one* pod per node.
 <4> All nodes will be referenced in heketi's database by a UUID.
-<5> Node block devices are formatted for mounting by GlusterFS.
+<5> Node block devices are formatted as physical LVM volumes for later use by GlusterFS.
 <6> heketi is deployed in a pod as well.
 
 NOTE: Some of the output contains auto-generated data, so references to UUIDs and pod names might be slightly different for you.

@@ -477,7 +477,7 @@ Resources:
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt InfraNode1.Private
+          - !GetAtt InfraNode1.PrivateIp
 
         - Name: !Join ['', ["*", .,  apps., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A

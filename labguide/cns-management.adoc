@@ -43,7 +43,7 @@ service "postgresql" created
 deploymentconfig "postgresql" created
 ----
 
-You can now use the OpenShift UI at https://{{ MASTER_EXTERNAL_FQDN }}/ (while being logged in as _fancyuser1_ in the newly created project `my-database-app`) to follow the deployment process. Alternatively watch the containers deploy like this:
+You can now use the OpenShift UI at {{WEB_CONSOLE_URL}} (while being logged in as _fancyuser1_ in the newly created project `my-database-app`) to follow the deployment process. Alternatively watch the containers deploy like this:
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods -w

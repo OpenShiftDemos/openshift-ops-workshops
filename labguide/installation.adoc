@@ -1,14 +1,14 @@
 ## Installation and Verification
 
-The method of installation that you shall be using for this session would be the 'Advanced Installation' method which uses Ansible playbooks for automating the installation of OpenShift Container Platform cluster (version 3.5). 
+The method of installation that you shall be using for this session would be the 'Advanced Installation' method which uses Ansible playbooks for automating the installation of OpenShift Container Platform cluster (version 3.5).
 The host preparation and prerequisites needed for the installation have already been done.
 
 *Step 1. Examining the provided Ansible inventory file -*
 Let us start by examining the Ansible inventory files which contains the host information.
 To perform the further steps, you will need to run the commands on the 'master' host.
-The master and other nodes are running as AWS EC-2 RHEL instances. 
+The master and other nodes are running as AWS EC-2 RHEL instances.
 
-To get the private key, download from the Qwiklabs page that pops up right after you click on the class and press `Start`. Store it on the localhost machine and keep note of the `path` where you have downloaded the .pem key. 
+To get the private key, download from the Qwiklabs page that pops up right after you click on the class and press `Start`. Store it on the localhost machine and keep note of the `path` where you have downloaded the .pem key.
 
 When you will log into the Fleet console and go to Services -> EC2 -> Instances. Click on the master host instance and look for the `Public DNS`. It should show a page with details -
 
@@ -33,16 +33,16 @@ Ensure the deployment_type parameter in your inventory file’s [OSEv3:vars] sec
 [OSEv3:vars]
 deployment_type=openshift-enterprise
 
-If you want a detailed list of all the cluster variables, you can refer the following page - 
+If you want a detailed list of all the cluster variables, you can refer the following page -
 
 *https://docs.openshift.com/container-platform/3.5/install_config/install/advanced_install.html#configuring-cluster-variables*
 
-This lists all the hosts and the functions and variables for master, 3 nodes and infrastructure node. 
+This lists all the hosts and the functions and variables for master, 3 nodes and infrastructure node.
 
 2) To configure host variables, indicate the defined variables under [master] or [nodes] section.
 
 3) You can assign labels to node hosts during the Ansible installation.
-To assign labels to a node host during an Ansible install, use the openshift_node_labels variable with the desired labels added to the desired node host entry in the [nodes] section. 
+To assign labels to a node host during an Ansible install, use the openshift_node_labels variable with the desired labels added to the desired node host entry in the [nodes] section.
 In the following example, labels are set for a region called primary and a zone called east:
 
 [literal]
@@ -67,14 +67,15 @@ The result should be similar to -
 
 [literal]
 NAME                        STATUS                     AGE
-master.example.com          Ready,SchedulingDisabled   165d
-node1.example.com           Ready                      165d
-node2.example.com           Ready                      165d
+{{MASTER_INTERNAL_FQDN}}          Ready,SchedulingDisabled   1m
+{{NODE1_INTERNAL_FQDN}}           Ready                      1m
+{{NODE2_INTERNAL_FQDN}}           Ready                      1m
+{{NODE3_INTERNAL_FQDN}}           Ready                      1m
 
-You should be able to see a list of all the hosts mentioned in the inventory file - i.e. 1 master node, 1 infrastructure node and 3 application nodes. 
+You should be able to see a list of all the hosts mentioned in the inventory file - i.e. 1 master node, 1 infrastructure node and 3 application nodes.
 
-2) Verify that the web console is installed correctly :
-Use the master host name and web console port number to access the web console using a web browser.For example, master host with name 'master.openshift.com' and which is using the default port '8443', should be reachable at https://master.openshift.com:8443/console .
+2) Verify that the web console is running:
+Point your browser to {{WEB_CONSOLE_URL}} in order to reach the management interface.
 
 3) Now that the installation has been verified, run the following command on each master and node host to add the atomic-openshift packages back to the list of yum excludes on the host:
 
@@ -94,6 +95,6 @@ To run selective diagnostics, you can include names in the command -
 [literal]
 $ oc adm diagnostics NodeConfigCheck UnitStatus
 
-To run diagnostics where the master and node configurations are not in the expected locations, use the following command to specify the location - 
+To run diagnostics where the master and node configurations are not in the expected locations, use the following command to specify the location -
 [literal]
 $ oc adm diagnostics --master-config=<file_path> --node-config=<file_path>

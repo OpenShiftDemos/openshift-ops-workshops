@@ -77,13 +77,24 @@
 
       - set_fact:
           ocp_routing_suffix: "{{ OCP_ROUTING_SUFFIX | default('apps.example.com') }}"
+          heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
           cns_storageclass: "{{ CNS_STORAGECLASS | default('cns') }}"
+
+      - name: get cluster-id from heketi
+        shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} --json cluster list
+        register: heketi_cluster_list
+
+      - set_fact:
+          heketi_output: "{{heketi_cluster_list.stdout|from_json}}"
+
+      - set_fact:
+          cns_clusterid: "{{heketi_output.clusters|first}}"
 
       - name: create storage class file from template
         template:
-          src: ../templates/cns-storageclass.yml.j2
-          dest: /tmp/cns-storageclass.yml
+          src: ../templates/cns-storageclass-gold.yml.j2
+          dest: /tmp/cns-storageclass-gold.yml
 
       - name: create storage class
-        shell: oc create -f /tmp/cns-storageclass.yml
+        shell: oc create -f /tmp/cns-storageclass-gold.yml
 ...

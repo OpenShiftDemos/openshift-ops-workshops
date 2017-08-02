@@ -1615,26 +1615,14 @@ Resources:
 
 
 Outputs:
-   UserName:
-      Description: "OpenShift Node Login"
-      Value: "admin"
-
-   Password:
-      Description: "OpenShift Node Login Password"
-      Value: "r3dh4t"
+   LabguideURL:
+     Description: "Student Lab Guide"
+     Value: !Sub "http://labguide.${AWS::AccountId}.${PublicHostedZone}/"
 
    SSHLoginUser:
       Description: "User name on the Master node to connect via SSH and PEM file"
       Value: "cloud-user"
 
-   LabguideURL:
-     Description: "Student Lab Guide"
-     Value: !Sub "http://labguide.${AWS::AccountId}.${PublicHostedZone}/"
-
    MasterIPAddress:
      Description: "Public IP of the OpenShift Master node"
      Value: !GetAtt Master1.PublicIp
-
-   OpenShiftURL:
-     Description: "OpenShift Web UI"
-     Value: !Sub "https://master.${AWS::AccountId}.${PublicHostedZone}/"

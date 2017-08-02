@@ -496,7 +496,7 @@ Resources:
           TTL: '900'
           ResourceRecords:
           - !GetAtt IdmNode1.PrivateIp
-
+          
         - Name: !Join ['', [labguide., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
@@ -669,7 +669,7 @@ Resources:
                   masters
                   nodes
                   etcd
-                  # new_nodes
+                  #new_nodes
 
                   [OSEv3:vars]
                   deployment_type=openshift-enterprise
@@ -917,7 +917,6 @@ Resources:
                 owner: cloud-user
                 group: cloud-user
 
-
               - content: |
                   OCP_ROUTING_SUFFIX: "apps.${AWS::AccountId}.${PublicHostedZone}"
                   NODE_BRICK_DEVICE: "/dev/xvdd"
@@ -928,6 +927,12 @@ Resources:
                   HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
                   CNS_STORAGECLASS: "cns-gold"
                   CNS_STORAGECLASS2: "cns-silver"
+                  NODE4_EXTERNAL_FQDN: "node04.${AWS::AccountId}.${PublicHostedZone}"
+                  NODE5_EXTERNAL_FQDN: "node05.${AWS::AccountId}.${PublicHostedZone}"
+                  NODE6_EXTERNAL_FQDN: "node06.${AWS::AccountId}.${PublicHostedZone}"
+                  NODE4_INTERNAL_FQDN: "${WorkerNode4.PrivateDnsName}"
+                  NODE5_INTERNAL_FQDN: "${WorkerNode5.PrivateDnsName}"
+                  NODE6_INTERNAL_FQDN: "${WorkerNode6.PrivateDnsName}"
                 path: /opt/lab/environment.yml
                 owner: root:root
 
@@ -1146,8 +1151,10 @@ Resources:
                 NODE6_INTERNAL_FQDN="${WorkerNode6.PrivateDnsName}"
                 NODE6_INTERNAL_IP="${WorkerNode6.PrivateIp}"
                 NODE_BRICK_DEVICE="/dev/xvdd"
+                NODE_BRICK_DEVICE2="/dev/xvdd"
                 CNS_NAMESPACE="container-native-storage"
-                CNS_STORAGECLASS="cns"
+                CNS_STORAGECLASS="cns-gold"
+                CNS_STORAGECLASS2="cns-silver"
                 HEKETI_ADMIN_PW="myS3cr3tpassw0rd"
                 HEKETI_ADMIN_PW_BASE64="bXlTM2NyM3RwYXNzdzByZA=="
                 HEKETI_USER_PW="mys3rs3cr3tpassw0rd"
@@ -1687,13 +1694,9 @@ Resources:
 
 
 Outputs:
-   UserName:
-      Description: "OpenShift Node Login"
-      Value: "admin"
-
-   Password:
-      Description: "OpenShift Node Login Password"
-      Value: "r3dh4t"
+   LabguideURL:
+     Description: "Student Lab Guide"
+     Value: !Sub "http://labguide.${AWS::AccountId}.${PublicHostedZone}/"
 
    SSHLoginUser:
       Description: "User name on the Master node to connect via SSH and PEM file"
@@ -1706,7 +1709,3 @@ Outputs:
    MasterIPAddress:
      Description: "Public IP of the OpenShift Master node"
      Value: !GetAtt Master1.PublicIp
-
-   OpenShiftURL:
-     Description: "OpenShift Web UI"
-     Value: !Sub "https://master.${AWS::AccountId}.${PublicHostedZone}/"

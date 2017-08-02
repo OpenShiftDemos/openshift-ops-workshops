@@ -729,24 +729,25 @@ Resources:
                   master.internal.${PublicHostedZone}
 
                   [nodes]
-                  master.internal.${PublicHostedZone}
-                  infra.internal.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
-                  node01.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node02.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node03.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  master.internal.aws.testdrive.openshift.com openshift_hostname=master.internal.aws.testdrive.openshift.com
+                  infra.internal.aws.testdrive.openshift.com openshift_node_labels="{'region': 'infra'}" openshift_hostname=infra.internal.aws.testdrive.openshift.com
+                  node01.internal.aws.testdrive.openshift.com openshift_node_labels="{'region': 'apps'}" openshift_hostname=node01.internal.aws.testdrive.openshift.com
+                  node02.internal.aws.testdrive.openshift.com openshift_node_labels="{'region': 'apps'}" openshift_hostname=node02.internal.aws.testdrive.openshift.com
+                  node03.internal.aws.testdrive.openshift.com openshift_node_labels="{'region': 'apps'}"  openshift_hostname=node03.internal.aws.testdrive.openshift.com
+
 
                   # [new_nodes]
-                  # node04.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  # node05.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  # node06.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  # node04.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node04.internal.aws.testdrive.openshift.com
+                  # node05.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node05.internal.aws.testdrive.openshift.com
+                  # node06.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node06.internal.aws.testdrive.openshift.com
 
                   [cns]
-                  node01.internal.${PublicHostedZone}
-                  node02.internal.${PublicHostedZone}
-                  node03.internal.${PublicHostedZone}
-                  node04.internal.${PublicHostedZone}
-                  node05.internal.${PublicHostedZone}
-                  node06.internal.${PublicHostedZone}
+                  node01.internal.${PublicHostedZone} openshift_hostname=node01.internal.aws.testdrive.openshift.com
+                  node02.internal.${PublicHostedZone} openshift_hostname=node02.internal.aws.testdrive.openshift.com
+                  node03.internal.${PublicHostedZone} openshift_hostname=node03.internal.aws.testdrive.openshift.com
+                  node04.internal.${PublicHostedZone} openshift_hostname=node04.internal.aws.testdrive.openshift.com
+                  node05.internal.${PublicHostedZone} openshift_hostname=node05.internal.aws.testdrive.openshift.com
+                  node06.internal.${PublicHostedZone} openshift_hostname=node06.internal.aws.testdrive.openshift.com
 
                   [idm]
                   idm.internal.${PublicHostedZone}

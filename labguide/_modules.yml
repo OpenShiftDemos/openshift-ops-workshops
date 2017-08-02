@@ -52,6 +52,8 @@ config:
       value: "node06.internal.example.com"
     - name: NODE6_INTERNAL_IP
       value: "192.168.0.106"
+    - name: WEB_CONSOLE_URL
+      value: "https://master.example.com/console"
 
 modules:
   environment:

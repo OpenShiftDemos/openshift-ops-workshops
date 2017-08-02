@@ -450,7 +450,7 @@ Resources:
       - WorkerNode5
       - WorkerNode6
     Properties:
-      HostedZoneName: !Join [internal., !Ref 'PublicHostedZone', .]]
+      HostedZoneName: !Join ['', [internal., !Ref 'PublicHostedZone', .]]
       RecordSets:
         - Name: !Join ['', [master.internal., !Ref 'PublicHostedZone', .]]
           Type: A

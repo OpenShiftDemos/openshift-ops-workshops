@@ -434,7 +434,7 @@ Resources:
       Name: internal.aws.testdrive.openshift.com
       VPCs:
       -
-        VPCID: !Ref "VPC"
+        VPCId: !Ref "VPC"
         VPCRegion: !Ref "AWS::Region"
 
   Route53Records:

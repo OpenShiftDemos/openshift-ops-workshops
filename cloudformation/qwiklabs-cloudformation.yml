@@ -433,7 +433,9 @@ Resources:
         Comment: "Internal Hosted Zone"
       Name: internal.aws.testdrive.openshift.com
       VPCs:
-      - !Ref VPC
+      -
+        VPCID: !Ref VPC
+        VPCRegion: Ref: AWS::Region
 
   Route53Records:
     Type: AWS::Route53::RecordSetGroup

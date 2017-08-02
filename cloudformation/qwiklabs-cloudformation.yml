@@ -590,7 +590,7 @@ Resources:
                   masters
                   nodes
                   etcd
-                  # new_nodes
+                  #new_nodes
 
                   [OSEv3:vars]
                   deployment_type=openshift-enterprise

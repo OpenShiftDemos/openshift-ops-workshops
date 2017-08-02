@@ -133,6 +133,22 @@ Resources:
         Value:
           Ref: AWS::StackId
 
+  DhcpOptions: 
+    Type: "AWS::EC2::DHCPOptions"
+    Properties: 
+      DomainName: internal.aws.testdrive.openshift.com
+      DomainNameServers: 
+        - AmazonProvidedDNS
+
+  VPCDHCPOptionsAssociation:
+    Type: AWS::EC2::VPCDHCPOptionsAssociation
+    Properties:
+      VpcId:
+        Ref: VPC
+      DhcpOptionsId:
+        Ref: DHCPOptions
+
+
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:

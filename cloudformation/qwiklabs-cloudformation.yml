@@ -133,6 +133,22 @@ Resources:
         Value:
           Ref: AWS::StackId
 
+  DhcpOptions:
+    Type: "AWS::EC2::DHCPOptions"
+    Properties:
+      DomainName: internal.aws.testdrive.openshift.com
+      DomainNameServers:
+        - AmazonProvidedDNS
+
+  VPCDHCPOptionsAssociation:
+    Type: AWS::EC2::VPCDHCPOptionsAssociation
+    Properties:
+      VpcId:
+        Ref: VPC
+      DhcpOptionsId:
+        Ref: DhcpOptions
+
+
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -432,7 +448,86 @@ Resources:
       HostedZoneConfig:
         Comment: "Internal Hosted Zone"
       Name: internal.aws.testdrive.openshift.com
-      VPCs: !Ref VPC
+      VPCs:
+      -
+        VPCId: !Ref "VPC"
+        VPCRegion: !Ref "AWS::Region"
+
+  InternalRoute53Records:
+    Type: AWS::Route53::RecordSetGroup
+    DependsOn:
+      - Master1
+      - InfraNode1
+      - IdmNode1
+      - WorkerNode1
+      - WorkerNode2
+      - WorkerNode3
+      - WorkerNode4
+      - WorkerNode5
+      - WorkerNode6
+    Properties:
+      HostedZoneName: !Join ['', [internal., !Ref 'PublicHostedZone', .]]
+      RecordSets:
+        - Name: !Join ['', [master.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt Master1.PrivateIp
+
+        - Name: !Join ['', [infra.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt InfraNode1.PrivateIp
+
+        - Name: !Join ['', [idm.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt IdmNode1.PrivateIp
+
+        - Name: !Join ['', [labguide.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt GuideNode.PrivateIp
+
+        - Name: !Join ['', [node01.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode1.PrivateIp
+
+        - Name: !Join ['', [node02.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode2.PrivateIp
+
+        - Name: !Join ['', [node03.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode3.PrivateIp
+
+        - Name: !Join ['', [node04.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode4.PrivateIp
+
+
+        - Name: !Join ['', [node05.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode5.PrivateIp
+
+        - Name: !Join ['', [node06.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode6.PrivateIp
 
   Route53Records:
     Type: AWS::Route53::RecordSetGroup
@@ -461,23 +556,11 @@ Resources:
           ResourceRecords:
           - !GetAtt Master1.PublicIp
 
-        - Name: !Join ['', [master.internal., !Ref 'PublicHostedZone', .]]
-          Type: A
-          TTL: '900'
-          ResourceRecords:
-          - !GetAtt Master1.PrivateIp
-
         - Name: !Join ['', [infra., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt InfraNode1.PublicIp
-
-        - Name: !Join ['', [infra.internal., !Ref 'PublicHostedZone', .]]
-          Type: A
-          TTL: '900'
-          ResourceRecords:
-          - !GetAtt InfraNode1.PrivateIp
 
         - Name: !Join ['', ["*", .,  apps., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
@@ -491,23 +574,11 @@ Resources:
           ResourceRecords:
           - !GetAtt IdmNode1.PublicIp
 
-        - Name: !Join ['', [idm.internal., !Ref 'PublicHostedZone', .]]
-          Type: A
-          TTL: '900'
-          ResourceRecords:
-          - !GetAtt IdmNode1.PrivateIp
-
         - Name: !Join ['', [labguide., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt GuideNode.PublicIp
-
-        - Name: !Join ['', [labguide.internal., !Ref 'PublicHostedZone', .]]
-          Type: A
-          TTL: '900'
-          ResourceRecords:
-          - !GetAtt GuideNode.PrivateIp
 
         - Name: !Join ['', [node01., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
@@ -515,23 +586,11 @@ Resources:
           ResourceRecords:
           - !GetAtt WorkerNode1.PublicIp
 
-        - Name: !Join ['', [node01.internal., !Ref 'PublicHostedZone', .]]
-          Type: A
-          TTL: '900'
-          ResourceRecords:
-          - !GetAtt WorkerNode1.PrivateIp
-
         - Name: !Join ['', [node02., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt WorkerNode2.PublicIp
-
-        - Name: !Join ['', [node02.internal., !Ref 'PublicHostedZone', .]]
-          Type: A
-          TTL: '900'
-          ResourceRecords:
-          - !GetAtt WorkerNode2.PrivateIp
 
         - Name: !Join ['', [node03., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
@@ -539,23 +598,11 @@ Resources:
           ResourceRecords:
           - !GetAtt WorkerNode3.PublicIp
 
-        - Name: !Join ['', [node03.internal., !Ref 'PublicHostedZone', .]]
-          Type: A
-          TTL: '900'
-          ResourceRecords:
-          - !GetAtt WorkerNode3.PrivateIp
-
         - Name: !Join ['', [node04., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt WorkerNode4.PublicIp
-
-        - Name: !Join ['', [node04.internal., !Ref 'PublicHostedZone', .]]
-          Type: A
-          TTL: '900'
-          ResourceRecords:
-          - !GetAtt WorkerNode4.PrivateIp
 
         - Name: !Join ['', [node05., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
@@ -563,23 +610,11 @@ Resources:
           ResourceRecords:
           - !GetAtt WorkerNode5.PublicIp
 
-        - Name: !Join ['', [node05.internal., !Ref 'PublicHostedZone', .]]
-          Type: A
-          TTL: '900'
-          ResourceRecords:
-          - !GetAtt WorkerNode5.PrivateIp
-
         - Name: !Join ['', [node06., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
           - !GetAtt WorkerNode6.PublicIp
-
-        - Name: !Join ['', [node06.internal., !Ref 'PublicHostedZone', .]]
-          Type: A
-          TTL: '900'
-          ResourceRecords:
-          - !GetAtt WorkerNode6.PrivateIp
 
   WaitHandle:
     Type: AWS::CloudFormation::WaitConditionHandle
@@ -695,24 +730,24 @@ Resources:
                   master.internal.${PublicHostedZone}
 
                   [nodes]
-                  master.internal.${PublicHostedZone}
-                  infra.internal.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
-                  node01.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node02.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node03.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  master.internal.aws.testdrive.openshift.com openshift_hostname=master.internal.aws.testdrive.openshift.com
+                  infra.internal.aws.testdrive.openshift.com openshift_node_labels="{'region': 'infra'}" openshift_hostname=infra.internal.aws.testdrive.openshift.com
+                  node01.internal.aws.testdrive.openshift.com openshift_node_labels="{'region': 'apps'}" openshift_hostname=node01.internal.aws.testdrive.openshift.com
+                  node02.internal.aws.testdrive.openshift.com openshift_node_labels="{'region': 'apps'}" openshift_hostname=node02.internal.aws.testdrive.openshift.com
+                  node03.internal.aws.testdrive.openshift.com openshift_node_labels="{'region': 'apps'}"  openshift_hostname=node03.internal.aws.testdrive.openshift.com
 
                   #[new_nodes]
-                  #node04.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  #node05.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  #node06.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  #node04.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node04.internal.aws.testdrive.openshift.com
+                  #node05.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node05.internal.aws.testdrive.openshift.com
+                  #node06.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node06.internal.aws.testdrive.openshift.com
 
                   [cns]
-                  node01.internal.${PublicHostedZone}
-                  node02.internal.${PublicHostedZone}
-                  node03.internal.${PublicHostedZone}
-                  node04.internal.${PublicHostedZone}
-                  node05.internal.${PublicHostedZone}
-                  node06.internal.${PublicHostedZone}
+                  node01.internal.${PublicHostedZone} openshift_hostname=node01.internal.aws.testdrive.openshift.com
+                  node02.internal.${PublicHostedZone} openshift_hostname=node02.internal.aws.testdrive.openshift.com
+                  node03.internal.${PublicHostedZone} openshift_hostname=node03.internal.aws.testdrive.openshift.com
+                  node04.internal.${PublicHostedZone} openshift_hostname=node04.internal.aws.testdrive.openshift.com
+                  node05.internal.${PublicHostedZone} openshift_hostname=node05.internal.aws.testdrive.openshift.com
+                  node06.internal.${PublicHostedZone} openshift_hostname=node06.internal.aws.testdrive.openshift.com
 
                   [idm]
                   idm.internal.${PublicHostedZone}

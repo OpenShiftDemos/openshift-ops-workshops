@@ -477,7 +477,7 @@ Resources:
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt InfraNode1.Private
+          - !GetAtt InfraNode1.PrivateIP
 
         - Name: !Join ['', ["*", .,  apps., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
@@ -1703,7 +1703,7 @@ Outputs:
    SSHLoginUser:
       Description: "User name on the Master node to connect via SSH and PEM file"
       Value: "cloud-user"
-      
+
    MasterIPAddress:
      Description: "Public IP of the OpenShift Master node"
      Value: !GetAtt Master1.PublicIp

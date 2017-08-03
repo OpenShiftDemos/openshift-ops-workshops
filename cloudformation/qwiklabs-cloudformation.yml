@@ -127,7 +127,7 @@ Resources:
         - vpc
         - cidr
       EnableDnsSupport: 'true'
-      EnableDnsHostnames: 'true'
+      EnableDnsHostnames: 'false'
       Tags:
       - Key: Application
         Value:

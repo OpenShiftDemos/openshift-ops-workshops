@@ -465,6 +465,7 @@ Resources:
       - WorkerNode4
       - WorkerNode5
       - WorkerNode6
+      - InternalDNS
     Properties:
       HostedZoneName: !Join ['', [internal., !Ref 'PublicHostedZone', .]]
       RecordSets:

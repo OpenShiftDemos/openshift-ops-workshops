@@ -648,7 +648,7 @@ Resources:
                   bindPassword: ldapadmin
                   rfc2307:
                     groupsQuery:
-                      baseDN: cn=groups,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
+                      baseDN: cn=groups,cn=accounts,<DC>
                       derefAliases: never
                       filter: '(|(cn=ose-*))'
                     groupUIDAttribute: dn

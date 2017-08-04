@@ -746,9 +746,9 @@ Resources:
                   node01.internal.${PublicHostedZone}
                   node02.internal.${PublicHostedZone}
                   node03.internal.${PublicHostedZone}
-                  node04.internal.${PublicHostedZone}
-                  node05.internal.${PublicHostedZone}
-                  node06.internal.${PublicHostedZone}
+                  #node04.internal.${PublicHostedZone}
+                  #node05.internal.${PublicHostedZone}
+                  #node06.internal.${PublicHostedZone}
 
                   [idm]
                   idm.internal.${PublicHostedZone}
@@ -1026,7 +1026,7 @@ Resources:
             #cloud-config
 
             fqdn: infra.internal.${PublicHostedZone}
-            
+
             write_files:
             - content: |
                 DEVS"'/dev/xvdb'
@@ -1055,7 +1055,6 @@ Resources:
             system_info:
               default_user:
                 name: cloud-user
-
 
   IdmNode1:
     Type: AWS::EC2::Instance
@@ -1098,7 +1097,7 @@ Resources:
                 name: cloud-user
 
             fqdn: idm.internal.${PublicHostedZone}
-            
+
             runcmd:
             - /usr/local/bin/idm-install
             - reboot
@@ -1146,7 +1145,7 @@ Resources:
             - runcmd
 
             fqdn: labguide.internal.${PublicHostedZone}
-            
+
             write_files:
             - content: |
                 DEVS='/dev/xvdb'
@@ -1219,7 +1218,6 @@ Resources:
             - ansible localhost -m wait_for -a "port=80 host=localhost"
             - 'curl -X PUT -H "Content-Type:" --data-binary "{ \"Status\" : \"SUCCESS\", \"Reason\": \"Configuration Complete\", \"UniqueId\": \"GuideNode\",\"Data\": \"GuideNode has reached all instances and generated lab guide\" }" "${WaitHandle}"'
 
-
   WorkerNode1:
     Type: AWS::EC2::Instance
     Properties:
@@ -1272,7 +1270,7 @@ Resources:
             - mounts
 
             fqdn: node01.internal.${PublicHostedZone}
-            
+
             fs_setup:
             - label: emptydir
               filesystem: xfs
@@ -1353,7 +1351,7 @@ Resources:
             - mounts
 
             fqdn: node02.internal.${PublicHostedZone}
-            
+
             fs_setup:
             - label: emptydir
               filesystem: xfs
@@ -1434,7 +1432,7 @@ Resources:
             - mounts
 
             fqdn: node03.internal.${PublicHostedZone}
-            
+
             fs_setup:
             - label: emptydir
               filesystem: xfs
@@ -1520,7 +1518,7 @@ Resources:
             - mounts
 
             fqdn: node04.internal.${PublicHostedZone}
-            
+
             fs_setup:
             - label: emptydir
               filesystem: xfs
@@ -1606,7 +1604,7 @@ Resources:
             - mounts
 
             fqdn: node05.internal.${PublicHostedZone}
-            
+
             fs_setup:
             - label: emptydir
               filesystem: xfs
@@ -1692,7 +1690,7 @@ Resources:
             - mounts
 
             fqdn: node06.internal.${PublicHostedZone}
-            
+
             fs_setup:
             - label: emptydir
               filesystem: xfs

@@ -225,7 +225,7 @@
           args:
             chdir: /home/cloud-user
           register: heketi_topology_load
-          failed_when: "Unable" in heketi_topology_load.stdout 
+          failed_when: "Unable" in heketi_topology_load.stdout
 
         - name: get second cluster-id from heketi
           shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster list --json
@@ -242,7 +242,7 @@
             src: ../templates/cns-storageclass-silver.yml.j2
             dest: /tmp/cns-storageclass-silver.yml
           environment:
-            - cns_clusterid: "{{ cns_clusterid_2 }}"
+            cns_clusterid: "{{ cns_clusterid_2 }}"
 
         - name: create storage class
           shell: oc create -f /tmp/cns-storageclass-silver.yml

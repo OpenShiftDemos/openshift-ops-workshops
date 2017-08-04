@@ -642,13 +642,13 @@ Resources:
               - content: |
                   kind: LDAPSyncConfig
                   apiVersion: v1
-                  url: ldap://IDM/cn=users,cn=accounts,<DC>?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,<DC>)
+                  url: 
                   ca: /etc/origin/master/ipa-ca.crt
-                  bindDN: uid=admin,cn=users,cn=accounts,<DC>
+                  bindDN: 
                   bindPassword: ldapadmin
                   rfc2307:
                     groupsQuery:
-                      baseDN: cn=groups,cn=accounts,<DC>
+                      baseDN: 
                       derefAliases: never
                       filter: '(|(cn=ose-*))'
                     groupUIDAttribute: dn
@@ -657,7 +657,7 @@ Resources:
                     groupMembershipAttributes:
                     - member
                     usersQuery:
-                      baseDN: cn=users,cn=accounts,<DC>
+                      baseDN: 
                       derefAliases: never
                     userUIDAttribute: dn
                     userNameAttributes:

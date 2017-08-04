@@ -146,10 +146,6 @@
         shell: oc project {{cns_namespace}}
 
       - set_fact:
-          new_cns_nodes_external_fqdn:
-            - "{{NODE4_EXTERNAL_FQDN}}"
-            - "{{NODE5_EXTERNAL_FQDN}}"
-            - "{{NODE6_EXTERNAL_FQDN}}"
           new_cns_nodes_internal_fqdn:
             - "{{NODE4_INTERNAL_FQDN}}"
             - "{{NODE5_INTERNAL_FQDN}}"
@@ -161,7 +157,7 @@
           path: /etc/ansible/hosts
           insertafter: "^\\[cns\\]"
           regexp: "^#{{ item }}"
-        with_items: "{{ new_cns_nodes_external_fqdn }}"
+        with_items: "{{ new_cns_nodes_internal_fqdn }}"
 
       - name: insert iptables rules required for GlusterFS
         blockinfile:
@@ -173,7 +169,7 @@
             -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
           insertbefore: "^COMMIT"
         delegate_to: "{{ item }}"
-        with_items: "{{ new_cns_nodes_external_fqdn }}"
+        with_items: "{{ new_cns_nodes_internal_fqdn }}"
 
       - name: label storage nodes
         shell: oc label node/{{ item }} storagenode=glusterfs

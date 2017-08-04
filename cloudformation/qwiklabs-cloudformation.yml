@@ -1185,7 +1185,7 @@ Resources:
                 NODE6_INTERNAL_IP="${WorkerNode6.PrivateIp}"
                 WEB_CONSOLE_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
                 NODE_BRICK_DEVICE="/dev/xvdd"
-                NODE_BRICK_DEVICE2="/dev/xvdd"
+                NODE_BRICK_DEVICE2="/dev/xvde"
                 CNS_NAMESPACE="container-native-storage"
                 CNS_STORAGECLASS="cns-gold"
                 CNS_STORAGECLASS2="cns-silver"

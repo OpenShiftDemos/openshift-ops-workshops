@@ -244,8 +244,8 @@
           shell: heketi-cli add device --name={{ node_brick_device2 }} --node={{ item }}
           with_items: "{{ cns_cluster_info.nodes }}"
 
-          tags:
-            - second-cns
+        tags:
+          - second-cns
 
       - block:
 

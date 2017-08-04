@@ -241,8 +241,6 @@
           template:
             src: ../templates/cns-storageclass-silver.yml.j2
             dest: /tmp/cns-storageclass-silver.yml
-          environment:
-            cns_clusterid: "{{ cns_clusterid_2 }}"
 
         - name: create storage class
           shell: oc create -f /tmp/cns-storageclass-silver.yml

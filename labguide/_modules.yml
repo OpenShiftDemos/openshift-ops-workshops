@@ -91,4 +91,5 @@ modules:
       CNS_STORAGECLASS: "cns-gold"
       CNS_STORAGECLASS2: "cns-silver"
       CNS_NAMESPACE: "container-native-storage"
+      NODE_BRICK_DEVICE: "/dev/xvdd"
       NODE_BRICK_DEVICE2: "/dev/xvde"

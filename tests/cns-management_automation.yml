@@ -233,7 +233,7 @@
             heketi_cluster_second: "{{heketi_cluster_list_second.stdout|from_json}}"
 
         - set_fact:
-            cns_clusterid_2: "{{heketi_output.clusters|difference([cns_clusterid_1])|first}}"
+            cns_clusterid_2: "{{heketi_cluster_second.clusters|difference([cns_clusterid_1])|first}}"
 
         - name: create storage class file from template
           template:

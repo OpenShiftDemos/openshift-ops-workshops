@@ -230,11 +230,6 @@
         - name: create storage class
           shell: oc create -f /tmp/cns-storageclass-silver.yml
 
-        tags:
-          - second-cns
-
-      - block:
-
         - name: query nodes of second cns cluster
           shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster info {{ cns_clusterid }} --json
           register: heketi_cluster_node_list
@@ -245,6 +240,11 @@
         - name: add additional devices to second CNS cluster
           shell: heketi-cli add device --name={{ node_brick_device2 }} --node={{ item }}
           with_items: "{{ cns_cluster_info.nodes }}"
+
+          tags:
+            - second-cns
+
+      - block:
 
         - name: get heketi ID of first node of second CNS cluster
           shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info | grep -B4 node04.internal.aws.testdrive.openshift.com | awk 'match($0, /Node Id: ([a-z0-9].*)/, result) { print result[1] }'"

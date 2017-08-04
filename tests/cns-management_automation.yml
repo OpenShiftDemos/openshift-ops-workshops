@@ -6,7 +6,7 @@
     tasks:
 
       - include_vars: /opt/lab/environment.yml
-        tags: all
+        tags: always
 
       - set_fact:
           cns_namespace: "{{ CNS_NAMESPACE }}"
@@ -22,7 +22,7 @@
           node_brick_device: "{{ NODE_BRICK_DEVICE }}"
           node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
           node4_internal_fqdn: " {{ NODE4_INTERNAL_FQDN }}"
-        tags: all
+        tags: always
 
 
       - block:

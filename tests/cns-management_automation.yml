@@ -20,6 +20,7 @@
           ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
           node_brick_device: "{{ NODE_BRICK_DEVICE }}"
           node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
+          node4_internal_fqdn: " {{ NODE4_INTERNAL_FQDN }}"
 
 
       - block:
@@ -247,14 +248,14 @@
       - block:
 
         - name: get heketi ID of first node of second CNS cluster
-          shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info | grep -B4 node04.internal.aws.testdrive.openshift.com | awk 'match($0, /Node Id: ([a-z0-9].*)/, result) { print result[1] }'"
+          shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info | grep -B4 {{ node4_internal_fqdn }} | awk 'match($0, /Node Id: ([a-z0-9].*)/, result) { print result[1] }'"
           register: heketi_node_4_query
 
         - set_fact:
             heketi_node_4_id: "{{ heketi_node_4_query.stdout }}"
 
         - name: get heketi ID of first device of this node
-          shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ heketi_node_4_id }} | grep "{{node_brick_device}}" | awk 'match($0, /Id:([a-z0-9].*) Name:/, result) { print result[1] }'"
+          shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ heketi_node_4_id }} | grep {{node_brick_device}} | awk 'match($0, /Id:([a-z0-9].*) Name:/, result) { print result[1] }'"
           register: heketi_node_4_device_query
 
         - set_fact:

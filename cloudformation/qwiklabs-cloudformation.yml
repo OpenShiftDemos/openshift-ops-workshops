@@ -788,7 +788,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "node01.${AWS::AccountId}.${PublicHostedZone}"
+                                                  "node01.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode1.PrivateIp}"
@@ -804,7 +804,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "node02.${AWS::AccountId}.${PublicHostedZone}"
+                                                  "node02.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode2.PrivateIp}"
@@ -820,7 +820,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "node03.${AWS::AccountId}.${PublicHostedZone}"
+                                                  "node03.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode3.PrivateIp}"
@@ -849,7 +849,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "node01.${AWS::AccountId}.${PublicHostedZone}"
+                                                  "node01.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode1.PrivateIp}"
@@ -865,7 +865,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "node02.${AWS::AccountId}.${PublicHostedZone}"
+                                                  "node02.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode2.PrivateIp}"
@@ -881,7 +881,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "node03.${AWS::AccountId}.${PublicHostedZone}"
+                                                  "node03.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode3.PrivateIp}"
@@ -901,7 +901,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "node04.${AWS::AccountId}.${PublicHostedZone}"
+                                                  "node04.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode4.PrivateIp}"
@@ -917,7 +917,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "node05.${AWS::AccountId}.${PublicHostedZone}"
+                                                  "node05.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode5.PrivateIp}"
@@ -933,7 +933,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "node06.${AWS::AccountId}.${PublicHostedZone}"
+                                                  "node06.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode6.PrivateIp}"

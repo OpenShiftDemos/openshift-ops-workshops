@@ -21,7 +21,7 @@
 
     - name: Configure bindDN in groupsync.yaml
       lineinfile:
-        line: "uid=admin,cn=users,cn=accounts,dc=auth,{{ dc_values }}"
+        line: "bindDN: uid=admin,cn=users,cn=accounts,dc=auth,{{ dc_values }}"
         regexp: '^bindDN:'
         path: /home/cloud-user/groupsync.yaml
 

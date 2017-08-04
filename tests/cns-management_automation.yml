@@ -232,8 +232,13 @@
         - set_fact:
             heketi_cluster_second: "{{heketi_cluster_list_second.stdout|from_json}}"
 
+        - debug: var=cns_clusterid_1
+        - debug: var=heketi_cluster_list_second
+
         - set_fact:
             cns_clusterid_2: "{{heketi_cluster_second.clusters|difference([cns_clusterid_1])|first}}"
+
+        - debug: var=cns_clusterid_2
 
         - name: create storage class file from template
           template:

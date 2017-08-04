@@ -237,9 +237,6 @@
         - set_fact:
             cns_clusterid_2: "{{heketi_cluster_second.clusters|difference([cns_clusterid_1])|first}}"
 
-        - set_fact:
-            cns_clusterid: "{{ cns_clusterid_2 }}"
-
         - name: create storage class file from template
           template:
             src: ../templates/cns-storageclass-silver.yml.j2

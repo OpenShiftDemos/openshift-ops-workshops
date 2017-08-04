@@ -224,6 +224,8 @@
           shell: heketi-cli topology --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} load --json=topology-extended.json
           args:
             chdir: /home/cloud-user
+          register: heketi_topology_load
+          failed_when: "Unable" in heketi_topology_load.stdout 
 
         - name: get second cluster-id from heketi
           shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster list --json

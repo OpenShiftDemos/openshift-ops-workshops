@@ -1,0 +1,78 @@
+---
+
+  - hosts: localhost
+
+    tasks:
+
+      - name: check project 'my-database-app' exists
+
+
+      - name: check health of rails-pgsql-persistent deployment
+
+
+      - name: check pvc called 'postgres' exists
+
+
+      - name: ensure pvc is issued against CNS
+
+
+      - name: ensure pv is satisfied from CNS
+
+
+      - name: check gluster volume of pv
+
+
+      - name: check project 'my-shared-storage' exists
+
+
+      - name: check health of file-uploader deployment
+
+
+      - name: check route of file-uploader sevice
+
+
+      - name: check replica level of file-uploader deployment
+
+
+      - name: ensure rwx pvc exists
+
+
+      - name: ensure pvc is part of file-uploader deployment
+
+
+      - name: ensure additional CNS nodes are configured in the inventory
+
+
+      - name: ensure firewall rules are present on CNS nodes
+
+
+      - name: ensure additional storage nodes have correct label
+
+
+      - name: check daemonset is scaled
+
+
+      - name: check daemonset health
+
+
+      - name: get second cluster id from heketi
+
+
+      - name: check second cluster nodes
+
+
+      - name: check storage class configuration
+
+
+      - name: check presence of additional devices in nodes
+
+
+      - name: check failed device has been removed
+
+
+      - name: check registry pvc from CNS
+
+
+      - name: ensure registry runs on pvc
+
+...

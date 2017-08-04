@@ -1,6 +1,7 @@
 ---
 
-  - hosts: localhost
+  - name: Automation of module 6 (CNS Management)
+    hosts: localhost
 
     tasks:
 
@@ -199,7 +200,7 @@
           chdir: /home/cloud-user
 
       - name: get cluster-id from heketi
-        shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} --json cluster list
+        shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster list --json
         register: heketi_cluster_list
 
       - set_fact:
@@ -217,4 +218,78 @@
 
       - name: create storage class
         shell: oc create -f /tmp/cns-storageclass-silver.yml
+
+      - name: query nodes of second cns cluster
+        shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster info {{ cns_clusterid }} --json
+        register: heketi_cluster_node_list
+
+      - set_fact:
+          cns_cluster_info: "{{ heketi_cluster_node_list|from_json }}"
+          node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
+
+      - name: add additional devices to second CNS cluster
+        shell: heketi-cli add device --name={{ node_brick_device2 }} --node={{ item }}
+        with_items: "{{ cns_cluster_info.nodes }}"
+
+      - name: get heketi ID of first node of second CNS cluster
+        shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info | grep -B4 node04.internal.aws.testdrive.openshift.com | awk 'match($0, /Node Id: ([a-z0-9].*)/, result) { print result[1] }'"
+        register: heketi_node_4_query
+
+      - set_fact:
+          node_brick_device: "{{ NODE_BRICK_DEVICE }}"
+          heketi_node_4_id: "{{ heketi_node_4_query.stdout }}"
+
+      - name: get heketi ID of first device of this node
+        shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ heketi_node_4_id }} | grep "{{node_brick_device}}" | awk 'match($0, /Id:([a-z0-9].*) Name:/, result) { print result[1] }'"
+        register: heketi_node_4_device_query
+
+      - set_fact:
+          heketi_node_4_device_id: "{{ heketi_node_4_device_query.stdout }}"
+
+      - name: disable the device
+        shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device disable {{ heketi_node_4_device_id }}
+
+      - name: remove the device
+        shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device remove {{ heketi_node_4_device_id }}
+
+      - name: delete the device
+        shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device delete {{ heketi_node_4_device_id }}
+
+      - name: log back in as cluster admin into default namespace
+        shell:
+
+      - name: create registry rwx pvc file from template
+        template:
+          src: ../templates/registry-rwx-pvc.yml.j2
+          dest: /tmp/registry-rwx-pvc.yml
+
+      - name: create registry pvc
+        shell: oc create -f /tmp/registry-rwx-pvc.yml
+
+      - name: wait for pvc to be bound
+        shell: oc get pvc/registry-storage -o jsonpath='{$.status.phase}'
+        register: registry_pvc
+        until: registry_pvc.stdout == "Bound"
+        retries: 6
+        delay: 5
+
+      - name: update registry deployment
+        shell: oc volume deploymentconfigs/docker-registry --add --name=registry-storage -t pvc  --claim-name=registry-storage --overwrite
+
+      - name: wait for registry deployment to be ready
+        shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="docker-registry")].status.readyReplicas}'
+        register: registry_rc_check
+        until: registry_rc_check.stdout == "1"
+        retries: 30
+        delay: 10
+
+      - name: scale the registry deployment to 3
+        shell: oc scale dc/docker-registry --replicas=3
+
+      - name: wait for registry to be scaled to 3 pods
+        shell: oc get dc -o jsonpath='{$.items[?(@.metadata.name=="docker-registry")].status.availableReplicas}'
+        register: registry_scale_check
+        until: registry_scale_check.stdout == "3"
+        retries: 12
+        delay: 10
 ...

@@ -6,6 +6,7 @@
     tasks:
 
       - include_vars: /opt/lab/environment.yml
+        tags: all
 
       - set_fact:
           cns_namespace: "{{ CNS_NAMESPACE }}"
@@ -21,90 +22,80 @@
           node_brick_device: "{{ NODE_BRICK_DEVICE }}"
           node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
           node4_internal_fqdn: " {{ NODE4_INTERNAL_FQDN }}"
+        tags: all
 
-      - name: login as fancyuser1
-        shell: oc login -u 'fancyuser1' -p 'openshift'
-        tags: rwo-example
 
-      - name: create new project called 'my-database-app'
-        shell: oc new-project my-database-app
-        tags: rwo-example
+      - block:
 
-      - name: export the rails-postgres-persistent template
-        shell: oc export template/rails-pgsql-persistent -n openshift -o yaml > rails-app-template.yml
-        args:
-          creates: rails-app-template.yml
-        tags: rwo-example
+        - name: login as fancyuser1
+          shell: oc login -u 'fancyuser1' -p 'openshift'
 
-      - name: render the rails-postgres-persistent template with custom volume capacity
-        shell: oc process -f rails-app-template.yml -o yaml -p VOLUME_CAPACITY=15Gi > my-rails-app.yml
-        args:
-          creates: my-rails-app.yml
-        tags: rwo-example
+        - name: create new project called 'my-database-app'
+          shell: oc new-project my-database-app
 
-      - name: deploy app
-        shell: oc create -f my-rails-app.yml
-        tags: rwo-example
+        - name: export the rails-postgres-persistent template
+          shell: oc export template/rails-pgsql-persistent -n openshift -o yaml > rails-app-template.yml
+          args:
+            creates: rails-app-template.yml
 
-      - name: wait for postgres app to be ready
-        shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.name=="rails-pgsql-persistent")].status.readyReplicas}'
-        register: pgsql_app_rc_check
-        until: pgsql_app_rc_check.stdout == "1"
-        retries: 60
-        delay: 10
-        tags: rwo-example
+        - name: render the rails-postgres-persistent template with custom volume capacity
+          shell: oc process -f rails-app-template.yml -o yaml -p VOLUME_CAPACITY=15Gi > my-rails-app.yml
+          args:
+            creates: my-rails-app.yml
 
-      - name: check pvc
-        shell: oc get pvc/postgresql
-        tags: rwo-example
+        - name: deploy app
+          shell: oc create -f my-rails-app.yml
 
-      - name: check route
-        shell: oc get route/rails-pgsql-persistent
-        tags: rwo-example
+        - name: wait for postgres app to be ready
+          shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.name=="rails-pgsql-persistent")].status.readyReplicas}'
+          register: pgsql_app_rc_check
+          until: pgsql_app_rc_check.stdout == "1"
+          retries: 60
+          delay: 10
 
-      - name: re-login as system:admin
-        shell: oc login -u system:admin
-        tags: rwo-example
+        - name: check pvc
+          shell: oc get pvc/postgresql
 
-      - name: change to project of fancyuser1
-        shell:  oc project my-database-app
-        tags: rwo-example
+        - name: check route
+          shell: oc get route/rails-pgsql-persistent
 
-      - name: get pvc
-        shell: oc get pvc/postgresql -o jsonpath='{$.spec.volumeName}'
-        register: pgsql_pv
-        failed_when: pgsql_pv.stdout == ""
-        tags: rwo-example
+        - name: re-login as system:admin
+          shell: oc login -u system:admin
 
-      - set_fact:
-          rwo_pv: "{{ pgsql_pv.stdout }}"
-        tags: rwo-example
+        - name: change to project of fancyuser1
+          shell:  oc project my-database-app
 
-      - name: get pv
-        shell: oc get pv/{{ rwo_pv }} -o jsonpath='{$.spec.glusterfs.path}'
-        register: pgsql_vol
-        failed_when: pgsql_vol.stdout == ""
-        tags: rwo-example
+        - name: get pvc
+          shell: oc get pvc/postgresql -o jsonpath='{$.spec.volumeName}'
+          register: pgsql_pv
+          failed_when: pgsql_pv.stdout == ""
 
-      - set_fact:
-          rwo_gvol: "{{ pgsql_vol.stdout }}"
-        tags: rwo-example
+        - set_fact:
+            rwo_pv: "{{ pgsql_pv.stdout }}"
 
-      - name: get first glusterfs pods hostIP
-        shell: oc get pods -n {{ cns_namespace }} -o jsonpath='{$.items[0].metadata.name}'
-        register: first_glusterfs_pod
-        failed_when: first_glusterfs_pod.stdout == ""
-        tags: rwo-example
+        - name: get pv
+          shell: oc get pv/{{ rwo_pv }} -o jsonpath='{$.spec.glusterfs.path}'
+          register: pgsql_vol
+          failed_when: pgsql_vol.stdout == ""
 
-      - set_fact:
-          gluster_pod: "{{ first_glusterfs_pod.stdout }}"
-        tags: rwo-example
+        - set_fact:
+            rwo_gvol: "{{ pgsql_vol.stdout }}"
 
-      - name: search for gluster vol based on pv
-        shell: oc rsh -n {{ cns_namespace }} {{ gluster_pod }} gluster vol list
-        register: gluster_vol_list
-        failed_when: gluster_vol_list.rc != 0 or rwo_gvol not in gluster_vol_list.stdout        
-        tags: rwo-example
+        - name: get first glusterfs pods hostIP
+          shell: oc get pods -n {{ cns_namespace }} -o jsonpath='{$.items[0].metadata.name}'
+          register: first_glusterfs_pod
+          failed_when: first_glusterfs_pod.stdout == ""
+
+        - set_fact:
+            gluster_pod: "{{ first_glusterfs_pod.stdout }}"
+
+        - name: search for gluster vol based on pv
+          shell: oc rsh -n {{ cns_namespace }} {{ gluster_pod }} gluster vol list
+          register: gluster_vol_list
+          failed_when: gluster_vol_list.rc != 0 or rwo_gvol not in gluster_vol_list.stdout
+
+        tags:
+          - rwo-example
 
       - block:
 

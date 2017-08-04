@@ -241,7 +241,7 @@
             cns_cluster_info: "{{ heketi_cluster_node_list.stdout|from_json }}"
 
         - name: add additional devices to second CNS cluster
-          shell: heketi-cli add device --name={{ node_brick_device2 }} --node={{ item }}
+          shell: heketi-cli device add --name={{ node_brick_device2 }} --node={{ item }}
           with_items: "{{ cns_cluster_info.nodes }}"
 
         tags:

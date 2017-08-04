@@ -34,7 +34,7 @@
     - name: Configure idm url in groupsync file
       lineinfile:
         line: "url: ldap://{{ idm_fqdn }}/cn=users,cn=accounts,dc=auth,{{ dc_values }}?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,{{ dc_values }})"
-        regexp: '^    url:'
+        regexp: '^url:'
         path: /home/cloud-user/groupsync.yaml      
 
 ...

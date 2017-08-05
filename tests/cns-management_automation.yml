@@ -192,6 +192,13 @@
           delegate_to: "{{ item }}"
           with_items: "{{ new_cns_nodes_internal_fqdn }}"
 
+        - name: reload iptables
+          systemd:
+            name: iptables
+            state: reloaded
+          delegate_to: "{{ item }}"
+          with_items: "{{ new_cns_nodes_internal_fqdn }}"
+
         - name: label storage nodes
           shell: oc label node/{{ item }} storagenode=glusterfs
           with_items: "{{ new_cns_nodes_internal_fqdn }}"

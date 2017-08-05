@@ -292,7 +292,7 @@
           shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device delete {{ heketi_node_4_device_id }}
 
         - name: log back in as cluster admin into default namespace
-          shell:
+          shell: oc login -u system:admin -n default
 
         - name: create registry rwx pvc file from template
           template:

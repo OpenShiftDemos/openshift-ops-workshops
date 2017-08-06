@@ -150,7 +150,7 @@
         changed_when: false
 
       - name: ensure rwx pvc exists
-        shell: oc get pvc/shared-storage -o json
+        shell: oc get pvc/my-shared-storage -o json
         register: get_file_uploader_pvc
         changed_when: false
 
@@ -193,21 +193,56 @@
         failed_when: get_file_uploader_pvc_name.stdout != file_uploader_pvc.metadata.name
         changed_when: false
 
-      # - name: ensure additional CNS nodes are configured in the inventory
-      #
-      #
-      # - name: ensure firewall rules are present on CNS nodes
-      #
-      #
-      # - name: ensure additional storage nodes have correct label
-      #
-      #
-      # - name: check daemonset is scaled
-      #
-      #
-      # - name: check daemonset health
-      #
-      #
+      - name: log back into cns namespace as cluster admin
+        shell: oc login -u system:admin -n {{ cns_namespace }}
+        changed_when: false
+
+      - name: ensure additional CNS nodes are configured in the inventory
+        fail:
+          msg: node {{ item }} is not part of the cns group in the inventory
+        when: item in groups['cns']
+        with_items: "{{ new_cns_nodes_internal_fqdn }}"
+
+      - set_fact:
+          iptables_rules
+            - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT"
+            - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT"
+            - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT"
+            - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT"
+
+      - name: ensure firewall rules are present on CNS nodes
+        shell: iptables -S OS_FIREWALL_ALLOW
+        register: iptables_rules
+        failed_when: item[0] not in iptables_rules.stdout
+        delegate_to: "{{ item[1] }}"
+        with_items:
+          - "{{ iptables_rules }}"
+          - "{{ new_cns_nodes_internal_fqdn }}"
+        changed_when: False
+
+      - name: ensure additional storage nodes have correct label
+        shell: oc get nodes -l storagenode=glusterfs -o jsonpath='{$.items[?(@.metadata.name=="{{ item }}].metadata.name}'
+        register: node_label_check
+        failed_when: node_label_check.stdout != item
+        with_items: "{{ new_cns_nodes_internal_fqdn }}"
+        changed_when: false
+
+      - name: check daemonset is scaled to 6 nodes
+        shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.desiredNumberScheduled}'
+        register: check_daemonset_desired
+        failed_when:
+          - check_daemonset_desired.stdout != "6"
+        changed_when: false
+
+      - name: check daemonset health
+        shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.numberReady}'
+        register: check_daemonset_ready
+        failed_when:
+          - check_daemonset_ready.stdout == ""
+          - check_daemonset_ready.stdout|int < check_daemonset_desired.stdout|int
+        changed_when: false
+
+
       # - name: get second cluster id from heketi
       #
       #

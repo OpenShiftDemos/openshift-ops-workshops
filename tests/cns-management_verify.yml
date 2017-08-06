@@ -150,7 +150,7 @@
         changed_when: false
 
       - name: ensure rwx pvc exists
-        shell: oc get pvc/file-uploader -o json
+        shell: oc get pvc/shared-storage -o json
         register: get_file_uploader_pvc
         changed_when: false
 

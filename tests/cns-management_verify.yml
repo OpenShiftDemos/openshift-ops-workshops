@@ -37,7 +37,7 @@
         changed_when: false
 
       - set_fact:
-          postgresql_pvc: "{{ register: get_postgresql_pvc.stdout|from_json }}"
+          postgresql_pvc: "{{ get_postgresql_pvc.stdout|from_json }}"
 
       - name: ensure pvc is bound
         fail:

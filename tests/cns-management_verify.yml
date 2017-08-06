@@ -200,7 +200,7 @@
       - name: ensure additional CNS nodes are configured in the inventory
         fail:
           msg: node {{ item }} is not part of the cns group in the inventory
-        when: item in groups['cns']
+        when: item not in groups['cns']
         with_items: "{{ new_cns_nodes_internal_fqdn }}"
 
       - set_fact:
@@ -214,7 +214,7 @@
         shell: iptables -S OS_FIREWALL_ALLOW
         register: iptables_rules
         failed_when: item[0] not in iptables_rules.stdout
-        delegate_to: "{{ item[1] }}"
+        delegate_to: item[1]
         with_items:
           - "{{ iptables_rules }}"
           - "{{ new_cns_nodes_internal_fqdn }}"

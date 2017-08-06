@@ -193,39 +193,39 @@
         failed_when: get_file_uploader_pvc_name.stdout != file_uploader_pvc.metadata.name
         changed_when: false
 
-      - name: ensure additional CNS nodes are configured in the inventory
-
-
-      - name: ensure firewall rules are present on CNS nodes
-
-
-      - name: ensure additional storage nodes have correct label
-
-
-      - name: check daemonset is scaled
-
-
-      - name: check daemonset health
-
-
-      - name: get second cluster id from heketi
-
-
-      - name: check second cluster nodes
-
-
-      - name: check storage class configuration
-
-
-      - name: check presence of additional devices in nodes
-
-
-      - name: check failed device has been removed
-
-
-      - name: check registry pvc from CNS
-
-
-      - name: ensure registry runs on pvc
+      # - name: ensure additional CNS nodes are configured in the inventory
+      #
+      #
+      # - name: ensure firewall rules are present on CNS nodes
+      #
+      #
+      # - name: ensure additional storage nodes have correct label
+      #
+      #
+      # - name: check daemonset is scaled
+      #
+      #
+      # - name: check daemonset health
+      #
+      #
+      # - name: get second cluster id from heketi
+      #
+      #
+      # - name: check second cluster nodes
+      #
+      #
+      # - name: check storage class configuration
+      #
+      #
+      # - name: check presence of additional devices in nodes
+      #
+      #
+      # - name: check failed device has been removed
+      #
+      #
+      # - name: check registry pvc from CNS
+      #
+      #
+      # - name: ensure registry runs on pvc
 
 ...

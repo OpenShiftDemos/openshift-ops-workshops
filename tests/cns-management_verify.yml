@@ -290,7 +290,7 @@
         shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ item }}
         with_items: "{{ cluster2_nodes }}"
         register: cluster2_node
-        failed_when: "{{ node_brick_device2 }} not in cluster2_node.stdout_lines"
+        failed_when: "'{{ node_brick_device2 }}' not in cluster2_node.stdout"
         changed_when: false
 
       - name: get heketi ID of first node of second CNS cluster
@@ -304,7 +304,7 @@
       - name: check that first device has been removed of first node of second cns cluster
         shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ heketi_node_4_id }}
         register: cluster2_node4
-        failed_when: "{{ node_brick_device }} in cluster2_node4.stdout_lines"
+        failed_when: "'{{ node_brick_device }}' in cluster2_node4.stdout"
         changed_when: false
 
       - name: log back in as cluster admin into default namespace

@@ -86,7 +86,7 @@ rails-pgsql-persistent-1-hook-pre   0/1       Terminating   0         1m
 
 Exit out of the watch mode with kbd:[Ctrl + c] when you see the *-deploy and *-hook-pre pods terminating.
 
-NOTE: It may take up to 10 minutes for the deployment to complete.
+NOTE: It may take up to 5 minutes for the deployment to complete.
 
 You should now also see a PVC that has been issued and now being in the _Bound_ state.
 
@@ -612,6 +612,8 @@ glusterfs-m9fvl   1/1       Running   0          3m       {{NODE3_INTERNAL_IP}} 
 heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}}         {{NODE3_INTERNAL_FQDN}}
 ----
 <1> The newly spawned GlusterFS pods.
+
+NOTE: It may take up to 60 seconds for the GlusterFS pods to be up and in _Ready_ state.
 
 The new pods run GlusterFS uninitialized. That is, they have not formed a cluster among themselves yet. This is triggered via heketi.
 

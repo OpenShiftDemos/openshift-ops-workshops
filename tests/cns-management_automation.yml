@@ -291,6 +291,11 @@
         - name: delete the device
           shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device delete {{ heketi_node_4_device_id }}
 
+        tags:
+          - remove-device
+
+      - block:
+        
         - name: log back in as cluster admin into default namespace
           shell: oc login -u system:admin -n default
 
@@ -298,11 +303,6 @@
           template:
             src: ../templates/registry-rwx-pvc.yml.j2
             dest: /tmp/registry-rwx-pvc.yml
-
-        tags:
-          - remove-device
-
-      - block:
 
         - name: create registry pvc
           shell: oc create -f /tmp/registry-rwx-pvc.yml

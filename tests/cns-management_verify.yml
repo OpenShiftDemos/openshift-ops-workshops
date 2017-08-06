@@ -134,61 +134,98 @@
         register: rails_app_rc_check
         failed_when: rails_app_rc_check.stdout != "1"
         changed_when: false
-      #
-      #
-      #
-      #
-      # - name: check project 'my-shared-storage' exists
-      #
-      #
-      # - name: check health of file-uploader deployment
-      #
-      #
-      # - name: check route of file-uploader sevice
-      #
-      #
-      # - name: check replica level of file-uploader deployment
-      #
-      #
-      # - name: ensure rwx pvc exists
-      #
-      #
-      # - name: ensure pvc is part of file-uploader deployment
-      #
-      #
-      # - name: ensure additional CNS nodes are configured in the inventory
-      #
-      #
-      # - name: ensure firewall rules are present on CNS nodes
-      #
-      #
-      # - name: ensure additional storage nodes have correct label
-      #
-      #
-      # - name: check daemonset is scaled
-      #
-      #
-      # - name: check daemonset health
-      #
-      #
-      # - name: get second cluster id from heketi
-      #
-      #
-      # - name: check second cluster nodes
-      #
-      #
-      # - name: check storage class configuration
-      #
-      #
-      # - name: check presence of additional devices in nodes
-      #
-      #
-      # - name: check failed device has been removed
-      #
-      #
-      # - name: check registry pvc from CNS
-      #
-      #
-      # - name: ensure registry runs on pvc
+
+      - name: check if user fancyuser1 can log in to 'my-shared-storage'
+        shell: oc project my-shared-storage
+        changed_when: false
+
+      - name: check health of file-uploader deployment
+        shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="file-uploader")].status.readyReplicas}'
+        register: fileuploader_rc_check
+        failed_when: fileuploader_rc_check.stdout != "3"
+        changed_when: false
+
+      - name: check route of file-uploader sevice
+        shell: oc get route/file-uploader
+        changed_when: false
+
+      - name: ensure rwx pvc exists
+        shell: oc get pvc/file-uploader -o json
+        register: get_file_uploader_pvc
+        changed_when: false
+
+      - set_fact:
+          file_uploader_pvc: "{{ get_file_uploader_pvc.stdout|from_json }}"
+
+      - name: ensure pvc is bound
+        fail:
+          msg: pvc is not bound
+        when: file_uploader_pvc.status.phase != "Bound"
+
+      - name: ensure pvc is issued against CNS
+        fail:
+          msg: pvc is not satisfied from StorageClass {{ cns_storageclass }}
+        when: file_uploader_pvc.metadata.annotations['volume.beta.kubernetes.io/storage-class'] != cns_storageclass
+
+      - shell: oc login -u system:admin -n my-database-app
+        changed_when: false
+
+      - name: check pv is exists
+        shell: oc get pv/{{ file_uploader_pvc.spec.volumeName }} -o json
+        register: get_file_uploader_pv
+        changed_when: false
+
+      - set_fact:
+          postgresql_pv: "{{ get_file_uploader_pv.stdout|from_json }}"
+
+      - name: check pv is provided by CNS
+        fail:
+          msg: pv is not provided by {{ cns_storageclass }}
+        when: postgresql_pv.metadata.annotations['volume.beta.kubernetes.io/storage-class'] != cns_storageclass
+
+      - name: log back in as fancyuser1 to my-shared-storage namespace
+        shell: oc login -u fancyuser1 -p openshift -n my-shared-storage
+        changed_when: false
+
+      - name: ensure pv is file-uploader deployment config contains pvc
+        shell: oc get dc/file-uploader -o jsonpath='{$.spec.template.spec.volumes[0].persistentVolumeClaim.claimName}'
+        register: get_file_uploader_pvc_name
+        failed_when: get_file_uploader_pvc_name.stdout != file_uploader_pvc.metadata.name
+        changed_when: false
+
+      - name: ensure additional CNS nodes are configured in the inventory
+
+
+      - name: ensure firewall rules are present on CNS nodes
+
+
+      - name: ensure additional storage nodes have correct label
+
+
+      - name: check daemonset is scaled
+
+
+      - name: check daemonset health
+
+
+      - name: get second cluster id from heketi
+
+
+      - name: check second cluster nodes
+
+
+      - name: check storage class configuration
+
+
+      - name: check presence of additional devices in nodes
+
+
+      - name: check failed device has been removed
+
+
+      - name: check registry pvc from CNS
+
+
+      - name: ensure registry runs on pvc
 
 ...

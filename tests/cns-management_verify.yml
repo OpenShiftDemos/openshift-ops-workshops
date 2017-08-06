@@ -267,7 +267,7 @@
         changed_when: false
 
       - name: check second set of cns nodes are pods in second cns cluster
-        shell: oc get pods -o wide -n container-native-storage -o jsonpath='{$.items[?(@.status.hostIP=="{{ (item|from_json).hostnames.storage|first }}")].metadata.name}'
+        shell: oc get pods -o wide -n container-native-storage -o jsonpath='{$.items[?(@.status.hostIP=="{{ (item.stdout|from_json).hostnames.storage|first }}")].metadata.name}'
         register: get_cluster2_node
         with_items: "{{ get_cluster2_node_infos.results }}"
         failed_when: get_cluster2_node.stdout == ""

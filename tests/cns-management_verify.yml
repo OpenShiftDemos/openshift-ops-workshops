@@ -66,7 +66,7 @@
         when: postgresql_pv.metadata.annotations['volume.beta.kubernetes.io/storage-class'] != cns_storageclass
 
       - name: get storage class
-        shell: oc get storageclass/cns-gold -o json
+        shell: oc get storageclass/{{ cns_storageclass }} -o json
         register: get_storageclass1
         changed_when: false
 
@@ -204,7 +204,7 @@
         with_items: "{{ new_cns_nodes_internal_fqdn }}"
 
       - set_fact:
-          iptables_rules
+          iptables_rules:
             - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT"
             - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT"
             - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT"
@@ -214,14 +214,14 @@
         shell: iptables -S OS_FIREWALL_ALLOW
         register: iptables_rules
         failed_when: item[0] not in iptables_rules.stdout
-        delegate_to: item[1]
-        with_items:
+        delegate_to: "{{ item[1] }}"
+        with_nested:
           - "{{ iptables_rules }}"
           - "{{ new_cns_nodes_internal_fqdn }}"
         changed_when: False
 
       - name: ensure additional storage nodes have correct label
-        shell: oc get nodes -l storagenode=glusterfs -o jsonpath='{$.items[?(@.metadata.name=="{{ item }}].metadata.name}'
+        shell: oc get nodes -l storagenode=glusterfs -o jsonpath='{$.items[?(@.metadata.name=="{{ item }}")].metadata.name}'
         register: node_label_check
         failed_when: node_label_check.stdout != item
         with_items: "{{ new_cns_nodes_internal_fqdn }}"
@@ -242,25 +242,73 @@
           - check_daemonset_ready.stdout|int < check_daemonset_desired.stdout|int
         changed_when: false
 
+      - name: get second cluster-id from heketi
+        shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster list --json
+        register: heketi_cluster_list
 
-      # - name: get second cluster id from heketi
-      #
-      #
-      # - name: check second cluster nodes
-      #
-      #
-      # - name: check storage class configuration
-      #
-      #
-      # - name: check presence of additional devices in nodes
-      #
-      #
-      # - name: check failed device has been removed
-      #
-      #
-      # - name: check registry pvc from CNS
-      #
-      #
-      # - name: ensure registry runs on pvc
+      - set_fact:
+          heketi_clusters: "{{heketi_cluster_list.stdout|from_json}}"
+
+      - set_fact:
+          clusterid2: "{{heketi_clusters.clusters|difference([clusterid1])|first}}"
+
+      - name: get nodes from heketi using CNS cluster id 2
+        shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster info {{ clusterid2 }} --json
+        register: get_cluster2_nodes
+        changed_when: false
+
+      - set_fact:
+          cluster2_node_ids: "{{ get_cluster2_nodes.stdout|from_json }}"
+
+      - name: get IPs of the nodes in the second CNS cluster
+        shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ item }} --json
+        with_items: "{{ cluster2_node_ids }}"
+        register: get_cluster2_node_infos
+        changed_when: false
+
+      - name: check second set of cns nodes are pods in second cns cluster
+        shell: oc get pods -o wide -n container-native-storage -o jsonpath='{$.items[?(@.status.hostIP=="{{ (item|from_json).hostnames.storage|first }}")].metadata.name}'
+        register: get_cluster2_node
+        with_items: "{{ get_cluster2_node_infos.results }}"
+        failed_when: get_cluster2_node.stdout == ""
+        changed_when: false
+
+      - name: get second storage class
+        shell: oc get storageclass/{{ cns_storageclass2 }} -o json
+        register: get_storageclass2
+        changed_when: false
+
+      - set_fact:
+          storageclass2: "{{ get_storageclass2.stdout|from_json }}"
+
+      - name: check second storage class carries second clusters id
+        fail:
+          msg: "cluster id {{ clusterid2 }} is not set in storageclass {{ cns_storageclass2 }}"
+        when: storageclass2.parameters.clusterid != clusterid2
+
+      - name: check presence of additional devices in nodes
+        shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ item }}
+        with_items: "{{ cluster2_node_ids }}"
+        register: cluster2_node
+        failed_when: "{{ node_brick_device2 }} not in cluster2_node.stdout_lines"
+        changed_when: false
+
+      - name: get heketi ID of first node of second CNS cluster
+        shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info | grep -B4 {{ node4_internal_fqdn }} | awk 'match($0, /Node Id: ([a-z0-9].*)/, result) { print result[1] }'"
+        register: heketi_node_4_query
+
+      - set_fact:
+          heketi_node_4_id: "{{ heketi_node_4_query.stdout }}"
+
+      - name: check that first device has been removed of first node of second cns cluster
+        shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ heketi_node_4_id }}
+        register: cluster2_node4
+        failed_when: "{{ node_brick_device }} in cluster2_node4.stdout_lines"
+        changed_when: false
+
+      - name: check registry pvc from CNS
+
+
+      - name: ensure registry runs on pvc
 
 ...

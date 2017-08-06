@@ -296,6 +296,7 @@
       - name: get heketi ID of first node of second CNS cluster
         shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info | grep -B4 {{ node4_internal_fqdn }} | awk 'match($0, /Node Id: ([a-z0-9].*)/, result) { print result[1] }'"
         register: heketi_node_4_query
+        changed_when: false
 
       - set_fact:
           heketi_node_4_id: "{{ heketi_node_4_query.stdout }}"
@@ -306,9 +307,21 @@
         failed_when: "{{ node_brick_device }} in cluster2_node4.stdout_lines"
         changed_when: false
 
+      - name: log back in as cluster admin into default namespace
+        shell: oc login -u system:admin -n default
+
       - name: check registry pvc from CNS
+        shell: oc get pvc/registry-storage -o json
+        register: get_registry_pvc
+        changed_when: false
 
+      - set_fact:
+          registry_pvc: "{{ get_registry_pvc.stdout|from_json }}"
 
-      - name: ensure registry runs on pvc
+      - name: ensure pv is file-uploader deployment config contains pvc
+        shell: oc get dc/docker-registry -o jsonpath='{$.spec.template.spec.volumes[0].persistentVolumeClaim.claimName}'
+        register: get_registry_pvc_name
+        failed_when: get_registry_pvc_name.stdout != get_registry_pvc.metadata.name
+        changed_when: false
 
 ...

@@ -258,11 +258,11 @@
         changed_when: false
 
       - set_fact:
-          cluster2_node_ids: "{{ get_cluster2_nodes.stdout|from_json }}"
+          cluster2_nodes: "{{ (get_cluster2_nodes.stdout|from_json).nodes }}"
 
       - name: get IPs of the nodes in the second CNS cluster
         shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ item }} --json
-        with_items: "{{ cluster2_node_ids }}"
+        with_items: "{{ cluster2_nodes }}"
         register: get_cluster2_node_infos
         changed_when: false
 
@@ -288,7 +288,7 @@
 
       - name: check presence of additional devices in nodes
         shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ item }}
-        with_items: "{{ cluster2_node_ids }}"
+        with_items: "{{ cluster2_nodes }}"
         register: cluster2_node
         failed_when: "{{ node_brick_device2 }} not in cluster2_node.stdout_lines"
         changed_when: false

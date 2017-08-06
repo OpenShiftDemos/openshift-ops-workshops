@@ -47,7 +47,7 @@
       - name: ensure pvc is issued against CNS
         fail:
           msg: pvc is not satisfied from StorageClass {{ cns_storageclass }}
-        when: postgresql_pvc.metadata.annotations.["volume.beta.kubernetes.io/storage-class"] != cns_storageclass
+        when: postgresql_pvc.metadata.annotations['volume.beta.kubernetes.io/storage-class'] != cns_storageclass
 
       - shell: login -u system:admin -n my-database-app
         changed_when: false
@@ -63,7 +63,7 @@
       - name: check pv is provided by CNS
         fail:
           msg: pv is not provided by {{ cns_storageclass }}
-        when: postgresql_pv.metadata.annotations.["volume.beta.kubernetes.io/storage-class"] != cns_storageclass
+        when: postgresql_pv.metadata.annotations['volume.beta.kubernetes.io/storage-class'] != cns_storageclass
 
       - name: get storage class
         shell: oc get storageclass/cns-gold -o json

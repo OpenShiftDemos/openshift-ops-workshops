@@ -4,27 +4,83 @@
   hosts: masters
 
   tasks:
-    
+
+    - include_vars: /opt/lab/environment.yml
+
+    - set_fact:
+        api_health_url: "{{ API_HEALTH_URL }}"
+        ocp_routing_suffix: "{{ OCP_ROUTING_SUFFIX }}"
+
     - name: Checking if the 'oc version' is correctly installed
       command: oc version
       register: version
       failed_when: version.stdout_lines[0] != "oc v3.5.5.31"  or version.stdout_lines[1] != "kubernetes v1.5.2+43a9be4"
+      changed_when: false
 
-    - name: Checking status of all the nodes to be 'Ready' 
+    - name: Checking status of all the nodes to be 'Ready'
       command: oc get -o jsonpath='{.status.conditions[?(@.reason=="KubeletReady")].type}' node {{ item }}
       with_items:
         - "{{ groups.nodes }}"
       register: status_of_node
-      failed_when: "'Ready' not in status_of_node.stdout"      
-      
+      failed_when: "'Ready' not in status_of_node.stdout"
+      changed_when: false
+
     - name: Checking if master node is unschedulable
       command: oc get -o jsonpath='{.spec.unschedulable}' node {{ item }}
       with_items:
         - "{{ groups.masters }}"
       register: master
-      failed_when: "'true' not in master.stdout"      
-      
-    - name: Running diagnostics test and display errors if any found
-      command: oc adm diagnostics
-      become_user: root
+      failed_when: "'true' not in master.stdout"
+      changed_when: false
+
+    - name: Validate the public address
+      uri:
+        url: "{{ api_health_url }}"
+        validate_certs: False
+        status_code: 200
+        method: GET
+      changed_when: false
+
+    - block:
+
+        - name: login as cluster admin
+          shell: oc login -u system:admin
+          changed_when: false
+
+        - name: create the validation project
+          command: "oc new-project validate"
+
+        - name: create hello world app
+          shell: "oc new-app cakephp-mysql-example"
+
+        - name: wait for msql db to be ready
+          shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.name=="mysql")].status.readyReplicas}'
+          register: mysql_db_rc_check
+          until: mysql_db_rc_check.stdout == "1"
+          changed_when: false
+          retries: 60
+          delay: 10
+
+        - name: wait for cake-php app to be ready
+          shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.name=="cakephp-mysql-example")].status.readyReplicas}'
+          register: cakephp_app_rc_check
+          until: cakephp_app_rc_check.stdout == "1"
+          changed_when: false
+          retries: 60
+          delay: 10
+
+        - name: check the status of the page
+          uri:
+            url: "http://cakephp-mysql-example-validate.{{ ocp_routing_suffix }}"
+            status_code: 200
+            method: GET
+          register: cakephp_app_route_check
+          until: cakephp_app_route_check|success and cakephp_app_route_check.status == 200
+          retries: 60
+          delay: 10
+
+        - name: delete the project
+          command: "oc delete project validate"
+
+      tags: canary-app
 ...

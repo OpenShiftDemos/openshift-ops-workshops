@@ -1138,7 +1138,7 @@ Resources:
       KeyName:
         Ref: KeyName
       SecurityGroupIds:
-        - !GetAtt IdmSecurityGroup
+        - !GetAtt IdmSecurityGroup.GroupId
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:

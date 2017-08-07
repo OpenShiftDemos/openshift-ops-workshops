@@ -48,7 +48,7 @@
         status_code: 200
         method: GET
       register: cakephp_app_route_check
-      until: result|success and result.status == 200
+      until: cakephp_app_route_check|success and cakephp_app_route_check.status == 200
       retries: 60
       delay: 10
 

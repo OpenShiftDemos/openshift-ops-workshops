@@ -43,7 +43,7 @@ This will deploy the metric collection and visualization stack on OpenShift. All
 
 NOTE: In this environment the persistent storage for the metrics store Cassandra will come from CNS. While functionally working it is at this time not recommended to store the metrics data on CNS for production environment. This is currently under testing and in parallel a more efficient CNS implementation for metrics and logging data in OpenShift is being developed.
 
-CAUTION: In this lab environment it can take up to 2-3 minutes after the metrics playbook finishes for the Hawkular stack to finish intialization. During this time you might see this error message in the UI: image::openshift-metrics-pods.png[] +
+CAUTION: In this lab environment it can take up to 2-3 minutes after the metrics playbook finishes for the Hawkular stack to finish intialization. During this time you might see this error message in the UI: image::openshift-metrics-url-error.png[] +
 This will disappear as soon as the hawkular-metrics pods are in _Ready_ state.
 
 As cluster admin, verify the metrics components are running in the `openshift-infra` namespace:
@@ -74,6 +74,9 @@ In the OpenShift UI ({{ WEB_CONSOLE_URL }}) you can see metric graphs appearing 
 
 .The OpenShift UI will show history metrics for applications
 image::openshift-metrics-overview.png[]
+
+IMPORTANT: If instead of metrics charts an error message is displayed, stating that the metrics URL could not be reached this is due to your browser not trusting the  self-signed certificates used in this environment. +
+Click the metrics URL https://metrics.{{ OCP_ROUTING_SUFFIX }}/ once and accept the untrusted certificate. Once you return to the OpenShift UI the graphs should start to appear.
 
 NOTE: It might be necessary for you to refresh your browser to see the charts.
 
@@ -117,7 +120,7 @@ The logging components will be deployed in the `logging` namespace. If you are n
 Verify the logging stack components are up and running:
 
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods -n logging
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods
 NAME                          READY     STATUS    RESTARTS   AGE
 logging-curator-1-bm14r       1/1       Running   0          7m
 logging-es-wihwmf7x-1-kpsc0   1/1       Running   0          7m
@@ -146,3 +149,7 @@ logging-kibana   kibana.apps.{{ OCP_ROUTING_SUFFIX }}             logging-kibana
 ----
 
 As stated above the UI should be reachable via https://kibana.apps.{{ OCP_ROUTING_SUFFIX }}/ - login with OpenShift user credentials of either an administrative account or a user account.
+
+The _Kibana_ user interface appears, providing reach controls to search through logs from all over the cluster.
+
+image::openshift-logging-kibana-ui.png[]

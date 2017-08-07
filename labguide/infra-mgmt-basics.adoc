@@ -4,9 +4,9 @@ Overview
 In this lab you are introduced to some basic management concepts of the OpenShift Container Platform. This is largely driven by automation through openshift-ansible which makes operations easy and predictable. +
 By the end of this module you should have your cluster extended by another 3 nodes, 1 nodes briefly put into maintenance and the cluster pruned of unnecessary data.
 
-### Overview of Logging and Metrics
+## Overview of Logging and Metrics
 
-## Deploying and using Metrics
+### Deploying and using Metrics
 
 _Metrics_ in OpenShift refers to the continuous collection of performance and utilization data of pods and nodes in the cluster. It allows for centralized monitoring in the OpenShift UI and automated horizontal scaling of pods based on utilization.
 
@@ -25,7 +25,7 @@ Modify (update or add) the inventory settings in the `[OSEv3:vars]` section as f
 [OSEv3:vars]
 ...
 openshift_metrics_install_metrics=true
-openshift_metrics_cassandra_storage_type=dynamic
+openshift_metrics_cassandra_storage_type=pv
 openshift_metrics_cassandra_pvc_size=10Gi
 openshift_metrics_cassanda_pvc_storage_class_name={{ CNS_STORAGECLASS }}
 openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }}
@@ -43,7 +43,8 @@ This will deploy the metric collection and visualization stack on OpenShift. All
 
 NOTE: In this environment the persistent storage for the metrics store Cassandra will come from CNS. While functionally working it is at this time not recommended to store the metrics data on CNS for production environment. This is currently under testing and in parallel a more efficient CNS implementation for metrics and logging data in OpenShift is being developed.
 
-CAUTION: In this lab environment it can take up to 2-3 minutes after the metrics playbook finishes for the Hawkular stack to finish intialization.
+CAUTION: In this lab environment it can take up to 2-3 minutes after the metrics playbook finishes for the Hawkular stack to finish intialization. During this time you might see this error message in the UI: image::openshift-metrics-pods.png[] +
+This will disappear as soon as the hawkular-metrics pods are in _Ready_ state.
 
 As cluster admin, verify the metrics components are running in the `openshift-infra` namespace:
 
@@ -80,7 +81,7 @@ In the context of a specific pod the *Metrics* tab in the UI will show metrics f
 
 image::openshift-metrics-pods.png[]
 
-## Deploying and using Logging
+### Deploying and using Logging
 
 Equally important to performance metrics is collecting and aggregating logs from the environments and the application pods it is running. OpenShift ships with an elastic log aggregation solution: *EFK*. +
 **E**lasticSearch, **F**luentd and **K**ibana forms a configuration where logs from all nodes and applications are consolidated (Fluentd) in a central place (ElasticSearch) on top of which rich queries can be made from a single UI (Kibana). Administrators can see and search through all logs, application owners and developers can allow access logs that belong to their projects. +

@@ -648,7 +648,7 @@ Resources:
                   bindPassword: ldapadmin
                   rfc2307:
                     groupsQuery:
-                      baseDN: 
+                      baseGroups: 
                       derefAliases: never
                       filter: '(|(cn=ose-*))'
                     groupUIDAttribute: dn
@@ -657,7 +657,7 @@ Resources:
                     groupMembershipAttributes:
                     - member
                     usersQuery:
-                      baseDN: 
+                      baseUsers: 
                       derefAliases: never
                     userUIDAttribute: dn
                     userNameAttributes:

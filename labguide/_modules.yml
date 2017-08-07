@@ -86,10 +86,18 @@ modules:
     name: Cluster Management Basics
   infra-mgmt-basics:
     name: Infrastructure Management Basics
+    requires:
+      - installation
+      - cns-deploy
+    vars:
+      - CNS_NAMESPACE: "container-native-storage"
+      - CNS_STORAGECLASS: "cns-gold"
   cns-management:
     name: Container-native Storage Management
     requires:
+      - installation
       - cns-deploy
+      - infra-mgmt-basics
     vars:
       HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
       CNS_STORAGECLASS: "cns-gold"

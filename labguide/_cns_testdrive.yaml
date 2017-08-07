@@ -14,3 +14,7 @@ vars:
 modules:
   activate:
   - environment
+  - installation
+  - cns-deploy
+  - cluster-mgmt-basics
+  - cns-management

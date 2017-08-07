@@ -90,8 +90,8 @@ modules:
       - installation
       - cns-deploy
     vars:
-      - CNS_NAMESPACE: "container-native-storage"
-      - CNS_STORAGECLASS: "cns-gold"
+      CNS_NAMESPACE: "container-native-storage"
+      CNS_STORAGECLASS: "cns-gold"
   cns-management:
     name: Container-native Storage Management
     requires:

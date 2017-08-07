@@ -6,18 +6,22 @@ The host preparation and prerequisites needed for the installation have already 
 *Step 1. Examining the provided Ansible inventory file -*
 Let us start by examining the Ansible inventory files which contains the host information.
 To perform the further steps, you will need to run the commands on the 'master' host.
-The master and other nodes are running as AWS EC-2 RHEL instances.
+
 
 To get the private key, download from the Qwiklabs page that pops up right after you click on the class and press `Start`. Store it on the localhost machine and keep note of the `path` where you have downloaded the .pem key.
 
-When you will log into the Fleet console and go to Services -> EC2 -> Instances. Click on the master host instance and look for the `Public DNS`. It should show a page with details -
+The Ip to log into the master host will be in the `STACK OUTPUTS:` block , under the `Additional information` section -
+
+example -
+
+`MasterIPAddress:  54.164.181.5`
 
 image::ec21.png[]
 
 Use this command to SSH into the master host -
 
 [literal]
-$ ssh -i <path/private_key.pem> cloud-user@<Public_DNS>
+$ ssh -i <path/private_key.pem> cloud-user@<Public_DNS_IP>
 
 Replace `path`by the path where you have stored the private keyand replace <Public_DNS> by the information shown on instance page.
 

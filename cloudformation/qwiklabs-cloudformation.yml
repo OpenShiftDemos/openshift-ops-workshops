@@ -785,6 +785,8 @@ Resources:
                     userNameAttributes:
                     - uid
                 path: /home/cloud-user/groupsync.yaml
+                owner: cloud-user
+                group: cloud-user
 
               - content: |
                   {

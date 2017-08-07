@@ -16,35 +16,41 @@
         status_code: 200
         method: GET
 
+    - name: login as cluster admin
+      shell: oc login -u system:admin
+      changed_when: false
+
     - name: Create the validation project
       command: "oc new-project validate"
 
     - name: Create Hello world app
       shell: "oc new-app cakephp-mysql-example"
 
-    - name: Wait for build to complete
-      shell: "oc get pod | grep -v deploy | awk '/cakephp-mysql-example-1-build/{ print $3 }'"
-      register: build_output
-      until: build_output.stdout | search("Completed")
-      retries: 30
-      delay: 15
+    - name: wait for msql db to be ready
+      shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.name=="mysql")].status.readyReplicas}'
+      register: cakephp_app_rc_check
+      until: cakephp_app_rc_check.stdout == "1"
+      changed_when: false
+      retries: 60
+      delay: 10
 
-    - name: Wait for App to be running
-      shell: "oc get pod | grep -v deploy | grep -v build  | awk '/cakephp-mysql-example-1-*/{print $3}'"
-      register: deployer_output
-      until: deployer_output.stdout | search("Running")
-      retries: 30
-      delay: 15
-
-    - name: Sleep to allow for route propegation
-      pause:
-        seconds: 10
+    - name: wait for cake-php app to be ready
+      shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.name=="cakephp-mysql-example")].status.readyReplicas}'
+      register: cakephp_app_rc_check
+      until: cakephp_app_rc_check.stdout == "1"
+      changed_when: false
+      retries: 60
+      delay: 10
 
     - name: check the status of the page
       uri:
         url: "http://cakephp-mysql-example-validate.{{ ocp_routing_suffix }}"
         status_code: 200
         method: GET
+      register: cakephp_app_route_check
+      until: result|success and result.status == 200
+      retries: 60
+      delay: 10
 
     - name: Delete the Project
       command: "oc delete project validate"

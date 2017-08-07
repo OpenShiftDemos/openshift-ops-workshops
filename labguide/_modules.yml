@@ -54,6 +54,8 @@ config:
       value: "192.168.0.106"
     - name: WEB_CONSOLE_URL
       value: "https://master.example.com/console"
+    - name: API_HEALTH_URL
+      value: "https://openshift.example.com/healthz/ready"
 
 modules:
   environment:

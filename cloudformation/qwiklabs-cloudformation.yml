@@ -970,6 +970,7 @@ Resources:
                   NODE5_INTERNAL_FQDN: "node05.internal.${PublicHostedZone}"
                   NODE6_INTERNAL_FQDN: "node06.internal.${PublicHostedZone}"
                   WEB_CONSOLE_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
+                  API_HEALTH_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                 path: /opt/lab/environment.yml
                 owner: root:root
 
@@ -1184,6 +1185,7 @@ Resources:
                 NODE6_INTERNAL_FQDN="node06.internal.${PublicHostedZone}"
                 NODE6_INTERNAL_IP="${WorkerNode6.PrivateIp}"
                 WEB_CONSOLE_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
+                API_HEALTH_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                 NODE_BRICK_DEVICE="/dev/xvdd"
                 NODE_BRICK_DEVICE2="/dev/xvde"
                 CNS_NAMESPACE="container-native-storage"

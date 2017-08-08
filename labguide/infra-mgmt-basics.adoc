@@ -2,7 +2,79 @@
 Overview
 --------
 In this lab you are introduced to some basic management concepts of the OpenShift Container Platform. This is largely driven by automation through openshift-ansible which makes operations easy and predictable. +
-By the end of this module you should have your cluster extended by another 3 nodes, 1 nodes briefly put into maintenance and the cluster pruned of unnecessary data.
+By the end of this module you should have your cluster extended by another 3 nodes, deployed logging and metrics facilities put 1 node briefly put into maintenance and have the cluster pruned of unnecessary data.
+
+## Extending the cluster
+
+Log in as cluster administrator:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc login -u system:admin
+
+Verify your cluster currently consists of 5 nodes, of which one is marked as _Not Schedulable_ (the Master).
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get nodes
+....
+----
+
+Use the label specified as the default node selector for pods in the inventory file  `/etc/ansible/hosts` to verify that your cluster currently has 3 application nodes:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get nodes -l region=apps
+....
+----
+
+Extending the cluster works by adding a new set of hosts to a group called `new_nodes` in the `openshift-ansible` installer's inventory and run a playbook that ships with the installer.
+
+Your environment has been provisioned with 3 additional nodes you have not used so far. The are already configured in the inventory file but commented out. +
+Remove the comment sign `#` in front of `new_nodes` in the `OSEv3` group to include that subgroup. Also remove the comments in front of that groups definition, so that your inventory file looks like the following:
+
+[source,ini]
+./etc/ansible/hosts
+----
+[OSEv3:children]
+masters
+nodes
+etcd
+new_nodes
+
+...
+
+[new_nodes]
+{{ NODE4_INTERNAL_FQDN }} openshift_node_labels="{'region': 'apps'}" openshift_hostname={{ NODE4_INTERNAL_FQDN }} openshift_public_hostname={{ NODE4_EXTERNAL_FQDN }}
+{{ NODE5_INTERNAL_FQDN }} openshift_node_labels="{'region': 'apps'}" openshift_hostname={{ NODE5_INTERNAL_FQDN }} openshift_public_hostname={{ NODE5_EXTERNAL_FQDN }}
+{{ NODE6_INTERNAL_FQDN }} openshift_node_labels="{'region': 'apps'}" openshift_hostname={{ NODE6_INTERNAL_FQDN }} openshift_public_hostname={{ NODE6_EXTERNAL_FQDN }}
+
+...
+
+----
+
+With the new hosts known by the installer you can use ansible to verify they are indeed online:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ ansible new_nodes -m ping
+....
+----
+
+In your environment those nodes have been already prepared to run OpenShift. This includes:
+
+1. Having access to required repositories to obtain OpenShift and docker
+2. Having docker installed and configured
+3. Ensure the provider firewall is configured to allow OpenShift traffic
+4. Sufficient local storage capacity provisioned
+
+To extend your cluster run the following playbook:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml
+
+The playbook takes 1-2 minutes to complete. When done verify the amount of application nodes known to OpenShift has been increased from 3 to 6:
+
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get nodes -l region=apps
+....
+----
+
+TIP: Although not covered in this exercise, it's also possible to add new master nodes. The procedure is similar with the difference of executing another playbook.
 
 ## Overview of Logging and Metrics
 
@@ -50,7 +122,7 @@ As cluster admin, verify the metrics components are running in the `openshift-in
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc login -u system:admin -n openshift-infra
-Logged into "https://{{ MASTER_INTERNAL_FQDN }}/:443" as "system:admin" using existing credentials.
+Logged into "https://{{ MASTER_INTERNAL_FQDN }}:443/" as "system:admin" using existing credentials.
 
 You have access to the following projects and can switch between them with 'oc project <projectname>':
 
@@ -153,3 +225,61 @@ As stated above the UI should be reachable via https://kibana.apps.{{ OCP_ROUTIN
 The _Kibana_ user interface appears, providing reach controls to search through logs from all over the cluster.
 
 image::openshift-logging-kibana-ui.png[]
+
+## Node maintenance
+
+It is possible to put any node of the OpenShift environment into maintenance by marking it as non-schedulable following by _evacuation_ of all pods on the node.
+
+These operations require elevated privileges. Ensure you are logged in as cluster admin:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc login -u system:admin
+
+You will see by now that there are pods running on almost all of your nodes:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods --all-namespaces -o wide
+
+When a node needs to undergo maintenance like replacing degraded hardware components or updating packages you can temporarily remove it from OpenShift like so:
+
+Mark node `{{ NODE2_INTERNAL_FQDN }}` as non-schedulable to prevent the schedulers in the system to place any new workloads on it:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oadm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=false
+
+Confirm the nodes is marked as non-schedulable:
+----
+[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get nodes
+....
+----
+
+Marking the node out like this did not impact the pods it is running. List those pods:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oadm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
+
+Depending on previous actions this node will run at least the pods associated with logging and Container-native Storage but also application pods.
+
+The next step is to evacuate the pods to other nodes in the cluster. You can first simulate what actions the system would perform during evacuation with the following command:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oadm manage-node {{ NODE2_INTERNAL_FQDN }} --evacuate --dry-run
+
+IMPORTANT: As the command output indicates, pods running on the node as part of a `DaemonSet` like those associated to Logging, Metrics or CNS would *not* be evacuated. They will not be accessible anymore through OpenShift but simply continue to run as docker containers on the nodes until the local OpenShift services are stopped or the node is shutdown. +
+This is not a problem since software like CNS or the OpenShift Metrics stack is designed to handle such situations transparently.
+
+Start the evacuation process like this:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oadm manage-node {{ NODE2_INTERNAL_FQDN }} --evacuate
+
+After a few moments, all of the pods, except the fluentd and glusterfs-pods, previously running on `{{ NODE2_INTERNAL_FQDN }}` should have terminated and new copies are restarted elsewhere.
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods --all-namespaces -o wide
+
+This has put `{{ NODE2_INTERNAL_FQDN }}` into a state where an administrator can start maintenance operations. If those include a reboot of the system or upgrading the OpenShift services (`atomic-openshift-node`) the pods associated CNS, Logging and Metrics would come backup automatically up system/service restart. +
+The system is still in non-schedulable though. Let's fix that.
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oadm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=true
+
+With this the node will be ready again to accept newly scheduled workloads. Confirm one last time the node is in _Ready_ state:
+
+  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get node/{{ NODE2_INTERNAL_FQDN }}
+
+## Manipulating multi-tenant networking
+
+## Pruning data

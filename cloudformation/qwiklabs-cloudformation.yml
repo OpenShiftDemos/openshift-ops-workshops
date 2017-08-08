@@ -133,6 +133,22 @@ Resources:
         Value:
           Ref: AWS::StackId
 
+  DhcpOptions:
+    Type: "AWS::EC2::DHCPOptions"
+    Properties:
+      DomainName: internal.aws.testdrive.openshift.com
+      DomainNameServers:
+        - AmazonProvidedDNS
+
+  VPCDHCPOptionsAssociation:
+    Type: AWS::EC2::VPCDHCPOptionsAssociation
+    Properties:
+      VpcId:
+        Ref: VPC
+      DhcpOptionsId:
+        Ref: DhcpOptions
+
+
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -415,6 +431,105 @@ Resources:
         ToPort: 65535
         CidrIp: 0.0.0.0/0
 
+  InternalDNS:
+    Type: "AWS::Route53::HostedZone"
+    DependsOn:
+      - VPC
+      - Master1
+      - InfraNode1
+      - IdmNode1
+      - WorkerNode1
+      - WorkerNode2
+      - WorkerNode3
+      - WorkerNode4
+      - WorkerNode5
+      - WorkerNode6
+    Properties:
+      HostedZoneConfig:
+        Comment: "Internal Hosted Zone"
+      Name: internal.aws.testdrive.openshift.com
+      VPCs:
+      -
+        VPCId: !Ref "VPC"
+        VPCRegion: !Ref "AWS::Region"
+
+  InternalRoute53Records:
+    Type: AWS::Route53::RecordSetGroup
+    DependsOn:
+      - Master1
+      - InfraNode1
+      - IdmNode1
+      - WorkerNode1
+      - WorkerNode2
+      - WorkerNode3
+      - WorkerNode4
+      - WorkerNode5
+      - WorkerNode6
+      - InternalDNS
+    Properties:
+      HostedZoneName: !Join ['', [internal., !Ref 'PublicHostedZone', .]]
+      RecordSets:
+        - Name: !Join ['', [master.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt Master1.PrivateIp
+
+        - Name: !Join ['', [infra.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt InfraNode1.PrivateIp
+
+        - Name: !Join ['', [idm.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt IdmNode1.PrivateIp
+
+        - Name: !Join ['', [labguide.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt GuideNode.PrivateIp
+
+        - Name: !Join ['', [node01.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode1.PrivateIp
+
+        - Name: !Join ['', [node02.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode2.PrivateIp
+
+        - Name: !Join ['', [node03.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode3.PrivateIp
+
+        - Name: !Join ['', [node04.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode4.PrivateIp
+
+
+        - Name: !Join ['', [node05.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode5.PrivateIp
+
+        - Name: !Join ['', [node06.internal., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt WorkerNode6.PrivateIp
+
   Route53Records:
     Type: AWS::Route53::RecordSetGroup
     DependsOn:
@@ -565,8 +680,8 @@ Resources:
               device: /dev/xvdc
               partition: auto
 
-            fqdn: master.${AWS::AccountId}.${PublicHostedZone}
-            manage_etc_hosts: true
+            fqdn: master.internal.${PublicHostedZone}
+
 
             write_files:
             - content: |
@@ -593,6 +708,7 @@ Resources:
                   #new_nodes
 
                   [OSEv3:vars]
+                  ansible_become=true
                   deployment_type=openshift-enterprise
                   containerized=true
                   openshift_master_api_port=443
@@ -610,33 +726,39 @@ Resources:
                   openshift_hosted_logging_deploy=false
 
                   [etcd]
-                  master.${AWS::AccountId}.${PublicHostedZone}
+                  master.internal.${PublicHostedZone}
 
                   [masters]
-                  master.${AWS::AccountId}.${PublicHostedZone}
+                  master.internal.${PublicHostedZone}
 
                   [nodes]
-                  master.${AWS::AccountId}.${PublicHostedZone}
-                  infra.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}"
-                  node01.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node02.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  node03.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  master.internal.${PublicHostedZone} openshift_hostname=master.internal.${PublicHostedZone} openshift_public_hostname=master.${AWS::AccountId}.${PublicHostedZone}
+                  infra.internal.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}" openshift_hostname=infra.internal.${PublicHostedZone} openshift_public_hostname=infra.${AWS::AccountId}.${PublicHostedZone}
+                  node01.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node01.internal.${PublicHostedZone} openshift_public_hostname=node01.${AWS::AccountId}.${PublicHostedZone}
+                  node02.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node02.internal.${PublicHostedZone} openshift_public_hostname=node02.${AWS::AccountId}.${PublicHostedZone}
+                  node03.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"  openshift_hostname=node03.internal.${PublicHostedZone} openshift_public_hostname=node03.${AWS::AccountId}.${PublicHostedZone}
 
                   #[new_nodes]
-                  #node04.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  #node05.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
-                  #node06.${AWS::AccountId}.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"
+                  #node04.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node04.internal.${PublicHostedZone} openshift_public_hostname=node04.${AWS::AccountId}.${PublicHostedZone}
+                  #node05.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node05.internal.${PublicHostedZone} openshift_public_hostname=node05.${AWS::AccountId}.${PublicHostedZone}
+                  #node06.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node06.internal.${PublicHostedZone} openshift_public_hostname=node06.${AWS::AccountId}.${PublicHostedZone}
 
                   [cns]
-                  node01.${AWS::AccountId}.${PublicHostedZone}
-                  node02.${AWS::AccountId}.${PublicHostedZone}
-                  node03.${AWS::AccountId}.${PublicHostedZone}
-                  #node04.${AWS::AccountId}.${PublicHostedZone}
-                  #node05.${AWS::AccountId}.${PublicHostedZone}
-                  #node06.${AWS::AccountId}.${PublicHostedZone}
+                  node01.internal.${PublicHostedZone}
+                  node02.internal.${PublicHostedZone}
+                  node03.internal.${PublicHostedZone}
+                  #node04.internal.${PublicHostedZone}
+                  #node05.internal.${PublicHostedZone}
+                  #node06.internal.${PublicHostedZone}
+
+                  [cns:vars]
+                  ansible_become=true
 
                   [idm]
-                  idm.${AWS::AccountId}.${PublicHostedZone}
+                  idm.internal.${PublicHostedZone}
+
+                  [idm:vars]
+                  ansible_become=true
                 path: /etc/ansible/hosts
 
               - content: |
@@ -663,6 +785,8 @@ Resources:
                     userNameAttributes:
                     - uid
                 path: /home/cloud-user/groupsync.yaml
+                owner: cloud-user
+                group: cloud-user
 
               - content: |
                   {
@@ -673,7 +797,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "${WorkerNode1.PrivateDnsName}"
+                                                  "node01.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode1.PrivateIp}"
@@ -689,7 +813,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "${WorkerNode2.PrivateDnsName}"
+                                                  "node02.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode2.PrivateIp}"
@@ -705,7 +829,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "${WorkerNode3.PrivateDnsName}"
+                                                  "node03.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode3.PrivateIp}"
@@ -734,7 +858,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "${WorkerNode1.PrivateDnsName}"
+                                                  "node01.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode1.PrivateIp}"
@@ -750,7 +874,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "${WorkerNode2.PrivateDnsName}"
+                                                  "node02.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode2.PrivateIp}"
@@ -766,7 +890,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "${WorkerNode3.PrivateDnsName}"
+                                                  "node03.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode3.PrivateIp}"
@@ -786,7 +910,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "${WorkerNode4.PrivateDnsName}"
+                                                  "node04.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode4.PrivateIp}"
@@ -802,7 +926,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "${WorkerNode5.PrivateDnsName}"
+                                                  "node05.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode5.PrivateIp}"
@@ -818,7 +942,7 @@ Resources:
                                       "node": {
                                           "hostnames": {
                                               "manage": [
-                                                  "${WorkerNode6.PrivateDnsName}"
+                                                  "node06.internal.${PublicHostedZone}"
                                               ],
                                               "storage": [
                                                   "${WorkerNode6.PrivateIp}"
@@ -851,10 +975,11 @@ Resources:
                   NODE4_EXTERNAL_FQDN: "node04.${AWS::AccountId}.${PublicHostedZone}"
                   NODE5_EXTERNAL_FQDN: "node05.${AWS::AccountId}.${PublicHostedZone}"
                   NODE6_EXTERNAL_FQDN: "node06.${AWS::AccountId}.${PublicHostedZone}"
-                  NODE4_INTERNAL_FQDN: "${WorkerNode4.PrivateDnsName}"
-                  NODE5_INTERNAL_FQDN: "${WorkerNode5.PrivateDnsName}"
-                  NODE6_INTERNAL_FQDN: "${WorkerNode6.PrivateDnsName}"
+                  NODE4_INTERNAL_FQDN: "node04.internal.${PublicHostedZone}"
+                  NODE5_INTERNAL_FQDN: "node05.internal.${PublicHostedZone}"
+                  NODE6_INTERNAL_FQDN: "node06.internal.${PublicHostedZone}"
                   WEB_CONSOLE_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
+                  API_HEALTH_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                 path: /opt/lab/environment.yml
                 owner: root:root
 
@@ -910,8 +1035,7 @@ Resources:
           !Sub |
             #cloud-config
 
-            fqdn: infra.${AWS::AccountId}.${PublicHostedZone}
-            manage_etc_hosts: true
+            fqdn: infra.internal.${PublicHostedZone}
 
             write_files:
             - content: |
@@ -941,7 +1065,6 @@ Resources:
             system_info:
               default_user:
                 name: cloud-user
-
 
   IdmNode1:
     Type: AWS::EC2::Instance
@@ -983,8 +1106,7 @@ Resources:
               default_user:
                 name: cloud-user
 
-            fqdn: idm.${AWS::AccountId}.${PublicHostedZone}
-            manage_etc_hosts: true
+            fqdn: idm.internal.${PublicHostedZone}
 
             runcmd:
             - /usr/local/bin/idm-install
@@ -1032,8 +1154,7 @@ Resources:
             - mounts
             - runcmd
 
-            fqdn: labguide.${AWS::AccountId}.${PublicHostedZone}
-            manage_etc_hosts: true
+            fqdn: labguide.internal.${PublicHostedZone}
 
             write_files:
             - content: |
@@ -1049,32 +1170,33 @@ Resources:
                 OCP_ROUTING_SUFFIX="apps.${AWS::AccountId}.${PublicHostedZone}"
                 MASTER_HOSTNAME="master"
                 MASTER_EXTERNAL_FQDN="master.${AWS::AccountId}.${PublicHostedZone}"
-                MASTER_INTERNAL_FQDN="${Master1.PrivateDnsName}"
-                INFRA_INTERNAL_FQDN="${InfraNode1.PrivateDnsName}"
+                MASTER_INTERNAL_FQDN="master.internal.${PublicHostedZone}"
+                INFRA_INTERNAL_FQDN="infra.internal.${PublicHostedZone}"
                 NODE1_HOSTNAME="node01"
                 NODE1_EXTERNAL_FQDN="node01.${AWS::AccountId}.${PublicHostedZone}"
-                NODE1_INTERNAL_FQDN="${WorkerNode1.PrivateDnsName}"
+                NODE1_INTERNAL_FQDN="node01.internal.${PublicHostedZone}"
                 NODE1_INTERNAL_IP="${WorkerNode1.PrivateIp}"
                 NODE2_HOSTNAME="node02"
                 NODE2_EXTERNAL_FQDN="node02.${AWS::AccountId}.${PublicHostedZone}"
-                NODE2_INTERNAL_FQDN="${WorkerNode2.PrivateDnsName}"
+                NODE2_INTERNAL_FQDN="node02.internal.${PublicHostedZone}"
                 NODE2_INTERNAL_IP="${WorkerNode2.PrivateIp}"
                 NODE3_HOSTNAME="node03"
                 NODE3_EXTERNAL_FQDN="node03.${AWS::AccountId}.${PublicHostedZone}"
-                NODE3_INTERNAL_FQDN="${WorkerNode3.PrivateDnsName}"
+                NODE3_INTERNAL_FQDN="node03.internal.${PublicHostedZone}"
                 NODE3_INTERNAL_IP="${WorkerNode3.PrivateIp}"
                 NODE4_EXTERNAL_FQDN="node04.${AWS::AccountId}.${PublicHostedZone}"
-                NODE4_INTERNAL_FQDN="${WorkerNode4.PrivateDnsName}"
+                NODE4_INTERNAL_FQDN="node04.internal.${PublicHostedZone}"
                 NODE4_INTERNAL_IP="${WorkerNode4.PrivateIp}"
                 NODE5_EXTERNAL_FQDN="node05.${AWS::AccountId}.${PublicHostedZone}"
-                NODE5_INTERNAL_FQDN="${WorkerNode5.PrivateDnsName}"
+                NODE5_INTERNAL_FQDN="node05.internal.${PublicHostedZone}"
                 NODE5_INTERNAL_IP="${WorkerNode5.PrivateIp}"
                 NODE6_EXTERNAL_FQDN="node06.${AWS::AccountId}.${PublicHostedZone}"
-                NODE6_INTERNAL_FQDN="${WorkerNode6.PrivateDnsName}"
+                NODE6_INTERNAL_FQDN="node06.internal.${PublicHostedZone}"
                 NODE6_INTERNAL_IP="${WorkerNode6.PrivateIp}"
                 WEB_CONSOLE_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
+                API_HEALTH_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                 NODE_BRICK_DEVICE="/dev/xvdd"
-                NODE_BRICK_DEVICE2="/dev/xvdd"
+                NODE_BRICK_DEVICE2="/dev/xvde"
                 CNS_NAMESPACE="container-native-storage"
                 CNS_STORAGECLASS="cns-gold"
                 CNS_STORAGECLASS2="cns-silver"
@@ -1106,7 +1228,6 @@ Resources:
             - ansible master -m wait_for -a "path=/etc/origin/master/ipa-ca.crt timeout=600"
             - ansible localhost -m wait_for -a "port=80 host=localhost"
             - 'curl -X PUT -H "Content-Type:" --data-binary "{ \"Status\" : \"SUCCESS\", \"Reason\": \"Configuration Complete\", \"UniqueId\": \"GuideNode\",\"Data\": \"GuideNode has reached all instances and generated lab guide\" }" "${WaitHandle}"'
-
 
   WorkerNode1:
     Type: AWS::EC2::Instance
@@ -1159,8 +1280,7 @@ Resources:
             - disk_setup
             - mounts
 
-            fqdn: node01.${AWS::AccountId}.${PublicHostedZone}
-            manage_etc_hosts: true
+            fqdn: node01.internal.${PublicHostedZone}
 
             fs_setup:
             - label: emptydir
@@ -1241,8 +1361,7 @@ Resources:
             - disk_setup
             - mounts
 
-            fqdn: node02.${AWS::AccountId}.${PublicHostedZone}
-            manage_etc_hosts: true
+            fqdn: node02.internal.${PublicHostedZone}
 
             fs_setup:
             - label: emptydir
@@ -1323,8 +1442,7 @@ Resources:
             - disk_setup
             - mounts
 
-            fqdn: node03.${AWS::AccountId}.${PublicHostedZone}
-            manage_etc_hosts: true
+            fqdn: node03.internal.${PublicHostedZone}
 
             fs_setup:
             - label: emptydir
@@ -1410,8 +1528,7 @@ Resources:
             - disk_setup
             - mounts
 
-            fqdn: node04.${AWS::AccountId}.${PublicHostedZone}
-            manage_etc_hosts: true
+            fqdn: node04.internal.${PublicHostedZone}
 
             fs_setup:
             - label: emptydir
@@ -1497,8 +1614,7 @@ Resources:
             - disk_setup
             - mounts
 
-            fqdn: node05.${AWS::AccountId}.${PublicHostedZone}
-            manage_etc_hosts: true
+            fqdn: node05.internal.${PublicHostedZone}
 
             fs_setup:
             - label: emptydir
@@ -1584,8 +1700,7 @@ Resources:
             - disk_setup
             - mounts
 
-            fqdn: node06.${AWS::AccountId}.${PublicHostedZone}
-            manage_etc_hosts: true
+            fqdn: node06.internal.${PublicHostedZone}
 
             fs_setup:
             - label: emptydir

@@ -54,6 +54,8 @@ config:
       value: "192.168.0.106"
     - name: WEB_CONSOLE_URL
       value: "https://master.example.com/console"
+    - name: API_HEALTH_URL
+      value: "https://openshift.example.com/healthz/ready"
 
 modules:
   environment:
@@ -69,8 +71,6 @@ modules:
       ETHERPAD_URL_PREFIX:
   installation:
     name: Installation and Verification
-  cluster-mgmt-basics:
-    name: Cluster Management Basics
   cns-deploy:
     name: Deploying Container-native Storage
     requires:
@@ -82,13 +82,26 @@ modules:
       HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
       HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
       CNS_STORAGECLASS: "cns-gold"
+  cluster-mgmt-basics:
+    name: Cluster Management Basics
+  infra-mgmt-basics:
+    name: Infrastructure Management Basics
+    requires:
+      - installation
+      - cns-deploy
+    vars:
+      CNS_NAMESPACE: "container-native-storage"
+      CNS_STORAGECLASS: "cns-gold"
   cns-management:
     name: Container-native Storage Management
     requires:
+      - installation
       - cns-deploy
+      - infra-mgmt-basics
     vars:
       HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
       CNS_STORAGECLASS: "cns-gold"
       CNS_STORAGECLASS2: "cns-silver"
       CNS_NAMESPACE: "container-native-storage"
+      NODE_BRICK_DEVICE: "/dev/xvdd"
       NODE_BRICK_DEVICE2: "/dev/xvde"

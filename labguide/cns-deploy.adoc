@@ -15,7 +15,7 @@ Make sure you are logged on to the master node.
 
 
   [cloud-user@{{MASTER_HOSTNAME}} ~]$ hostname
-  {{MASTER_EXTERNAL_FQDN}}
+  {{MASTER_INTERNAL_FQDN}}
 
 
 First, verify that the CNS deployment tool is installed. +

@@ -19,6 +19,12 @@
         regexp: '^openshift_master_identity_providers='
         path: /etc/ansible/hosts
 
+    - name: Configure bindDN in groupsync.yaml
+      lineinfile:
+        line: "bindDN: uid=admin,cn=users,cn=accounts,dc=auth,{{ dc_values }}"
+        regexp: '^bindDN:'
+        path: /home/cloud-user/groupsync.yaml
+
     - name: Configure baseDN in groupsync.yaml for Groups Query
       lineinfile:
         line: "    baseDN: cn=groups,cn=accounts,dc=auth,{{ dc_values }}"
@@ -37,7 +43,5 @@
         line: "url: ldap://{{ idm_fqdn }}/cn=users,cn=accounts,dc=auth,{{ dc_values }}?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,{{ dc_values }})"
         regexp: '^url:'
         path: /home/cloud-user/groupsync.yaml
-
-
    
 ...

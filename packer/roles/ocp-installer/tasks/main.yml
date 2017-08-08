@@ -14,6 +14,7 @@
       - bridge-utils
       - bash-completion
       - atomic-openshift-clients
+      - dnsmasq
       - atomic-openshift-utils
       - atomic-openshift-excluder-3.5.5.26-1.git.0.276cbb4.el7
       - atomic-openshift-docker-excluder-3.5.5.26-1.git.0.276cbb4.el7

@@ -51,6 +51,7 @@
 
       - name: run cns-deploy
         shell: cns-deploy --yes -n {{cns_namespace}} -g /home/cloud-user/topology.json --admin-key '{{heketi_admin_pw}}' --user-key '{{heketi_user_pw}}'
+        become: true
 
       - set_fact:
           heketi_admin_pw_base64: "{{HEKETI_ADMIN_PW_BASE64 }}"

@@ -708,6 +708,7 @@ Resources:
                   #new_nodes
 
                   [OSEv3:vars]
+                  ansible_become=true
                   deployment_type=openshift-enterprise
                   containerized=true
                   openshift_master_api_port=443
@@ -750,8 +751,14 @@ Resources:
                   #node05.internal.${PublicHostedZone}
                   #node06.internal.${PublicHostedZone}
 
+                  [cns:vars]
+                  ansible_become=true
+
                   [idm]
                   idm.internal.${PublicHostedZone}
+
+                  [idm:vars]
+                  ansible_become=true
                 path: /etc/ansible/hosts
 
               - content: |
@@ -778,6 +785,8 @@ Resources:
                     userNameAttributes:
                     - uid
                 path: /home/cloud-user/groupsync.yaml
+                owner: cloud-user
+                group: cloud-user
 
               - content: |
                   {

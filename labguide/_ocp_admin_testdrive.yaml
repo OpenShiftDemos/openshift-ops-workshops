@@ -17,4 +17,5 @@ modules:
   - installation
   - cns-deploy
   - cluster-mgmt-basics
+  - infra-mgmt-basics
   - cns-management

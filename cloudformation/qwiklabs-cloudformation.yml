@@ -412,7 +412,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
-        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ] 
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
         FromPort: 443
         ToPort: 443
@@ -1041,6 +1041,11 @@ Resources:
                   NODE4_EXTERNAL_FQDN: "node04.${AWS::AccountId}.${PublicHostedZone}"
                   NODE5_EXTERNAL_FQDN: "node05.${AWS::AccountId}.${PublicHostedZone}"
                   NODE6_EXTERNAL_FQDN: "node06.${AWS::AccountId}.${PublicHostedZone}"
+                  MASTER_INTERNAL_FQDN: "master.internal.${PublicHostedZone}" 
+                  INFRA_INTERNAL_FQDN: "infra.internal.${PublicHostedZone}"
+                  NODE1_INTERNAL_FQDN: "node01.internal.${PublicHostedZone}"
+                  NODE2_INTERNAL_FQDN: "node02.internal.${PublicHostedZone}"
+                  NODE3_INTERNAL_FQDN: "node03.internal.${PublicHostedZone}"
                   NODE4_INTERNAL_FQDN: "node04.internal.${PublicHostedZone}"
                   NODE5_INTERNAL_FQDN: "node05.internal.${PublicHostedZone}"
                   NODE6_INTERNAL_FQDN: "node06.internal.${PublicHostedZone}"

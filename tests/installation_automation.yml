@@ -1,6 +1,6 @@
 ---
  
-- hosts: localhost
+- hosts: masters
 
   tasks:
     - name: Running the Ansible Playbook to kickstart the OCP installation

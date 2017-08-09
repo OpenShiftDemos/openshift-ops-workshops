@@ -20,3 +20,4 @@ modules:
   - ldap-groupsync
   - infra-mgmt-basics
   - cns-management
+  - skipping-ahead

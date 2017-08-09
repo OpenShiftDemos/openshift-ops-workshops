@@ -56,6 +56,8 @@ config:
       value: "https://master.example.com/console"
     - name: API_HEALTH_URL
       value: "https://openshift.example.com/healthz/ready"
+    - name: CODE_CLONE_LOCATION
+      value: "/opt/lab/code"
 
 modules:
   environment:
@@ -82,6 +84,10 @@ modules:
       HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
       HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
       CNS_STORAGECLASS: "cns-gold"
+  cluster-mgmt-basics:
+    name: Cluster Management Basics
+    requires:
+      - installation
   defaultproj_template:
     name: Create a Default Project Template (Quota and Limits)
   ldap-groupsync:
@@ -107,3 +113,5 @@ modules:
       CNS_NAMESPACE: "container-native-storage"
       NODE_BRICK_DEVICE: "/dev/xvdd"
       NODE_BRICK_DEVICE2: "/dev/xvde"
+  skipping-ahead:
+    name: Skipping modules

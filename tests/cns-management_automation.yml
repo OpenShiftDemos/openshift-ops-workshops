@@ -194,10 +194,9 @@
           become: true
 
       - name: insert iptables rules required for GlusterFS
-        blockinfile:
+        lineinfile:
           dest: /etc/sysconfig/iptables
-          block: |
-            :OS_FIREWALL_ALLOW - [0:0]
+          line: ':OS_FIREWALL_ALLOW - [0:0]'
           insertbefore: "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"
         become: true
 

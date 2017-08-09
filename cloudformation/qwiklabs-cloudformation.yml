@@ -830,13 +830,13 @@ Resources:
               - content: |
                   kind: LDAPSyncConfig
                   apiVersion: v1
-                  url: ldap://idm.unset.ocp-admin.aws.openshifttestdrive.com
+                  url: ldap://idm.internal.aws.testdrive.openshift.com
                   ca: /etc/origin/master/ipa-ca.crt
-                  bindDN: uid=admin,cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
+                  bindDN: uid=admin,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
                   bindPassword: ldapadmin
                   rfc2307:
                     groupsQuery:
-                      baseDN: cn=groups,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
+                      baseDN: cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
                       derefAliases: never
                       filter: '(|(cn=ose-*))'
                     groupUIDAttribute: dn
@@ -845,7 +845,7 @@ Resources:
                     groupMembershipAttributes:
                     - member
                     usersQuery:
-                      baseDN: cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
+                      baseDN: cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
                       derefAliases: never
                     userUIDAttribute: dn
                     userNameAttributes:

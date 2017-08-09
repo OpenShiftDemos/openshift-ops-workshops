@@ -362,6 +362,72 @@ Resources:
         ToPort: 65535
         CidrIp: 0.0.0.0/0
 
+  IdmSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Ref: VPC
+      GroupDescription: Firewall definition for Idm
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 389
+        ToPort: 389
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 88
+        ToPort: 88
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 88
+        ToPort: 88
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 123
+        ToPort: 123
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: udp
+        FromPort: 464
+        ToPort: 464
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 464
+        ToPort: 464
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 749
+        ToPort: 749
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 636
+        ToPort: 636
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: icmp
+        FromPort: -1
+        ToPort: -1
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      SecurityGroupEgress:
+      - IpProtocol: -1
+        FromPort: 0
+        ToPort: 65535
+        CidrIp: 0.0.0.0/0
+
+
   MasterSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -764,13 +830,13 @@ Resources:
               - content: |
                   kind: LDAPSyncConfig
                   apiVersion: v1
-                  url: 
+                  url: ldap://idm.internal.aws.testdrive.openshift.com
                   ca: /etc/origin/master/ipa-ca.crt
-                  bindDN: 
+                  bindDN: uid=admin,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
                   bindPassword: ldapadmin
                   rfc2307:
                     groupsQuery:
-                      baseGroups: 
+                      baseDN: cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
                       derefAliases: never
                       filter: '(|(cn=ose-*))'
                     groupUIDAttribute: dn
@@ -779,7 +845,7 @@ Resources:
                     groupMembershipAttributes:
                     - member
                     usersQuery:
-                      baseUsers: 
+                      baseDN: cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
                       derefAliases: never
                     userUIDAttribute: dn
                     userNameAttributes:
@@ -975,6 +1041,11 @@ Resources:
                   NODE4_EXTERNAL_FQDN: "node04.${AWS::AccountId}.${PublicHostedZone}"
                   NODE5_EXTERNAL_FQDN: "node05.${AWS::AccountId}.${PublicHostedZone}"
                   NODE6_EXTERNAL_FQDN: "node06.${AWS::AccountId}.${PublicHostedZone}"
+                  MASTER_INTERNAL_FQDN: "master.internal.${PublicHostedZone}" 
+                  INFRA_INTERNAL_FQDN: "infra.internal.${PublicHostedZone}"
+                  NODE1_INTERNAL_FQDN: "node01.internal.${PublicHostedZone}"
+                  NODE2_INTERNAL_FQDN: "node02.internal.${PublicHostedZone}"
+                  NODE3_INTERNAL_FQDN: "node03.internal.${PublicHostedZone}"
                   NODE4_INTERNAL_FQDN: "node04.internal.${PublicHostedZone}"
                   NODE5_INTERNAL_FQDN: "node05.internal.${PublicHostedZone}"
                   NODE6_INTERNAL_FQDN: "node06.internal.${PublicHostedZone}"
@@ -1081,7 +1152,7 @@ Resources:
       KeyName:
         Ref: KeyName
       SecurityGroupIds:
-        - !GetAtt NodeSecurityGroup.GroupId
+        - !GetAtt IdmSecurityGroup.GroupId
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:

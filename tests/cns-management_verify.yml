@@ -219,6 +219,7 @@
           - "{{ iptables_rules }}"
           - "{{ new_cns_nodes_internal_fqdn }}"
         changed_when: False
+        become: true
 
       - name: ensure additional storage nodes have correct label
         shell: oc get nodes -l storagenode=glusterfs -o jsonpath='{$.items[?(@.metadata.name=="{{ item }}")].metadata.name}'

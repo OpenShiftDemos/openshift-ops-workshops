@@ -6,20 +6,25 @@ The host preparation and prerequisites needed for the installation have already 
 *Step 1. Examining the provided Ansible inventory file -*
 Let us start by examining the Ansible inventory files which contains the host information.
 To perform the further steps, you will need to run the commands on the 'master' host.
-The master and other nodes are running as AWS EC-2 RHEL instances.
+
 
 To get the private key, download from the Qwiklabs page that pops up right after you click on the class and press `Start`. Store it on the localhost machine and keep note of the `path` where you have downloaded the .pem key.
 
-When you will log into the Fleet console and go to Services -> EC2 -> Instances. Click on the master host instance and look for the `Public DNS`. It should show a page with details -
+The IP to log into the master host will be in the `STACK OUTPUTS:` block , under the `Additional information` section -
 
-image::ec21.png[]
+example -
+
+`MasterIPAddress:  54.164.181.5`
+
+NOTE: This information will be available only after the `AWS CF State` of the lab is `CREATE_COMPLETE`, it takes about 5 minutes to get to this stage and is displayed on the top left of the page.
+
 
 Use this command to SSH into the master host -
 
 [literal]
-$ ssh -i <path/private_key.pem> cloud-user@<Public_DNS>
+$ ssh -i <path/private_key.pem> cloud-user@<Master_IP-Address>
 
-Replace `path`by the path where you have stored the private keyand replace <Public_DNS> by the information shown on instance page.
+Replace `path`by the path where you have stored the private keyand replace <Master_IP-Address> by the information shown on the page after you start the lab.
 
 1) Check the /etc/ansible/hosts to view the configurations done for clouster variables and host variables:
 
@@ -58,11 +63,12 @@ The above command runs the ansible playbook to start the advanced installation.
 
 
 *Step 3. Verifying the Installation -*
-1) Run as 'root' user on the master node :
+1) Run the following on the master node :
 
  # oc get nodes
 
-Using the above command verify that the master is started and the nodes are in Ready status.
+Using the above command verify that the master is started and the nodes are in Ready status. Also, check that the master is not scheduled yet by checking its 'Status' in the output of the command.
+
 The result should be similar to -
 
 [literal]
@@ -80,21 +86,3 @@ Point your browser to {{WEB_CONSOLE_URL}} in order to reach the management inter
 3) Now that the installation has been verified, run the following command on each master and node host to add the atomic-openshift packages back to the list of yum excludes on the host:
 
  # atomic-openshift-excluder exclude
-
-4) *Diagnostics Tool* :
-OpenShift also provides a diagnostics tool to verify the cluster and run a series of checks for any errors in the host or cluster.
-
-The diagnostics were added to the 'openshift' binary so that wherever there is an OpenShift Origin server or client, the diagnostics can run in the exact same environment.
-
-To use the diagnostics tool, run this command on the master host. This runs all the available diagnostics, skipping any that do not apply. -
-
-[literal]
-$ oc adm diagnostics
-
-To run selective diagnostics, you can include names in the command -
-[literal]
-$ oc adm diagnostics NodeConfigCheck UnitStatus
-
-To run diagnostics where the master and node configurations are not in the expected locations, use the following command to specify the location -
-[literal]
-$ oc adm diagnostics --master-config=<file_path> --node-config=<file_path>

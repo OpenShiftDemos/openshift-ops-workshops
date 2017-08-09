@@ -832,7 +832,7 @@ Resources:
                   apiVersion: v1
                   url: ldap://idm.internal.aws.testdrive.openshift.com
                   ca: /etc/origin/master/ipa-ca.crt
-                  bindDN: uid=admin,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
+                  bindDN: uid=admin,cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
                   bindPassword: ldapadmin
                   rfc2307:
                     groupsQuery:

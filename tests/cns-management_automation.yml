@@ -193,12 +193,12 @@
           with_items: "{{ new_cns_nodes_internal_fqdn }}"
           become: true
 
-      - name: insert iptables rules required for GlusterFS
-        lineinfile:
-          dest: /etc/sysconfig/iptables
-          line: ':OS_FIREWALL_ALLOW - [0:0]'
-          insertbefore: "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"
-        become: true
+        - name: insert iptables rules required for GlusterFS
+          lineinfile:
+            dest: /etc/sysconfig/iptables
+            line: ':OS_FIREWALL_ALLOW - [0:0]'
+            insertbefore: "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"
+          become: true
 
         - name: reload iptables
           systemd:

@@ -1,0 +1,19 @@
+---
+- name: Automation of the steps in lab module 4.2 
+  hosts: masters
+  
+  tasks:
+    - name: Create the project-request template in the namespace 'default' 
+      command: oc create -f /opt/lab/code/labguide/files/project_request_template.yaml -n default
+      
+    - name: modify the master-config.yaml to create project request template
+      lineinfile:
+        line: '  projectRequestTemplate: "default/project-request"'
+        regexp: '  projectRequestTemplate: ""'
+        path: /etc/origin/master/master-config.yaml
+      become_user: root
+    
+    - name: Restart the service for changes to apply
+      command: systemctl restart atomic-openshift-master
+      become_user: root    
+...      

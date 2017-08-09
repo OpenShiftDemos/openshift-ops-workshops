@@ -88,6 +88,10 @@ modules:
     name: Cluster Management Basics
     requires:
       - installation
+  defaultproj_template:
+    name: Create a Default Project Template (Quota and Limits)
+  ldap-groupsync:
+    name: Using External Authentication Providers (LDAP)  
   infra-mgmt-basics:
     name: Infrastructure Management Basics
     requires:

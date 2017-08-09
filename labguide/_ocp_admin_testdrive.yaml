@@ -16,7 +16,8 @@ modules:
   - environment
   - installation
   - cns-deploy
-  - cluster-mgmt-basics
+  - defaultproj_template
+  - ldap-groupsync
   - infra-mgmt-basics
   - cns-management
   - skipping-ahead

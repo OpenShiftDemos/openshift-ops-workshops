@@ -15,6 +15,13 @@
           insertbefore: "^COMMIT"
         become: true
 
+      - name: insert iptables rules required for GlusterFS
+        lineinfile:
+          dest: /etc/sysconfig/iptables
+          line: ':OS_FIREWALL_ALLOW - [0:0]'
+          insertbefore: "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"
+        become: true
+
       - name: reload iptables
         systemd:
           name: iptables

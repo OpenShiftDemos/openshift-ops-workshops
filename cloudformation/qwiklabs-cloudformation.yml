@@ -830,7 +830,7 @@ Resources:
               - content: |
                   kind: LDAPSyncConfig
                   apiVersion: v1
-                  url: ldap://idm.internal.aws.openshifttestdrive.com
+                  url: ldap://idm.internal.aws.testdrive.openshift.com
                   ca: /etc/origin/master/ipa-ca.crt
                   bindDN: uid=admin,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
                   bindPassword: ldapadmin

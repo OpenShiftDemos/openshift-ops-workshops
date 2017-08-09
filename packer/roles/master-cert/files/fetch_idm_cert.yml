@@ -5,7 +5,7 @@
   tasks:
 
     - set_fact:
-        idm_fqdn: "idm.{{ ansible_domain }}"
+        idm_fqdn: "idm.internal.aws.testdrive.openshift.com"
 
     - name: wait for IDM server to be started
       wait_for:

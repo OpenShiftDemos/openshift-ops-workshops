@@ -14,14 +14,22 @@ Verify your cluster currently consists of 5 nodes, of which one is marked as _No
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get nodes
-....
+NAME                                          STATUS                     AGE
+{{ INFRA_INTERNAL_FQDN }}    Ready                      1h
+{{ MASTER_INTERNAL_FQDN }}   Ready,SchedulingDisabled   1h
+{{ NODE1_INTERNAL_FQDN }}   Ready                      1h
+{{ NODE2_INTERNAL_FQDN }}   Ready                      1h
+{{ NODE3_INTERNAL_FQDN }}   Ready                      1h
 ----
 
 Use the label specified as the default node selector for pods in the inventory file  `/etc/ansible/hosts` to verify that your cluster currently has 3 application nodes:
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get nodes -l region=apps
-....
+NAME                                          STATUS                     AGE
+{{ NODE1_INTERNAL_FQDN }}   Ready                      1h
+{{ NODE2_INTERNAL_FQDN }}   Ready                      1h
+{{ NODE3_INTERNAL_FQDN }}   Ready                      1h
 ----
 
 Extending the cluster works by adding a new set of hosts to a group called `new_nodes` in the `openshift-ansible` installer's inventory and run a playbook that ships with the installer.
@@ -53,7 +61,18 @@ With the new hosts known by the installer you can use ansible to verify they are
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ ansible new_nodes -m ping
-....
+{{ NODE5_INTERNAL_FQDN }} | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+{{ NODE4_INTERNAL_FQDN }} | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+{{ NODE6_INTERNAL_FQDN }} | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
 ----
 
 In your environment those nodes have been already prepared to run OpenShift. This includes:
@@ -71,7 +90,13 @@ The playbook takes 1-2 minutes to complete. When done verify the amount of appli
 
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get nodes -l region=apps
-....
+NAME                                          STATUS                     AGE
+{{ NODE1_INTERNAL_FQDN }}   Ready                      1h
+{{ NODE2_INTERNAL_FQDN }}   Ready                      1h
+{{ NODE3_INTERNAL_FQDN }}   Ready                      1h
+{{ NODE4_INTERNAL_FQDN }}   Ready                      1m
+{{ NODE5_INTERNAL_FQDN }}   Ready                      1m
+{{ NODE6_INTERNAL_FQDN }}   Ready                      1m
 ----
 
 TIP: Although not covered in this exercise, it's also possible to add new master nodes. The procedure is similar with the difference of executing another playbook.
@@ -115,9 +140,6 @@ This will deploy the metric collection and visualization stack on OpenShift. All
 
 NOTE: In this environment the persistent storage for the metrics store Cassandra will come from CNS. While functionally working it is at this time not recommended to store the metrics data on CNS for production environment. This is currently under testing and in parallel a more efficient CNS implementation for metrics and logging data in OpenShift is being developed.
 
-CAUTION: In this lab environment it can take up to 2-3 minutes after the metrics playbook finishes for the Hawkular stack to finish intialization. During this time you might see this error message in the UI: image::openshift-metrics-url-error.png[] +
-This will disappear as soon as the hawkular-metrics pods are in _Ready_ state.
-
 As cluster admin, verify the metrics components are running in the `openshift-infra` namespace:
 
 ----
@@ -142,15 +164,18 @@ hawkular-metrics-0c5c3       1/1       Running   0          10m
 heapster-sv95t               1/1       Running   0          10m
 ----
 
-In the OpenShift UI ({{ WEB_CONSOLE_URL }}) you can see metric graphs appearing next to `DeploymentConfig` object:
+CAUTION: In this lab environment it can take up to 2-3 minutes after the metrics playbook finishes for the Hawkular stack to finish intialization and all pods be in _Ready_ state.
+
+Upon refreshing your browser window, the OpenShift UI ({{ WEB_CONSOLE_URL }}) will start to render metric graphs next to `DeploymentConfig` objects
+
+IMPORTANT: At this point the OpenShift UI might still display an error message, stating that the metrics URL could not be reached. image:openshift-metrics-url-error.png[] +
+This is due to your browser not trusting the self-signed certificates used in this environment. +
+Like suggested, click the metrics URL https://metrics.{{ OCP_ROUTING_SUFFIX }}/ once and accept the untrusted certificate. Then return to the OpenShift UI and the graphs should start to appear.
+
+When done correctly, it looks like this:
 
 .The OpenShift UI will show history metrics for applications
 image::openshift-metrics-overview.png[]
-
-IMPORTANT: If instead of metrics charts an error message is displayed, stating that the metrics URL could not be reached this is due to your browser not trusting the  self-signed certificates used in this environment. +
-Click the metrics URL https://metrics.{{ OCP_ROUTING_SUFFIX }}/ once and accept the untrusted certificate. Once you return to the OpenShift UI the graphs should start to appear.
-
-NOTE: It might be necessary for you to refresh your browser to see the charts.
 
 In the context of a specific pod the *Metrics* tab in the UI will show metrics for this particular pod only with a configurable time-range. Also optionally a _donut_ chart next to a resource appears if the pods was given a consumption limit on this resource (e.g. RAM).
 
@@ -220,7 +245,7 @@ NAME             HOST/PORT                                              PATH    
 logging-kibana   kibana.apps.{{ OCP_ROUTING_SUFFIX }}             logging-kibana   <all>     reencrypt/Redirect   None
 ----
 
-As stated above the UI should be reachable via https://kibana.apps.{{ OCP_ROUTING_SUFFIX }}/ - login with OpenShift user credentials of either an administrative account or a user account.
+As stated above the UI should be reachable via https://kibana.{{ OCP_ROUTING_SUFFIX }}/ - login with OpenShift user credentials of either an administrative account or a user account.
 
 The _Kibana_ user interface appears, providing reach controls to search through logs from all over the cluster.
 
@@ -247,7 +272,15 @@ Mark node `{{ NODE2_INTERNAL_FQDN }}` as non-schedulable to prevent the schedule
 Confirm the nodes is marked as non-schedulable:
 ----
 [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get nodes
-....
+NAME                                          STATUS                     AGE
+{{ INFRA_INTERNAL_FQDN }}    Ready                      1h
+{{ MASTER_INTERNAL_FQDN }}   Ready,SchedulingDisabled   1h
+{{ NODE1_INTERNAL_FQDN }}   Ready                      1h
+{{ NODE2_INTERNAL_FQDN }}   Ready,SchedulingDisabled                      1h
+{{ NODE3_INTERNAL_FQDN }}   Ready                      1h
+{{ NODE4_INTERNAL_FQDN }}   Ready                      15m
+{{ NODE5_INTERNAL_FQDN }}   Ready                      15m
+{{ NODE6_INTERNAL_FQDN }}   Ready                      15m
 ----
 
 Marking the node out like this did not impact the pods it is running. List those pods:
@@ -281,5 +314,3 @@ With this the node will be ready again to accept newly scheduled workloads. Conf
   [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get node/{{ NODE2_INTERNAL_FQDN }}
 
 ## Manipulating multi-tenant networking
-
-## Pruning data

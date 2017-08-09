@@ -13,11 +13,13 @@
             -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
             -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
           insertbefore: "^COMMIT"
+        become: true
 
       - name: reload iptables
         systemd:
           name: iptables
           state: reloaded
+        become: true
 
   - hosts: localhost
 

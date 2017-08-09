@@ -56,6 +56,8 @@ config:
       value: "https://master.example.com/console"
     - name: API_HEALTH_URL
       value: "https://openshift.example.com/healthz/ready"
+    - name: CODE_CLONE_LOCATION
+      value: "/opt/lab/code"
 
 modules:
   environment:

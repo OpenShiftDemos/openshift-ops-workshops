@@ -84,6 +84,8 @@ modules:
       CNS_STORAGECLASS: "cns-gold"
   cluster-mgmt-basics:
     name: Cluster Management Basics
+    requires:
+      - installation
   infra-mgmt-basics:
     name: Infrastructure Management Basics
     requires:
@@ -105,3 +107,5 @@ modules:
       CNS_NAMESPACE: "container-native-storage"
       NODE_BRICK_DEVICE: "/dev/xvdd"
       NODE_BRICK_DEVICE2: "/dev/xvde"
+  skipping-ahead:
+    name: Skipping modules

@@ -19,3 +19,4 @@ modules:
   - cluster-mgmt-basics
   - infra-mgmt-basics
   - cns-management
+  - skipping-ahead

@@ -22,10 +22,16 @@
         node4_internal_fqdn: " {{ NODE4_INTERNAL_FQDN }}"
       tags: always
 
-   - name: uncomment new_nodes line
+    - name: uncomment new_nodes line
       replace:
         regexp: '#\[new_nodes\]'
         replace: '[new_nodes]'
+        path: /etc/ansible/hosts
+
+    - name: uncomment new_nodes line
+      replace:
+        regexp: '#'
+        replace: ''
         path: /etc/ansible/hosts
 
     - name: insert iptables rules required for GlusterFS

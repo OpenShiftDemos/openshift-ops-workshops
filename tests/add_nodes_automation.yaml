@@ -1,0 +1,45 @@
+---
+ 
+- hosts: masters
+  tasks:
+    - name: ensure additional hosts are part of cns group
+      lineinfile:
+        line: "{{ item }}"
+        path: /etc/ansible/hosts
+        insertafter: "^\\[cns\\]"
+        regexp: "^#{{ item }}"
+      with_items: "{{ new_cns_nodes_internal_fqdn }}"
+
+    - name: insert iptables rules required for GlusterFS
+      blockinfile:
+        dest: /etc/sysconfig/iptables
+        block: |
+          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT
+          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
+          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
+          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
+        insertbefore: "^COMMIT"
+      delegate_to: "{{ item }}"
+      with_items: "{{ new_cns_nodes_internal_fqdn }}"
+      become: true
+
+    - name: insert iptables rules required for GlusterFS
+      lineinfile:
+        dest: /etc/sysconfig/iptables
+        line: ':OS_FIREWALL_ALLOW - [0:0]'
+        insertbefore: "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"
+      delegate_to: "{{ item }}"
+      with_items: "{{ new_cns_nodes_internal_fqdn }}"
+      become: true
+
+    - name: reload iptables
+      systemd:
+        name: iptables
+        state: reloaded
+      delegate_to: "{{ item }}"
+      with_items: "{{ new_cns_nodes_internal_fqdn }}"
+      become: true
+
+    - name: Running the Ansible Playbook to kickstart the OCP installation
+      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml
+...

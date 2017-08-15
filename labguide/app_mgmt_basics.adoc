@@ -1,0 +1,172 @@
+## Application Management Basics
+
+
+*Topic 1 - To deploy a sample application*
+(Explain Pod, Services, Routes, DCs, BCs, PV, PVCs (CNS))
+
+In this module,you would deploy a sample application using the 'oc' tool and go through some features like pods, services, routes, etc.
+
+We would deploy a sample application from a DockerHub image. 
+
+Pull the image :-
+
+ # docker pull siamaksade/mapit
+
+Once the image is pulled from the repository, check that the image exists  :-
+
+ # docker images 
+
+Output would be similar to -
+[literal]
+REPOSITORY                                TAG                 IMAGE ID            CREATED             SIZE
+docker.io/siamaksade/mapit                latest              9eca6ec7696a        7 days ago          444.1 MB
+docker.io/osevg/workshopper               0.1                 12e0cad142f2        9 weeks ago         756.3 MB
+
+The previous command should list out all the available images and you can then create an application using :-
+
+ # oc new-app docker.io/siamaksade/mapit
+
+The output would be similar to this -
+[literal]
+--> Found Docker image 9eca6ec (11 days old) from docker.io for "docker.io/siamaksade/mapit"
+
+    * An image stream will be created as "mapit:latest" that will track this image
+    * This image will be deployed in deployment config "mapit"
+    * Ports 8080/tcp, 8778/tcp, 9779/tcp will be load balanced by service "mapit"
+      * Other containers can access this service through the hostname "mapit"
+
+--> Creating resources ...
+    imagestream "mapit" created
+    deploymentconfig "mapit" created
+    service "mapit" created
+--> Success
+    Run 'oc status' to view your app.
+
+
+
+*i) Pods :-*
+Pods are 'one or more containers deployed together on host'. A pod is the smallest compute unit you can define, deploy and manage. Each pod has ben allocated its own internal IP address and will own the entire port range. The containers within pods can share local storage space and networking resources. 
+
+Pods are treated as `static` objects by OpenShift, i.e., one cannot change the pod definition while running. 
+
+Check the running pod for this application using the 'oc' tool.
+
+ # oc get pods 
+
+Run oc describe to get pod details:
+[cloud-user@master ~]$ oc describe pod hello-openshift
+
+Output would look similar to this -
+[literal]
+NAME                       READY     STATUS    RESTARTS   AGE
+docker-registry-1-d869z    1/1       Running   0          32m
+mapit-1-mn7wn              1/1       Running   0          15m
+registry-console-1-rf74x   1/1       Running   0          32m
+router-1-l7bkt             1/1       Running   0          33m
+
+[literal]
+[root@master ~]# oc describe pod mapit-1-mn7wn 
+Name:			mapit-1-mn7wn
+Namespace:		default
+Security Policy:	restricted
+Node:			node02.internal.aws.testdrive.openshift.com/10.0.3.20
+Start Time:		Tue, 15 Aug 2017 14:01:08 +0000
+Labels:			app=mapit
+			deployment=mapit-1
+			deploymentconfig=mapit
+Status:			Running
+IP:			10.130.0.3
+Controllers:		ReplicationController/mapit-1
+Containers:
+  mapit:
+    Container ID:	docker://1d0c8f1d285d477136ee2f60f6db2a57b84c46b73477d933f0735246f6044232
+    Image:		docker.io/siamaksade/mapit@sha256:338a3031df6354e3adc3ba7d559ae22a0f2c79eade68aa72447f821cc7b8370c
+    Image ID:		docker-pullable://docker.io/siamaksade/mapit@sha256:338a3031df6354e3adc3ba7d559ae22a0f2c79eade68aa72447f821cc7b8370c
+    Ports:		8778/TCP, 9779/TCP, 8080/TCP
+    State:		Running
+      Started:		Tue, 15 Aug 2017 14:01:36 +0000
+    Ready:		True
+    Restart Count:	0
+    Volume Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-9z85k (ro)
+    Environment Variables:	<none>
+Conditions:
+  Type		Status
+  Initialized 	True 
+  Ready 	True 
+  PodScheduled 	True 
+Volumes:
+  default-token-9z85k:
+    Type:	Secret (a volume populated by a Secret)
+    SecretName:	default-token-9z85k
+QoS Class:	BestEffort
+Tolerations:	<none>
+Events:
+  FirstSeen	LastSeen	Count	From							SubObjectPath		Type		Reason		Message
+  ---------	--------	-----	----							-------------		--------	------		-------
+  15m		15m		1	{default-scheduler }					Normal		Scheduled	Successfully assigned mapit-1-mn7wn to node02.internal.aws.testdrive.openshift.com
+  15m		15m		1	{kubelet node02.internal.aws.testdrive.openshift.com}spec.containers{mapit}	Normal		Pulling		pulling image "docker.io/siamaksade/mapit@sha256:338a3031df6354e3adc3ba7d559ae22a0f2c79eade68aa72447f821cc7b8370c"
+  15m		15m		1	{kubelet node02.internal.aws.testdrive.openshift.com}spec.containers{mapit}	Normal		Pulled		Successfully pulled image "docker.io/siamaksade/mapit@sha256:338a3031df6354e3adc3ba7d559ae22a0f2c79eade68aa72447f821cc7b8370c"
+  15m		15m		1	{kubelet node02.internal.aws.testdrive.openshift.com}spec.containers{mapit}	Normal		Created		Created container with docker id 1d0c8f1d285d; Security:[seccomp=unconfined]
+  15m		15m		1	{kubelet node02.internal.aws.testdrive.openshift.com}spec.containers{mapit}	Normal		Started		Started container with docker id 1d0c8f1d285d
+
+
+This gives you a detailed description of the pod in which the 'mapit' application is running. You can check some details like `Status` whether it is Running or not, the `Name`, `NameSpace`, `Start Time`, `Labels` if any, the `Node` that it is running in, the `Container` and `Image` being used, etc and the various `Events` that happened.
+
+
+
+
+
+
+*ii) Services :-*
+Service represents group of pods and provides permanent IP and hostname for other applications to use. Service layer connects application components together.
+Services allow simple internal load balancing across application components.
+
+
+
+To examine the details of the service :-
+ $ oc describe service mapit
+[literal] 
+[root@master ~]# oc describe service mapit
+Name:			mapit
+Namespace:		default
+Labels:			app=mapit
+Selector:		app=mapit,deploymentconfig=mapit
+Type:			ClusterIP
+IP:			172.30.35.49
+Port:			8080-tcp	8080/TCP
+Endpoints:		10.130.0.3:8080
+Port:			8778-tcp	8778/TCP
+Endpoints:		10.130.0.3:8778
+Port:			9779-tcp	9779/TCP
+Endpoints:		10.130.0.3:9779
+Session Affinity:	None
+No events.
+
+*iii) Routes :-*
+Routes are a feature of OpenShift Networking. A route exposes service by giving it externally reachable hostname.
+It consists of route name, service selector, and (optional) security configuration. Router can consume defined route and endpoints identified by service. It provides named connectivity and lets external clients reach OpenShift-hosted applications.
+
+To expose a service 'mapit' and create a route for it - 
+[literal]
+[root@master ~]# oc expose svc/mapit --hostname=www.mapit-testdrive.com
+route "mapit" exposed
+
+*Topic 2 - Test Liveliness and Readiness Probes*
+
+Container Health Checks Using Probes:
+
+A probe is a Kubernetes action that periodically performs diagnostics on a running container. Currently, two types of probes exist, each serving a different purpose:
+
+Liveness Probe-
+
+A liveness probe checks if the container in which it is configured is still running. If the liveness probe fails, the kubelet kills the container, which will be subjected to its restart policy. Set a liveness check by configuring the `template.spec.containers.livenessprobe` stanza of a pod configuration.
+
+Readiness Probe-
+
+A readiness probe determines if a container is ready to service requests. If the readiness probe fails a container, the endpoints controller ensures the container has its IP address removed from the endpoints of all services. A readiness probe can be used to signal to the endpoints controller that even though a container is running, it should not receive any traffic from a proxy. Set a readiness check by configuring the `template.spec.containers.readinessprobe` stanza of a pod configuration.
+
+
+
+
+

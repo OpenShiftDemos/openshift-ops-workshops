@@ -84,6 +84,10 @@ modules:
       HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
       HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
       CNS_STORAGECLASS: "cns-gold"
+  app-mgmt-basics:
+    name: Application Management Basics
+    requires:
+      - installation
   cluster-mgmt-basics:
     name: Cluster Management Basics
     requires:

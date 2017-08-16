@@ -1180,7 +1180,7 @@ Resources:
             fqdn: idm.internal.${PublicHostedZone}
 
             runcmd:
-            - /usr/local/bin/idm-install
+            - /usr/local/bin/idm-install > /var/log/idm-install.log
             - reboot
 
   GuideNode:

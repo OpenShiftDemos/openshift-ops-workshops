@@ -56,18 +56,15 @@ do
   # add user to OSE group
   ipa group-add-member ose-user --users=$user
   kdestroy
+  echo -e ldapadmin | kinit admin
   expect -c '
-    spawn kinit '"$user"'
+    spawn ipa user-mod '"$user"' --password
     expect {
-      -re ".*COM:" {
-        send "'"$userpw"'\r"
-        exp_continue
-      }
-      -re ".*password:" {
+      -re ".*Password" {
         send "'"$newpw"'\r"
         exp_continue
       }
-      -re ".*again:" {
+      -re ".*verify:" {
         send "'"$newpw"'\r"
       }
     }

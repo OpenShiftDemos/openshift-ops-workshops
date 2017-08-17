@@ -162,10 +162,171 @@ Liveness Probe-
 
 A liveness probe checks if the container in which it is configured is still running. If the liveness probe fails, the kubelet kills the container, which will be subjected to its restart policy. Set a liveness check by configuring the `template.spec.containers.livenessprobe` stanza of a pod configuration.
 
+
+You can add a liveness probe by using `oc set probe` command. This updates the DC(Deployment Config) and then starts a new deploy for the pod in which application 'mapit' is running. 
+Use the following command to add a liveness probe which will 'echo' 'ok' after checking.
+
+ # oc set probe dc/mapit --liveness -- echo ok
+
+The output will be like -
+[literal]
+deploymentconfig "mapit" updated
+
+And the update deployment config would be like this -
+[literal]
+ # oc get dc -o yaml
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: 2017-08-15T17:34:28Z
+    generation: 2
+    labels:
+      docker-registry: default
+    name: docker-registry
+    namespace: default
+    resourceVersion: "1391"
+    selfLink: /oapi/v1/namespaces/default/deploymentconfigs/docker-registry
+    uid: fd71e03e-81df-11e7-a514-122f751b1c86
+  spec:
+    replicas: 1
+    selector:
+      docker-registry: default
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          docker-registry: default
+      spec:
+        containers:
+        - env:
+          - name: REGISTRY_HTTP_ADDR
+            value: :5000
+          - name: REGISTRY_HTTP_NET
+            value: tcp
+          - name: REGISTRY_HTTP_SECRET
+            value: Ed+qw27zsTbFPIlcvp5/09kseaD1li17nO0U7DYuEII=
+          - name: REGISTRY_MIDDLEWARE_REPOSITORY_OPENSHIFT_ENFORCEQUOTA
+            value: "false"
+          - name: REGISTRY_HTTP_TLS_KEY
+            value: /etc/secrets/registry.key
+          - name: REGISTRY_HTTP_TLS_CERTIFICATE
+            value: /etc/secrets/registry.crt
+          image: openshift3/ose-docker-registry:v3.5.5.31
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 5000
+              scheme: HTTPS
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+
+
+
+
 Readiness Probe-
 
 A readiness probe determines if a container is ready to service requests. If the readiness probe fails a container, the endpoints controller ensures the container has its IP address removed from the endpoints of all services. A readiness probe can be used to signal to the endpoints controller that even though a container is running, it should not receive any traffic from a proxy. Set a readiness check by configuring the `template.spec.containers.readinessprobe` stanza of a pod configuration.
 
+You can add a readiness probe by using `oc set probe` command. This updates the DC(Deployment Config) and then starts a new deploy for the pod in which application 'mapit' is running. 
+Use the following command to add a readiness probe using HTTPS method -
+[literal]
+ # oc set probe dc/mapit --readiness --get-url=https://:8080/health
+deploymentconfig "mapit" updated
+
+The updated deployment config should look like this -
+[literal]
+ # oc get dc mapit -o yaml
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  creationTimestamp: 2017-08-15T18:03:06Z
+  generation: 10
+  labels:
+    app: mapit
+  name: mapit
+  namespace: default
+  resourceVersion: "6961"
+  selfLink: /oapi/v1/namespaces/default/deploymentconfigs/mapit
+  uid: fd074f20-81e3-11e7-a514-122f751b1c86
+spec:
+  replicas: 1
+  selector:
+    app: mapit
+    deploymentconfig: mapit
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftNewApp
+      creationTimestamp: null
+      labels:
+        app: mapit
+        deploymentconfig: mapit
+    spec:
+      containers:
+      - image: docker.io/siamaksade/mapit@sha256:338a3031df6354e3adc3ba7d559ae22a0f2c79eade68aa72447f821cc7b8370c
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - echo
+            - ok
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: mapit
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8778
+          protocol: TCP
+        - containerPort: 9779
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTPS
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
 
 
 

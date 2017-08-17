@@ -12,4 +12,10 @@
     - "{{ ose_infra_images }}"
     - "{{ cns_core_images }}"
 
+- name: download other images
+  docker_image:
+    name: "{{ item }}"
+  with_items:
+    - "{{ other_images }}"
+
 ...

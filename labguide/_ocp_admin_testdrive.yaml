@@ -7,9 +7,6 @@ content:
 
 vars:
   ENVIRONMENT: "Amazon Web Services"
-  MASTERS: "1"
-  INFRA: "1"
-  NODES: "3"
 
 modules:
   activate:

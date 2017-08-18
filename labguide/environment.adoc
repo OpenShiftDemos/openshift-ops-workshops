@@ -1,16 +1,37 @@
 ## Environment Overview
 
 You will be interacting with an OpenShift environment that is running on {{ ENVIRONMENT }}. The environment consists of the following systems:
-* {{ MASTERS }} master nodes
-* {{ INFRA }} infrastructure nodes
-* {{ NODES }} "application" nodes
 
-You will be installing OpenShift Container Platform v3.5 by using Ansible playbooks. The inventory file has alreayd been configured and you can view the contents of the file in the first lab module. It will give you information on how the hosts are configured and other information like cluster variables and platform variables.
+* 1 master node
+* 1 infrastructure node
+* 6 "application" nodes
+** 3 will run workload and the initial Container Native Storage instances
+** 3 will be added to the cluster later
+* 1 server running Red Hat Identity Management (for LDAP authentication)
+* 1 server providing this lab guide
 
-The nodes are named as -
-1) Master Node - Master1
-2) Infrastructure Node - InfraNode1
-3) Application Nodes - WorkerNode1, WorkerNode2, WorkerNode3
+You will be installing OpenShift Container Platform v3.5 using the advanced
+installation method, driven by Ansible playbooks. You will also install
+Container Native Storage.
 
-You will be using the Master node to install OpenShift and verify the installation. 
-Qwiklabs will be used to start the lab and the instances can be used to log in via AWS platform.
+You will only need to SSH into the master host to perform all of these
+exercises. However, should you wish to explore the other hosts in the
+environment, the naming covention is as follows:
+
+The hosts are:
+
+. Master - `master`
+. Infrastructure Node - `infra`
+. Application Nodes - `node01` through `node06`
+. IDM server - `idm`
+. Lab guide - `labguide`
+
+You will see various code and command blocks throughout these exercises. Some of
+the command blocks can be copy/pasted directly. Others will require modification
+of the command before execution. If you see a command block with a red border
+(see below), the command will require slight modification.
+
+[source,role=copypaste]
+----
+some command to modify
+----

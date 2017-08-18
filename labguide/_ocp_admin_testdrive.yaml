@@ -14,7 +14,7 @@ modules:
   - installation
   - cns-deploy
   - app-mgmt-basics
-  - defaultproj-template
+  - template-quota-limits
   - ldap-groupsync
   - infra-mgmt-basics
   - cns-management

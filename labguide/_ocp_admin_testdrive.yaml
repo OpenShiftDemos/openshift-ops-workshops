@@ -16,7 +16,8 @@ modules:
   - environment
   - installation
   - cns-deploy
-  - defaultproj_template
+  - app-mgmt-basics
+  - defaultproj-template
   - ldap-groupsync
   - infra-mgmt-basics
   - cns-management

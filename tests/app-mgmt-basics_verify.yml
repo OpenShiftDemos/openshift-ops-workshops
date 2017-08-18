@@ -1,0 +1,27 @@
+---
+- name: Testing Application Management Basics module
+  hosts: masters
+  become_user: root
+  tasks:
+
+    - name: Login as system:admin
+      command: oc login -u system:admin
+
+    - name: Check for app-management project
+      command: oc get project app-management
+
+    - name: Check for mapit dc
+      command: oc get dc mapit
+
+    - name: Check for mapit route
+      command: oc get route mapit
+
+    - name: Check if mapit pod is there
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+
+    - name: Check for mapit liveness probe
+      command: oc get dc mapit -o jsonpath='{.spec.template.spec.containers[?(@.name=="mapit")].livenessProbe}'
+
+    - name: Check for mapit readiness probe
+      command: oc get dc mapit -o jsonpath='{.spec.template.spec.containers[?(@.name=="mapit")].readinessProbe}'
+

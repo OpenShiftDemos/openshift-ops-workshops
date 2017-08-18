@@ -1,13 +1,10 @@
 ---
-
 - name: Verification tests for lab module 4.3
   hosts: masters
-
   tasks:
 
-    - name: Login as cluster:admin so as to list all groups and projects
-      command: oc login -u teamuser1 -p openshift
-      become_user : root
+    - name: Login as system:admin so as to list all groups and projects
+      command: oc login -u system:admin
 
     - name: Checking if all the groups have been created by 'oc adm groups sync'
       command: oc get group {{ item }}

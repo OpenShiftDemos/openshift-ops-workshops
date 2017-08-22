@@ -92,12 +92,12 @@ modules:
     name: Cluster Management Basics
     requires:
       - installation
-  defaultproj-template:
-    name: Create a Default Project Template (Quota and Limits)
+  ldap-groupsync:
+    name: Using External Authentication Providers (LDAP)
+  template-quota-limits:
+    name: Project Template, Quota, and Limits
     requires:
       - installation
-  ldap-groupsync:
-    name: Using External Authentication Providers (LDAP)  
   infra-mgmt-basics:
     name: Infrastructure Management Basics
     requires:

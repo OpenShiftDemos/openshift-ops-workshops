@@ -1,19 +1,21 @@
 ---
-- name: Automation of the steps in lab module 4.2 
+- name: Automation of project request template, quota, limits module
   hosts: masters
-  
   tasks:
+    - name: Check for the project request template
+      command: oc get template project-request -n default
+      register: template_output
+      ignore_errors: true
+
     - name: Create the project-request template in the namespace 'default' 
       command: oc create -f /opt/lab/code/labguide/files/project_request_template.yaml -n default
+      when: template_output | failed
       
     - name: modify the master-config.yaml to create project request template
       lineinfile:
         line: '  projectRequestTemplate: "default/project-request"'
         regexp: '  projectRequestTemplate: ""'
         path: /etc/origin/master/master-config.yaml
-      become_user: root
     
     - name: Restart the service for changes to apply
       command: systemctl restart atomic-openshift-master
-      become_user: root    
-...      

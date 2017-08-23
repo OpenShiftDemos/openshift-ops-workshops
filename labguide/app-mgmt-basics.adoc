@@ -10,19 +10,25 @@ core building blocks as it relates to applications. Understanding these building
 blocks will help you better see the big picture of application management on the
 platform.
 
+#### Projects
+A *Project* is a "bucket", of sorts. It's a meta construct where all of a user's
+resources live. From an administrative perspective, each *Project* can be
+thought of like a tenant. *Projects* may have multiple users who can access
+them, and users may be able to access multiple *Projects*.
+
+For this exercise, first create a *Project* to hold our resources:
+
+[source]
+----
+oc new-project app-management
+----
+
 #### Deploy a Sample Application
 The `new-app` command provides a very simple way to tell OpenShift to run
 things. You simply provide it with one of a wide array of inputs, and it figures
 out what to do. Users will commonly use this command to get OpenShift to launch
 existing images, to create builds of source code and ultimately deploy them, to
 instantiate templates, and so on.
-
-First, create a project for this application and exercise:
-
-[source]
-----
-oc new-project app-management
-----
 
 You will now launch a specific image that exists on Dockerhub 
 

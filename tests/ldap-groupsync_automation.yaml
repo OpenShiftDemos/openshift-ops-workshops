@@ -11,14 +11,41 @@
     - name: Sync all of the LDAP groups
       command: oc adm groups sync --sync-config=/home/cloud-user/groupsync.yaml --confirm
 
+    - name: Check for app-dev project
+      command: oc get project app-dev
+      register: project_out
+      ignore_errors: true
+
+    - name: Create app-dev project
+      command: oc adm new-project app-dev --display-name="Application Development"
+      when: project_out | failed
+
+    - name: Check for app-test project
+      command: oc get project app-test
+      register: project_out
+      ignore_errors: true
+
+    - name: Create app-dev project
+      command: oc adm new-project app-test --display-name="Application Test"
+      when: project_out | failed
+
+    - name: Check for app-prod project
+      command: oc get project app-prod
+      register: project_out
+      ignore_errors: true
+
+    - name: Create app-prod project
+      command: oc adm new-project app-prod --display-name="Application Production"
+      when: project_out | failed
+
     - name: Give cluster-reader to fancy-dev
       command: oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
 
-    - name: Create app-dev project
-      block:
-        - command: oc get project {{ item[0] }}
-          register: project_out
-        - command: 'oc adm new-project {{ item[0] }} --display-name="{{ item[1] }}"'
-          when: project_out | failed
+    - name: Manipulate group roles
+      command: oc adm policy add-role-to-group {{ item.role }} {{ item.group }} -n {{ item.namespace }}
       with_items:
-        - ["app-dev", "Application Development"]
+        - { role: "edit", group: "ose-teamed-app", namespace: "app-dev" }
+        - { role: "edit", group: "ose-teamed-app", namespace: "app-test" }
+        - { role: "view", group: "ose-teamed-app", namespace: "app-prod" }
+        - { role: "edit", group: "ose-fancy-dev", namespace: "app-prod" }
+

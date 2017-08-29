@@ -25,3 +25,10 @@
     - name: Check for mapit readiness probe
       command: oc get dc mapit -o jsonpath='{.spec.template.spec.containers[?(@.name=="mapit")].readinessProbe}'
 
+    - name: Check for two app instances
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+      register: result
+      failed_when: '"2" not in result.stdout'
+
+    # should probably check for two service endpoints but it seems like a messy
+    # job right now

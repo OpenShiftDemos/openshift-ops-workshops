@@ -45,3 +45,13 @@
     - name: Create mapit route
       command: oc expose service mapit
 
+    - name: Scale to two instances
+      command: oc scale dc/mapit --replicas=2
+
+    - name: Wait for both app instances
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+      register: result
+      until: '"2" in result.stdout'
+      retries: 10
+      delay: 15
+

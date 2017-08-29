@@ -1241,6 +1241,7 @@ Resources:
                 OCP_ROUTING_SUFFIX="apps.${AWS::AccountId}.${PublicHostedZone}"
                 MASTER_HOSTNAME="master"
                 MASTER_EXTERNAL_FQDN="master.${AWS::AccountId}.${PublicHostedZone}"
+                MASTER_EXTERNAL_IP="${Master1.PublicIp}"
                 MASTER_INTERNAL_FQDN="master.internal.${PublicHostedZone}"
                 INFRA_INTERNAL_FQDN="infra.internal.${PublicHostedZone}"
                 NODE1_HOSTNAME="node01"

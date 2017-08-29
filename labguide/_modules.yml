@@ -84,14 +84,20 @@ modules:
       HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
       HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
       CNS_STORAGECLASS: "cns-gold"
+  app-mgmt-basics:
+    name: Application Management Basics
+    requires:
+      - installation
   cluster-mgmt-basics:
     name: Cluster Management Basics
     requires:
       - installation
-  defaultproj_template:
-    name: Create a Default Project Template (Quota and Limits)
   ldap-groupsync:
-    name: Using External Authentication Providers (LDAP)  
+    name: Using External Authentication Providers (LDAP)
+  template-quota-limits:
+    name: Project Template, Quota, and Limits
+    requires:
+      - installation
   infra-mgmt-basics:
     name: Infrastructure Management Basics
     requires:

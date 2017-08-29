@@ -1,38 +1,51 @@
 ---
 
-- name: Automation of module 3.3 (if user wants to skip)
+- name: Automation of LDAP and user manipulation module
   hosts: masters
   become_user: root
   
   tasks: 
-    - name: syncing all the groups using 'oc adm' CLI tool and applying changes to the system
+    - name: Login as system:admin
+      command: oc login -u system:admin
+
+    - name: Sync all of the LDAP groups
       command: oc adm groups sync --sync-config=/home/cloud-user/groupsync.yaml --confirm
-      become_user: root
-      
-    - name: Changing policy of the group - 'ose-normal-dev' to 'cluster-admin'
-      command: oc adm policy add-cluster-role-to-group cluster-admin ose-normal-dev
-      become_user: root
-      
-    - name: Logging in as 'teamuser1' of group 'ose-normal-dev'
-      command: oc login -u teamuser1 -p openshift
-      
-    - name: Creating new projects using 'oc adm new-project' command
+
+    - name: Check for app-dev project
+      command: oc get project app-dev
+      register: project_out
+      ignore_errors: true
+
+    - name: Create app-dev project
       command: oc adm new-project app-dev --display-name="Application Development"
-      
-    - name: Creating new projects using 'oc adm new-project' command
-      command: oc adm new-project app-test --display-name="Application Testing"
-      
-    - name: Creating new projects using 'oc adm new-project' command
+      when: project_out | failed
+
+    - name: Check for app-test project
+      command: oc get project app-test
+      register: project_out
+      ignore_errors: true
+
+    - name: Create app-dev project
+      command: oc adm new-project app-test --display-name="Application Test"
+      when: project_out | failed
+
+    - name: Check for app-prod project
+      command: oc get project app-prod
+      register: project_out
+      ignore_errors: true
+
+    - name: Create app-prod project
       command: oc adm new-project app-prod --display-name="Application Production"
-      
-    - name: Granting group 'ose-normal-dev' admin rights in the app-dev project
-      command: oc adm policy add-role-to-group admin ose-normal-dev -n app-dev
-      
-    - name: Granting group 'ose-normal-dev' admin rights in the app-test project
-      command: oc adm policy add-role-to-group admin ose-normal-dev -n app-test
-      
-    - name: Granting group 'ose-fancy-dev' admin rights in the app-prod project
-      command: oc adm policy add-role-to-group admin ose-fancy-dev -n app-prod
-      
-              
-...
+      when: project_out | failed
+
+    - name: Give cluster-reader to fancy-dev
+      command: oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
+
+    - name: Manipulate group roles
+      command: oc adm policy add-role-to-group {{ item.role }} {{ item.group }} -n {{ item.namespace }}
+      with_items:
+        - { role: "edit", group: "ose-teamed-app", namespace: "app-dev" }
+        - { role: "edit", group: "ose-teamed-app", namespace: "app-test" }
+        - { role: "view", group: "ose-teamed-app", namespace: "app-prod" }
+        - { role: "edit", group: "ose-fancy-dev", namespace: "app-prod" }
+

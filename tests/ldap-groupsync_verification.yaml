@@ -1,19 +1,16 @@
 ---
-
 - name: Verification tests for lab module 4.3
   hosts: masters
-
   tasks:
 
-    - name: Login as cluster:admin so as to list all groups and projects
-      command: oc login -u teamuser1 -p openshift
-      become_user : root
+    - name: Login as system:admin so as to list all groups and projects
+      command: oc login -u system:admin
 
-    - name: Checking if all the groups have been created by 'oc adm groups sync'
+    - name: Look for all of the synced groups
       command: oc get group {{ item }}
       with_items: [ 'ose-user', 'ose-normal-dev', 'ose-fancy-dev', 'ose-teamed-app' ]
 
-    - name: Check if all users are present in group - 'ose-user'
+    - name: Check for ose-user group users
       command: oc get -o jsonpath='{.users}' group ose-user
       register: ose_user_users
       failed_when: >
@@ -23,7 +20,7 @@
         'fancyuser1' not in ose_user_users.stdout or
         'fancyuser2' not in ose_user_users.stdout
 
-    - name: Check if all users are present in group - 'ose-normal-dev'
+    - name: check for ose-normal-dev group users
       command: oc get -o jsonpath='{.users}' group 'ose-normal-dev'
       register: normaldev_users
       failed_when: >
@@ -31,42 +28,54 @@
         'teamuser1' not in normaldev_users.stdout or
         'teamuser2' not in normaldev_users.stdout
 
-    - name: Check if all users are present in group - 'ose-fancy-dev'
+    - name: Check for ose-fancy-dev group users
       command: oc get -o jsonpath='{.users}' group ose-fancy-dev
       register: fancydev_users
       failed_when: >
         'fancyuser1' not in fancydev_users.stdout or
         'fancyuser2' not in fancydev_users.stdout
 
-    - name: Check if all users are present in group - 'ose-teamed-app'
+    - name: Check for ose-teamed-app group users
       command: oc get -o jsonpath='{.users}' group ose-teamed-app
       register: teamedapp_users
       failed_when: >
         'teamuser1'  not in teamedapp_users.stdout or
         'teamuser2'  not in teamedapp_users.stdout
 
-    - name: login as fancyuser1 of group - ose-fancy-dev
+    - name: Login as normaluser1
+      command: oc login -u normaluser1 -p openshift
+
+    - name: Check that normaluser1 cannot see projects
+      command: oc get project app-dev
+      register: project_out
+      failed_when: project_out | success
+
+    - name: Login as fancyuser1
       command: oc login -u fancyuser1 -p openshift
 
-    - name: list down projects in access of fancyuser1
-      command: oc get -o jsonpath='{.items[*].metadata.name}' projects
-      register: fancyuser1_projects
-      failed_when: "'app-prod' not in fancyuser1_projects.stdout"
+    - name: cluster-reader (fancyuser1) should be able to see default project
+      command: oc get project default
 
-    - name: log out of fancyuser1
-      command: oc logout
+    - name: Login as teamuser1
+      command: oc login -u teamuser1 -p openshift
 
-    - name: Log in as teamuser2
-      command: oc login -u teamuser2 -p openshift
+    - name: teamuser1 should see prod project
+      command: oc get project app-prod
 
-    - name: list down projects in access of teamuser2
-      command: oc get -o jsonpath='{.items[*].metadata.name}' projects
-      register: teamuser2_projects
-      failed_when: "'app-dev' not in teamuser2_projects.stdout"
+    - name: Switch to prod project
+      command: oc project app-prod
 
+    - name: teamuser1 cannot create in app-prod
+      command: oc new-app docker.io/siamaksade/mapit
+      register: result
+      failed_when: result | success
 
-    - name: list down projects in access of teamuser2
-      command: oc get -o jsonpath='{.items[*].metadata.name}' projects
-      register: fancyuser1_projects
-      failed_when: "'app-test' not in teamuser2_projects.stdout"
-...
+    - name: Login as cluster administrator
+      command: oc login -u system:admin
+
+    - name: Delete projects
+      command: oc delete project {{ item }}
+      with_items:
+        - "app-dev"
+        - "app-test"
+        - "app-prod"

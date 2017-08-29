@@ -1,45 +1,61 @@
-This lab module is about using external authentication providers and LDAP is one of them. Access to resources like a project in OCP can be controlled by using authentication methods like LDAP and only the allowed privileges can be mapped to a user or a certain group.
+## Configuring External Authentication Providers
 
-LDAP stands for Lightweight Directory Access Protocol. LDAP provides different levels of access to users based on their groups and privileges.
+OpenShift supports a number of different authentication providers, and you can
+find the complete list in the
+link:https://docs.openshift.com/container-platform/3.5/install_config/configuring_authentication.html[authentication
+documentation]. One of the most commonly used authentication providers is LDAP,
+whether provided by Microsoft Active Directory or by other sources.
 
-We have defined 4 groups for this lab :-
+OpenShift can perform user authentication against an LDAP server, and can also
+configure group membership and certain RBAC attributes based on LDAP group
+membership.
 
-1. ose-user                       "Users with OpenShift access"
-2. ose-normal-dev                 "Normal OpenShift users"
-3. ose-fancy-dev                  "Fancy OpenShift users"
-4. ose-teamed-app                 "Teamed app users"
+### Background: LDAP Structure
 
-Users defined in the CloudFormation Template are as follows -
+In this environment we are providing LDAP with a Red Hat Identity Management
+server running on Red Hat Enterprise Linux 7 running in a VM. IDM is configured
+with the following user groups:
 
- - ose-normal-dev -> normaluser1, teamuser1, teamuser2
- - ose-fancy-dev -> fancyuser1, fancyuser2
- - ose-teamed-app -> teamuser1, teamuser2
- - ose-user -> normaluser1, teamuser1, teamuser2, fancyuser1, fancyuser2
+* `ose-user`: Users with OpenShift access
+** Any users who should be able to log-in to OpenShift must be members of this
+group
+** All of the below mentioned users are in this group
+* `ose-normal-dev`: Normal OpenShift users
+** Regular users of OpenShift without special permissions
+** Contains: `normaluser1`, `teamuser1`, `teamuser2`
+* `ose-fancy-dev`: Fancy OpenShift users
+** Users of OpenShift that are granted some special privileges
+** Contains: `fancyuser1`, `fancyuser2`
+* `ose-teamed-app`: Teamed app users
+** A group of users that will have access to the same OpenShift *Project*
+** Contains: `teamuser1`, `teamuser2`
 
+#### Examine the master configuration
+The installation of OpenShift already included setting up LDAP authentication in
+the inventory file. As the `root` user on the master host, examine the master
+config with `cat`, `less`, or your favorite editor:
 
-Step-1] Check the master-config.yaml file :
+[source]
+----
+cat /etc/origin/master/master-config.yaml
+----
 
-After SSH-ing into the master host, go into the root mode -
- $ sudo -i
+Look for one of the `oauthConfig` sections that looks like the following:
 
-
- # cat /etc/origin/master/master-config.yaml
-
-
-Contents will look like -
-[literal]
+[source]
+----
 oauthConfig:
-  assetPublicURL: https://openshift.unset.ocp-admin.aws.openshifttestdrive.com/console/
+  assetPublicURL: https://{{ MASTER_EXTERNAL_FQDN }}/console/
   grantConfig:
     method: auto
   identityProviders:
   - challenge: true
-    login: true
-    mappingMethod: claim
-    name: idm
+    login: true 
+    mappingMethod: claim <1>
+    name: idm <2>
     provider:
       apiVersion: v1
-      attributes:
+      attributes: <3>
         email:
         - mail
         id:
@@ -48,108 +64,333 @@ oauthConfig:
         - cn
         preferredUsername:
         - uid
-      bindDN: uid=admin,cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
-      bindPassword: ldapadmin
-      ca: /etc/origin/master/ipa-ca.crt
+      bindDN: <4> uid=admin,cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
+      bindPassword: <5> ldapadmin
+      ca: /etc/origin/master/ipa-ca.crt <6>
       insecure: false
       kind: LDAPPasswordIdentityProvider
-      url: ldap://idm.unset.ocp-admin.aws.openshifttestdrive.com/cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com)
-  masterCA: ca-bundle.crt
-  masterPublicURL: https://openshift.unset.ocp-admin.aws.openshifttestdrive.com
-  masterURL: https://ip-10-0-1-200.ec2.internal
+      url: <7>ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com)
+  ...
+----
 
-Some notable fields under 'identityProviders:' are their meanings are -
+Some notable fields under `identityProviders:`:
 
-i) challenge:true -> When true, unauthenticated token requests from non-web clients (like the CLI) are sent a WWW-Authenticate challenge header for this provider.
+<1> `name`: The unique ID of the identity provider. It is possible to have
+multiple authentication providers in an OpenShift environment, and OpenShift is
+able to distinguish between them.
 
-ii) login:true -> When true, unauthenticated token requests from web clients (like the web console) are redirected to a login page backed by this provider.
+<2> `mappingMethod: claim`: This section has to do with how usernames are
+assigned within an OpenShift cluster when multiple providers are configured. See
+the
+link:https://docs.openshift.com/container-platform/3.5/install_config/configuring_authentication.html#mapping-identities-to-users[mapping
+identities to users] section for more information.
 
-iii)  mappingMethod: claim -> Defines how new identities are mapped to users when they login. 'claim' is the default value. Provisions a user with the identity’s preferred user name. Fails if a user with that user name is already mapped to another identity.
+<3> `attributes`: This section defines the LDAP fields to iterate over and
+assign to the fields in the OpenShift user's "account". If any attributes are
+not found / not populated when searching through the list, the entire
+authentication fails. In this case we are creating an identity that is
+assocuated with the LDAP `dn`, an email address from the LDAP `mail`, a name from
+the LDAP `cn`, and a username from the LDAP `uid`.
 
-iv) kind: LDAPPasswordIdentityProvider -> Set 'kind' field to LDAPPasswordIdentityProvider in the identityProviders stanza to validate user names and passwords against an LDAPv3 server, using simple bind authentication.
+<4> `bindDN`: When searching LDAP, bind to the server as this user.
 
-Step-2 ] Make LDAP config file for group sync. This file is already configured and present in your master host.
-View the contents of the file by typing this command -
+<5> `bindPassword`: The password to use when binding for searching.
 
- # cat /home/cloud-user/groupsync.yaml
+<6> `ca`: The CA certificate to use for validating the SSL certificate of the
+LDAP server.
 
+<7> `url`: Identifies the LDAP server and the search to perform.
 
-Step-3] Map and sync LDAP groups :
-Run the command for LDAP groups sync to create the groups listed earlier in the master host -
+For more information on the specific details of LDAP authentication in OpenShift
+you can refer to the
+link:https://docs.openshift.com/container-platform/3.5/install_config/configuring_authentication.html#LDAPPasswordIdentityProvider[LDAP
+provider documentation].
 
- # oc adm groups sync --sync-config=/home/cloud-user/groupsync.yaml --confirm
+[NOTE]
+====
+You can find the installer configuration line that sets up LDAP authentication
+by looking in `/etc/ansible/hosts` at the line that begins with
+`openshift_master_identity_providers=`
+====
 
-The output will list down the four groups.
-[literal]
-[root@master ~]# oc adm groups sync --sync-config=/home/cloud-user/groupsync.yaml --confirm
+#### Syncing LDAP Groups to OpenShift Groups
+In OpenShift, groups can be used to manage users and control permissions for
+multiple users at once. There is a section in the documentation on how to
+link:https://docs.openshift.com/container-platform/3.5/install_config/syncing_groups_with_ldap.html[sync
+groups with LDAP]. Syncing groups involves running a program called `groupsync`
+when logged into OpenShift as a user with `cluster-admin` privileges, and using
+a configuration file that tells OpenShift what to do with the users it finds in
+the various groups.
+
+We have provided a `groupsync` configuration file for you already. Using `cat`,
+`less`, or your favorite editor, look at the following file:
+
+[source]
+----
+cat /home/cloud-user/groupsync.yaml
+----
+
+Without going into too much detail (you can look at the documentation), the
+`groupsync` config file does the following:
+
+* searches LDAP using the specified bind user and password
+* queries for any LDAP groups whose name begins with `ose-`
+* creates OpenShift groups with a name from the `cn` of the LDAP group
+* finds the members of the LDAP group and then puts them into the created
+  OpenShift group
+* uses the `dn` and `uid` as the UID and name attributes, respectively, in
+  OpenShift
+
+Now that you understand how the `groupsync` is configured, first make sure you
+are logged in as the `root` user. Then, make sure you are logged in as a cluster
+administrator:
+
+[source]
+----
+oc login -u system:admin
+----
+
+And then execute the `groupsync`:
+
+[source]
+----
+oc adm groups sync --sync-config=/home/cloud-user/groupsync.yaml --confirm
+----
+
+You will see output like the following:
+
+[source]
+----
 group/ose-user
 group/ose-normal-dev
 group/ose-fancy-dev
 group/ose-teamed-app
+----
 
+What you are seeing is the *Group* objects that have been created by the
+`groupsync` command. If you are curious about the `--confirm` flag, check the
+output of the help with `oc adm groups sync -h`.
 
+If you want to see the *Groups* that were created, execute the following:
 
-Step-4] Change group policy :
-Changing policy of the group - 'ose-teamed-app' to 'cluster-admin' so that 'teamuser1' user can now create projects.
-Change the policy by using this command -
+[source]
+----
+oc get groups
+----
 
- # oc adm policy add-cluster-role-to-group cluster-admin ose-teamed-app
+You will see output like the following:
 
-Step-5] Create projects :
+[source]
+----
+NAME             USERS
+ose-fancy-dev    fancyuser1, fancyuser2
+ose-normal-dev   normaluser1, teamuser1, teamuser2
+ose-teamed-app   teamuser1, teamuser2
+ose-user         normaluser1, fancyuser1, fancyuser2, teamuser1, teamuser2
+----
 
-Login as 'teamuser1' with the password 'openshift' to create projects as it would have admin rights.
-[literal]
-$ oc login -u teamuser1 -p openshift
+Take a look at a specific group in YAML:
 
-Use the following commands to create 3 projects named 'app-dev', 'app-test'  and 'app-prod' -
-[literal]
-$ oc adm new-project app-dev --display-name="Application Development"
-$ oc adm new-project app-test --display-name="Application Testing"
-$ oc adm new-project app-prod --display-name="Application Production"
+[source]
+----
+oc get group ose-fancy-dev -o yaml
 
-Step-6] Map groups to projects :
+apiVersion: v1
+kind: Group
+metadata:
+  annotations:
+    openshift.io/ldap.sync-time: 2017-08-29T14:29:33Z
+    openshift.io/ldap.uid: cn=ose-fancy-dev,cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
+    openshift.io/ldap.url: idm.internal.aws.testdrive.openshift.com:389
+  creationTimestamp: 2017-08-29T14:29:33Z
+  labels:
+    openshift.io/ldap.host: idm.internal.aws.testdrive.openshift.com
+  name: ose-fancy-dev
+  resourceVersion: "5242"
+  selfLink: /oapi/v1/groups/ose-fancy-dev
+  uid: 7a353ec7-8cc6-11e7-b355-0ee4d6c98466
+users:
+- fancyuser1
+- fancyuser2
+----
 
-In this step we will give admin rights to certain groups so that the users associated with these groups can have 'admin' rights to the projects.
-Use the following command to grant group 'ose-teamed-app' admin rights in the app-dev project -
-[literal]
-$ oc adm policy add-role-to-group admin ose-teamed-app -n app-dev
+OpenShift has automatically associated some LDAP metadata with the *Group*, and
+has listed the users who are in the group.
 
-Use the following command to grant group 'ose-teamed-app' admin rights in the app-test project -
-[literal]
-$ oc adm policy add-role-to-group admin ose-teamed-app -n app-test
+What happens if you list the *Users*?
 
-Use the follwing command to grant group 'ose-fancy-dev' admin rights in the app-prod project -
-[literal]
-$ oc adm policy add-role-to-group admin ose-fancy-dev -n app-prod
+[source]
+----
+oc get user
 
-Now, the users of groups ose-teamed-app will have admin rights on the projects 'app-dev' and 'app-test', whereas users of group ose-fancy-dev will have admin rights on the project 'app-prod'.
+[root@master ~]# oc get user
+No resources found.
+----
 
-Step-7] Test access to a project for an externally defined user:
-This step will show that 'teamuser2' can list down the projects created and 'fancyuser1' can list down projects created by 'ose-fancy-dev' group.
+Why are there no *Users* found? They are clearly listed in the *Group* definition.
 
-Commands for logging in as the above mentioned users would be -
-[literal]
-$ oc login -u teamuser2 -p openshift
-$ oc login -u fancyuser1 -p openshift
+*Users* are not actually created until the first time they try to log in. What
+you are seeing in the *Group* definition is simply a placeholder telling
+OpenShift that, if it encounters a *User* with that specific ID, that it should
+be associated with the *Group*.
 
-When logged in as 'teamuser2', you would see an output similar to this -
-[literal]
-Login successful.
-You have access to the following projects and can switch between them with 'oc project <projectname>':
-    app-dev
-  * app-prod
-    app-test
-    default
-    kube-system
-    logging
-    management-infra
-    openshift
-    openshift-infra
+#### Change Group Policy
+In your environment, there are a special group of super developers called
+_fancy-dev_ who should have special `cluster-reader` privileges. This is a role
+that allows a user to view administrative-level information about the cluster.
+For example, they can see the list of all *Projects* in the cluster.
 
-When logged in as 'fancyuser1', you would see an output similar to this -
-[literal]
-Login successful.
-You have one project on this server: "app-prod"
-Using project "app-prod".
+Change the policy for the `fancy-dev` *Group*:
 
-This is so because 'teamuser2' belongs to the group 'ose-teamed-app' which has the 'cluster-admin' rights and you can see it lists down all the projects present in the cluster.
+[source]
+----
+oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
+----
+
+[NOTE]
+====
+If you are interested in the different roles that come with OpenShift, you can
+learn more about them in the
+link:https://docs.openshift.com/container-platform/3.5/admin_guide/manage_authorization_policy.html[authorization
+policies] documentation.
+====
+
+#### Examine `cluster-reader` policy
+Go ahead and login as a regular user:
+
+[source]
+----
+oc login -u normaluser1 -p openshift
+----
+
+Then, try to list *Projects*:
+
+[source]
+----
+oc get projects
+----
+
+You will see:
+
+[source]
+----
+No resources found.
+----
+
+Now, login as a member of `fancy-dev`:
+
+[source]
+----
+oc login -u fancyuser1 -p openshift
+----
+
+And then perform the same `oc get projects` and you will now see the list of all
+of the projects in the cluster:
+
+[source]
+----
+NAME               DISPLAY NAME   STATUS
+default                           Active
+kube-system                       Active
+logging                           Active
+management-infra                  Active
+openshift                         Active
+openshift-infra                   Active
+----
+
+You should now be starting to understand how RBAC in OpenShift Container
+Platform can work.
+
+#### Create Projects for Collaboration
+Make sure you login as the cluster administrator:
+
+[source]
+----
+oc login -u system:admin
+----
+
+Then, create several *Projects* for people to collaborate:
+
+[source]
+----
+oc adm new-project app-dev --display-name="Application Development"
+oc adm new-project app-test --display-name="Application Testing"
+oc adm new-project app-prod --display-name="Application Production"
+----
+
+You have now created several *Projects* that represent a typical Software
+Development Lifecycle setup. Next, you will configure *Groups* to grant
+collaborative access to these projects.
+
+#### Map Groups to Projects
+As you saw earlier, there are several roles within OpenShift that are
+preconfigured. When it comes to *Projects*, you similarly can grant view, edit,
+or administrative access. Let's give our `teamed-app` users access to edit the
+development and testing projects:
+
+[source]
+----
+oc adm policy add-role-to-group edit ose-teamed-app -n app-dev
+oc adm policy add-role-to-group edit ose-teamed-app -n app-test
+----
+
+And then give them access to view production:
+
+[source]
+----
+oc adm policy add-role-to-group view ose-teamed-app -n app-prod
+----
+
+Now, give the `fancy-dev` group edit access to the production project:
+
+[source]
+----
+oc adm policy add-role-to-group edit ose-fancy-dev -n app-prod
+----
+
+#### Examine Group Access
+Log in as `normaluser1` and see what *Projects* you can see:
+
+[source]
+----
+oc login -u normaluser1 -p openshift
+oc get projects
+----
+
+Then, try `teamuser1` from the `teamed-app` group:
+
+[source]
+----
+oc login -u teamuser1 -p openshift
+oc get projects
+----
+
+You did not grant the team users edit access to the production project. Go ahead
+and try to create something in the production project as `teamuser1`:
+
+[source]
+----
+oc project app-prod
+oc new-app docker.io/siamaksade/mapit
+----
+
+You will see that it will not work:
+
+[source]
+----
+[root@master ~]# oc new-app docker.io/siamaksade/mapit
+--> Found Docker image 338a303 (3 weeks old) from docker.io for "docker.io/siamaksade/mapit"
+
+    * An image stream will be created as "mapit:latest" that will track this image
+    * This image will be deployed in deployment config "mapit"
+    * Ports 8080/tcp, 8778/tcp, 9779/tcp will be load balanced by service "mapit"
+      * Other containers can access this service through the hostname "mapit"
+
+--> Creating resources ...
+    error: User "teamuser1" cannot create imagestreams in project "app-prod"
+    error: User "teamuser1" cannot create deploymentconfigs in project "app-prod"
+    error: User "teamuser1" cannot create services in project "app-prod"
+--> Failed
+----
+
+This failure is exactly what we wanted to see.

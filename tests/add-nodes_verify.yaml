@@ -1,0 +1,15 @@
+---
+- name: Verifying cluster scale up
+  hosts: masters
+  become_user: root
+  tasks:
+    - name: Login as system:admin
+      command: oc login -u system:admin
+
+    - name: Check for additional node
+      command: oc get node {{ item }}
+      with_items:
+        - "node04.internal.aws.testdrive.openshift.com"
+        - "node05.internal.aws.testdrive.openshift.com"
+        - "node06.internal.aws.testdrive.openshift.com"
+

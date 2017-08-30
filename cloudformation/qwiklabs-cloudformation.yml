@@ -62,17 +62,17 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-ee437f95
+      ami: ami-e05b559b
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-e0a94598
+      ami: ami-cc03e8b4
     eu-west-1:
-      ami: ami-9e3bc6e7
+      ami: ami-b9cd36c0
     eu-central-1:
-      ami: ami-218b234e
+      ami: ami-ab2e84c4
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
@@ -779,7 +779,7 @@ Resources:
                   containerized=true
                   openshift_master_api_port=443
                   openshift_master_console_port=443
-                  openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=admin,cn=users,cn=accounts,<DC>', 'bindPassword': 'ldapadmin', 'ca': '/etc/origin/master/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://IDM/cn=users,cn=accounts,<DC>?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,<DC>)'}]
+                  openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=system,cn=sysaccounts,cn=etc,dc=auth,<DC>', 'bindPassword': 'bindingpassword', 'ca': '/etc/origin/master/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://IDM/cn=users,cn=accounts,<DC>?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,<DC>)'}]
                   openshift_image_tag=v3.5.5.26
                   openshift_pkg_version=-3.5.5.26-1
                   openshift_master_default_subdomain=apps.${AWS::AccountId}.${PublicHostedZone}
@@ -837,8 +837,8 @@ Resources:
                   apiVersion: v1
                   url: ldap://idm.internal.aws.testdrive.openshift.com
                   ca: /etc/origin/master/ipa-ca.crt
-                  bindDN: uid=admin,cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
-                  bindPassword: ldapadmin
+                  bindDN: uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
+                  bindPassword: bindingpassword 
                   rfc2307:
                     groupsQuery:
                       baseDN: cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com

@@ -38,6 +38,18 @@ echo -e ldapadmin | kinit admin
 ipa dnsrecord-mod "$mydomain" idm --a-rec="$publicip"
 ipa dnsrecord-mod "$mydomain" ipa-ca --a-rec="$publicip"
 
+cat > /tmp/sysacccount.ldif << EOF
+dn: uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
+changetype: add
+objectclass: account
+objectclass: simplesecurityobject
+uid: system
+userPassword: bindingpassword
+EOF
+
+echo -e ldapadmin | kinit admin
+ldapmodify -x -D 'cn=Directory Manager' -w ldapadmin -f /tmp/sysacccount.ldif
+
 echo -e "Creating user groups...\n"
 ipa group-add ose-user --desc="Users with OpenShift access"
 ipa group-add ose-normal-dev --desc="Normal OpenShift users"

@@ -4,10 +4,10 @@ learn about some of the core concepts, fundamental objects, and basics of
 application management on OpenShift Container Platform.
 
 [NOTE]
-----
+====
 You will want to have an SSH session opened to the `master` server for these
 lab exercises.
-----
+====
 
 ### Core OpenShift Concepts
 As a future administrator of OpenShift, it is important to understand several

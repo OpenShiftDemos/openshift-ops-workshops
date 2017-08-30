@@ -792,14 +792,13 @@ Resources:
                   #metrics_openshift_metrics_install_metrics=true
                   #metrics_openshift_metrics_cassandra_storage_type=pv
                   #metrics_openshift_metrics_cassandra_pvc_size=10Gi
-                  #metrics_openshift_metrics_cassanda_pvc_storage_class_name={{ CNS_STORAGECLASS }}
-                  #metrics_openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }}
+                  #metrics_openshift_metrics_hawkular_hostname=metrics.apps.${AWS::AccountId}.${PublicHostedZone}
                   openshift_logging_install_logging=false
                   #logging_openshift_logging_install_logging=true
                   #logging_openshift_logging_namespace=logging
                   #logging_openshift_logging_es_pvc_size=10Gi
-                  #logging_openshift_logging_kibana_hostname=kibana.{{ OCP_ROUTING_SUFFIX }}
-                  #logging_openshift_logging_public_master_url=https://kibana.{{ OCP_ROUTING_SUFFIX }}
+                  #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
+                  #logging_openshift_logging_public_master_url=https://kibana.apps.${AWS::AccountId}.${PublicHostedZone}
 
                   [etcd]
                   master.internal.${PublicHostedZone}

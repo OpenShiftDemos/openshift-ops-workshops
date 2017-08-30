@@ -162,7 +162,6 @@ following:
 openshift_metrics_install_metrics=true
 openshift_metrics_cassandra_storage_type=pv
 openshift_metrics_cassandra_pvc_size=10Gi
-openshift_metrics_cassanda_pvc_storage_class_name={{ CNS_STORAGECLASS }}
 openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }}
 ...
 ----

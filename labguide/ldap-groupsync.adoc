@@ -322,6 +322,25 @@ You have now created several *Projects* that represent a typical Software
 Development Lifecycle setup. Next, you will configure *Groups* to grant
 collaborative access to these projects.
 
+[NOTE]
+====
+Creating projects with `oc adm new-project` does *not* use the project request
+process or the project request template. These projects will not have quotas or
+limitranges applied by default. A cluster administrator can "impersonate" other
+users, so there are several options if you wanted these projects to get
+quotas/limit ranges:
+
+. use `--as` to specify impersonating a regular user with `oc new-project`
+. use `oc process` and provide values for the project request template, piping
+  into create (eg: `oc process ... | oc create -f -`). This will create all of
+  the objects in the project request template, which would include the quota and
+  limit range.
+. manually create/define the quota and limit ranges after creating the projects.
+
+For these exercises it is not important to have quotas or limit ranges on these
+projects.
+====
+
 #### Map Groups to Projects
 As you saw earlier, there are several roles within OpenShift that are
 preconfigured. When it comes to *Projects*, you similarly can grant view, edit,

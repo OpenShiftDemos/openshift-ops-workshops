@@ -1061,7 +1061,6 @@ Resources:
 
             runcmd:
             - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
-            - ansible-playbook /opt/lab/helpers/inventory_ldap_auth.yml
             - mkdir -p /var/lib/etcd
             - git clone https://github.com/openshift/openshift-cns-testdrive.git /opt/lab/code
 

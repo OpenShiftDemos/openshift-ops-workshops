@@ -771,7 +771,7 @@ Resources:
                   masters
                   nodes
                   etcd
-                  #new_nodes
+                  #scaleup_new_nodes
 
                   [OSEv3:vars]
                   ansible_become=true
@@ -789,6 +789,11 @@ Resources:
                   osm_default_node_selector='region=apps'
                   openshift_examples_modify_imagestreams=true
                   openshift_metrics_install_metrics=false
+                  #metrics_openshift_metrics_install_metrics=true
+                  #metrics_openshift_metrics_cassandra_storage_type=pv
+                  #metrics_openshift_metrics_cassandra_pvc_size=10Gi
+                  #metrics_openshift_metrics_cassanda_pvc_storage_class_name={{ CNS_STORAGECLASS }}
+                  #metrics_openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }}
                   openshift_hosted_logging_deploy=false
 
                   [etcd]
@@ -804,10 +809,10 @@ Resources:
                   node02.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node02.internal.${PublicHostedZone} openshift_public_hostname=node02.${AWS::AccountId}.${PublicHostedZone}
                   node03.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"  openshift_hostname=node03.internal.${PublicHostedZone} openshift_public_hostname=node03.${AWS::AccountId}.${PublicHostedZone}
 
-                  #[new_nodes]
-                  #node04.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node04.internal.${PublicHostedZone} openshift_public_hostname=node04.${AWS::AccountId}.${PublicHostedZone}
-                  #node05.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node05.internal.${PublicHostedZone} openshift_public_hostname=node05.${AWS::AccountId}.${PublicHostedZone}
-                  #node06.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node06.internal.${PublicHostedZone} openshift_public_hostname=node06.${AWS::AccountId}.${PublicHostedZone}
+                  #scaleup_[new_nodes]
+                  #scaleup_node04.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node04.internal.${PublicHostedZone} openshift_public_hostname=node04.${AWS::AccountId}.${PublicHostedZone}
+                  #scaleup_node05.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node05.internal.${PublicHostedZone} openshift_public_hostname=node05.${AWS::AccountId}.${PublicHostedZone}
+                  #scaleup_node06.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node06.internal.${PublicHostedZone} openshift_public_hostname=node06.${AWS::AccountId}.${PublicHostedZone}
 
                   [cns]
                   node01.internal.${PublicHostedZone}

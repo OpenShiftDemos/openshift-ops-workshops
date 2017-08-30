@@ -273,7 +273,7 @@ To configure the installation of EFK edit (update or insert) the Ansible
 inventory file just like you did for metrics. In the `/etc/ansible/hosts` file,
 make the following changes:
 
-* remove the line `openshift_hosted_logging_deploy=false`
+* remove the line `openshift_logging_install_logging=false`
 * remove the comments beginning with `#logging_`
 
 Your resulting file should look like the following:

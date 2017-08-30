@@ -21,11 +21,17 @@
       command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml
       when: node_present | failed
 
-    - name: uncomment metrics lines
+    - name: Uncomment metrics lines
       replace:
         regexp: '#metrics_'
         replace: ''
         path: /etc/ansible/hosts
+
+    - name: Remove metrics false line
+      lineinfile:
+        path: /etc/ansible/hosts
+        state: absent
+        regexp: 'openshift_metrics_install_metrics=false'
 
     - name: Check for metrics before trying to install metrics
       command: oc get service hawkular-cassandra -n openshift-infra
@@ -36,11 +42,17 @@
       command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
       when: hawkular_cassandra_service | failed
 
-    - name: uncomment logging lines
+    - name: Uncomment logging lines
       replace:
         regexp: '#logging_'
         replace: ''
         path: /etc/ansible/hosts
+
+    - name: Remove logging false line
+      lineinfile:
+        path: /etc/ansible/hosts
+        state: absent
+        regexp: 'openshift_logging_install_logging=false'
 
     - name: Check for logging before trying to install logging
       command: oc get service logging-es-cluster -n logging

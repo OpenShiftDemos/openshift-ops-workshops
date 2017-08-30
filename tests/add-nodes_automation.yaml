@@ -1,69 +1,53 @@
 ---
- 
-- hosts: masters
+- hosts: localhost
+  become: true
+  name: Scale-up the cluster
   tasks:
+    - name: Login as the cluster administrator
+      command: oc login -u system:admin
 
-    - include_vars: /opt/lab/environment.yml
-      tags: always
-
-    - set_fact:
-        cns_namespace: "{{ CNS_NAMESPACE }}"
-        cns_storageclass: "{{ CNS_STORAGECLASS }}"
-        new_cns_nodes_internal_fqdn:
-          - "{{NODE4_INTERNAL_FQDN}}"
-          - "{{NODE5_INTERNAL_FQDN}}"
-          - "{{NODE6_INTERNAL_FQDN}}"
-        heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
-        heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
-        cns_storageclass2: "{{CNS_STORAGECLASS2}}"
-        ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
-        node_brick_device: "{{ NODE_BRICK_DEVICE }}"
-        node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
-        node4_internal_fqdn: " {{ NODE4_INTERNAL_FQDN }}"
-      tags: always
-
-    - name: uncomment new_nodes line
+    - name: uncomment scaleup lines
       replace:
-        regexp: '#\[new_nodes\]'
-        replace: '[new_nodes]'
-        path: /etc/ansible/hosts
-
-    - name: uncomment new_nodes line
-      replace:
-        regexp: '#'
+        regexp: '#scaleup_'
         replace: ''
         path: /etc/ansible/hosts
 
-    - name: insert iptables rules required for GlusterFS
-      blockinfile:
-        dest: /etc/sysconfig/iptables
-        block: |
-          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT
-          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
-          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
-          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
-        insertbefore: "^COMMIT"
-      delegate_to: "{{ item }}"
-      with_items: "{{ new_cns_nodes_internal_fqdn }}"
-      become: true
+    - name: Check for extra nodes before trying to run scaleup
+      command: oc get node node04.internal.aws.testdrive.openshift.com
+      register: node_present
+      ignore_errors: true
 
-    - name: insert iptables rules required for GlusterFS
-      lineinfile:
-        dest: /etc/sysconfig/iptables
-        line: ':OS_FIREWALL_ALLOW - [0:0]'
-        insertbefore: "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"
-      delegate_to: "{{ item }}"
-      with_items: "{{ new_cns_nodes_internal_fqdn }}"
-      become: true
-
-    - name: reload iptables
-      systemd:
-        name: iptables
-        state: reloaded
-      delegate_to: "{{ item }}"
-      with_items: "{{ new_cns_nodes_internal_fqdn }}"
-      become: true
-
-    - name: Running the Ansible Playbook to kickstart the OCP installation
+    - name: Run the scaleup playbook
       command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml
-...
+      when: node_present | failed
+
+    - name: uncomment metrics lines
+      replace:
+        regexp: '#metrics_'
+        replace: ''
+        path: /etc/ansible/hosts
+
+    - name: Check for metrics before trying to install metrics
+      command: oc get service hawkular-cassandra -n openshift-infra
+      register: hawkular_cassandra_service
+      ignore_errors: true
+
+    - name: Run the metrics installation playbook
+      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
+      when: hawkular_cassandra_service | failed
+
+    - name: uncomment logging lines
+      replace:
+        regexp: '#logging_'
+        replace: ''
+        path: /etc/ansible/hosts
+
+    - name: Check for logging before trying to install logging
+      command: oc get service logging-es-cluster -n logging
+      register: logging_es_cluster_service
+      ignore_errors: true
+
+    - name: Run the metrics installation playbook
+      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
+      when: logging_es_cluster_service | failed
+

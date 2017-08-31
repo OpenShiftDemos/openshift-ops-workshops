@@ -242,7 +242,7 @@
       register: ose_dc
 
     - name: Deploy ose pod into netproj-a
-      command: oc create -f /home/cloud-user/ose.yaml -n netproj-a
+      command: oc create -f /opt/lab/code/support/ose.yaml -n netproj-a
       when: ose_dc | failed
       tags:
         - networking
@@ -255,7 +255,7 @@
       register: ose_dc
 
     - name: Deploy ose pod into netproj-b
-      command: oc create -f /home/cloud-user/ose.yaml -n netproj-b
+      command: oc create -f /opt/lab/code/support/ose.yaml -n netproj-b
       when: ose_dc | failed
       tags:
         - networking

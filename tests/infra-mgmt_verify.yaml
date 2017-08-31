@@ -171,7 +171,7 @@
 
     # This assumes that this test is being run after the cluster has been scaled
     - name: Wait for fluentd daemonset instances to be running
-      command: oc get daemonset logging-fluentd -o jsonpath='{.status.numberReady}'
+      command: oc get daemonset logging-fluentd -n logging -o jsonpath='{.status.numberReady}'
       register: result
       until: '"8" in result.stdout'
       retries: 5

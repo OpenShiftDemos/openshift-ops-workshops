@@ -627,23 +627,15 @@ schedulers in the system to place any new workloads on it:
 
 [source]
 ----
-oadm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=false
+oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=false
 ----
 
-Confirm the nodes is marked as non-schedulable:
+The output of the command will show that the node is now not schedulable:
 
 [source]
 ----
-oc get nodes
 NAME                                          STATUS                     AGE
-{{ INFRA_INTERNAL_FQDN }}    Ready                      1h
-{{ MASTER_INTERNAL_FQDN }}   Ready,SchedulingDisabled   1h
-{{ NODE1_INTERNAL_FQDN }}   Ready                      1h
-{{ NODE2_INTERNAL_FQDN }}   Ready,SchedulingDisabled                      1h
-{{ NODE3_INTERNAL_FQDN }}   Ready                      1h
-{{ NODE4_INTERNAL_FQDN }}   Ready                      15m
-{{ NODE5_INTERNAL_FQDN }}   Ready                      15m
-{{ NODE6_INTERNAL_FQDN }}   Ready                      15m
+{{ NODE2_INTERNAL_FQDN }}   Ready,SchedulingDisabled   4h
 ----
 
 Marking the node out like this did not impact the pods it is running. List those
@@ -651,30 +643,29 @@ pods:
 
 [source]
 ----
-oadm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
+oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
 ----
 
-Depending on previous actions this node will run at least the pods associated
-with logging and Container-native Storage but also application pods.
+Other than a *Pod* for Container Native Storage and a Fluentd instance (there is
+one on every node), there may or may not be other *Pods* running on this node.
 
-The next step is to evacuate the pods to other nodes in the cluster. You can
+The next step is to evacuate the *Pods* to other nodes in the cluster. You can
 first simulate what actions the system would perform during evacuation with the
 following command:
 
 [source]
 ----
-oadm manage-node {{ NODE2_INTERNAL_FQDN }} --evacuate --dry-run
+oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --evacuate --dry-run
 ----
 
 [IMPORTANT]
 ====
-As the command output indicates, pods running on the node as part of a
-`DaemonSet` like those associated to Logging, Metrics or CNS would *not* be
-evacuated. They will not be accessible anymore through OpenShift but simply
-continue to run as docker containers on the nodes until the local OpenShift
-services are stopped or the node is shutdown. + This is not a problem since
-software like CNS or the OpenShift Metrics stack is designed to handle such
-situations transparently.
+*Pods* running on the node as part of a `DaemonSet` like those associated to
+Logging or CNS will *not* be evacuated. They will not be accessible anymore
+through OpenShift, but will continue to run as containers on the nodes until the
+local OpenShift services are stopped and/or the node is shutdown. This is not a
+problem since software like CNS or the OpenShift Metrics stack is designed to
+handle such situations transparently.
 ====
 
 Start the evacuation process like this:
@@ -684,30 +675,32 @@ Start the evacuation process like this:
 oadm manage-node {{ NODE2_INTERNAL_FQDN }} --evacuate
 ----
 
-After a few moments, all of the pods, except the fluentd and glusterfs-pods,
-previously running on `{{ NODE2_INTERNAL_FQDN }}` should have terminated and new
-copies are restarted elsewhere.
+After a few moments, all of the *Pods*, except those for Fluentd and Container
+Native Storage, previously running on `{{ NODE2_INTERNAL_FQDN }}` should have
+terminated and been launched elsewhere.
 
 [source]
 ----
 oc get pods --all-namespaces -o wide
 ----
 
-This has put `{{ NODE2_INTERNAL_FQDN }}` into a state where an administrator can
+The node `{{ NODE2_INTERNAL_FQDN }}` is now ready for an administrator to
 start maintenance operations. If those include a reboot of the system or
-upgrading the OpenShift services (`atomic-openshift-node`) the pods associated
-CNS, Logging and Metrics would come backup automatically up system/service
-restart. + The system is still in non-schedulable though. Let's fix that.
+upgrading OpenShift components, the *Pods* associated with
+CNS and logging will come back up automatically.
+
+Now that our maintenance is complete, the node is still non-schedulable. Let's
+fix that:
 
 [source]
 ----
-oadm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=true
+oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=true
 ----
 
-With this the node will be ready again to accept newly scheduled workloads.
-Confirm one last time the node is in _Ready_ state:
+Now the node will be able to have workload scheduled on it again:
 
 [source]
 ----
-oc get node/{{ NODE2_INTERNAL_FQDN }}
+NAME                                          STATUS    AGE
+{{ NODE2_INTERNAL_FQDN }}   Ready     4h
 ----

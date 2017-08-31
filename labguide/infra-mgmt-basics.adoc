@@ -1,9 +1,8 @@
 ## Infrastructure Management, Metrics and Logging
-In this lab you are introduced to some basic management concepts of the
-OpenShift Container Platform. This is largely driven by automation through
-openshift-ansible which makes operations easy and predictable. + By the end of
-this module you should have your cluster extended by another 3 nodes, deployed
-logging and metrics facilities put 1 node briefly put into maintenance.
+In this lab you will explore various aspects of managing cluster infrastructure.
+This includes the extending the OpenShift cluster and installation of the
+Logging and Metrics components, all automated by the installer. It also includes
+some maintenance of nodes, as well as manipulating the multitenant network.
 
 ### Extending the cluster
 

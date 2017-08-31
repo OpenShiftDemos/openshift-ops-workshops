@@ -77,7 +77,7 @@
       command: oc get rc -n openshift-infra {{ hawkular_cassandra_rc.stdout }} -o jsonpath='{.status.availableReplicas}'
       register: result
       until: '"1" in result.stdout'
-      retries: 2
+      retries: 5
       delay: 60
       tags:
         - metrics
@@ -87,7 +87,7 @@
       command: oc get rc -n openshift-infra hawkular-metrics -o jsonpath='{.status.availableReplicas}'
       register: result
       until: '"1" in result.stdout'
-      retries: 2
+      retries: 5
       delay: 60
       tags:
         - metrics
@@ -97,7 +97,7 @@
       command: oc get rc -n openshift-infra heapster -o jsonpath='{.status.availableReplicas}'
       register: result
       until: '"1" in result.stdout'
-      retries: 2
+      retries: 5
       delay: 60
       tags:
         - metrics
@@ -143,7 +143,7 @@
       command: oc get dc -n logging {{ logging_es_dc.stdout }} -o jsonpath='{.status.readyReplicas}'
       register: result
       until: '"1" in result.stdout'
-      retries: 2
+      retries: 5
       delay: 60
       tags:
         - logging
@@ -153,7 +153,7 @@
       command: oc get dc -n logging logging-curator -o jsonpath='{.status.availableReplicas}'
       register: result
       until: '"1" in result.stdout'
-      retries: 2
+      retries: 5
       delay: 60
       tags:
         - logging
@@ -163,7 +163,7 @@
       command: oc get dc -n logging logging-kibana -o jsonpath='{.status.availableReplicas}'
       register: result
       until: '"1" in result.stdout'
-      retries: 2
+      retries: 5
       delay: 60
       tags:
         - logging
@@ -174,7 +174,7 @@
       command: oc get daemonset logging-fluentd -o jsonpath='{.status.numberReady}'
       register: result
       until: '"8" in result.stdout'
-      retries: 2
+      retries: 5
       delay: 60
       tags:
         - logging

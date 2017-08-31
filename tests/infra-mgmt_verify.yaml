@@ -1,10 +1,31 @@
 ---
-- name: Verifying cluster scale, logging, metrics
+- name: Cluster scale, logging, metrics, networking
   hosts: localhost
   become_user: root
   tasks:
     - name: Login as system:admin
       command: oc login -u system:admin
+
+    - name: uncomment scaleup lines
+      replace:
+        regexp: '#scaleup_'
+        replace: ''
+        path: /etc/ansible/hosts
+      tags:
+        - scaleup
+
+    - name: Check for extra nodes before trying to run scaleup
+      command: oc get node node04.internal.aws.testdrive.openshift.com
+      register: node_present
+      ignore_errors: true
+      tags:
+        - scaleup
+
+    - name: Run the scaleup playbook
+      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml
+      when: node_present | failed
+      tags:
+        - scaleup
 
     - name: Check for additional node
       command: oc get node {{ item }}
@@ -14,12 +35,43 @@
         - "node06.internal.aws.testdrive.openshift.com"
       tags:
         - scaleup
+        - scaleup_test
+
+    - name: Uncomment metrics lines
+      replace:
+        regexp: '#metrics_'
+        replace: ''
+        path: /etc/ansible/hosts
+      tags:
+        - metrics
+
+    - name: Remove metrics false line
+      lineinfile:
+        path: /etc/ansible/hosts
+        state: absent
+        regexp: 'openshift_metrics_install_metrics=false'
+      tags:
+        - metrics
+
+    - name: Check for metrics before trying to install metrics
+      command: oc get service hawkular-cassandra -n openshift-infra
+      register: hawkular_cassandra_service
+      ignore_errors: true
+      tags:
+        - metrics
+
+    - name: Run the metrics installation playbook
+      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
+      when: hawkular_cassandra_service | failed
+      tags:
+        - metrics
 
     - name: Determine hawkular-cassandra rc
       shell: oc get rc -n openshift-infra | awk '/hawkular-cassandra*/{ print $1 }'
       register: hawkular_cassandra_rc
       tags:
         - metrics
+        - metrics_test
 
     - name: Wait for Cassandra to be running
       command: oc get rc -n openshift-infra {{ hawkular_cassandra_rc.stdout }} -o jsonpath='{.status.availableReplicas}'
@@ -29,6 +81,7 @@
       delay: 60
       tags:
         - metrics
+        - metrics_test
 
     - name: Wait for hawkular to be running
       command: oc get rc -n openshift-infra hawkular-metrics -o jsonpath='{.status.availableReplicas}'
@@ -38,6 +91,7 @@
       delay: 60
       tags:
         - metrics
+        - metrics_test
 
     - name: Wait for heapster to be running
       command: oc get rc -n openshift-infra heapster -o jsonpath='{.status.availableReplicas}'
@@ -47,12 +101,43 @@
       delay: 60
       tags:
         - metrics
+        - metrics_test
+
+    - name: Uncomment logging lines
+      replace:
+        regexp: '#logging_'
+        replace: ''
+        path: /etc/ansible/hosts
+      tags:
+        - logging
+
+    - name: Remove logging false line
+      lineinfile:
+        path: /etc/ansible/hosts
+        state: absent
+        regexp: 'openshift_logging_install_logging=false'
+      tags:
+        - logging
+
+    - name: Check for logging before trying to install logging
+      command: oc get service logging-es-cluster -n logging
+      register: logging_es_cluster_service
+      ignore_errors: true
+      tags:
+        - logging
+
+    - name: Run the logging installation playbook
+      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml
+      when: logging_es_cluster_service | failed
+      tags:
+        - logging
 
     - name: Determine elasticsearch dc
       shell: oc get dc -n logging | awk '/logging-es-*/{ print $1 }'
       register: logging_es_dc
       tags:
         - logging
+        - logging_test
 
     - name: Wait for elasticsearch to be running
       command: oc get dc -n logging {{ logging_es_dc.stdout }} -o jsonpath='{.status.readyReplicas}'
@@ -62,6 +147,7 @@
       delay: 60
       tags:
         - logging
+        - logging_test
 
     - name: Wait for curator to be running
       command: oc get dc -n logging logging-curator -o jsonpath='{.status.availableReplicas}'
@@ -71,6 +157,7 @@
       delay: 60
       tags:
         - logging
+        - logging_test
 
     - name: Wait for kibana to be running
       command: oc get dc -n logging logging-kibana -o jsonpath='{.status.availableReplicas}'
@@ -80,6 +167,7 @@
       delay: 60
       tags:
         - logging
+        - logging_test
 
     # This assumes that this test is being run after the cluster has been scaled
     - name: Wait for fluentd daemonset instances to be running
@@ -90,3 +178,176 @@
       delay: 60
       tags:
         - logging
+        - logging_test
+
+    # failure of this command (nonzero exit) means it isn't
+    - name: Check that multitenant SDN is installed by looking for netnamespaces
+      command: oc get netnamespace
+      tags:
+        - networking
+        - networking_test
+
+    - name: Check for netproj-a
+      command: oc get project netproj-a
+      register: netproj_a
+      ignore_errors: true
+      tags:
+        - networking
+
+    - name: Create netproj-a
+      command: oc adm new-project netproj-a
+      when: netproj_a | failed
+      tags:
+        - networking
+
+    - name: Check for netproj-b
+      command: oc get project netproj-b
+      register: netproj_b
+      ignore_errors: true
+      tags:
+        - networking
+
+    - name: Create netproj-b
+      command: oc adm new-project netproj-b
+      when: netproj_b | failed
+      tags:
+        - networking
+
+    - name: Ensure the projects are isolated for idempotency
+      command: oc adm pod-network isolate-projects netproj-a
+      tags:
+        - networking
+        - networking_test
+
+    - name: Get the network ID of netproj-a
+      command: oc get netnamespace netproj-a -o jsonpath='{.netid}'
+      register: netproj_a
+      tags:
+        - networking
+        - networking_test
+
+    - name: Check that the network ID for netproj-b is different
+      command: oc get netnamespace netproj-b -o jsonpath='{.netid}'
+      register: netproj_b
+      failed_when: netproj_a.stdout == netproj_b.stdout
+      tags:
+        - networking
+        - networking_test
+
+    - name: Check for ose dc in netproj-a
+      command: oc get dc ose -n netproj-a
+      ignore_errors: true
+      tags:
+        - networking
+      register: ose_dc
+
+    - name: Deploy ose pod into netproj-a
+      command: oc create -f /home/cloud-user/ose.yaml -n netproj-a
+      when: ose_dc | failed
+      tags:
+        - networking
+
+    - name: Check for ose dc in netproj-b
+      command: oc get dc ose -n netproj-b
+      ignore_errors: true
+      tags:
+        - networking
+      register: ose_dc
+
+    - name: Deploy ose pod into netproj-b
+      command: oc create -f /home/cloud-user/ose.yaml -n netproj-b
+      when: ose_dc | failed
+      tags:
+        - networking
+
+    - name: Wait for ose pods to be running
+      command: oc get dc ose -n {{ item }} -o jsonpath='{.status.readyReplicas}'
+      register: result
+      until: '"1" in result.stdout'
+      retries: 2
+      delay: 60
+      with_items:
+        - "netproj-a"
+        - "netproj-b"
+      tags:
+        - networking
+
+    - name: Get the ip of the netproj-a pod
+      shell: oc get pod -n netproj-a -o jsonpath='{.status.podIP}' $(oc get pod -n netproj-a | awk '/ose-*/{ print $1 }')
+      register: pod_a
+      tags:
+        - networking
+        - networking_test
+
+    - name: Get the ip of the netproj-b pod
+      shell: oc get pod -n netproj-b -o jsonpath='{.status.podIP}' $(oc get pod -n netproj-b | awk '/ose-*/{ print $1 }')
+      register: pod_b
+      tags:
+        - networking
+        - networking_test
+
+    - name: Test connectivity from netproj-a to netproj-b
+      shell: oc exec -n netproj-a $(oc get pod -n netproj-a | awk '/ose-*/{ print $1 }') -- ping -c1 -W1 {{ pod_b.stdout }}
+      register: ping_b
+      failed_when: ping_b | success
+      tags:
+        - networking
+        - networking_test
+
+    - name: Test connectivity from netproj-b to netproj-a
+      shell: oc exec -n netproj-b $(oc get pod -n netproj-b | awk '/ose-*/{ print $1 }') -- ping -c1 -W1 {{ pod_a.stdout }}
+      register: ping_a
+      failed_when: ping_b | success
+      tags:
+        - networking
+        - networking_test
+
+    - name: Join the netproj-a and netproj-b networks
+      command: oc adm pod-network join-projects netproj-a --to=netproj-b
+      tags:
+        - networking
+        - networking_test
+
+    - name: Get the network ID of netproj-a
+      command: oc get netnamespace netproj-a -o jsonpath='{.netid}'
+      register: netproj_a
+      tags:
+        - networking
+        - networking_test
+
+    - name: Check that the network ID for netproj-b is the same
+      command: oc get netnamespace netproj-b -o jsonpath='{.netid}'
+      register: netproj_b
+      failed_when: netproj_a.stdout != netproj_b.stdout
+      tags:
+        - networking
+        - networking_test
+
+    - name: Get the ip of the netproj-a pod
+      shell: oc get pod -n netproj-a -o jsonpath='{.status.podIP}' $(oc get pod -n netproj-a | awk '/ose-*/{ print $1 }')
+      register: pod_a
+      tags:
+        - networking
+        - networking_test
+
+    - name: Get the ip of the netproj-b pod
+      shell: oc get pod -n netproj-b -o jsonpath='{.status.podIP}' $(oc get pod -n netproj-b | awk '/ose-*/{ print $1 }')
+      register: pod_b
+      tags:
+        - networking
+        - networking_test
+
+    - name: Test connectivity from netproj-a to netproj-b
+      shell: oc exec -n netproj-a $(oc get pod -n netproj-a | awk '/ose-*/{ print $1 }') -- ping -c1 -W1 {{ pod_b.stdout }}
+      register: ping_b
+      tags:
+        - networking
+        - networking_test
+
+    - name: Test connectivity from netproj-b to netproj-a
+      shell: oc exec -n netproj-b $(oc get pod -n netproj-b | awk '/ose-*/{ print $1 }') -- ping -c1 -W1 {{ pod_a.stdout }}
+      register: ping_a
+      tags:
+        - networking
+        - networking_test
+

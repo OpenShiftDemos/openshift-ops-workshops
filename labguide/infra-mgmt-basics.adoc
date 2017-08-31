@@ -248,6 +248,8 @@ When working properly, it looks like this:
 .The OpenShift UI will show history metrics for applications
 image::openshift-metrics-overview.png[]
 
+====
+
 In the context of a specific *Pod*, the _Metrics_ tab in the UI will show CPU,
 memory and network throughput for this particular *Pod* with a configurable
 time-range. Also optionally a _donut_ chart next to a resource appears if the
@@ -423,4 +425,238 @@ With this the node will be ready again to accept newly scheduled workloads. Conf
 
   [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get node/{{ NODE2_INTERNAL_FQDN }}
 
-## Manipulating multi-tenant networking
+### OpenShift Multitenant Networking
+OpenShift has a software defined network (SDN) inside the platform that is based
+on Open vSwitch. This SDN is used to provide connectivity between application
+components inside of the OpenShift environment. It comes with default network
+ranges pre-configured, although you can make changes to these should they
+conflict with your existing infrastructure, or for whatever other reason you may
+have. 
+
+When you installed OpenShift, there was an option set in the installer's
+configuration to enable the multitenant network plugin:
+
+[source]
+----
+os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
+----
+
+The OpenShift Multitenant SDN plug-in enables a true isolated multi-tenant
+network infrastructure inside OpenShift’s software defined network. While you
+have seen projects isolate resources through OpenShift’s RBAC, the multitenant
+SDN plugin isolates projects using separate virtual network IDs within Open
+vSwitch.
+
+The multitenant network plugin was introduced in OpenShift 3.1, and more
+information about it and its configuration can be found in the
+link:https://docs.openshift.com/container-platform/3.5/architecture/additional_concepts/sdn.html[networking
+documentation]. Additionally, other vendors are working with the upstream
+Kubernetes community to implement their own SDN plugins, and several of these
+are supported by the vendors for use with OpenShift. These plugin
+implementations make use of appc/CNI, which is outside the scope of this lab.
+
+#### Execute the Creation Script
+Only users with cluster administration privileges can manipulate *Project*
+networks. First, make sure you are logged in as the cluster administrator:
+
+[source]
+----
+oc login -u system:admin
+----
+
+Then, execute a script that we have prepared for you. It will create two
+*Projects* and then deploy a *DeploymentConfig* with a *Pod* for you:
+
+[source]
+----
+bash /opt/lab/code/support/net-proj.sh
+----
+
+#### Examine Network Namespaces
+Two *Projects* were created for you, `netproj-a` and `netproj-b`. Execute the
+following command to see the network namespaces:
+
+[source]
+----
+oc get netnamespaces
+----
+
+You will see something like the following:
+
+[source]
+----
+NAME               NETID
+default            0
+kube-system        8046473
+logging            2245491
+management-infra   693975
+netproj-a          8708998
+netproj-b          8295735
+openshift          10626031
+openshift-infra    1151705
+...
+----
+
+Note that each project has its own network namespace with a unique ID. The
+`default` project is a special exception. Its network ID is 0. This network is a
+global network. It is joined (not isolated) to all other networks in the SDN by
+default. If you remember from earlier exercises, the OpenShift router and the
+image registry are both in the `default` project. This means that *Pods* in all
+other projects can access them. That's good, because the router needs to be able
+to proxy traffic to the *Pods* to make them accessible from outside of
+OpenShift.
+
+#### Test Connectivity
+Now that you have some networks and pods, you will need to find the IP address
+of the pod in the `netproj-b` *Project*. The following command will show you the
+IP address:
+
+[source]
+----
+bash /opt/lab/code/support/podbip.sh
+----
+
+The output will simply be the IP address of the pod in the `netproj-b` project.
+The everyday way to do this would be with a combination of the `get` and
+`describe` verbs. Feel free to do the following to verify what the script did:
+
+[source,role=copypaste]
+----
+oc get pod -n netproj-b
+oc describe pod ose-1-f0deb
+----
+
+Make sure to substitute the correct pod name in the describe command.
+
+`describe` will show you a lot of information about the pod, including its IP
+address on the software defined network. Either way, make note of the IP address
+you found above. It will look something like _10.1.4.12_.
+
+Export the IP address of your pod into a shell variable like so:
+
+[source,role=copypaste]
+----
+export POD_B_IP=10.1.4.12
+----
+
+Make sure to use the correct IP address that you saw earlier in the command
+output.
+
+The OpenShift command-line tool and the web console provide mechanisms to
+execute commands inside *Pods* running in the environment. This is a useful
+feature for both developers as well as for cluster and application
+operators/administrators. You will use that feature in order to test network
+connectivity between the two *Pods* you created.
+
+Get the name of the *Pod* running in the `netproj-a` *Project*:
+
+[source]
+----
+oc get pods -n netproj-a
+----
+
+Then, export the *Pod* ID as a shell variable:
+
+[source,role=copypaste]
+----
+export POD_A_NAME=ose-1-q9mt5
+----
+
+Be sure to use the name that you saw in the output of your command.
+
+Now, go ahead and `exec` a `ping` command inside *Pod* A, trying to reach *Pod*
+B:
+
+[source]
+----
+oc exec -n netproj-a $POD_A_NAME -- ping -c1 -W1 $POD_B_IP
+----
+
+Your `ping` output should look like the following:
+
+[source]
+----
+PING 10.129.0.10 (10.129.0.10) 56(84) bytes of data.
+
+--- 10.129.0.10 ping statistics ---
+1 packets transmitted, 0 received, 100% packet loss, time 0ms
+----
+
+You will see 100% packet loss (your `ping` command sends 1 packet, waits 1 second,
+and gets no response). This is because the networks are not connected to one
+another. Now simply execute the following:
+
+[source]
+----
+ping -c1 -W1 $POD_B_IP
+----
+
+You will see a successful ping. This is because the master (the system you are
+on) is also a node attached to the SDN. At the host level you are able to reach
+across all networks, virtual or otherwise. This is important to keep in mind
+when you consider the overall network-level security of your cluster. Someone
+logged in to an OpenShift host can "see" and touch everything on the SDN.
+
+#### Join the Networks
+Now it’s time to join the networks. Execute the following:
+
+[source]
+----
+oc get netnamespace
+----
+
+Take note of the network IDs for `netproj-a` and `netproj-b`. Then:
+
+[source]
+----
+oc adm pod-network join-projects netproj-a --to=netproj-b
+----
+
+And then look at the network IDs again:
+
+[source]
+----
+oc get netnamespace
+----
+
+You should see that the network IDs of the two projects are now the same.
+
+#### Retest Connectivity
+Now that the projects are joined, your `ping` between the pods should work.
+Execute the original `ping` test again:
+
+[source]
+----
+oc exec -n netproj-a $POD_A_NAME -- ping -c1 -W1 $POD_B_IP
+----
+
+This time, your packet should reach its destination:
+
+[source]
+----
+PING 10.129.0.10 (10.129.0.10) 56(84) bytes of data.
+64 bytes from 10.129.0.10: icmp_seq=1 ttl=64 time=1.07 ms
+
+--- 10.129.0.10 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 1.075/1.075/1.075/0.000 ms
+----
+
+#### Isolate Projects
+Now, go ahead and isolate (unjoin) the projects, and then run your `ping` again:
+
+[source]
+----
+oc adm pod-network isolate-projects netproj-a
+oc exec -n netproj-a $POD_A_NAME -- ping -c1 -W1 $POD_B_IP
+----
+
+You should see that your `ping` fails again.
+
+Network multitenancy is a bit of a blunt tool. You can either give total access
+between two projects, or completely restrict access. Don't fret, though. If you
+need finer-grained control of inter-*Pod* and *Service* communication, there is
+a Tech Preview network implementation called `NetworkPolicy`. You can learn more
+about it in the
+link:https://docs.openshift.com/container-platform/3.5/admin_guide/managing_networking.html#admin-guide-networking-networkpolicy[product
+documentation].

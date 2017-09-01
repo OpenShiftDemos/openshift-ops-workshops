@@ -1061,7 +1061,24 @@ Resources:
                   WEB_CONSOLE_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
                   API_HEALTH_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                 path: /opt/lab/environment.yml
-                owner: root:root
+
+              - content: |
+                  apiVersion: storage.k8s.io/v1beta1
+                  kind: StorageClass
+                  metadata:
+                    name: cns-gold
+                    annotations:
+                      storageclass.beta.kubernetes.io/is-default-class: "true"
+                  provisioner: kubernetes.io/glusterfs
+                  parameters:
+                    resturl: "http://heketi-container-native-storage.apps.${AWS::AccountId}.${PublicHostedZone}"
+                    restauthenabled: "true"
+                    restuser: "admin"
+                    volumetype: "replicate:3"
+                    clusterid: "INSERT-CLUSTER-ID-HERE"
+                    secretNamespace: "default"
+                    secretName: "cns-secret"
+                path: /opt/lab/support/cns-storageclass.yaml
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]

@@ -769,6 +769,7 @@ Resources:
             - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
             - mkdir -p /var/lib/etcd
             - git clone https://github.com/openshift/openshift-cns-testdrive.git /opt/lab/code
+            - mv /opt/lab/code/support/* /opt/lab/support/
 
             write_files:
               - content: |
@@ -865,7 +866,7 @@ Resources:
                     userUIDAttribute: dn
                     userNameAttributes:
                     - uid
-                path: /opt/lab/code/support/groupsync.yaml
+                path: /opt/lab/support/groupsync.yaml
 
               - content: |
                   {
@@ -924,7 +925,7 @@ Resources:
                           }
                       ]
                   }
-                path: /opt/lab/code/support/topology.json
+                path: /opt/lab/support/topology.json
 
               - content: |
                   {
@@ -1035,7 +1036,7 @@ Resources:
                           }
                       ]
                   }
-                path: /opt/lab/code/support/topology-extended.json
+                path: /opt/lab/support/topology-extended.json
 
               - content: |
                   OCP_ROUTING_SUFFIX: "apps.${AWS::AccountId}.${PublicHostedZone}"

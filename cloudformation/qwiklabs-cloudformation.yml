@@ -765,6 +765,11 @@ Resources:
               default_user:
                 name: cloud-user
 
+            runcmd:
+            - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
+            - mkdir -p /var/lib/etcd
+            - git clone https://github.com/openshift/openshift-cns-testdrive.git /opt/lab/code
+
             write_files:
               - content: |
                   [OSEv3:children]
@@ -860,9 +865,7 @@ Resources:
                     userUIDAttribute: dn
                     userNameAttributes:
                     - uid
-                path: /home/cloud-user/groupsync.yaml
-                owner: cloud-user
-                group: cloud-user
+                path: /opt/lab/code/support/groupsync.yaml
 
               - content: |
                   {
@@ -921,9 +924,7 @@ Resources:
                           }
                       ]
                   }
-                path: /home/cloud-user/topology.json
-                owner: cloud-user
-                group: cloud-user
+                path: /opt/lab/code/support/topology.json
 
               - content: |
                   {
@@ -1034,9 +1035,7 @@ Resources:
                           }
                       ]
                   }
-                path: /home/cloud-user/topology-extended.json
-                owner: cloud-user
-                group: cloud-user
+                path: /opt/lab/code/support/topology-extended.json
 
               - content: |
                   OCP_ROUTING_SUFFIX: "apps.${AWS::AccountId}.${PublicHostedZone}"
@@ -1063,11 +1062,6 @@ Resources:
                   API_HEALTH_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                 path: /opt/lab/environment.yml
                 owner: root:root
-
-            runcmd:
-            - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
-            - mkdir -p /var/lib/etcd
-            - git clone https://github.com/openshift/openshift-cns-testdrive.git /opt/lab/code
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]

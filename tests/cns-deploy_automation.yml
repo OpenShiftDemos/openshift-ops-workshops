@@ -94,4 +94,3 @@
 
     - name: create storage class
       shell: oc create -f /tmp/cns-storageclass-gold.yml
-.

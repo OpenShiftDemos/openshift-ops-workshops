@@ -30,27 +30,15 @@ not, make sure that you return to the Qwiklabs page to get the private key.
 Don't forget where you put it, and don't forget to change its permissions
 (`400).
 
-One more piece of information that you will want to retrieve from the Qwiklabs
-page is the IP address of the `master`. The IP address will
-be in the *STACK OUTPUTS:* block, under the *Additional information* section.
-
-For example:
-
-[source]
-----
-MasterIPAddress:  54.164.181.5
-----
-
 For Linux, Mac, and other *nix users, something like the following command would
 be used to SSH into the `master`:
 
 [source,role=copypaste]
 ----
-ssh -i <path_to/qwikLABS-LXX-YYYY.pem> cloud-user@<Master_IP-Address>
+ssh -i <path_to/qwikLABS-LXX-YYYY.pem> cloud-user@{{ MASTER_EXTERNAL_IP }}
 ----
 
-Make sure that you use the correct path and that you substitute the IP address
-you determined earlier.
+Make sure that you use the correct path to your SSH key file.
 
 NOTE: Windows users are encouraged to use the
 link:https://www.chiark.greenend.org.uk/~sgtatham/putty/[PuTTY] client. Instructions for how

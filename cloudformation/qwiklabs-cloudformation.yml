@@ -770,6 +770,7 @@ Resources:
             - mkdir -p /var/lib/etcd
             - git clone https://github.com/openshift/openshift-cns-testdrive.git /opt/lab/code
             - mv /opt/lab/code/support/* /opt/lab/support/
+            - chown -R cloud-user:cloud-user /opt/lab/support
 
             write_files:
               - content: |
@@ -867,6 +868,7 @@ Resources:
                     userNameAttributes:
                     - uid
                 path: /opt/lab/support/groupsync.yaml
+                owner: cloud-user:cloud-user
 
               - content: |
                   {
@@ -926,6 +928,7 @@ Resources:
                       ]
                   }
                 path: /opt/lab/support/topology.json
+                owner: cloud-user:cloud-user
 
               - content: |
                   {
@@ -1037,6 +1040,7 @@ Resources:
                       ]
                   }
                 path: /opt/lab/support/topology-extended.json
+                owner: cloud-user:cloud-user
 
               - content: |
                   OCP_ROUTING_SUFFIX: "apps.${AWS::AccountId}.${PublicHostedZone}"
@@ -1080,6 +1084,7 @@ Resources:
                     secretNamespace: "default"
                     secretName: "cns-secret"
                 path: /opt/lab/support/cns-storageclass.yaml
+                owner: cloud-user:cloud-user
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]

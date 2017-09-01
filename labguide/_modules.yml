@@ -74,7 +74,7 @@ modules:
   installation:
     name: Installation and Verification
   cns-deploy:
-    name: Deploying Container-native Storage
+    name: Deploying Container Native Storage
     requires:
       - installation
     vars:

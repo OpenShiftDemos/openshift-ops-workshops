@@ -769,8 +769,9 @@ Resources:
             - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
             - mkdir -p /var/lib/etcd
             - git clone https://github.com/openshift/openshift-cns-testdrive.git /opt/lab/code
-            - mv /opt/lab/code/support/* /opt/lab/support/
-            - chown -R cloud-user:cloud-user /opt/lab/support
+            - chown -R cloud-user:cloud-user /opt/lab
+            - cp /opt/lab/code/support/* /opt/lab/support/
+            - chown -R cloud-user:cloud-user /opt/lab
 
             write_files:
               - content: |

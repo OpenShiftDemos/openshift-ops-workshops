@@ -46,7 +46,7 @@
 
     - name: check existance of topology file
       stat:
-        path: /home/cloud-user/topology.json
+        path: /opt/lab/support/topology.json
       register: topology_file
       changed_when: False
       failed_when: not topology_file.stat.exists
@@ -57,7 +57,7 @@
         heketi_user_pw: "{{ HEKETI_USER_PW }}"
 
     - name: run cns-deploy
-      shell: cns-deploy --yes -n {{cns_namespace}} -g /home/cloud-user/topology.json --admin-key '{{heketi_admin_pw}}' --user-key '{{heketi_user_pw}}'
+      shell: cns-deploy --yes -n {{cns_namespace}} -g /opt/lab/support/topology.json --admin-key '{{heketi_admin_pw}}' --user-key '{{heketi_user_pw}}'
       become: true
 
     - set_fact:

@@ -63,7 +63,7 @@ with the following command:
 
 [source]
 ----
-ansible-playbook /opt/lab/code/support/configure-firewall.yaml
+ansible-playbook /opt/lab/support/configure-firewall.yaml
 ----
 
 When the playbooks completes successfully, your output should look like the
@@ -140,7 +140,7 @@ the OpenShift environment.
 There has already been a JSON file defined for you:
 
 [source,json]
-./opt/lab/code/support/topology.json
+./opt/lab/support/topology.json
 ----
 {
     "clusters": [
@@ -534,7 +534,7 @@ API, specifically) so that OpenShift can use it when provisioning or deleting
 storage volumes.
 
 The definition of this *Secret* is in a file
-`/opt/lab/code/support/cns-secret.yaml`. It contains a base64-encoded version of
+`/opt/lab/support/cns-secret.yaml`. It contains a base64-encoded version of
 the heketi admin password that you used earlier when deploying CNS. Make sure
 you are still in the `{{ CNS_NAMESPACE }}` *Project*:
 
@@ -547,13 +547,13 @@ Then, you can create (instantiate) the *Secret*:
 
 [source]
 ----
-oc create -f /opt/lab/code/support/cns-secret.yaml
+oc create -f /opt/lab/support/cns-secret.yaml
 ----
 
 #### Create the Storage Class
 To tell OpenShift about the existence of a dynamic storage provider, you use a
 *StorageClass*. There is a definition file
-`/opt/lab/code/support/cns-storageclass.yaml` that describes the *StorageClass*
+`/opt/lab/support/cns-storageclass.yaml` that describes the *StorageClass*
 as well as references the *Secret* you just created. You will need to edit it
 appropriately. Open the file with your favorite editor, and substitute
 `INSERT-CLUSTER-ID-HERE` with the ID of your cluster.
@@ -589,7 +589,7 @@ Create the *StorageClass*:
 
 [source]
 ----
-oc create -f /opt/lab/code/support/cns-storageclass.yml
+oc create -f /opt/lab/support/cns-storageclass.yml
 ----
 
 With these components in place, OpenShift can now dynamically provision storage

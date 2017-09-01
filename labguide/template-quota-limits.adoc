@@ -239,7 +239,7 @@ Go ahead and execute the following:
 
 [source]
 ----
-oc create -f /opt/lab/code/support/project_request_template.yaml -n default
+oc create -f /opt/lab/support/project_request_template.yaml -n default
 ----
 
 This will create the *Template* object in the `default` *Project*. You can now

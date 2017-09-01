@@ -8,7 +8,7 @@
       ignore_errors: true
 
     - name: Create the project-request template in the namespace 'default' 
-      command: oc create -f /opt/lab/code/labguide/files/project_request_template.yaml -n default
+      command: oc create -f /opt/lab/support/project_request_template.yaml -n default
       when: template_output | failed
       
     - name: modify the master-config.yaml to create project request template

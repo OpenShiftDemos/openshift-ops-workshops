@@ -351,24 +351,24 @@
         - networking
         - networking_test
 
-    - name: Make node2 unschedulable
-      command: oc adm manage-node node02.internal.aws.testdrive.openshift.com --schedulable=false
+    - name: Make node03 unschedulable
+      command: oc adm manage-node node03.internal.aws.testdrive.openshift.com --schedulable=false
       tags:
         - maintenance
 
-    - name: Evacuate node2
-      command: oc adm manage-node node02.internal.aws.testdrive.openshift.com --evacuate
+    - name: Evacuate node03
+      command: oc adm manage-node node03.internal.aws.testdrive.openshift.com --evacuate
       tags:
         - maintenance
 
-    - name: Wait 60 seconds for evacuation
+    - name: Wait 120 seconds for evacuation and restart
       pause:
-        seconds: 60
+        seconds: 120
       tags:
         - maintenance
 
-    - name: Make node2 schedulable again
-      command: oc adm manage-node node02.internal.aws.testdrive.openshift.com --schedulable=true
+    - name: Make node03 schedulable again
+      command: oc adm manage-node node03.internal.aws.testdrive.openshift.com --schedulable=true
       tags:
         - maintenance
 

@@ -361,6 +361,7 @@
       tags:
         - maintenance
 
+    # instead of waiting like this, should probably find the gluster pod and then wait for it to be ready
     - name: Wait 120 seconds for evacuation and restart
       pause:
         seconds: 120

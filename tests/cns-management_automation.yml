@@ -61,14 +61,14 @@
         node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
         node4_internal_fqdn: " {{ NODE4_INTERNAL_FQDN }}"
 
-    - name: check route
-      shell: oc get route/rails-pgsql-persistent
-
     - name: re-login as system:admin
       shell: oc login -u system:admin
 
     - name: change to project of fancyuser1
       shell:  oc project my-database-app
+
+    - name: check route
+      shell: oc get route/rails-pgsql-persistent
 
     - name: check pvc called 'postgres' exists
       shell: oc get pvc/postgresql -o json
@@ -101,62 +101,14 @@
         msg: pv is not provided by {{ cns_storageclass }}
       when: postgresql_pv.metadata.annotations['volume.beta.kubernetes.io/storage-class'] != cns_storageclass
 
-    - name: get storage class
-      shell: oc get storageclass/{{ cns_storageclass }} -o json
-      register: get_storageclass1
-      changed_when: false
+    - name: get volume path of pv for app
+      shell: oc get pv $(oc get pvc -n my-database-app postgresql -o jsonpath='{.spec.volumeName}') -o jsonpath='{.spec.glusterfs.path}'
+      register: pv_volume_path
 
-    - set_fact:
-        storageclass1: "{{ get_storageclass1.stdout|from_json }}"
-
-    - name: get CNS cluster id of storageclass
-      set_fact:
-        clusterid1: "{{storageclass1.parameters.clusterid}}"
-
-    - name: get nodes from heketi using CNS cluster id
-      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster info {{ clusterid1 }} --json
-      register: get_cluster1_nodes
-      changed_when: false
-
-    - set_fact:
-        cluster1_nodes: "{{ get_cluster1_nodes.stdout|from_json }}"
-
-    - name: get id of first node of CNS cluster
-      set_fact:
-        cluster1_node1_id: "{{ cluster1_nodes.nodes|first }}"
-
-    - name: get details of first node of CNS cluster
-      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ cluster1_node1_id }} --json
-      register: get_cluster1_node1
-      changed_when: false
-
-    - set_fact:
-        cluster1_node1: "{{ get_cluster1_node1.stdout|from_json }}"
-
-    - set_fact:
-        cluster1_node1_hostip: "{{ cluster1_node1.hostnames.storage|first }}"
-
-    - name: get pod name of first node of cns cluster
-      shell: oc get pods -o wide -n container-native-storage -o jsonpath='{$.items[?(@.status.hostIP=="{{ cluster1_node1_hostip }}")].metadata.name}'
-      register: get_cluster1_node1_pod
-      changed_when: false
-
-    - set_fact:
-        cluster1_node1_pod: "{{ get_cluster1_node1_pod.stdout }}"
-
-    - set_fact:
-        pv_gluster_vol_name: "{{ postgresql_pv.spec.glusterfs.path }}"
-
-    - name: switch to cns namespace
-      shell: oc project {{ cns_namespace }}
-      changed_when: false
-
+    # I don't know why first pod was important, any seem to return the same info
+    # This fixes a problem where the first node has both the heketi and cns pod
     - name: check gluster volume of pv
-      shell: oc rsh {{ cluster1_node1_pod }} gluster vol info {{ pv_gluster_vol_name }}
-      changed_when: false
-
-    - name: log back in as fancyuser1 to my-database-app
-      shell: oc login -u fancyuser1 -p openshift -n my-database-app
+      shell: oc exec $(oc get pod -n container-native-storage --no-headers | head -1 | awk '{print $1}') -- gluster vol info {{ pv_volume_path.stdout }}
       changed_when: false
 
     - name: check health of postgres-db deployment

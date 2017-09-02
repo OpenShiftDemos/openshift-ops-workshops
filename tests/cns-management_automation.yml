@@ -339,13 +339,13 @@
     - name: change to cns namespace
       shell: oc project {{cns_namespace}}
     
-    - name: ensure additional hosts are part of cns group
-      lineinfile:
-        line: "{{ item }}"
+    - name: uncomment additional cns lines
+      replace:
+        regexp: '#addcns_'
+        replace: ''
         path: /etc/ansible/hosts
-        insertafter: "^\\[cns\\]"
-        regexp: "^#{{ item }}"
-      with_items: "{{ new_cns_nodes_internal_fqdn }}"
+      tags:
+        - scaleup
     
     - name: insert iptables rules required for GlusterFS
       blockinfile:

@@ -831,9 +831,9 @@ Resources:
                   node01.internal.${PublicHostedZone}
                   node02.internal.${PublicHostedZone}
                   node03.internal.${PublicHostedZone}
-                  #node04.internal.${PublicHostedZone}
-                  #node05.internal.${PublicHostedZone}
-                  #node06.internal.${PublicHostedZone}
+                  #addcns_node04.internal.${PublicHostedZone}
+                  #addcns_node05.internal.${PublicHostedZone}
+                  #addcns_node06.internal.${PublicHostedZone}
 
                   [cns:vars]
                   ansible_become=true

@@ -108,10 +108,10 @@ volume claims, and *Pods*. Take a look at the `ResourceQuota` section from the
   spec:
     hard:
       pods: 10 <2>
-      limits.cpu: 4000m <3>
-      limits.memory: 1Gi <4>
+      requests.cpu: 4000m <3>
+      requests.memory: 8Gi <4>
       resourcequotas: 1
-      requests.storage: 5Gi <5>
+      requests.storage: 25Gi <5>
       persistentvolumeclaims: 5 <6>
 ----
 
@@ -205,13 +205,13 @@ The settings we provide for you in these examples generally restrict projects to
 *** cannot be defined with less than 10 milicores
 *** will default to a request of 100 milicores (if not specified)
 *** may burst up to a limit of 4 cores (if not specified)
-* A total memory usage of 1 Gibibyte (1024 Mebibytes) where
+* A total memory usage of 8 Gibibyte (8192 Megabytes) where
 ** Individual containers
 *** must use 1 Gi or less
 *** cannot be defined with less than 5 Mi
 *** will default to a request of 512 Mi
 *** may burst up to a limit of 1024 Mi
-* Total storage claims of 5 Gi or less
+* Total storage claims of 25 Gi or less
 * A total number of 5 volume claims
 * 10 or less *Pods*
 
@@ -239,7 +239,7 @@ Go ahead and execute the following:
 
 [source]
 ----
-oc create -f /opt/lab/code/labguide/files/project_request_template.yaml -n default
+oc create -f /opt/lab/support/project_request_template.yaml -n default
 ----
 
 This will create the *Template* object in the `default` *Project*. You can now
@@ -322,36 +322,36 @@ The output will look something like:
 
 [source]
 ----
-Name:		template-test
-Namespace:	<none>
-Created:	5 seconds ago
-Labels:		<none>
-Annotations:	openshift.io/description=
-		openshift.io/display-name=
-		openshift.io/requester=system:admin
-		openshift.io/sa.scc.mcs=s0:c8,c2
-		openshift.io/sa.scc.supplemental-groups=1000060000/10000
-		openshift.io/sa.scc.uid-range=1000060000/10000
-Display Name:	<none>
-Description:	<none>
-Status:		Active
-Node Selector:	<none>
+Name:           template-test
+Namespace:      <none>
+Created:        5 seconds ago
+Labels:         <none>
+Annotations:    openshift.io/description=
+                openshift.io/display-name=
+                openshift.io/requester=fancyuser1
+                openshift.io/sa.scc.mcs=s0:c12,c9
+                openshift.io/sa.scc.supplemental-groups=1000150000/10000
+                openshift.io/sa.scc.uid-range=1000150000/10000
+Display Name:   <none>
+Description:    <none>
+Status:         Active
+Node Selector:  <none>
 Quota:
-	Name:			template-test-quota
-	Resource		Used	Hard
-	--------		----	----
-	limits.cpu		0	1
-	limits.memory		0	1Gi
-	persistentvolumeclaims	0	5
-	pods			0	10
-	requests.storage	0	5Gi
-	resourcequotas		1	1
+        Name:                   template-test-quota
+        Resource                Used    Hard
+        --------                ----    ----
+        persistentvolumeclaims  0       5
+        pods                    0       10
+        requests.cpu            0       4
+        requests.memory         0       4Gi
+        requests.storage        0       25Gi
+        resourcequotas          1       1
 Resource limits:
-	Name:		template-test-limits
-	Type		Resource	Min	Max	Default
-	----		--------	---	---	---
-	Container	cpu		100m	5	4
-	Container	memory		5Mi	1Gi	1Gi
+        Name:           template-test-limits
+        Type            Resource        Min     Max     Default
+        ----            --------        ---     ---     ---
+        Container       cpu             10m     4       4
+        Container       memory          5Mi     1Gi     1Gi
 ----
 
 You can also see that the *Quota* and *LimitRange* objects were created:

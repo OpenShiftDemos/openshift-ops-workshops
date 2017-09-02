@@ -765,6 +765,14 @@ Resources:
               default_user:
                 name: cloud-user
 
+            runcmd:
+            - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
+            - mkdir -p /var/lib/etcd
+            - git clone https://github.com/openshift/openshift-cns-testdrive.git /opt/lab/code
+            - chown -R cloud-user:cloud-user /opt/lab
+            - cp /opt/lab/code/support/* /opt/lab/support/
+            - chown -R cloud-user:cloud-user /opt/lab
+
             write_files:
               - content: |
                   [OSEv3:children]
@@ -823,9 +831,9 @@ Resources:
                   node01.internal.${PublicHostedZone}
                   node02.internal.${PublicHostedZone}
                   node03.internal.${PublicHostedZone}
-                  #node04.internal.${PublicHostedZone}
-                  #node05.internal.${PublicHostedZone}
-                  #node06.internal.${PublicHostedZone}
+                  #addcns_node04.internal.${PublicHostedZone}
+                  #addcns_node05.internal.${PublicHostedZone}
+                  #addcns_node06.internal.${PublicHostedZone}
 
                   [cns:vars]
                   ansible_become=true
@@ -860,9 +868,8 @@ Resources:
                     userUIDAttribute: dn
                     userNameAttributes:
                     - uid
-                path: /home/cloud-user/groupsync.yaml
-                owner: cloud-user
-                group: cloud-user
+                path: /opt/lab/support/groupsync.yaml
+                owner: cloud-user:cloud-user
 
               - content: |
                   {
@@ -921,9 +928,8 @@ Resources:
                           }
                       ]
                   }
-                path: /home/cloud-user/topology.json
-                owner: cloud-user
-                group: cloud-user
+                path: /opt/lab/support/topology.json
+                owner: cloud-user:cloud-user
 
               - content: |
                   {
@@ -1034,9 +1040,8 @@ Resources:
                           }
                       ]
                   }
-                path: /home/cloud-user/topology-extended.json
-                owner: cloud-user
-                group: cloud-user
+                path: /opt/lab/support/topology-extended.json
+                owner: cloud-user:cloud-user
 
               - content: |
                   OCP_ROUTING_SUFFIX: "apps.${AWS::AccountId}.${PublicHostedZone}"
@@ -1062,12 +1067,59 @@ Resources:
                   WEB_CONSOLE_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
                   API_HEALTH_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                 path: /opt/lab/environment.yml
-                owner: root:root
 
-            runcmd:
-            - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
-            - mkdir -p /var/lib/etcd
-            - git clone https://github.com/openshift/openshift-cns-testdrive.git /opt/lab/code
+              - content: |
+                  apiVersion: storage.k8s.io/v1beta1
+                  kind: StorageClass
+                  metadata:
+                    name: cns-gold
+                    annotations:
+                      storageclass.beta.kubernetes.io/is-default-class: "true"
+                  provisioner: kubernetes.io/glusterfs
+                  parameters:
+                    resturl: "http://heketi-container-native-storage.apps.${AWS::AccountId}.${PublicHostedZone}"
+                    restauthenabled: "true"
+                    restuser: "admin"
+                    volumetype: "replicate:3"
+                    clusterid: "INSERT-CLUSTER-ID-HERE"
+                    secretNamespace: "default"
+                    secretName: "cns-secret"
+                path: /opt/lab/support/cns-storageclass.yaml
+                owner: cloud-user:cloud-user
+
+              - content: |
+                  apiVersion: storage.k8s.io/v1beta1
+                  kind: StorageClass
+                  metadata:
+                    name: cns-silver
+                    annotations:
+                  provisioner: kubernetes.io/glusterfs
+                  parameters:
+                    resturl: "http://heketi-container-native-storage.apps.${AWS::AccountId}.${PublicHostedZone}"
+                    restauthenabled: "true"
+                    restuser: "admin"
+                    volumetype: "replicate:3"
+                    clusterid: "INSERT-CLUSTER-ID-HERE"
+                    secretNamespace: "default"
+                    secretName: "cns-secret"
+                path: /opt/lab/support/second-cns-storageclass.yaml
+                owner: cloud-user:cloud-user
+
+              - content: |
+                  kind: PersistentVolumeClaim
+                  apiVersion: v1
+                  metadata:
+                    name: my-container-storage-silver
+                    annotations:
+                      volume.beta.kubernetes.io/storage-class: cns-silver
+                  spec:
+                    accessModes:
+                    - ReadWriteOnce
+                    resources:
+                      requests:
+                        storage: 1Gi
+                path: /opt/lab/support/cns-silver-pvc.yaml
+                owner: cloud-user:cloud-user
 
             mounts:
             - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]

@@ -1,99 +1,96 @@
 ---
+- hosts: cns
+  name: Configure CNS host firewalls
+  tasks:
+    - name: insert iptables rules required for GlusterFS
+      blockinfile:
+        dest: /etc/sysconfig/iptables
+        block: |
+          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT
+          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
+          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
+          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
+        insertbefore: "^COMMIT"
+      become: true
 
-  - hosts: cns
+    - name: insert iptables rules required for GlusterFS
+      lineinfile:
+        dest: /etc/sysconfig/iptables
+        line: ':OS_FIREWALL_ALLOW - [0:0]'
+        insertbefore: "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"
+      become: true
 
-    tasks:
+    - name: reload iptables
+      systemd:
+        name: iptables
+        state: reloaded
+      become: true
 
-      - name: insert iptables rules required for GlusterFS
-        blockinfile:
-          dest: /etc/sysconfig/iptables
-          block: |
-            -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT
-            -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
-            -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
-            -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
-          insertbefore: "^COMMIT"
-        become: true
+- hosts: localhost
+  name: Install and configure CNS
+  tasks:
 
-      - name: insert iptables rules required for GlusterFS
-        lineinfile:
-          dest: /etc/sysconfig/iptables
-          line: ':OS_FIREWALL_ALLOW - [0:0]'
-          insertbefore: "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"
-        become: true
+    - include_vars: /opt/lab/environment.yml
 
-      - name: reload iptables
-        systemd:
-          name: iptables
-          state: reloaded
-        become: true
+    - name: login via oc as system:admin to default namespace
+      shell: oc login -u system:admin -n default
 
-  - hosts: localhost
+    - set_fact:
+        cns_namespace: "{{ CNS_NAMESPACE }}"
 
-    tasks:
+    - name: create new project
+      shell: oc new-project {{ cns_namespace }}
 
-      - include_vars: /opt/lab/environment.yml
+    - name: add privileges to default service account
+      shell: oc adm policy add-scc-to-user privileged -z default -n {{ cns_namespace }}
 
-      - name: login via oc as system:admin to default namespace
-        shell: oc login -u system:admin -n default
+    - name: check existance of topology file
+      stat:
+        path: /opt/lab/support/topology.json
+      register: topology_file
+      changed_when: False
+      failed_when: not topology_file.stat.exists
 
-      - set_fact:
-          cns_namespace: "{{ CNS_NAMESPACE }}"
+    - set_fact:
+        cns_namespace: "{{ CNS_NAMESPACE }}"
+        heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
+        heketi_user_pw: "{{ HEKETI_USER_PW }}"
 
-      - name: create new project
-        shell: oc new-project {{ cns_namespace }}
+    - name: run cns-deploy
+      shell: cns-deploy --yes -n {{cns_namespace}} -g /opt/lab/support/topology.json --admin-key '{{heketi_admin_pw}}' --user-key '{{heketi_user_pw}}'
+      become: true
 
-      - name: add privileges to default service account
-        shell: oc adm policy add-scc-to-user privileged -z default -n {{ cns_namespace }}
+    - set_fact:
+        heketi_admin_pw_base64: "{{HEKETI_ADMIN_PW_BASE64 }}"
 
-      - name: check existance of topology file
-        stat:
-          path: /home/cloud-user/topology.json
-        register: topology_file
-        changed_when: False
-        failed_when: not topology_file.stat.exists
+    - name: create storage secret file from template
+      template:
+        src: ../templates/cns-secret.yml.j2
+        dest: /tmp/cns-secret.yml
 
-      - set_fact:
-          cns_namespace: "{{ CNS_NAMESPACE }}"
-          heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
-          heketi_user_pw: "{{ HEKETI_USER_PW }}"
+    - name: create storage secret in default namespace
+      shell: |
+        oc create -n default -f /tmp/cns-secret.yml
 
-      - name: run cns-deploy
-        shell: cns-deploy --yes -n {{cns_namespace}} -g /home/cloud-user/topology.json --admin-key '{{heketi_admin_pw}}' --user-key '{{heketi_user_pw}}'
-        become: true
+    - set_fact:
+        ocp_routing_suffix: "{{ OCP_ROUTING_SUFFIX }}"
+        heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+        cns_storageclass: "{{ CNS_STORAGECLASS }}"
 
-      - set_fact:
-          heketi_admin_pw_base64: "{{HEKETI_ADMIN_PW_BASE64 }}"
+    - name: get cluster-id from heketi
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} --json cluster list
+      register: heketi_cluster_list
 
-      - name: create storage secret file from template
-        template:
-          src: ../templates/cns-secret.yml.j2
-          dest: /tmp/cns-secret.yml
+    - set_fact:
+        heketi_output: "{{heketi_cluster_list.stdout|from_json}}"
 
-      - name: create storage secret in default namespace
-        shell: |
-          oc create -n default -f /tmp/cns-secret.yml
+    - set_fact:
+        cns_clusterid: "{{heketi_output.clusters|first}}"
 
-      - set_fact:
-          ocp_routing_suffix: "{{ OCP_ROUTING_SUFFIX }}"
-          heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
-          cns_storageclass: "{{ CNS_STORAGECLASS }}"
+    - name: create storage class file from template
+      template:
+        src: ../templates/cns-storageclass-gold.yml.j2
+        dest: /tmp/cns-storageclass-gold.yml
 
-      - name: get cluster-id from heketi
-        shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} --json cluster list
-        register: heketi_cluster_list
-
-      - set_fact:
-          heketi_output: "{{heketi_cluster_list.stdout|from_json}}"
-
-      - set_fact:
-          cns_clusterid: "{{heketi_output.clusters|first}}"
-
-      - name: create storage class file from template
-        template:
-          src: ../templates/cns-storageclass-gold.yml.j2
-          dest: /tmp/cns-storageclass-gold.yml
-
-      - name: create storage class
-        shell: oc create -f /tmp/cns-storageclass-gold.yml
-...
+    - name: create storage class
+      shell: oc create -f /tmp/cns-storageclass-gold.yml

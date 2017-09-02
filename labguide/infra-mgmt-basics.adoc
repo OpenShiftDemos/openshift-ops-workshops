@@ -406,7 +406,7 @@ Then, execute a script that we have prepared for you. It will create two
 
 [source]
 ----
-bash /opt/lab/code/support/net-proj.sh
+bash /opt/lab/support/net-proj.sh
 ----
 
 #### Examine Network Namespaces
@@ -450,7 +450,7 @@ IP address:
 
 [source]
 ----
-bash /opt/lab/code/support/podbip.sh
+bash /opt/lab/support/podbip.sh
 ----
 
 The output will simply be the IP address of the pod in the `netproj-b` project.

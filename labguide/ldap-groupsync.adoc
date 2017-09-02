@@ -127,7 +127,7 @@ We have provided a `groupsync` configuration file for you already. Using `cat`,
 
 [source]
 ----
-cat /home/cloud-user/groupsync.yaml
+cat /opt/lab/support/groupsync.yaml
 ----
 
 Without going into too much detail (you can look at the documentation), the
@@ -154,7 +154,7 @@ And then execute the `groupsync`:
 
 [source]
 ----
-oc adm groups sync --sync-config=/home/cloud-user/groupsync.yaml --confirm
+oc adm groups sync --sync-config=/opt/lab/support/groupsync.yaml --confirm
 ----
 
 You will see output like the following:

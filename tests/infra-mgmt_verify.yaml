@@ -242,7 +242,7 @@
       register: ose_dc
 
     - name: Deploy ose pod into netproj-a
-      command: oc create -f /opt/lab/code/support/ose.yaml -n netproj-a
+      command: oc create -f /opt/lab/support/ose.yaml -n netproj-a
       when: ose_dc | failed
       tags:
         - networking
@@ -255,7 +255,7 @@
       register: ose_dc
 
     - name: Deploy ose pod into netproj-b
-      command: oc create -f /opt/lab/code/support/ose.yaml -n netproj-b
+      command: oc create -f /opt/lab/support/ose.yaml -n netproj-b
       when: ose_dc | failed
       tags:
         - networking
@@ -351,24 +351,25 @@
         - networking
         - networking_test
 
-    - name: Make node2 unschedulable
-      command: oc adm manage-node node02.internal.aws.testdrive.openshift.com --schedulable=false
+    - name: Make node03 unschedulable
+      command: oc adm manage-node node03.internal.aws.testdrive.openshift.com --schedulable=false
       tags:
         - maintenance
 
-    - name: Evacuate node2
-      command: oc adm manage-node node02.internal.aws.testdrive.openshift.com --evacuate
+    - name: Evacuate node03
+      command: oc adm manage-node node03.internal.aws.testdrive.openshift.com --evacuate
       tags:
         - maintenance
 
-    - name: Wait 60 seconds for evacuation
+    # instead of waiting like this, should probably find the gluster pod and then wait for it to be ready
+    - name: Wait 120 seconds for evacuation and restart
       pause:
-        seconds: 60
+        seconds: 120
       tags:
         - maintenance
 
-    - name: Make node2 schedulable again
-      command: oc adm manage-node node02.internal.aws.testdrive.openshift.com --schedulable=true
+    - name: Make node03 schedulable again
+      command: oc adm manage-node node03.internal.aws.testdrive.openshift.com --schedulable=true
       tags:
         - maintenance
 

@@ -1,52 +1,131 @@
-[abstract]
-Overview
---------
-In this lab we are going to provide a view 'under the hood' of OpenShift `PersistentVolumes` provided by CNS. For this purpose we will examine volumes leveraged by example applications using different volume access modes.
+## Storage Management
+In this lab we are going to provide a view 'under the hood' of OpenShift
+`PersistentVolumes` provided by CNS. For this purpose we will examine volumes
+leveraged by example applications using different volume access modes.
 
-### CNS under the hood
+### A Simple CNS Use Case
 
-We are going to deploy a sample application that ships with OpenShift which creates a PVC as part of the deployment.
-Log on to the system as `fancyuser1` und create a project with the name `my-database-app`.
+We are going to deploy a sample application that ships with OpenShift which
+creates a PVC as part of the deployment.  Log on to the system as `fancyuser1`
+und create a project with the name `my-database-app`.
 
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc login -u fancyuser1
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc new-project my-database-app
-
-The example applications ships in form of ready-to-use resource templates. Enter the following command to export the template for a sample Ruby on Rails application with a PostgreSQL database:
-
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc export template/rails-pgsql-persistent -n openshift -o yaml > rails-app-template.yml
-
-In the file `rails-app-template.yml` you can now review the template for this entire application stack. In essence it creates Rails Application instance which mimics a very basic weblog. The articles and comments are saved in a PostgreSQL database which runs in another pod. +
-As part of the resource template a PVC is issued (line 194) to supply the PostgreSQL pod with persistent storage with the mount point `/var/lib/pgsql/data` (line 275). This will request a `PersistentVolume` in *RWO* mode. Storage provided in this mode can only be mounted by a single pod at a time.
-
-Next we are going to render the template to a fully functional set of resource descriptors while passing in an additional parameter to override the default storage capacity requested from the PVC.
-
-TIP: To list all available parameters from this template run `oc process -f rails-app-template.yml --parameters`
-
-The parameter in the template is called `VOLUME_CAPACITY`. We will process the template with the CLI client and override this parameter with a value of _15Gi_ as follows:
-
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc process -f rails-app-template.yml -o yaml -p VOLUME_CAPACITY=15Gi > my-rails-app.yml
-
-The `oc process` command parses the template and replaces any parameters with their default values if not supplied explicitly like we did for the volume capacity.
-
-The resulting `my-rails-app.yml` file contains all resources for this application ready to deploy. Deploy it like so:
-
+#### Create/Deploy the Application
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc create -f my-rails-app.yml
-secret "rails-pgsql-persistent" created
-service "rails-pgsql-persistent" created
-route "rails-pgsql-persistent" created
-imagestream "rails-pgsql-persistent" created
-buildconfig "rails-pgsql-persistent" created
-deploymentconfig "rails-pgsql-persistent" created
-persistentvolumeclaim "postgresql" created
-service "postgresql" created
-deploymentconfig "postgresql" created
+oc login -u fancyuser1
+oc new-project my-database-app
 ----
 
-You can now use the OpenShift UI at {{WEB_CONSOLE_URL}} (while being logged in as _fancyuser1_ in the newly created project `my-database-app`) to follow the deployment process. Alternatively watch the containers deploy like this:
+The example applications ships in form of ready-to-use resource templates. Enter
+the following command to look at the template for a sample Ruby on Rails
+application with a PostgreSQL database:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods -w
+oc get template/rails-pgsql-persistent -n openshift -o yaml
+----
+
+This template creates a Rails Application instance which mimics a very basic
+weblog. The articles and comments are saved in a PostgreSQL database which runs
+in another pod. As part of the resource template a PVC is issued (line 194) to
+supply the PostgreSQL pod with persistent storage with the mount point
+`/var/lib/pgsql/data` (line 275). This will request a *PersistentVolume* in
+`RWO` mode. Storage provided in this mode can only be mounted by a single pod at
+a time.
+
+[TIP]
+====
+If you want to see more about the paramters or other details of this template,
+you can execute the following:
+
+[source]
+----
+oc describe template rails-pgsql-persistent -n openshift
+----
+====
+
+The storage size parameter in the template is called `VOLUME_CAPACITY`. The
+`new-app` command will actually handle processing and interpreting a *Template*
+into the appropriate OpenShift objects. We will specify that we want _5Gi_ of
+storage as follows:
+
+[source]
+----
+oc new-app rails-pgsql-persistent -p VOLUME_CAPACITY=5Gi
+----
+
+[NOTE]
+====
+The `new-app` command will automatically check for templates in the special
+`openshift` namespace. In fact, `new-app` tries to do quite a lot of interesting
+automagic things, including code introspection when pointed at code
+repositories. It is a developer's good friend.
+====
+
+You will then see something like the following:
+
+[source]
+----
+--> Deploying template "openshift/rails-pgsql-persistent" to project my-database-app
+
+     Rails + PostgreSQL (Persistent)
+     ---------
+     An example Rails application with a PostgreSQL database. For more information about using this template, including OpenShift considerations, see https://github.com/openshift/rails-ex/blob/master/README.md.
+
+     The following service(s) have been created in your project: rails-pgsql-persistent, postgresql.
+     
+     For more information about using this template, including OpenShift considerations, see https://github.com/openshift/rails-ex/blob/master/README.md.
+
+
+     * With parameters:
+        * Name=rails-pgsql-persistent
+        * Namespace=openshift
+        * Memory Limit=512Mi
+        * Memory Limit (PostgreSQL)=512Mi
+        * Volume Capacity=5Gi
+        * Git Repository URL=https://github.com/openshift/rails-ex.git
+        * Git Reference=
+        * Context Directory=
+        * Application Hostname=
+        * GitHub Webhook Secret=yGhTIuuUjH7JHClrCtYYbY2FdtT0RF5oxA77tGWO # generated
+        * Secret Key=8phdjyreu8vaai84ffmvyw18vc3awvgje1c4mw42uplrcvf0dbdyvy1gav4d8dpqwd340l3r6m2otas7eat1cdixpxv65d7rbdbmjhma2jmf2wf0darnou8hhn56ecq # generated
+        * Application Username=openshift
+        * Application Password=secret
+        * Rails Environment=production
+        * Database Service Name=postgresql
+        * Database Username=userP8B # generated
+        * Database Password=USrJhqh6 # generated
+        * Database Name=root
+        * Maximum Database Connections=100
+        * Shared Buffer Amount=12MB
+        * Custom RubyGems Mirror URL=
+
+--> Creating resources ...
+    secret "rails-pgsql-persistent" created
+    service "rails-pgsql-persistent" created
+    route "rails-pgsql-persistent" created
+    imagestream "rails-pgsql-persistent" created
+    buildconfig "rails-pgsql-persistent" created
+    deploymentconfig "rails-pgsql-persistent" created
+    persistentvolumeclaim "postgresql" created
+    service "postgresql" created
+    deploymentconfig "postgresql" created
+--> Success
+    Build scheduled, use 'oc logs -f bc/rails-pgsql-persistent' to track its progress.
+    Run 'oc status' to view your app.
+----
+
+Go back to the OpenShift web console:
+
+*{{WEB_CONSOLE_URL}}*
+
+Make sure you are logged in as _fancyuser1_ and find your newly created project
+`my-database-app`. You can now follow the deployment process. Alternatively, watch the
+containers deploy from the command line like this:
+
+[source]
+----
+oc get pods -w
 NAME                             READY     STATUS              RESTARTS   AGE
 postgresql-1-deploy              0/1       ContainerCreating   0          11s
 rails-pgsql-persistent-1-build   0/1       ContainerCreating   0          11s
@@ -84,63 +163,106 @@ rails-pgsql-persistent-1-hook-pre   0/1       Terminating   0         1m
 rails-pgsql-persistent-1-hook-pre   0/1       Terminating   0         1m
 ----
 
-Exit out of the watch mode with kbd:[Ctrl + c] when you see the *-deploy and *-hook-pre pods terminating.
+Exit out of the watch mode with kbd:[Ctrl + c] when you see the *-deploy and
+*-hook-pre pods terminating.
 
-NOTE: It may take up to 5 minutes for the deployment to complete.
+[NOTE]
+====
+It may take up to 5 minutes for the deployment to complete, and you might not
+see _exactly_ the same output, depending on when you first start watching (`-w`)
+the *Pod* list.
+====
 
-You should now also see a PVC that has been issued and now being in the _Bound_ state.
+You should now also see a PVC that has been issued and now being in the _Bound_
+state.
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pvc
+oc get pvc
 NAME         STATUS    VOLUME                                     CAPACITY   ACCESSMODES   AGE
-postgresql   Bound     pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8   15Gi       RWO           4m
+postgresql   Bound     pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8   5Gi        RWO           4m
 ----
 
-TIP: This PVC has been automatically fulfilled by CNS because it's StorageClass was set up as the system-wide default in lab module link:cns-deploy["Deploying  Container-native Storage"]
+[TIP]
+====
+This PVC has been automatically fulfilled by CNS because the `cns-gold` *StorageClass*
+was set up as the system-wide default in lab module link:cns-deploy["Deploying
+Container-native Storage"]
+====
 
-Now go ahead and try out the application. The overview page in the OpenShift UI will tell you the `route` which has been deployed as well. Otherwise get it on the CLI like this:
+#### Try the Application
+Now go ahead and try out the application. The overview page in the OpenShift UI
+will tell you the *Route* which has been deployed as well. Otherwise get it on
+the CLI like this:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get route
+oc get route
 NAME                     HOST/PORT                                                      PATH      SERVICES                 PORT      TERMINATION   WILDCARD
 rails-pgsql-persistent   rails-pgsql-persistent-my-database-app.{{OCP_ROUTING_SUFFIX}}            rails-pgsql-persistent   <all>                   None
 ----
 
-Following this output, point your browser to http://rails-pgsql-persistent-my-database-app.{{OCP_ROUTING_SUFFIX}}/articles. +
-The username/password to create articles and comments is by default 'openshift'/'secret'.
+Following this output, point your browser to:
 
-You should be able to successfully create articles and comments. When they are saved they are actually saved in the PostgreSQL database which stores it's table spaces on a GlusterFS volume provided by CNS.
+*http://rails-pgsql-persistent-my-database-app.{{OCP_ROUTING_SUFFIX}}/articles*
 
-Now let's take a look at how this was deployed on the GlusterFS side. First you need to acquire necessary permissions:
+The username/password to create articles and comments is by default
+'openshift'/'secret'.
 
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc login -u system:admin
+You should be able to successfully create articles and comments. When they are
+saved they are actually saved in the PostgreSQL database which stores it's table
+spaces on a GlusterFS volume provided by CNS.
+
+[NOTE]
+====
+This application's template included a *Route* object definition, which is why
+the *Service* was automatically exposed. This is a good practice.
+====
+
+#### Explore the Underlying CNS Artifacts
+Now let's take a look at how this was deployed on the GlusterFS side. First you
+need to acquire necessary permissions:
+
+[source]
+----
+oc login -u system:admin
+----
 
 Select the example project of the user `fancyuser1` if not already/still selected:
 
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc project my-database-app
+[source]
+----
+oc project my-database-app
+----
 
 Look at the PVC to determine the PV:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pvc
+oc get pvc
 NAME         STATUS    VOLUME                                     CAPACITY   ACCESSMODES   AGE
-postgresql   Bound     pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8   15Gi       RWO           17m
+postgresql   Bound     pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8   5Gi        RWO           17m
 ----
 
-NOTE: Your PV name will be different as it's dynamically generated.
+[NOTE]
+====
+Your PV name will be different as it's dynamically generated.
+====
 
-Look at the details of the PV bound to the PVC, in this case `pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8`:
+Look at the details of the PV bound to the PVC, in this case
+`pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8`:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc describe pv/pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8
+oc describe pv/pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8
 Name:		pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8 <1>
 Labels:		<none>
-StorageClass:	{{ CNS_STORAGECLASS }}
+StorageClass:	cns-gold
 Status:		Bound
 Claim:		my-database-app/postgresql
 Reclaim Policy:	Delete
 Access Modes:	RWO
-Capacity:	15Gi
+Capacity:	5Gi
 Message:
 Source:
     Type:		Glusterfs (a Glusterfs mount on the host that shares a pod's lifetime)
@@ -156,12 +278,16 @@ Note the GlusterFS volume name, in this case *vol_e8fe7f46fedf7af7628feda0dcbf2f
 
 Now let's switch to the namespace we used for CNS deployment:
 
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc project {{ CNS_NAMESPACE }}
+[source]
+----
+oc project container-native-storage
+----
 
 Look at the GlusterFS pods running and pick one (which one is not important):
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods -o wide
+oc get pods -o wide
 NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
 glusterfs-37vn8   1/1       Running   0          3m       {{NODE1_INTERNAL_IP}}         {{NODE1_INTERNAL_FQDN}} <1>
 glusterfs-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}         {{NODE2_INTERNAL_FQDN}} <1>
@@ -172,24 +298,29 @@ heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}} 
 Remember the IP address of the pod you select, for example: *{{NODE1_INTERNAL_IP}}* of pod *glusterfs-37vn8*. +
 Log on to the selected GlusterFS pod with a remote terminal session like so:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc rsh glusterfs-37vn8
+oc rsh glusterfs-37vn8
 sh-4.2#
 ----
 
 You have now access to this container's namespace which has the GlusterFS CLI utilities installed. +
 Let's use them to list all known volumes:
 
+[source]
 ----
 sh-4.2# gluster volume list
 heketidbstorage <1>
 vol_e8fe7f46fedf7af7628feda0dcbf2f60 <2>
+vol_5e1cd71070734a3b02f58d822f89486a
+vol_f2e8fda1d42a41efabbb4d4a3b4a5659
 ----
 <1> A special volume dedicated to heketi's internal database.
 <2> The volume backing the PV of the PostgreSQL database deployed earlier.
 
 Query GlusterFS about the topology of this volume:
 
+[source]
 ----
 sh-4.2# gluster volume info vol_e8fe7f46fedf7af7628feda0dcbf2f60
 
@@ -211,15 +342,25 @@ nfs.disable: on
 ----
 <1> According to the output of `oc get pods -o wide` this is the container we are logged on to.
 
-NOTE: Identify the right brick by looking at the host IP of the GlusterFS pod you have just logged on to. `oc get pods -o wide` will give you this information. The host's IP will be noted next to one of the bricks.
+[NOTE]
+====
+Identify the right brick by looking at the host IP of the GlusterFS pod
+you have just logged on to. `oc get pods -o wide` will give you this
+information. The host's IP will be noted next to one of the bricks.
+====
 
-GlusterFS created this volume as a 3-way replica set across all GlusterFS pods, in therefore across all your OpenShift App nodes running CNS. +
-Each pod/node exposes it's local storage via the GlusterFS protocol. This local storage is known as a *brick* in GlusterFS and is usually backed by a local SAS disk or NVMe device. +
-The brick is simply a directory on a block device formatted with XFS and thus made available to GlusterFS.
+GlusterFS created this volume as a 3-way replica set across all GlusterFS pods,
+in therefore across all your OpenShift App nodes running CNS. + Each pod/node
+exposes it's local storage via the GlusterFS protocol. This local storage is
+known as a *brick* in GlusterFS and is usually backed by a local SAS disk or
+NVMe device. The brick is simply a directory on a block device formatted with
+XFS and thus made available to GlusterFS.
 
 You can even look at this yourself, by listing the files in the brick directory.
-Select the brick's directory (the path starting with `/var/lib/heketi/...`) marked in the output above:
+Select the brick's directory (the path starting with `/var/lib/heketi/...`)
+marked in the output above:
 
+[source]
 ----
 sh-4.2# ls -ahl /var/lib/heketi/mounts/vg_0246fd563709384a3cbc3f3bbeeb87a9/brick_684a01f8993f241a92db02b117e0b912/brick
 total 16K
@@ -261,34 +402,56 @@ drwx------.  3 1000080000 root   60 Jun  6 14:44 pg_xlog
 -rw-------.  2 1000080000 root   89 Jun  6 14:46 postmaster.pid
 ----
 
-NOTE: The exact path name will be different in your environment as it has been automatically generated.
+[NOTE]
+====
+The exact path name will be different in your environment as it has been
+automatically generated.
+====
 
-You are looking at the PostgreSQL internal data file structure from the perspective of the GlusterFS server side. It's a normal local filesystem here.
+You are looking at the PostgreSQL internal data file structure from the
+perspective of the GlusterFS server side. It's a normal local filesystem here.
 
-Clients, like the OpenShift nodes and their application pods talk to this storage with the GlusterFS protocol. Which abstracts the 3-way replication behind a single FUSE mount point. +
-When a pod starts that mounts storage from a PV backed by GlusterFS, OpenShift will mount the GlusterFS volume on the right app node and then _bind-mount_ this directory to the right pod. +
-This is happening transparently to the application inside the pod and looks like a normal local filesystem.
+Clients, like the OpenShift nodes and their application pods talk to this
+storage with the GlusterFS protocol. Which abstracts the 3-way replication
+behind a single FUSE mount point. + When a pod starts that mounts storage from a
+PV backed by GlusterFS, OpenShift will mount the GlusterFS volume on the right
+app node and then _bind-mount_ this directory to the right pod. + This is
+happening transparently to the application inside the pod and looks like a
+normal local filesystem.
 
 You may now exit your remote session to the GlusterFS pod.
 
- sh-4.2# exit
+[source]
+----
+sh-4.2# exit
+----
 
-### Providing shared storage with CNS
+### Providing Shared Storage With CNS
+So far only very few options, like the basic NFS support, existed to provide a
+*PersistentVolume* to more than one container at once. The access mode used for
+this is `ReadWriteMany`. Traditional block-based storage solutions are not able
+to do this.
 
-So far only very few options, like the basic NFS support, existed to provide a `PersistentVolume` to more than one container at once. The access mode used for this is *ReadWriteMany*. Traditional block-based storage solutions are not able to do this.
+With CNS this capability is now available to all OpenShift deployments, no
+matter where they are deployed. To illustrate the benefit of this, we will
+deploy a PHP application, a file uploader that has multiple front-end instances
+sharing a common storage repository.+ To highlight the difference this makes to
+non-shared storage we will first run this application without a PV.
 
-With CNS this capability is now available to all OpenShift deployments, no matter where they are deployed. To illustrate the benefit of this, we will deploy a PHP application, a file uploader that has multiple front-end instances sharing a common storage repository.+
-To highlight the difference this makes to non-shared storage we will first run this application without a PV.
+#### Deploy a New Application
+First log back in as _fancyuser1_ and create a new project:
 
-First log back in as `fancyuser1` and create a new project:
-
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc login -u fancyuser1
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc new-project my-shared-storage
+[source]
+----
+oc login -u fancyuser1
+oc new-project my-shared-storage
+----
 
 Next deploy the example application:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc new-app openshift/php:7.0~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
+oc new-app openshift/php:7.0~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
 --> Found image a1ebebb (6 weeks old) in image stream "openshift/php" under tag "7.0" for "openshift/php:7.0"
 
     Apache 2.4 with PHP 7.0
@@ -314,10 +477,11 @@ Next deploy the example application:
     Run 'oc status' to view your app.
 ----
 
-Wait for the application to be deployed with the suggest command:
+Watch and wait for the application to be deployed:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc logs -f bc/file-uploader
+oc logs -f bc/file-uploader
 Cloning "https://github.com/christianh814/openshift-php-upload-demo" ...
 	Commit:	7508da63d78b4abc8d03eac480ae930beec5d29d (Update index.html)
 	Author:	Christian Hernandez <christianh814@users.noreply.github.com>
@@ -330,44 +494,65 @@ Pushed 2/5 layers, 40% complete
 Push successful
 ----
 
-Again kbd:[Ctrl + c] out of the tail mode.
+You should kbd:[Ctrl + c] out of the tail mode once you see _Push successful_.
+
 When the build is completed ensure the pods are running:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods
+oc get pods
 NAME                             READY     STATUS      RESTARTS   AGE
 file-uploader-1-build            0/1       Completed   0          2m
 file-uploader-1-k2v0d            1/1       Running     0          1m
 ...
 ----
 
-Note the name of the single pod currently running the app, in the example above  *file-uploader-1-k2v0d*. The container called `file-uploader-1-build` is the builder container and is not relevant for us. A service has been created for our app but not exposed yet. Let's fix this:
+Note the name of the single pod currently running the app, in the example above
+`file-uploader-1-k2v0d`. The container called `file-uploader-1-build` is the
+builder container and is not relevant for us. A service has been created for our
+app but not exposed externally via a *Route* yet. Let's fix this:
 
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc expose svc/file-uploader
-
-Check the route that has been created:
-
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get route
+oc expose svc/file-uploader
+----
+
+Check the *Route* that has been created:
+
+[source]
+----
+oc get route
 NAME                     HOST/PORT                                                      PATH      SERVICES                 PORT       TERMINATION   WILDCARD
 file-uploader            file-uploader-my-shared-storage.{{ OCP_ROUTING_SUFFIX}}                      file-uploader            8080-tcp                 None
 ...
 ----
 
-Point your browser the the URL advertised by the route (http://file-uploader-my-shared-storage.{{ OCP_ROUTING_SUFFIX}})
+[NOTE]
+====
+This use of the `new-app` command directly asked for application code to be
+built and did not involve a template. This is why a *Route* needs to be created
+by hand.
+====
+Point your browser the the URL advertised by the route
+(http://file-uploader-my-shared-storage.{{ OCP_ROUTING_SUFFIX}})
 
-The application simply lists all file previously uploaded and offers the ability to upload new ones as well as download the existing data. Right now there is nothing.
+The application simply lists all file previously uploaded and offers the ability
+to upload new ones as well as download the existing data. Right now there is
+nothing.
 
 Select an arbitrary from your local system and upload it to the app.
 
 .A simple PHP-based file upload tool
 image::uploader_screen_upload.png[]
 
-After uploading a file validate it has been stored locally in the container by following the link _List uploaded files_ in the browser or logging into it via a remote session (using the name noted earlier):
+After uploading a file validate it has been stored locally in the container by
+following the link _List uploaded files_ in the browser or logging into it via a
+remote session (using the name noted earlier):
 
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc rsh file-uploader-1-k2v0d
-
+[source]
 ----
+oc rsh file-uploader-1-k2v0d
+
 sh-4.2$ cd uploaded
 sh-4.2$ pwd
 /opt/app-root/src/uploaded
@@ -376,29 +561,45 @@ total 16K
 -rw-r--r--. 1 1000080000 root 16K May 26 09:32 cns-deploy-4.0.0-15.el7rhgs.x86_64.rpm.gz
 ----
 
-NOTE: The exact name of the pod will be different in your environment.
+[NOTE]
+====
+The exact name of the *Pod* will be different in your environment.
+====
 
 The app should also list the file in the overview:
 
 .The file has been uploaded and can be downloaded again
 image::uploader_screen_list.png[]
 
-This pod currently does not use any persistent storage. It stores the file locally.
+This pod currently does not use any persistent storage. It stores the file
+locally.
 
-CAUTION: Never store data in a pod. It's ephemeral by definition and will be lost as soon as the pod terminates.
+[CAUTION]
+====
+Never attempt to store persistent data in a *Pod*. *Pods* and their containers are
+ephemeral by definition, and any stored data will be lost as soon as the *Pod*
+terminates.
+====
 
 Let's see when this become a problem. Exit out of the container shell:
 
- sh-4.2$ exit
+[source]
+----
+sh-4.2$ exit
+----
 
 Let's scale the deployment to 3 instances of the app:
 
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc scale dc/file-uploader --replicas=3
-
-Watch the additional pods getting spawned:
-
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods
+oc scale dc/file-uploader --replicas=3
+----
+
+Watch the additional *Pods* getting spawned:
+
+[source]
+----
+oc get pods
 NAME                             READY     STATUS      RESTARTS   AGE
 file-uploader-1-3cgh1            1/1       Running     0          20s
 file-uploader-1-3hckj            1/1       Running     0          20s
@@ -407,12 +608,18 @@ file-uploader-1-k2v0d            1/1       Running     0          3m
 ...
 ----
 
-NOTE: The pod names will be different in your environment since they are automatically generated.
+[NOTE]
+====
+The pod names will be different in your environment since they are automatically
+generated.
+====
 
-When you log on to one of the new instances you will see they have no data.
+When you log on to one of the new instances (one of the ones with an age much
+smaller than the others) you will see they have no data:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc rsh file-uploader-1-3cgh1
+oc rsh file-uploader-1-3cgh1
 sh-4.2$ cd uploaded
 sh-4.2$ pwd
 /opt/app-root/src/uploaded
@@ -420,54 +627,55 @@ sh-4.2$ ls -hl
 total 0
 ----
 
-Similarly, other users of the app will sometimes see your uploaded files and sometimes not - whenever the load balancing service in OpenShift points to the pod that has the file stored locally. You can simulate this with another instance of your browser in "Incognito mode" pointing to your app.
+Similarly, other users of the app will sometimes see your uploaded files and
+sometimes not - whenever the load balancing service in OpenShift points to the
+*Pod* that has the file stored locally. You can simulate this with another
+instance of your browser in "Incognito mode" pointing to your app.
 
-The app is of course not usable like this. We can fix this by providing shared storage to this app.
+The app is of course not usable like this. We can fix this by providing shared
+storage to this app.
 
-First create a PVC with the appropriate setting in a file called `cns-rwx-pvc.yml` with below contents:
+You can create a *PersistentVolumeClaim* and attach it into an application with
+the `oc volume` command. Execute the following
 
-[source,yaml]
-.cns-rwx-pvc.yml
+[source]
 ----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: my-shared-storage
-  annotations:
-    volume.beta.kubernetes.io/storage-class: {{ CNS_STORAGECLASS }}
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 10Gi
+oc volume dc/file-uploader --add --name=my-shared-storage -t pvc --claim-mode=ReadWriteMany --claim-size=5Gi --claim-name=my-shared-storage --mount-path=/opt/app-root/src/uploaded
 ----
 
-Submit the request to the system:
+This command will:
 
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc create -f cns-rwx-pvc.yml
+* create a *PersistentVolumeClaim*
+* update the *DeploymentConfig* to include a `volume` definition
+* update the *DeploymentConfig* to attach a `volumemount` into the specified
+  `mount-path`
+* cause a new deployment of the application *Pods*
 
-Let's look at the result:
+For more information on what `oc volume` is capable of, look at its help output
+with `oc volume -h`. Now, let's look at the result of adding the volume:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pvc
+oc get pvc
 NAME                STATUS    VOLUME                                     CAPACITY   ACCESSMODES   AGE
-my-shared-storage   Bound     pvc-62aa4dfe-4ad2-11e7-b56f-2cc2602a6dc8   10Gi       RWX           22s
+my-shared-storage   Bound     pvc-62aa4dfe-4ad2-11e7-b56f-2cc2602a6dc8   5Gi        RWX           22s
 ...
 ----
 
-Notice the ACCESSMODE being set to *RWX* (short for _ReadWriteMany_, equivalent to "shared storage").
+Notice the `ACCESSMODE` being set to *RWX* (short for `ReadWriteMany`, equivalent
+to "shared storage"). Without this `ACCESSMODE`, OpenShift will not attempt to
+attach multiple *Pods* to the same *PersistentVolume*. If you attempt to scale
+up deployments that are using `ReadWriteOnce` storage, they will actually fail.
 
-We can now update the _DeploymentConfig_ of our application to use this PVC to provide the application with persistent, shared storage for uploads.
+The app is now re-deploying (in a rolling fashion) with the new settings - all
+pods will mount the volume identified by the PVC under
+`/opt/app-root/src/upload`.
 
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc volume dc/file-uploader --add --name=shared-storage --type=persistentVolumeClaim --claim-name=my-shared-storage --mount-path=/opt/app-root/src/uploaded
+You can watch the redeployment like this:
 
-Our app will now re-deploy (in a rolling fashion) with the new settings - all pods will mount the volume identified by the PVC under /opt/app-root/src/upload (the path is predictable so we can hard-code it here).
-
-You can watch it like this:
-
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc logs dc/file-uploader -f
+oc logs dc/file-uploader -f
 --> Scaling up file-uploader-2 from 0 to 3, scaling down file-uploader-1 from 3 to 0 (keep 3 pods available, don't exceed 4 pods)
     Scaling file-uploader-2 up to 1
     Scaling file-uploader-1 down to 2
@@ -478,10 +686,34 @@ You can watch it like this:
 --> Success
 ----
 
+[IMPORTANT]
+====
+The logs for the *DeploymentConfig* will only be available / look like the above
+if you attempt to view them _*during*_ the deployment. Once the deployment has
+completed, you will see something very different:
+
+[source]
+----
+-> Cgroups memory limit is set, using HTTPD_MAX_REQUEST_WORKERS=68
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 10.131.0.23. Set the 'ServerName' directive globally to suppress this message
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 10.131.0.23. Set the 'ServerName' directive globally to suppress this message
+[Sat Sep 02 20:15:14.848118 2017] [auth_digest:notice] [pid 1] AH01757: generating secret for digest authentication ...
+[Sat Sep 02 20:15:14.852187 2017] [http2:warn] [pid 1] AH02951: mod_ssl does not seem to be enabled
+[Sat Sep 02 20:15:14.853049 2017] [lbmethod_heartbeat:notice] [pid 1] AH02282: No slotmem from mod_heartmonitor
+[Sat Sep 02 20:15:15.175812 2017] [mpm_prefork:notice] [pid 1] AH00163: Apache/2.4.25 (Red Hat) configured -- resuming normal operations
+[Sat Sep 02 20:15:15.175844 2017] [core:notice] [pid 1] AH00094: Command line: 'httpd -D FOREGROUND'
+----
+
+Don't worry. Nothing is wrong. There is actually a `deployer` *Pod* that handles
+the deployment, and it disappears once the deployment is complete. You are
+seeing the logs for this deployer in the above example (`Scaling up...`).
+====
+
 The new config `file-uploader-2` will have 3 pods all sharing the same storage.
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods
+oc get pods
 NAME                             READY     STATUS      RESTARTS   AGE
 file-uploader-1-build            0/1       Completed   0          18m
 file-uploader-2-jd22b            1/1       Running     0          1m
@@ -490,63 +722,86 @@ file-uploader-2-xbz24            1/1       Running     0          1m
 ...
 ----
 
-Try it out in your application: upload new files and watch them being visible from within all application pods. In the browser the application behaves fluently as it circles through the pods between browser sessions.
+Try it out in your application: upload new files and watch them being visible
+from within all application pods. In the browser the application behaves
+seamlessly as it circles through the pods between browser sessions (if you use
+an incognito session or a different browser).
 
-
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc rsh file-uploader-2-jd22b
+oc rsh file-uploader-2-jd22b
 sh-4.2$ ls -lh uploaded
 total 16K
 -rw-r--r--. 1 1000080000 root 16K May 26 10:21 cns-deploy-4.0.0-15.el7rhgs.x86_64.rpm.gz
 sh-4.2$ exit
 exit
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc rsh file-uploader-2-kw9lq
+oc rsh file-uploader-2-kw9lq
 sh-4.2$ ls -lh uploaded
 -rw-r--r--. 1 1000080000 root 16K May 26 10:21 cns-deploy-4.0.0-15.el7rhgs.x86_64.rpm.gz
 sh-4.2$ exit
 exit
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc rsh file-uploader-2-xbz24
+oc rsh file-uploader-2-xbz24
 sh-4.2$ ls -lh uploaded
 -rw-r--r--. 1 1000080000 root 16K May 26 10:21 cns-deploy-4.0.0-15.el7rhgs.x86_64.rpm.gz
 sh-4.2$ exit
 ----
 
-That's it. You have successfully provided shared storage to pods throughout the entire system, therefore avoiding the need for data to be replicated at the application level to each pod.
+That's it. You have successfully provided shared storage to pods throughout the
+entire system, therefore avoiding the need for data to be replicated at the
+application level to each pod.
 
-With CNS this is available wherever OpenShift is deployed with no external dependency.
+With CNS this is available wherever OpenShift is deployed with no external
+dependency.
 
-### Increasing storage capacity in CNS
+### Increasing Storage Capacity in CNS
 
-Once deployed there are two way in which to increase the storage capacity offered by CNS. Either by adding additional nodes with storage to OpenShift cluster or by adding additional storage devices to the existing nodes running CNS.
+Once deployed there are two way in which to increase the storage capacity
+offered by CNS. Either by adding additional nodes with storage to OpenShift
+cluster or by adding additional storage devices to the existing nodes running
+CNS.
 
 #### Adding nodes to CNS
 
-The pre-requisite of adding nodes to the CNS setup is that these nodes have been added to the OpenShift cluster before. That is, increasing the storage capacity of CNS this way is a two-step process:
+The pre-requisite of adding nodes to the CNS setup is that these nodes have been
+added to the OpenShift cluster before. That is, increasing the storage capacity
+of CNS this way is a two-step process:
 
 1. Extend the OpenShift cluster with additional nodes
 2. Add the newly added nodes to the CNS setup
 
-Fortunately both steps are easy thanks to automation. In the preceeding link:infra-mgmt-basics["Infrastructure Management Module"] you have already added a second set of 3 nodes to the OpenShift cluster. +
-These have an additional storage device available, so we will use those.
+Fortunately both steps are easy thanks to automation. In the preceeding
+link:infra-mgmt-basics["Infrastructure Management Module"] you have already
+added a second set of 3 nodes to the OpenShift cluster. + These have an
+additional storage device available, so we will use those.
 
 For the second step, adding these new nodes to the CNS setup, you generally have two options:
 
-A. add the new nodes to the existing CNS storage cluster, provisioned in the module link:cns-deploy["Deploying Container-native Storage"]
-B. add the new nodes to a new, independent CNS storage cluster, still managed by the single heketi API service
+A. add the new nodes to the existing CNS storage cluster, provisioned in the
+  module link:cns-deploy["Deploying Container-native Storage"]
+B. add the new nodes to a new, independent CNS storage cluster, still managed by
+  the single heketi API service
 
-Option A is the straigt-forward choice when you just need more storage space. For this you can start with a single additional node. +
-Use option B when you need a net-new, independent storage cluster for the sake of tenant isolation, different geographical region or exposing different storage tiers as separate clusters. For this, you need at least 3 new nodes. +
-In this exercise we will implement Option B.
+Option A is the straigt-forward choice when you just need more storage space.
+For this you can start with a single additional node. Use option B when you need
+a net-new, independent storage cluster for the sake of tenant isolation,
+different geographical region or exposing different storage tiers as separate
+clusters. For this, you need at least 3 new nodes. In this exercise we will
+implement Option B.
 
-The following action require elevated privileges in OpenShift, login as cluster admin and change to the CNS namespace:
+The following action require elevated privileges in OpenShift. Login as cluster
+admin and change to the CNS namespace:
 
-  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc login -u system:admin
-  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc project {{CNS_NAMESPACE}}
+[source]
+----
+oc login -u system:admin
+oc project container-native-storage
+----
 
 First, identify the newly added nodes - the easiest way is to look at their uptime:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get nodes
+oc get nodes
 NAME                         STATUS                     AGE
 {{NODE1_INTERNAL_FQDN}}   Ready                      3h
 {{NODE4_INTERNAL_FQDN}}   Ready                      50m <1>
@@ -559,9 +814,13 @@ NAME                         STATUS                     AGE
 ----
 <1> The nodes added in the previous lab
 
-Now we need to make sure, that these new systems have the right firewall ports opened. For simplicity, we will just re-execute the `configure-firewall.yml` from the link:cns-deploy["Deploying  Container-native Storage"] module against these new systems.
+Now we need to make sure, that these new systems have the right firewall ports
+opened. For simplicity, we will just re-execute the `configure-firewall.yml`
+from the link:cns-deploy["Deploying  Container-native Storage"] module against
+these new systems.
 
-First uncomment the additional nodes entries already prepared in the ansible inventory file `/etc/ansible/hosts`:
+First uncomment the additional nodes entries already prepared in the ansible
+inventory file `/etc/ansible/hosts` (they are prefixed with `#addcns_`):
 
 [source,ini]
 ./etc/ansible/hosts
@@ -581,27 +840,36 @@ First uncomment the additional nodes entries already prepared in the ansible inv
 
 Then execute the `configure-firewall.yml` playbook again:
 
- [cloud-user@{{MASTER_HOSTNAME}} ~]$ ansible-playbook configure-firewall.yml
-
-Next, add the following label to these nodes in order have the `DaemonSet` that CNS is based upon schedule new GlusterFS pods on them:
-
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get daemonset
+ansible-playbook /opt/lab/support/configure-firewall.yml
+----
+
+Next, add the following label to these nodes in order have the *DaemonSet* that
+CNS is based upon schedule new GlusterFS pods on them:
+
+[source]
+----
+oc get daemonset
 NAME        DESIRED   CURRENT   READY     NODE-SELECTOR           AGE
 glusterfs   3         3         3         storagenode=glusterfs   3h
 ----
-<1> The label definition the `DaemonSet` uses to select the nodes which run a GlusterFS pod.
+<1> The label definition the *DaemonSet* uses to select the nodes which run a GlusterFS pod.
 
+[source]
 ----
 oc label node/{{NODE4_INTERNAL_FQDN}} storagenode=glusterfs
 oc label node/{{NODE5_INTERNAL_FQDN}} storagenode=glusterfs
 oc label node/{{NODE6_INTERNAL_FQDN}} storagenode=glusterfs
 ----
 
-This launches the GlusterFS pods on the newly added nodes. Wait for them to be in `Ready` state.
+The *DaemonSet* will detect that new nodes have these labels, and GlusterFS
+*Pods* will be launched on the newly labeled nodes. Wait for these *Pods* to be
+in `Ready` state:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods -o wide
+oc get pods -o wide
 NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
 glusterfs-3gjc5   1/1       Running   0          1m       {{NODE6_INTERNAL_IP}}         {{NODE6_INTERNAL_FQDN}}  <1>
 glusterfs-37vn8   1/1       Running   0          3h       {{NODE1_INTERNAL_IP}}         {{NODE1_INTERNAL_FQDN}}
@@ -613,27 +881,36 @@ heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}} 
 ----
 <1> The newly spawned GlusterFS pods.
 
-NOTE: It may take up to 60 seconds for the GlusterFS pods to be up and in _Ready_ state.
+[NOTE]
+====
+It may take up to 120 seconds for the GlusterFS *Pods* to be up and in _Ready_ state.
+====
 
-The new pods run GlusterFS uninitialized. That is, they have not formed a cluster among themselves yet. This is triggered via heketi.
+The new *Pods* run GlusterFS uninitialized. That is, they have not formed a
+cluster among themselves yet. This is triggered via heketi.
 
-heketi initializes vanilla GlusterFS pods as part of loading the topology file. Like during the cns-deploy phase in the link:cns-deploy["Deploying  Container-native Storage"] module it can read an additional cluster structure from the JSON file.
-This has already been prepared suitable for your environment in the `/home/cloud-user/topology-extended.json`. It contains the original 3 nodes we started with, and then newly added nodes.
+heketi initializes vanilla GlusterFS *Pods* as part of loading the topology file.
+Like during the cns-deploy phase in the link:cns-deploy["Deploying
+Container-native Storage"] module it can read an additional cluster structure
+from the JSON file.  This has already been prepared suitable for your
+environment in the `/opt/lab/support/topology-extended.json`. It contains the
+original 3 nodes we started with, and then newly added nodes.
 
 Initialize the heketi-cli with environment variables like so:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ export HEKETI_CLI_SERVER=http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ export HEKETI_CLI_USER=admin
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ export HEKETI_CLI_KEY={{HEKETI_ADMIN_PW}}
+export HEKETI_CLI_SERVER=http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+export HEKETI_CLI_USER=admin
+export HEKETI_CLI_KEY={{HEKETI_ADMIN_PW}}
 ----
 
-This avoids repetitive command switches with heketi-cli. Use the heketi client to load the new topology. Make sure you are currently in `/home/cloud-user`:
+This avoids repetitive command switches with heketi-cli. Use the heketi client
+to load the new topology. Make sure you are currently in `/opt/lab/support`:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ pwd
-/home/cloud-user
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli topology load --json=topology-extended.json
+heketi-cli topology load --json=/opt/lab/support/topology-extended.json
 	Found node {{NODE1_INTERNAL_FQDN}} on cluster ec7a9c8be8327a54839236791bf7ba24
 		Found device /dev/xvdd
 	Found node {{NODE2_INTERNAL_FQDN}} on cluster ec7a9c8be8327a54839236791bf7ba24
@@ -648,10 +925,12 @@ This avoids repetitive command switches with heketi-cli. Use the heketi client t
 		Adding device /dev/xvdd ... OK
 ----
 
-With this you've successfully initialized a second CNS storage cluster that is managed by heketi. You can query heketi for the new topology:
+With this you've successfully initialized a second CNS storage cluster that is
+managed by heketi. You can query heketi for the new topology:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}}  ~]$ heketi-cli topology info
+heketi-cli topology info
 
 Cluster Id: ca777ae0285ef6d8cd7237c862bd591c <1>
 
@@ -696,11 +975,18 @@ Cluster Id: ca777ae0285ef6d8cd7237c862bd591c <1>
 ----
 <1> The internal ID of the new cluster managed by heketi
 
-NOTE: The cluster ID will be different for you since it's automatically generated.
+[NOTE]
+====
+The cluster ID will be different for you since it's automatically generated.
+====
 
-To use this cluster specifically, you can create a separate `StorageClass` for it in OpenShift. PVCs issued against it, will only be served from this particular CNS storage cluster. For this purpose, note it's internal heketi ID - in the example above *ca777ae0285ef6d8cd7237c862bd591c*.
+To use this cluster specifically, you can create a separate *StorageClass* for
+it in OpenShift. PVCs issued against it, will only be served from this
+particular CNS storage cluster. For this purpose, note it's internal heketi ID -
+in the example above *ca777ae0285ef6d8cd7237c862bd591c*.
 
-Create the file `second-cns-storageclass.yml` like below:
+There is a file on your system `/opt/lab/support/second-cns-storageclass.yaml`.
+Open it with your favorite editor:
 
 [source,yaml]
 .second-cns-storageclass.yml
@@ -708,34 +994,39 @@ Create the file `second-cns-storageclass.yml` like below:
 apiVersion: storage.k8s.io/v1beta1
 kind: StorageClass
 metadata:
-  name: {{CNS_STORAGECLASS2}}
+  name: cns-silver
 provisioner: kubernetes.io/glusterfs
 parameters:
   resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
   restauthenabled: "true"
   restuser: "admin"
   volumetype: "replicate:3"
-  clusterid: "ca777ae0285ef6d8cd7237c862bd591c" <1>
+  clusterid: "INSERT-CLUSTER-ID-HERE" <1>
   secretNamespace: "default"
   secretName: "cns-secret"
 ----
-<1> The heketi internal ID of the new cluster is used to specifically direct requests to it. *Replace it with the ID of your cluster!*
+<1> The heketi internal ID of the new cluster is used to specifically direct
+requests to it. *Replace it with the ID of your cluster!*
 
-Create the `StorageClass`:
+After you have correctly replaced your new cluster ID, create the `StorageClass`:
 
-  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc create -f second-cns-storageclass.yml
+[source]
+----
+oc create -f /opt/lab/support/second-cns-storageclass.yml
+----
 
-Next create a `PersistentVolumeClaim` like the following:
+There is a *PersistentVolumeClaim* definition file that already has been placed
+in `/opt/lab/support` for you:
 
 [source,yaml]
-.cns-pvc-silver.yml
+.cns-silver-pvc.yaml
 ----
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: my-container-storage-silver
   annotations:
-    volume.beta.kubernetes.io/storage-class: {{CNS_STORAGECLASS2}}
+    volume.beta.kubernetes.io/storage-class: cns-silver
 spec:
   accessModes:
   - ReadWriteOnce
@@ -744,57 +1035,107 @@ spec:
       storage: 1Gi
 ----
 
-And run it:
+You can create it with the following:
 
-  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc create -f cns-pvc-silver.yml
+[source]
+----
+oc create -f /opt/lab/support/cns-silver-pvc.yaml
+----
 
-This PVC will now be fulfilled by the _{{CNS_STORAGECLASS2}}_ `StorageClass` which specifically directs the requests to the second cluster specified by it's UUID in the `clusterid` parameter of the `StorageClass`.
+This PVC will now be fulfilled by the _cns-silver_ *StorageClass*
+which specifically directs the requests to the second cluster specified by its
+UUID in the `clusterid` parameter of the *StorageClass*.
 
-#### Adding additional devices to a CNS cluster
+You can see that this claim is automatically bound:
 
-Instead of adding a net-new cluster you can also add additional devices to an existing cluster. The process is very similar to adding new nodes - loading a modified topology JSON file via the heketi client.
+[source]
+----
+oc get pvc
+NAME                          STATUS    VOLUME                                     CAPACITY   ACCESSMODES   AGE
+my-container-storage-silver   Bound     pvc-5efde23a-901e-11e7-bebd-12eaac0992cc   1Gi        RWO           2m
+----
+
+### Other CNS Maintenance Activities
+In addition to extending your CNS cluster with additional storage nodes, you may
+also want to perform other maintenance activities. For example, if you have
+added more block devices to one of your CNS nodes, you may simply wish to add
+additional devices to the cluster. Or, if you have degraded physical devices
+that need to be replaced, maintained, or eliminated, you may wish to remove
+devices from a cluster.
+
+#### Adding Additional Devices to a CNS Cluster
+Instead of adding a net-new cluster you can also add additional devices to an
+existing cluster. The process is very similar to adding new nodes - loading a
+modified topology JSON file via the heketi client.
 
 To illustrate an alternative we are going to use `heketi-cli` tool directly.
 
-The nodes of the second cluster, have an additional, unused storage device  `{{NODE_BRICK_DEVICE2}}`. To add them we need to know their node IDs. +
-With the environment variables for `heketi-cli` still set run:
+The nodes of the second cluster, have an additional, unused storage device
+`{{NODE_BRICK_DEVICE2}}`. To add them we need to know their node IDs. + With the
+environment variables for `heketi-cli` still set run:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli node list | grep ca777ae0285ef6d8cd7237c862bd591c
+heketi-cli node list | grep ca777ae0285ef6d8cd7237c862bd591c
 Id:33e0045354db4be29b18728cbe817605	Cluster:ca777ae0285ef6d8cd7237c862bd591c
 Id:d8443e7ee8314c0c9fb4d8274a370bbd	Cluster:ca777ae0285ef6d8cd7237c862bd591c
 Id:caaed3927e424b22b1a89d261f7617ad	Cluster:ca777ae0285ef6d8cd7237c862bd591c
 ----
 
-IMPORTANT: `grep` for your unique cluster ID, used when creating the `StorageClass` before.
+[IMPORTANT]
+====
+You will need to replace the `grep` with your unique cluster ID. This is the
+cluster ID of the second / new CNS cluster that you just created previously, and
+used when creating the new `cns-silver` *StorageClass*.
+====
 
-Now add the device for each node:
+For each node in the output (eg: `33e0045354db4be29b18728cbe817605`,
+`d8443e7ee8314c0c9fb4d8274a370bbd`, and `caaed3927e424b22b1a89d261f7617ad`), go
+ahhead and `device add` the additional block device:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=33e0045354db4be29b18728cbe817605
+heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=33e0045354db4be29b18728cbe817605
 Device added successfully
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=d8443e7ee8314c0c9fb4d8274a370bbd
+heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=d8443e7ee8314c0c9fb4d8274a370bbd
 Device added successfully
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=caaed3927e424b22b1a89d261f7617ad
+heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=caaed3927e424b22b1a89d261f7617ad
 Device added successfully
 ----
 
-NOTE: The node UUIDs will be different for you since they are automatically generated.
+[NOTE]
+====
+The node UUIDs will be different for you since they are automatically generated.
+====
 
 You can now verify the presence of these new devices by running:
 
-  [cloud-user@{{MASTER_HOSTNAME}}  ~]$ heketi-cli topology info
-
-### Replacing failed disks and nodes
-
-Despite CNS' capability to continue operating transparently to the client in face of failing disks and nodes you soon might want to replace such components to move out of degraded state.
-
-For this exercise, let's assume the device `{{NODE_BRICK_DEVICE}}` of your node {{NODE4_INTERNAL_FQDN}} failed and you need to replace it. You can do that as long as there is enough spare capacity somewhere else in the cluster, preferrable but not necessarily in the same failure domain (as specifed in the topology).
-
-The first step is to, again, determine the nodes internal UUID in heketi's database:
-
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli topology info | grep -B4 {{NODE4_INTERNAL_FQDN}}
+heketi-cli topology info
+----
+
+You should see a `/dev/xvde` device present for each of the nodes in the
+`cns-silver` cluster.
+
+### Replacing Failed Disks and Nodes
+
+Despite CNS' capability to continue operating transparently to the client in the
+face of failing disks and nodes, you soon might want to replace such components
+to move out of a degraded state.
+
+For this exercise, let's assume the device `{{NODE_BRICK_DEVICE}}` of your node
+{{NODE4_INTERNAL_FQDN}} failed and you need to replace it. You can do that as
+long as there is enough spare capacity somewhere else in the cluster,
+preferrable but not necessarily in the same failure domain (as specifed in the
+topology).
+
+The first step is to, again, determine the CNS node's internal UUID in heketi's
+database:
+
+[source]
+----
+heketi-cli topology info | grep -B4 {{NODE4_INTERNAL_FQDN}}
 	Node Id: 33e0045354db4be29b18728cbe817605
 	State: online
 	Cluster Id: ca777ae0285ef6d8cd7237c862bd591c
@@ -802,10 +1143,12 @@ The first step is to, again, determine the nodes internal UUID in heketi's datab
 	Management Hostname: {{NODE4_INTERNAL_FQDN}}
 ----
 
-Second, determine the device's UUID by querying the node:
+Second, determine the device's UUID by querying the node (indicated above by
+`Node Id`):
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli node info 33e0045354db4be29b18728cbe817605
+heketi-cli node info 33e0045354db4be29b18728cbe817605
 Node Id: 33e0045354db4be29b18728cbe817605
 State: online
 Cluster Id: ca777ae0285ef6d8cd7237c862bd591c
@@ -814,119 +1157,177 @@ Management Hostname: {{NODE4_INTERNAL_FQDN}}
 Storage Hostname: {{NODE4_INTERNAL_IP}}
 Devices:
 Id:01c94798bf6b1af87974573b420c4dff   Name:{{NODE_BRICK_DEVICE}}           State:online    Size (GiB):9       Used (GiB):1       Free (GiB):8
+Id:da91a2f1c9f62d9916831de18cc09952   Name:{{NODE_BRICK_DEVIVCE2}}           State:online    Size (GiB):9       Used (GiB):1       Free (GiB):8
 ----
 
-Notice the UUID of the device `{{NODE_BRICK_DEVICE}}` as shown:
+Notice the UUID of the device `{{NODE_BRICK_DEVICE}}` as shown.
 
-NOTE: The device ID, as well as all other UUIDs in heketi commands are automatically generated and different in your environment. Please be aware when copy&pasting.
+[NOTE]
+====
+The device ID, as well as all other UUIDs in heketi commands are
+automatically generated and different in your environment. Please be aware when
+copy & pasting.
+====
 
-Third, mark the device as offline to stop heketi from further attempts to allocate space from it:
+Third, mark the device as offline to stop heketi from further attempts to
+allocate space from it:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli device disable 01c94798bf6b1af87974573b420c4dff
+heketi-cli device disable 01c94798bf6b1af87974573b420c4dff
 Device 01c94798bf6b1af87974573b420c4dff is now offline
 ----
 
-The device is now offline but it's still part of replicated volumes. To remove it and trigger a self-healing operation in the background issue:
+The device is now offline but it's still part of replicated volumes. To remove
+it and trigger a self-healing operation in the background issue:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli device remove 01c94798bf6b1af87974573b420c4dff
+heketi-cli device remove 01c94798bf6b1af87974573b420c4dff
 Device 01c94798bf6b1af87974573b420c4dff is now removed
 ----
 
-This command can take a bit longer as it will go through the topology and search for the next available device on the same node, in the same failure domain and in the rest of the cluster (in that order) and trigger a brick-replacement operation. +
-This way data is re-replicated to another health storage device and the 3-way replicated storage volume moves out of degraded state.
+This command can take a bit longer as it will go through the topology and search
+for the next available device on the same node, in the same failure domain and
+in the rest of the cluster (in that order) and trigger a brick-replacement
+operation. This way data is re-replicated to another health storage device and
+the 3-way replicated storage volume moves out of degraded state.
 
-The device is still lurking around in _failed_ state. To finally get rid of it issue:
+The device is still lurking around in _failed_ state. To finally get rid of it
+issue:
 
+[source]
 ----
-[cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli device delete 01c94798bf6b1af87974573b420c4dff
-Device 01c94798bf6b1af87974573b420c4dff delete
+heketi-cli device delete 01c94798bf6b1af87974573b420c4dff
+Device 01c94798bf6b1af87974573b420c4dff deleted
 ----
 
-NOTE: Only devices that are not used by other Gluster volumes can be deleted. If that's not the case `heketi-cli` will tell you about it. In this case you need to issue a `remove` operation before.
+[NOTE]
+====
+Only devices that are not used by other Gluster volumes can be deleted. If
+that's not the case `heketi-cli` will tell you about it. In this case you need
+to issue a `remove` operation before.
+====
 
 You can now check that the device is gone from the topology by running:
 
-  [cloud-user@{{MASTER_HOSTNAME}} ~]$ heketi-cli topology info
+[source]
+----
+heketi-cli topology info
+----
 
 Node deletion is also possible and is basically comprised of:
 
 1. successful execution of the `remove` operation on all devices of the node
-2. running `# heketi-cli node delete <node_id>` on the node in question
+2. running `heketi-cli node delete <node_id>` on the node in question
 
 ### Running the OpenShift Registry with CNS
 
-The Registry in OpenShift is a critical component. When it's unavailable no new pods can be spawned nor can new build be triggered.
-It runs as one or more containers in specific Infrastructure Nodes or Master Nodes in OpenShift.
+The Registry in OpenShift is a critical component. As it is the default
+destination for all container builds in the cluster, and is the source for
+deploying applications built inside the cluster, being unavailable is a big
+problem. 
 
-By default the registry uses a hosts local storage which makes it prone to outages. Also, multiple registry pods need shared storage.
+The internal registry runs as one or more *Pods* inside the OpenShift
+environment. By default the registry uses local ephemeral storage in its *Pod*.
+This means that any restarts or re-deployments or outages would cause all of the
+built/pushed container images to be lost. Also, only having one registry
+instance and/or one infrastructure node could cause temporary outages. So,
+adding storage and scaling up the registry is a good idea.
 
-This can be achieved with CNS simply by making the registry pods refer to a PVC in access mode *RWX* based on CNS. This way a highly-available scale-out registry can be provided without external dependencies on NFS or Cloud Provider storage.
+[IMPORTANT]
+====
+Your cluster only has one infrastructure node. In practice, you would want a
+minimum of two to achieve high-availability for all infrastructure services.
+====
 
-IMPORTANT: The following method will be disruptive. All data stored in the registry so far will become unavailable. Migration scenarios exist but are beyond the scope of this lab.
+#### Adding CNS to the Registry
+Adding storage to the registry is as easy as it was for our file-uploader
+application. Simply make the registry *Pods* use a PVC in access mode *RWX*
+based on CNS. This way, a highly-available scale-out registry can be provided
+without external dependencies on NFS or Cloud Provider storage.
+
+[IMPORTANT]
+====
+The following method will be disruptive. All data stored in the registry so far
+will be lost (the Rails and PHP app images). Migration scenarios exist but are
+beyond the scope of this lab, but normally you would configure persistent
+storage for the registry before starting to really use your cluster.
+====
 
 Make sure you are logged in as `system:admin` in the `default` namespace:
 
-  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc login -u system:admin -n default
-
-Create a PVC for shared storage with thefile `cns-registry-pvc.yml` below:
-
-[source,yaml]
-.cns-registry-pvc.yml
+[source]
 ----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: registry-storage
-  annotations:
-    volume.beta.kubernetes.io/storage-class: {{CNS_STORAGECLASS}}
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 20Gi
+oc login -u system:admin -n default
 ----
 
-Create the PVC and ensure it's *BOUND*
+Just like with the file uploader example, you can simply add a volume (and have
+its *PersistentVolumeClaim* created automatically) with the `oc volume` command.
+Execute the following:
 
-  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc create -f cns-registry-pvc.yml
-
-In your environment a registry is already running. This will be the case for most environments. So the existing registry configuration needs to be adjusted to include a PVC and make the pods mount it's volume.
-This is done by modifying the `DeploymentConfig` of the registry.
-
-TIP: In the next release of OpenShift Container Platform the openshift-ansible installer will provide an option to deploy the Registry on CNS-backed storage right from the start.
-
-Update the registry's `DeploymentConfig` to refer to the PVC created before:
-
-  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc volume deploymentconfigs/docker-registry --add --name=registry-storage -t pvc  --claim-name=registry-storage --overwrite
+[source]
+----
+oc volume dc/docker-registry --add --name=registry-storage -t pvc --claim-mode=ReadWriteMany --claim-size=10Gi --claim-name=registry-storage --overwrite
+----
 
 The registry will now redeploy.
 
+[NOTE]
+====
+The registry is preconfigured with a volume called `registry-storage` that is
+using the `emptyDir` storage type. The above command `--overwrite` the existing
+volume with our new PVC. More information can be found in the
+link:https://docs.openshift.com/container-platform/3.5/dev_guide/volumes.html[volumes
+documentation].
+====
+
+[TIP]
+====
+In a future release of OpenShift, you will be able to configure Container Native
+Storage as part of the OpenShift installation directly, including automatically
+using CNS for the storage for the registry, fully supported.
+====
+
 Observe the registry deployment get updated:
 
-  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc logs -f dc/docker-registry
+[source]
+----
+oc get pod -w
+----
+
+Remember to kbd:[Ctrl + c] when you are done watching the *Pods* redeploy.
 
 After a couple of seconds a new deployment of the registry should be available.
-Verify a new version of the registry's `DeploymentConfig` is running:
+Verify a new version of the registry's *DeploymentConfig* is running:
 
-  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get dc/docker-registry
-  NAME              REVISION   DESIRED   CURRENT   TRIGGERED BY
-  docker-registry   2          1         1         config
+[source]
+----
+oc get dc/docker-registry
+NAME              REVISION   DESIRED   CURRENT   TRIGGERED BY
+docker-registry   2          1         1         config
+----
 
-With this the OpenShift Registry is based on persistent storage provided by CNS. Since this is shared storage this also allows to scale out the registry pods.
+Now your OpenShift Registry is using persistent storage provided by CNS.  Since
+this is shared storage this also allows you to scale out the registry pods.
 
 You can scale the registry like this:
 
-  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc scale dc/docker-registry --replicas=3
+[source]
+----
+oc scale dc/docker-registry --replicas=3
+----
 
-After a short while you should see 3 healthy registry pods in the default namespace:
+After a short while you should see 3 healthy registry pods in the default
+*Project*:
 
-  [cloud-user@{{MASTER_HOSTNAME}} ~]$ oc get pods
-  NAME                       READY     STATUS    RESTARTS   AGE
-  docker-registry-2-5rszg    1/1       Running   0          1m
-  docker-registry-2-7s3tm    1/1       Running   0          14s
-  docker-registry-2-g3l70    1/1       Running   0          14s
-  registry-console-1-b47jt   1/1       Running   0          6h
-  router-1-hs9wp             1/1       Running   0          6h
+[source]
+----
+oc get pods
+NAME                       READY     STATUS    RESTARTS   AGE
+docker-registry-2-5rszg    1/1       Running   0          1m
+docker-registry-2-7s3tm    1/1       Running   0          14s
+docker-registry-2-g3l70    1/1       Running   0          14s
+registry-console-1-b47jt   1/1       Running   0          6h
+router-1-hs9wp             1/1       Running   0          6h
+----

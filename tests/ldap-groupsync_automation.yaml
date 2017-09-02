@@ -9,7 +9,7 @@
       command: oc login -u system:admin
 
     - name: Sync all of the LDAP groups
-      command: oc adm groups sync --sync-config=/home/cloud-user/groupsync.yaml --confirm
+      command: oc adm groups sync --sync-config=/opt/lab/support/groupsync.yaml --confirm
 
     - name: Check for app-dev project
       command: oc get project app-dev

@@ -108,7 +108,7 @@
     # I don't know why first pod was important, any seem to return the same info
     # This fixes a problem where the first node has both the heketi and cns pod
     - name: check gluster volume of pv
-      shell: oc exec $(oc get pod -n container-native-storage --no-headers | head -1 | awk '{print $1}') -- gluster vol info {{ pv_volume_path.stdout }}
+      shell: oc exec -n container-native-storage $(oc get pod -n container-native-storage --no-headers | head -1 | awk '{print $1}') -- gluster vol info {{ pv_volume_path.stdout }}
       changed_when: false
 
     - name: check health of postgres-db deployment

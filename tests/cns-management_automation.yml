@@ -105,8 +105,6 @@
       shell: oc get pv $(oc get pvc -n my-database-app postgresql -o jsonpath='{.spec.volumeName}') -o jsonpath='{.spec.glusterfs.path}'
       register: pv_volume_path
 
-    # I don't know why first pod was important, any seem to return the same info
-    # This fixes a problem where the first node has both the heketi and cns pod
     - name: check gluster volume of pv
       shell: oc exec -n container-native-storage $(oc get pod -n container-native-storage --no-headers | head -1 | awk '{print $1}') -- gluster vol info {{ pv_volume_path.stdout }}
       changed_when: false
@@ -148,43 +146,43 @@
 
     - name: log back in as fancyuser1
       shell: oc login -u 'fancyuser1' -p 'openshift'
-    
+
     - name: create new project called 'my-shared-storage'
       shell: oc new-project my-shared-storage
-    
+
     - name: deploy file-uploader app
       shell: oc new-app openshift/php:7.0~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
-    
+
     - name: wait for php app to be ready
       shell: oc get dc file-uploader -o jsonpath='{.status.availableReplicas}'
       register: php_app_check
       until: php_app_check.stdout == "1"
       retries: 30
       delay: 10
-    
+
     - name: expose php app service
       shell: oc expose svc/file-uploader
-    
+
     - name: scale php app
       shell: oc scale dc/file-uploader --replicas=3
-    
+
     - name: wait for php app to be scaled to 3 pods
       shell: oc get dc file-uploader -o jsonpath='{.status.availableReplicas}'
       register: php_app_scale_check
       until: php_app_scale_check.stdout == "3"
       retries: 12
       delay: 10
-    
+
     - name: add pvc to app deploymentconfig
       shell: oc volume dc/file-uploader --add --name=my-shared-storage -t pvc --claim-mode=ReadWriteMany --claim-size=5Gi --claim-name=my-shared-storage --mount-path=/opt/app-root/src/uploaded
-    
+
     - name: wait for php app replication controller to be updated
       shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="file-uploader")].spec.template.spec.volumes[?(@.persistentVolumeClaim.claimName=="my-shared-storage")].name}'
       register: php_app_update_rc_check
       until: '"shared-storage" in php_app_update_rc_check.stdout'
       retries: 12
       delay: 10
-    
+
     - name: wait for php app to be fully redeployed
       shell: oc get rc file-uploader-$(oc get dc file-uploader -o jsonpath='{.status.latestVersion}') -o jsonpath='{.status.availableReplicas}'
       register: php_app_update_check
@@ -264,6 +262,7 @@
 
 - name: Extend CNS
   hosts: localhost
+  become: true
   tags:
     - cns_example
     - cns_extend
@@ -287,10 +286,10 @@
 
     - name: log in as cluster admin
       shell: oc login -u system:admin
-    
+
     - name: change to cns namespace
       shell: oc project {{cns_namespace}}
-    
+
     - name: uncomment additional cns lines
       replace:
         regexp: '#addcns_'
@@ -298,7 +297,7 @@
         path: /etc/ansible/hosts
       tags:
         - scaleup
-    
+
     - name: insert iptables rules required for GlusterFS
       blockinfile:
         dest: /etc/sysconfig/iptables
@@ -311,7 +310,7 @@
       delegate_to: "{{ item }}"
       with_items: "{{ new_cns_nodes_internal_fqdn }}"
       become: true
-    
+
     - name: insert iptables rules required for GlusterFS
       lineinfile:
         dest: /etc/sysconfig/iptables
@@ -320,7 +319,7 @@
       delegate_to: "{{ item }}"
       with_items: "{{ new_cns_nodes_internal_fqdn }}"
       become: true
-    
+
     - name: reload iptables
       systemd:
         name: iptables
@@ -328,17 +327,17 @@
       delegate_to: "{{ item }}"
       with_items: "{{ new_cns_nodes_internal_fqdn }}"
       become: true
-    
+
     - name: label storage nodes
       shell: oc label node/{{ item }} storagenode=glusterfs
       with_items: "{{ new_cns_nodes_internal_fqdn }}"
-    
+
     - name: check daemonset
       shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.desiredNumberScheduled}' -n {{cns_namespace}}
       register: check_daemonset_desired
       failed_when: check_daemonset_desired.stdout == ""
       changed_when: False
-    
+
     - name: wait for daemonset to have desired nodes ready
       shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.numberReady}' -n {{cns_namespace}}
       register: check_daemonset_ready
@@ -346,45 +345,45 @@
       failed_when: check_daemonset_ready.stdout == ""
       retries: 12
       delay: 10
-    
+
     - name: get first cluster-id from heketi
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster list --json
       register: heketi_cluster_list_first
-    
+
     - set_fact:
         heketi_cluster_first: "{{heketi_cluster_list_first.stdout|from_json}}"
-    
+
     - set_fact:
         cns_clusterid_1: "{{heketi_cluster_first.clusters|first}}"
-    
+
     - name: load new topology
       shell: heketi-cli topology --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} load --json=/opt/lab/support/topology-extended.json
-    
+
     - name: get second cluster-id from heketi
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster list --json
       register: heketi_cluster_list_second
-    
+
     - set_fact:
         heketi_cluster_second: "{{heketi_cluster_list_second.stdout|from_json}}"
-    
+
     - set_fact:
         cns_clusterid_2: "{{heketi_cluster_second.clusters|difference([cns_clusterid_1])|first}}"
-    
+
     - name: create storage class file from template
       template:
         src: ../templates/cns-storageclass-silver.yml.j2
         dest: /tmp/cns-storageclass-silver.yml
-    
+
     - name: create storage class
       shell: oc create -f /tmp/cns-storageclass-silver.yml
-    
+
     - name: query nodes of second cns cluster
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster info {{ cns_clusterid_2 }} --json
       register: heketi_cluster_node_list
-    
+
     - set_fact:
         cns_cluster_info: "{{ heketi_cluster_node_list.stdout|from_json }}"
-    
+
     - name: add additional devices to second CNS cluster
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device add --name={{ node_brick_device2 }} --node={{ item }}
       with_items: "{{ cns_cluster_info.nodes }}"
@@ -415,6 +414,9 @@
     - name: log back into cns namespace as cluster admin
       shell: oc login -u system:admin -n {{ cns_namespace }}
       changed_when: false
+
+    - name: reload inventory from file
+      meta: refresh_inventory
 
     - name: ensure additional CNS nodes are configured in the inventory
       fail:
@@ -555,27 +557,27 @@
     - name: get heketi ID of first node of second CNS cluster
       shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info | grep -B4 {{ node4_internal_fqdn }} | awk 'match($0, /Node Id: ([a-z0-9].*)/, result) { print result[1] }'"
       register: heketi_node_4_query
-    
+
     - set_fact:
         heketi_node_4_id: "{{ heketi_node_4_query.stdout }}"
-    
+
     - name: get heketi ID of first device of this node
       shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ heketi_node_4_id }} | grep {{node_brick_device}} | awk 'match($0, /Id:([a-z0-9].*) Name:/, result) { print result[1] }'"
       register: heketi_node_4_device_query
-    
+
     - set_fact:
         heketi_node_4_device_id: "{{ heketi_node_4_device_query.stdout }}"
-    
+
     - name: disable the device
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device disable {{ heketi_node_4_device_id }}
-    
+
     - name: remove the device
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device remove {{ heketi_node_4_device_id }}
-    
+
     - name: delete the device
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device delete {{ heketi_node_4_device_id }}
 
-- name: Perform CNS Maintenance
+- name: Verify CNS Maintenance
   hosts: localhost
   tags:
     - cns_maintenance_example
@@ -612,7 +614,7 @@
       failed_when: node_brick_device in cluster2_node4.stdout
       changed_when: false
 
-- name: Registry Persistent Storage
+- name: Put Registry on Persistent Storage
   hosts: localhost
   tags:
     - registry_storage_example
@@ -637,9 +639,9 @@
 
     - name: log back in as cluster admin into default namespace
       shell: oc login -u system:admin -n default
-    
+
     - name: update registry deployment
-      shell: oc volume dc/docker-registry --add --name=registry-storage -t pvc --claim-mode=ReadWriteMany --claim-size=10Gi --claim-name=registry-storage --overwrite    
+      shell: oc volume dc/docker-registry --add --name=registry-storage -t pvc --claim-mode=ReadWriteMany --claim-size=10Gi --claim-name=registry-storage --overwrite
 
     - name: wait for pvc to be bound
       shell: oc get pvc/registry-storage -o jsonpath='{$.status.phase}'
@@ -647,17 +649,17 @@
       until: registry_pvc.stdout == "Bound"
       retries: 6
       delay: 5
-    
+
     - name: wait for registry deployment to be ready
       shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="docker-registry")].status.readyReplicas}'
       register: registry_rc_check
       until: registry_rc_check.stdout == "1"
       retries: 30
       delay: 10
-    
+
     - name: scale the registry deployment to 3
       shell: oc scale dc/docker-registry --replicas=3
-    
+
     - name: wait for registry to be scaled to 3 pods
       shell: oc get rc docker-registry-$(oc get dc docker-registry -o jsonpath='{.status.latestVersion}') -o jsonpath='{.status.availableReplicas}'
       register: registry_scale_check
@@ -665,7 +667,7 @@
       retries: 12
       delay: 10
 
-- name: Registry Persistent Storage
+- name: Verify Registry Persistent Storage
   hosts: localhost
   tags:
     - registry_storage_example
@@ -700,4 +702,3 @@
       shell: oc get dc/docker-registry -o jsonpath='{$.spec.template.spec.volumes[0].persistentVolumeClaim.claimName}'
       register: get_registry_pvc_name
       failed_when: get_registry_pvc_name.stdout != registry_pvc.metadata.name
-

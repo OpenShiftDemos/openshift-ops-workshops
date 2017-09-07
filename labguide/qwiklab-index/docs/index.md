@@ -18,45 +18,41 @@ For this lab you need to fulfill the following pre-requisites:
 To start the Test Drive press <b><span style="background-color:#909e33; color:white; font-size: 120%">&nbsp;&nbsp;Start Lab&nbsp;&nbsp;</span></b> button in the top bar.
 
 
+## 3. Download Access Key
 
-## 3. How to access your lab guide
+Immediately after pressing the start button pane labeled <b><span style="background-color:#777777; color:white; font-size: 120%">&nbsp;&nbsp;Connect&nbsp;&nbsp;</span></b> will rollover presenting your custom SSH access key to download.
 
-When you started your Test Drive the lab environment will provision in roughly 5 minutes. During this time you'll see a progress bar above this page.
+![CNS Lab Infrastructure](img/qwiklab-pem-key.png)
+
+Download the *PEM* key to your computer if you are using regular OpenSSH on the command line Linux or macOS. Choose *PPK* if you are using PuTTY on Windows.
+
+Click "Connect" button again to hide the pane.
+
+## 4. Wait for lab provisioning to complete.
+
+When you started your Test Drive the lab environment provision process initiated in the background. During provisioning you can monitor progress in the top navigation bar
 
 ![CNS Lab Infrastructure](img/qwiklab-progress-bar.png)
 
-When your lab infrastructure is ready this progress bar disappear and you will
+In total provisioning usually takes about 5 minutes and should not exceed 10 minutes.
+When your lab infrastructure is ready this progress bar disappears and you will
 see a button to end your lab session and countdown until automatic shutdown
 instead:
 
 ![CNS Lab Infrastructure](img/qwiklab-end-button.png)
 
-Click the <span style="background-color:#0087cf; color:white; font-size: 120%">&nbsp;&nbsp;Addl. Info&nbsp;&nbsp;</span> button to retrieve the URL to your lab guide:
+## 5. How to access your personalized lab guide
+
+This lab features a personalized lab guide which is ready as soon as the environment is provisioned. The button will appear on the right side of your screen as soon as that is the case.
+
+To access it, click the <span style="background-color:#0087cf; color:white; font-size: 120%">&nbsp;&nbsp;Addl. Info&nbsp;&nbsp;</span> button on the right.
+
+If it is not visible wait for your lab environment to complete provisioning!
+An additional roll-over menu appears similar to the screen shot below.
 
 ![CNS Lab Infrastructure](img/qwiklab-labguide-url.png)
 
-Open this URL in a new tab to view your personalized lab guide!
-
-
-
-## 4. How to access the lab environment
-
-When your lab infrastructure is ready click the <span style="background-color:#0087cf; color:white; font-size: 120%">&nbsp;&nbsp;Connect&nbsp;&nbsp;</span> button and download the SSH private key to your computer:
-
-![CNS Lab Infrastructure](img/qwiklab-pem-key.png)
-
-&#8680; To login via SSH download the PEM file to your machine and change the permissions:
-
-    chmod 0400 ~/Downloads/<pem-file-name>
-
-Click the <span style="background-color:#0087cf; color:white; font-size: 120%">&nbsp;&nbsp;Addl. Info&nbsp;&nbsp;</span> button again to retrieve IP address of your environment:
-
-![CNS Lab Infrastructure](img/qwiklab-master-ip.png)
-
-&#8680; Then login with the ssh client like this:
-
-    ssh -i ~/Downloads/<pem-file-name> -l cloud-user <MasterIPAddress>
-
-Follow the lab guide to navigate the environment and conduct the prepared exercises.
+Open the URL in a new tab to view your personalized lab guide!
+It will walk you through the rest of the lab show you how to access your environment.
 
 Have fun!

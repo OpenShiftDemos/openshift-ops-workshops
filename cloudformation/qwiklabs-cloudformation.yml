@@ -851,7 +851,7 @@ Resources:
                   url: ldap://idm.internal.aws.testdrive.openshift.com
                   ca: /etc/origin/master/ipa-ca.crt
                   bindDN: uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
-                  bindPassword: bindingpassword 
+                  bindPassword: bindingpassword
                   rfc2307:
                     groupsQuery:
                       baseDN: cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
@@ -1056,7 +1056,7 @@ Resources:
                   NODE4_EXTERNAL_FQDN: "node04.${AWS::AccountId}.${PublicHostedZone}"
                   NODE5_EXTERNAL_FQDN: "node05.${AWS::AccountId}.${PublicHostedZone}"
                   NODE6_EXTERNAL_FQDN: "node06.${AWS::AccountId}.${PublicHostedZone}"
-                  MASTER_INTERNAL_FQDN: "master.internal.${PublicHostedZone}" 
+                  MASTER_INTERNAL_FQDN: "master.internal.${PublicHostedZone}"
                   INFRA_INTERNAL_FQDN: "infra.internal.${PublicHostedZone}"
                   NODE1_INTERNAL_FQDN: "node01.internal.${PublicHostedZone}"
                   NODE2_INTERNAL_FQDN: "node02.internal.${PublicHostedZone}"
@@ -1865,14 +1865,6 @@ Resources:
 
 
 Outputs:
-   LabguideURL:
+   LabGuide:
      Description: "Student Lab Guide"
      Value: !Sub "http://labguide.${AWS::AccountId}.${PublicHostedZone}/"
-
-   SSHLoginUser:
-      Description: "User name on the Master node to connect via SSH and PEM file"
-      Value: "cloud-user"
-
-   MasterIPAddress:
-     Description: "Public IP of the OpenShift Master node"
-     Value: !GetAtt Master1.PublicIp

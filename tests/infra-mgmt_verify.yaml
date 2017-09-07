@@ -1,7 +1,7 @@
 ---
 - name: Cluster scale, logging, metrics, networking
   hosts: localhost
-  become_user: root
+  become: true
   tasks:
     - name: Login as system:admin
       command: oc login -u system:admin
@@ -372,4 +372,3 @@
       command: oc adm manage-node node03.internal.aws.testdrive.openshift.com --schedulable=true
       tags:
         - maintenance
-

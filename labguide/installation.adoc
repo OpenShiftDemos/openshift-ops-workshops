@@ -21,29 +21,10 @@ the
 link:https://docs.openshift.com/container-platform/3.5/install_config/install/quick_install.html[installation
 section] of the product documentation.
 
+At this point *you should be logged in as `cloud-user` on the OpenShift Master node* via SSH.
+
 ### Examining the provided Ansible inventory file
 First, let's examine the provided installer configuration file.
-
-#### SSH into `master`
-Hopefully you downloaded the SSH private key before you opened the labguide. If
-not, make sure that you return to the Qwiklabs page to get the private key.
-Don't forget where you put it, and don't forget to change its permissions
-(`400).
-
-For Linux, Mac, and other *nix users, something like the following command would
-be used to SSH into the `master`:
-
-[source,role=copypaste]
-----
-ssh -i <path_to/qwikLABS-LXX-YYYY.pem> cloud-user@{{ MASTER_EXTERNAL_IP }}
-----
-
-Make sure that you use the correct path to your SSH key file.
-
-NOTE: Windows users are encouraged to use the
-link:https://www.chiark.greenend.org.uk/~sgtatham/putty/[PuTTY] client. Instructions for how
-to use SSH keys with PuTTY can be found in their
-link:https://the.earth.li/~sgtatham/putty/0.70/htmldoc/Chapter8.html#pubkey[documentation].
 
 #### Look at the file
 Use `cat`, `less`, or an editor to look at the `/etc/ansible/hosts` file:
@@ -76,7 +57,7 @@ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
 
 This will take some time. You might want to go get a beverage or check your
 email. Come back in about 7-10 minutes. We have pre-cached as much of the
-content as possible to make the installation go quickly. 
+content as possible to make the installation go quickly.
 
 A typical multi-host installation like this might take around an hour depending
 on the speed of your internet connection. Disconnected installation options are
@@ -99,12 +80,12 @@ with something that looks like the following:
 [source]
 ----
 PLAY RECAP ***********************************************************************************
-infra.internal.aws.testdrive.openshift.com : ok=241  changed=53   unreachable=0    failed=0   
-localhost                  : ok=11   changed=0    unreachable=0    failed=0   
-master.internal.aws.testdrive.openshift.com : ok=703  changed=157  unreachable=0    failed=0   
-node01.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0   
-node02.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0   
-node03.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0  
+infra.internal.aws.testdrive.openshift.com : ok=241  changed=53   unreachable=0    failed=0
+localhost                  : ok=11   changed=0    unreachable=0    failed=0
+master.internal.aws.testdrive.openshift.com : ok=703  changed=157  unreachable=0    failed=0
+node01.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0
+node02.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0
+node03.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0
 ----
 
 You will notice zero failed tasks.
@@ -112,7 +93,7 @@ You will notice zero failed tasks.
 #### Look at the Nodes
 As an administrator, most of your interaction with OpenShift will be from the
 command line. The `oc` program is a command line interface that talks to the
-OpenShift API. 
+OpenShift API.
 
 On the `master` host, after the installation, the `root` system account is
 preconfigured to use a special "super administrator" account. It is vitally
@@ -159,7 +140,8 @@ and you could see these things. However, we have not yet explored authentication
 topics, so you have no cluster administrator "human" accounts yet.
 
 Point your browser to {{WEB_CONSOLE_URL}} to verify that the web console is
-available and responding.
+available and responding. You can login using the user `teamuser1` with password `openshift`.
+You are not required to do anything in the web console at this point.
 
 WARNING: You will receive a self-signed certificate error in your browser. When
 OpenShift is installed, by default, a CA and SSL certificates are generated for
@@ -168,4 +150,3 @@ It is possible to provide your own SSL certificates during the installation, and
 more information can be found in the
 link:https://docs.openshift.com/container-platform/3.5/install_config/install/advanced_install.html#advanced-install-custom-certificates[custom
 certificates] section of the installation documentation.
-

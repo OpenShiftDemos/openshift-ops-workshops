@@ -342,6 +342,7 @@ While still in the `{{CNS_NAMESPACE}}` project on the CLI list all running
 [source]
 ----
 oc get pods -o wide
+
 NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
 glusterfs-37vn8   1/1       Running   0          3m       {{NODE1_INTERNAL_IP}}         {{NODE1_INTERNAL_FQDN}} <1>
 glusterfs-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}         {{NODE2_INTERNAL_FQDN}} <1>
@@ -378,6 +379,7 @@ To expose heketi's API a *Service* named _heketi_ has been created:
 [source]
 ----
 oc get service/heketi
+
 NAME      CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
 heketi    172.30.5.231   <none>        8080/TCP   31m
 ----
@@ -388,6 +390,7 @@ monitoring/data gathering, or other automation), a *Route* has been created:
 [source]
 ----
 oc get route/heketi
+
 NAME      HOST/PORT                                               PATH      SERVICES   PORT      TERMINATION   WILDCARD
 heketi    heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}             heketi     <all>                   None
 ----
@@ -397,6 +400,7 @@ You may verify this with a trivial health check:
 [source]
 ----
 curl http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}/hello
+
 Hello from Heketi
 ----
 
@@ -427,6 +431,7 @@ managing:
 [source]
 ----
 heketi-cli cluster list
+
 Clusters:
 ec7a9c8be8327a54839236791bf7ba24 <1>
 ----
@@ -563,7 +568,7 @@ appropriately. Open the file with your favorite editor, and substitute
 
 Remmeber: you can get the CNS cluster ID from `heketi-cli cluster list`.
 
-[source,yaml]
+[source,yaml,role=copypaste]
 .cns-storageclass.yaml
 ----
 apiVersion: storage.k8s.io/v1beta1

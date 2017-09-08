@@ -242,6 +242,7 @@ Look at the PVC to determine the PV:
 [source]
 ----
 oc get pvc
+
 NAME         STATUS    VOLUME                                     CAPACITY   ACCESSMODES   AGE
 postgresql   Bound     pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8   5Gi        RWO           17m
 ----
@@ -257,6 +258,7 @@ Look at the details of the PV bound to the PVC, in this case
 [source]
 ----
 oc describe pv/pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8
+
 Name:		pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8 <1>
 Labels:		<none>
 StorageClass:	cns-gold
@@ -290,6 +292,7 @@ Look at the GlusterFS pods running and pick one (which one is not important):
 [source]
 ----
 oc get pods -o wide
+
 NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
 glusterfs-37vn8   1/1       Running   0          3m       {{NODE1_INTERNAL_IP}}         {{NODE1_INTERNAL_FQDN}} <1>
 glusterfs-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}         {{NODE2_INTERNAL_FQDN}} <1>
@@ -303,6 +306,7 @@ Log on to the selected GlusterFS pod with a remote terminal session like so:
 [source]
 ----
 oc rsh glusterfs-37vn8
+
 sh-4.2#
 ----
 
@@ -312,6 +316,7 @@ Let's use them to list all known volumes:
 [source]
 ----
 sh-4.2# gluster volume list
+
 heketidbstorage <1>
 vol_e8fe7f46fedf7af7628feda0dcbf2f60 <2>
 vol_5e1cd71070734a3b02f58d822f89486a
@@ -365,6 +370,7 @@ marked in the output above:
 [source]
 ----
 sh-4.2# ls -ahl /var/lib/heketi/mounts/vg_0246fd563709384a3cbc3f3bbeeb87a9/brick_684a01f8993f241a92db02b117e0b912/brick
+
 total 16K
 drwxrwsr-x.   5 root       2001   57 Jun  6 14:44 .
 drwxr-xr-x.   3 root       root   19 Jun  6 14:44 ..
@@ -454,6 +460,7 @@ Next deploy the example application:
 [source]
 ----
 oc new-app openshift/php:7.0~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
+
 --> Found image a1ebebb (6 weeks old) in image stream "openshift/php" under tag "7.0" for "openshift/php:7.0"
 
     Apache 2.4 with PHP 7.0
@@ -484,6 +491,7 @@ Watch and wait for the application to be deployed:
 [source]
 ----
 oc logs -f bc/file-uploader
+
 Cloning "https://github.com/christianh814/openshift-php-upload-demo" ...
 	Commit:	7508da63d78b4abc8d03eac480ae930beec5d29d (Update index.html)
 	Author:	Christian Hernandez <christianh814@users.noreply.github.com>
@@ -503,6 +511,7 @@ When the build is completed ensure the pods are running:
 [source]
 ----
 oc get pods
+
 NAME                             READY     STATUS      RESTARTS   AGE
 file-uploader-1-build            0/1       Completed   0          2m
 file-uploader-1-k2v0d            1/1       Running     0          1m
@@ -524,6 +533,7 @@ Check the *Route* that has been created:
 [source]
 ----
 oc get route
+
 NAME                     HOST/PORT                                                      PATH      SERVICES                 PORT       TERMINATION   WILDCARD
 file-uploader            file-uploader-my-shared-storage.{{ OCP_ROUTING_SUFFIX}}                      file-uploader            8080-tcp                 None
 ...
@@ -602,6 +612,7 @@ Watch the additional *Pods* getting spawned:
 [source]
 ----
 oc get pods
+
 NAME                             READY     STATUS      RESTARTS   AGE
 file-uploader-1-3cgh1            1/1       Running     0          20s
 file-uploader-1-3hckj            1/1       Running     0          20s
@@ -622,6 +633,7 @@ smaller than the others) you will see they have no data:
 [source]
 ----
 oc rsh file-uploader-1-3cgh1
+
 sh-4.2$ cd uploaded
 sh-4.2$ pwd
 /opt/app-root/src/uploaded
@@ -659,6 +671,7 @@ with `oc volume -h`. Now, let's look at the result of adding the volume:
 [source]
 ----
 oc get pvc
+
 NAME                STATUS    VOLUME                                     CAPACITY   ACCESSMODES   AGE
 my-shared-storage   Bound     pvc-62aa4dfe-4ad2-11e7-b56f-2cc2602a6dc8   5Gi        RWX           22s
 ...
@@ -678,6 +691,7 @@ You can watch the redeployment like this:
 [source]
 ----
 oc logs dc/file-uploader -f
+
 --> Scaling up file-uploader-2 from 0 to 3, scaling down file-uploader-1 from 3 to 0 (keep 3 pods available, don't exceed 4 pods)
     Scaling file-uploader-2 up to 1
     Scaling file-uploader-1 down to 2
@@ -716,6 +730,7 @@ The new config `file-uploader-2` will have 3 pods all sharing the same storage.
 [source]
 ----
 oc get pods
+
 NAME                             READY     STATUS      RESTARTS   AGE
 file-uploader-1-build            0/1       Completed   0          18m
 file-uploader-2-jd22b            1/1       Running     0          1m
@@ -732,6 +747,7 @@ an incognito session or a different browser).
 [source]
 ----
 oc rsh file-uploader-2-jd22b
+
 sh-4.2$ ls -lh uploaded
 total 16K
 -rw-r--r--. 1 1000080000 root 16K May 26 10:21 cns-deploy-4.0.0-15.el7rhgs.x86_64.rpm.gz
@@ -804,6 +820,7 @@ First, identify the newly added nodes - the easiest way is to look at their upti
 [source]
 ----
 oc get nodes
+
 NAME                         STATUS                     AGE
 {{NODE1_INTERNAL_FQDN}}   Ready                      3h
 {{NODE4_INTERNAL_FQDN}}   Ready                      50m <1>
@@ -853,6 +870,7 @@ CNS is based upon schedule new GlusterFS pods on them:
 [source]
 ----
 oc get daemonset
+
 NAME        DESIRED   CURRENT   READY     NODE-SELECTOR           AGE
 glusterfs   3         3         3         storagenode=glusterfs   3h
 ----
@@ -872,6 +890,7 @@ in `Ready` state:
 [source]
 ----
 oc get pods -o wide
+
 NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
 glusterfs-3gjc5   1/1       Running   0          1m       {{NODE6_INTERNAL_IP}}         {{NODE6_INTERNAL_FQDN}}  <1>
 glusterfs-37vn8   1/1       Running   0          3h       {{NODE1_INTERNAL_IP}}         {{NODE1_INTERNAL_FQDN}}
@@ -913,6 +932,7 @@ to load the new topology. Make sure you are currently in `/opt/lab/support`:
 [source]
 ----
 heketi-cli topology load --json=/opt/lab/support/topology-extended.json
+
 	Found node {{NODE1_INTERNAL_FQDN}} on cluster ec7a9c8be8327a54839236791bf7ba24
 		Found device /dev/xvdd
 	Found node {{NODE2_INTERNAL_FQDN}} on cluster ec7a9c8be8327a54839236791bf7ba24
@@ -991,7 +1011,7 @@ There is a file on your system `/opt/lab/support/second-cns-storageclass.yaml`.
 Open it with your favorite editor:
 
 [source,yaml]
-.second-cns-storageclass.yml
+./opt/lab/support/second-cns-storageclass.yml
 ----
 apiVersion: storage.k8s.io/v1beta1
 kind: StorageClass
@@ -1021,7 +1041,7 @@ There is a *PersistentVolumeClaim* definition file that already has been placed
 in `/opt/lab/support` for you:
 
 [source,yaml]
-.cns-silver-pvc.yaml
+./opt/lab/support/cns-silver-pvc.yaml
 ----
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -1053,6 +1073,7 @@ You can see that this claim is automatically bound:
 [source]
 ----
 oc get pvc
+
 NAME                          STATUS    VOLUME                                     CAPACITY   ACCESSMODES   AGE
 my-container-storage-silver   Bound     pvc-5efde23a-901e-11e7-bebd-12eaac0992cc   1Gi        RWO           2m
 ----
@@ -1099,8 +1120,10 @@ ahhead and `device add` the additional block device:
 ----
 heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=33e0045354db4be29b18728cbe817605
 Device added successfully
+
 heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=d8443e7ee8314c0c9fb4d8274a370bbd
 Device added successfully
+
 heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=caaed3927e424b22b1a89d261f7617ad
 Device added successfully
 ----
@@ -1138,6 +1161,7 @@ database:
 [source]
 ----
 heketi-cli topology info | grep -B4 {{NODE4_INTERNAL_FQDN}}
+
 	Node Id: 33e0045354db4be29b18728cbe817605
 	State: online
 	Cluster Id: ca777ae0285ef6d8cd7237c862bd591c
@@ -1151,6 +1175,7 @@ Second, determine the device's UUID by querying the node (indicated above by
 [source]
 ----
 heketi-cli node info 33e0045354db4be29b18728cbe817605
+
 Node Id: 33e0045354db4be29b18728cbe817605
 State: online
 Cluster Id: ca777ae0285ef6d8cd7237c862bd591c
@@ -1177,6 +1202,7 @@ allocate space from it:
 [source]
 ----
 heketi-cli device disable 01c94798bf6b1af87974573b420c4dff
+
 Device 01c94798bf6b1af87974573b420c4dff is now offline
 ----
 
@@ -1186,6 +1212,7 @@ it and trigger a self-healing operation in the background issue:
 [source]
 ----
 heketi-cli device remove 01c94798bf6b1af87974573b420c4dff
+
 Device 01c94798bf6b1af87974573b420c4dff is now removed
 ----
 
@@ -1201,6 +1228,7 @@ issue:
 [source]
 ----
 heketi-cli device delete 01c94798bf6b1af87974573b420c4dff
+
 Device 01c94798bf6b1af87974573b420c4dff deleted
 ----
 
@@ -1306,6 +1334,7 @@ Verify a new version of the registry's *DeploymentConfig* is running:
 [source]
 ----
 oc get dc/docker-registry
+
 NAME              REVISION   DESIRED   CURRENT   TRIGGERED BY
 docker-registry   2          1         1         config
 ----
@@ -1326,6 +1355,7 @@ After a short while you should see 3 healthy registry pods in the default
 [source]
 ----
 oc get pods
+
 NAME                       READY     STATUS    RESTARTS   AGE
 docker-registry-2-5rszg    1/1       Running   0          1m
 docker-registry-2-7s3tm    1/1       Running   0          14s

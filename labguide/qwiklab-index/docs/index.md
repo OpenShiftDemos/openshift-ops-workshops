@@ -21,6 +21,7 @@ The lab will cost you 10 credits. Upon initial registration you have 40 credits 
 
 ![Launching a lab with credits](img/qwiklab-credit-approval.png)
 
+If you see a link called "BUY CREDITS" you have run out of credits. Please contact us in this case.
 
 ## 3. Download Access Key
 

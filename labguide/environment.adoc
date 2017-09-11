@@ -37,6 +37,8 @@ You will be installing OpenShift Container Platform v3.5 using the advanced
 installation method, driven by Ansible playbooks. You will also install
 Container Native Storage.
 
+### Logging in
+
 You will only need to SSH into the master node to perform all of these
 exercises. If you are on Linux or macOS use the the private key (*PEM* file) you downloaded earlier. Make sure it has the right permissions to be used by the SSH client:
 

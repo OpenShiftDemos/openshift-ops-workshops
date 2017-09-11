@@ -26,3 +26,4 @@ ansible.log
 static-inventory
 *.retry
 id_rsa*
+labguide/qwiklab-index/site

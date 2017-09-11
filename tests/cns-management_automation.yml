@@ -432,7 +432,7 @@
           - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT"
 
     - name: ensure firewall rules are present on CNS nodes
-      shell: iptables -S OS_FIREWALL_ALLOW
+      shell: iptables -w -S OS_FIREWALL_ALLOW
       register: iptables_rules
       failed_when: item[0] not in iptables_rules.stdout
       delegate_to: "{{ item[1] }}"
@@ -657,14 +657,14 @@
       retries: 30
       delay: 10
 
-      # without retry we suffer from the following error: Scaling the resource failed with: Operation cannot be fulfilled on deploymentconfigs "docker-registry": the object has been modified; please apply your changes to the latest version and try again; Current resource version Unknown
+      # without retry we suffer from the following error: Scaling the resource failed with: Operation cannot be fulfilled on deploymentconfigs "docker-registry": the object has been modified; please apply you
+r changes to the latest version and try again; Current resource version Unknown
     - name: scale the registry deployment to 3
       shell: oc scale dc/docker-registry --replicas=3
       register: scale_dc
-      until: scale_dc.rc == "0"
+      until: scale_dc|success
       retries: 5
       delay: 10
-      ignore_errors: yes
 
     - name: wait for registry to be scaled to 3 pods
       shell: oc get rc docker-registry-$(oc get dc docker-registry -o jsonpath='{.status.latestVersion}') -o jsonpath='{.status.availableReplicas}'

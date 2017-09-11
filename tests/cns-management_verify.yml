@@ -211,7 +211,7 @@
             - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT"
 
       - name: ensure firewall rules are present on CNS nodes
-        shell: iptables -S OS_FIREWALL_ALLOW
+        shell: iptables -w -S OS_FIREWALL_ALLOW
         register: iptables_rules
         failed_when: item[0] not in iptables_rules.stdout
         delegate_to: "{{ item[1] }}"

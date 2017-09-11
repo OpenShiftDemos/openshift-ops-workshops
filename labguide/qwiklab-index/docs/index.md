@@ -1,6 +1,7 @@
 # Welcome to the OpenShift for Ops Test Drive
 
 Please follow below instructions to get started. In case of problems please reach out to testdrives (at) redhat.com.
+Completing the entire lab content will typically take between 2 and 3 hours.
 
 
 ## 1. Pre-requisites
@@ -10,8 +11,6 @@ For this lab you need to fulfill the following pre-requisites:
 - Workstation with Internet access
 
 - SSH client supporting authentication with a private key
-
-
 
 ## 2. How to start your Test Drive
 

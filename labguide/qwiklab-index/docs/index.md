@@ -1,4 +1,4 @@
-# Welcome to the OpenShift Test Drive for Administrators
+# Welcome to the OpenShift for Ops Test Drive
 
 Please follow below instructions to get started.
 
@@ -19,7 +19,7 @@ To start the Test Drive press <b><span style="background-color:#909e33; color:wh
 
 The lab will cost you 10 credits. Upon initial registration you have 40 credits in total. You can use remaining credits to again run this Test Drive or other Red Hat Test Drives.
 
-![Launcing a lab with credits](img/qwiklab-credit-approval.png)
+![Launching a lab with credits](img/qwiklab-credit-approval.png)
 
 
 ## 3. Download Access Key

@@ -1,6 +1,6 @@
 ---
 id: ocp-admin-testdrive
-name: OpenShift for Administrators
+name: OpenShift for Ops Test Drive
 
 content:
   url: https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/master/labguide

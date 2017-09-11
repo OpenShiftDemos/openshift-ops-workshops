@@ -1,6 +1,6 @@
 # Welcome to the OpenShift for Ops Test Drive
 
-Please follow below instructions to get started.
+Please follow below instructions to get started. In case of problems please reach out to testdrives (at) redhat.com.
 
 
 ## 1. Pre-requisites
@@ -24,13 +24,13 @@ The lab will cost you 10 credits. Upon initial registration you have 40 credits 
 
 ## 3. Download Access Key
 
-Immediately after pressing the start button pane labeled <b><span style="background-color:#777777; color:white; font-size: 120%">&nbsp;&nbsp;Connect&nbsp;&nbsp;</span></b> will rollover presenting your custom SSH access key to download.
+Immediately after pressing the <b><span style="background-color:#909e33; color:white; font-size: 120%">&nbsp;&nbsp;Start Lab&nbsp;&nbsp;</span></b> button, a pane labeled <b><span style="background-color:#777777; color:white; font-size: 120%">&nbsp;&nbsp;Connect&nbsp;&nbsp;</span></b> will rollover presenting your custom SSH access key to download.
 
 ![Download SSH access keys](img/qwiklab-pem-key.png)
 
 Download the *PEM* key to your computer if you are using regular OpenSSH on the command line Linux or macOS. Choose *PPK* if you are using PuTTY on Windows.
 
-Click "Connect" button again to hide the pane.
+Click <b><span style="background-color:#777777; color:white; font-size: 120%">&nbsp;&nbsp;Connect&nbsp;&nbsp;</span></b> button again to hide the pane.
 
 ## 4. Wait for lab provisioning to complete.
 

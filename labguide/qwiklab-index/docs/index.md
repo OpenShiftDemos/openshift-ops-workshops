@@ -32,7 +32,7 @@ Download the *PEM* key to your computer if you are using regular OpenSSH on the 
 
 Click <b><span style="background-color:#777777; color:white; font-size: 120%">&nbsp;&nbsp;Connect&nbsp;&nbsp;</span></b> button again to hide the pane.
 
-## 4. Wait for lab provisioning to complete.
+## 4. Wait for lab provisioning to complete
 
 When you started your Test Drive the lab environment provision process initiated in the background. During provisioning you can monitor progress in the top navigation bar
 

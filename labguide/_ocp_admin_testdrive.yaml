@@ -1,0 +1,21 @@
+---
+id: ocp-admin-testdrive
+name: OpenShift for Ops Test Drive
+
+content:
+  url: https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/master/labguide
+
+vars:
+  ENVIRONMENT: "Amazon Web Services"
+
+modules:
+  activate:
+  - environment
+  - installation
+  - cns-deploy
+  - app-mgmt-basics
+  - template-quota-limits
+  - ldap-groupsync
+  - infra-mgmt-basics
+  - cns-management
+  - skipping-ahead

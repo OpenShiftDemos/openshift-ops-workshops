@@ -1,99 +1,152 @@
 ## Installation and Verification
 
-The method of installation that you shall be using for this session would be the 'Advanced Installation' method which uses Ansible playbooks for automating the installation of OpenShift Container Platform cluster (version 3.5). 
-The host preparation and prerequisites needed for the installation have already been done.
+There are two primary methods of installation for OpenShift Container Platform.
 
-*Step 1. Examining the provided Ansible inventory file -*
-Let us start by examining the Ansible inventory files which contains the host information.
-To perform the further steps, you will need to run the commands on the 'master' host.
-The master and other nodes are running as AWS EC-2 RHEL instances. 
+* Quick Installation
+The quick installation provides a simplified experience through an interactive
+CLI. It does not support as much customization or configuration of the OpenShift
+environment. For quick and simple POC-type scenarios, it can be a useful tool.
 
-To get the private key, download from the Qwiklabs page that pops up right after you click on the class and press `Start`. Store it on the localhost machine and keep note of the `path` where you have downloaded the .pem key. 
+* Advanced Installation
+You will use the advanced installation method in this exercise. The advanced
+installation method involves configuring an Ansible hosts file and then invoking
+Ansible directly to run the installation playbooks. The advanced installer
+supports many, many configuration and customization options.
 
-When you will log into the Fleet console and go to Services -> EC2 -> Instances. Click on the master host instance and look for the `Public DNS`. It should show a page with details -
+We have pre-configured the installer's configuration file (`/etc/ansible/hosts`)
+for you.
 
-image::ec21.png[]
+For more information on installing OpenShift Container Platform, please refer to
+the
+link:https://docs.openshift.com/container-platform/3.5/install_config/install/quick_install.html[installation
+section] of the product documentation.
 
-Use this command to SSH into the master host -
+At this point *you should be logged in as `cloud-user` on the OpenShift Master node* via SSH.
 
-[literal]
-$ ssh -i <path/private_key.pem> ec2-user@<Public_DNS>
+### Examining the provided Ansible inventory file
+First, let's examine the provided installer configuration file.
 
-Replace `path`by the path where you have stored the private keyand replace <Public_DNS> by the information shown on instance page.
+#### Look at the file
+Use `cat`, `less`, or an editor to look at the `/etc/ansible/hosts` file:
 
-1) Check the /etc/ansible/hosts to view the configurations done for clouster variables and host variables:
+[source]
+----
+cat /etc/ansible/hosts
+----
 
- # cat /etc/ansible/hosts
+General settings and other variable information is defined on lines within the
+`[OSEv3:vars]` section. There are also various host groups defined for things
+like *Masters* and *Nodes*.
 
-The variables are defined on separate,single lines within the '[OSEv3:vars]' section.
+For more details on how OpenShift uses Ansible for its installation, please
+refer to the
+link:https://docs.openshift.com/container-platform/3.5/install_config/install/advanced_install.html#configuring-ansible[advanced
+installer's documentation].
 
-Ensure the deployment_type parameter in your inventory file’s [OSEv3:vars] section is set to openshift-enterprise to install the OpenShift Container Platform variant:
+### Installing OpenShift
+Since we have pre-configured the installer for you, you can simply run it.
 
-[literal]
-[OSEv3:vars]
-deployment_type=openshift-enterprise
+#### Run the Installer
+Launching the advanced installation is as simple as executing the following
+command:
 
-If you want a detailed list of all the cluster variables, you can refer the following page - 
+[source]
+----
+ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+----
 
-*https://docs.openshift.com/container-platform/3.5/install_config/install/advanced_install.html#configuring-cluster-variables*
+This will take some time. You might want to go get a beverage or check your
+email. Come back in about 7-10 minutes. We have pre-cached as much of the
+content as possible to make the installation go quickly.
 
-This lists all the hosts and the functions and variables for master, 3 nodes and infrastructure node. 
+A typical multi-host installation like this might take around an hour depending
+on the speed of your internet connection. Disconnected installation options are
+also available. Prerequisites and other information is all covered in the
+documentation.
 
-2) To configure host variables, indicate the defined variables under [master] or [nodes] section.
+### Verifying the Installation
+Once the installation process is complete, there are some basic tests you can
+perform to ensure that it went successfully.
 
-3) You can assign labels to node hosts during the Ansible installation.
-To assign labels to a node host during an Ansible install, use the openshift_node_labels variable with the desired labels added to the desired node host entry in the [nodes] section. 
-In the following example, labels are set for a region called primary and a zone called east:
+#### Check the Logs
+The installer is quite verbose, and can be made even more verbose. If you know
+anything about Ansible, the output should be familiar to you. In any case, so
+long as there are no fatal-type errors and all hosts exit "OK", the odds are
+good that the installation was succesful.
 
-[literal]
-[nodes]
-node1.example.com openshift_node_labels="{'region': 'primary', 'zone': 'east'}"
+If you look in your terminal at the output of the installer, it should finish
+with something that looks like the following:
 
+[source]
+----
+PLAY RECAP ***********************************************************************************
+infra.internal.aws.testdrive.openshift.com : ok=241  changed=53   unreachable=0    failed=0
+localhost                  : ok=11   changed=0    unreachable=0    failed=0
+master.internal.aws.testdrive.openshift.com : ok=703  changed=157  unreachable=0    failed=0
+node01.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0
+node02.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0
+node03.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0
+----
 
-*Step 2. Running the Advanced Installation -*
+You will notice zero failed tasks.
 
- # ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+#### Look at the Nodes
+As an administrator, most of your interaction with OpenShift will be from the
+command line. The `oc` program is a command line interface that talks to the
+OpenShift API.
 
-The above command runs the ansible playbook to start the advanced installation.
+On the `master` host, after the installation, the `root` system account is
+preconfigured to use a special "super administrator" account. It is vitally
+important that you protect access to the `root` system account, or to remove
+this preconfigured config. Otherwise, anyone who can `sudo` on the master has
+super user privileges on the entire cluster.
 
+Additionally, since we ran the installation as `cloud-user`, this account, too,
+is preconfigured for cluster administrator access.
 
-*Step 3. Verifying the Installation -*
-1) Run as 'root' user on the master node :
+Execute the following command to see a list of the *Nodes* that OpenShift knows
+about:
 
- # oc get nodes
+[source]
+----
+oc get nodes
+----
 
-Using the above command verify that the master is started and the nodes are in Ready status.
-The result should be similar to -
+The output should look something like the following:
 
-[literal]
-NAME                        STATUS                     AGE
-master.example.com          Ready,SchedulingDisabled   165d
-node1.example.com           Ready                      165d
-node2.example.com           Ready                      165d
+[source]
+----
+NAME                          STATUS                     AGE
+{{INFRA_INTERNAL_FQDN}}     Ready                      1m
+{{MASTER_INTERNAL_FQDN}}    Ready,SchedulingDisabled   1m
+{{NODE1_INTERNAL_FQDN}}    Ready                      1m
+{{NODE2_INTERNAL_FQDN}}    Ready                      1m
+{{NODE3_INTERNAL_FQDN}}    Ready                      1m
+----
 
-You should be able to see a list of all the hosts mentioned in the inventory file - i.e. 1 master node, 1 infrastructure node and 3 application nodes. 
+All of the systems listed in the `[nodes]` group in the `/etc/ansible/hosts`
+file should be listed here.
 
-2) Verify that the web console is installed correctly :
-Use the master host name and web console port number to access the web console using a web browser.For example, master host with name 'master.openshift.com' and which is using the default port '8443', should be reachable at https://master.openshift.com:8443/console .
+The OpenShift *Master* is also a *Node* because it needs to participate in the
+software defined network (SDN). By default, however, scheduling is disabled --
+no workload will be run on masters.
 
-3) Now that the installation has been verified, run the following command on each master and node host to add the atomic-openshift packages back to the list of yum excludes on the host:
+#### Check the Web Console
+OpenShift provides a web console for users, developers and application operators
+to interact with the environment. There are not many cluster administrative
+functions to perform through the web console. Some OpenShift components (like
+the internal image registry) run as workload inside the OpenShift environment,
+and you could see these things. However, we have not yet explored authentication
+topics, so you have no cluster administrator "human" accounts yet.
 
- # atomic-openshift-excluder exclude
+Point your browser to {{WEB_CONSOLE_URL}} to verify that the web console is
+available and responding. You can login using the user `teamuser1` with password `openshift`.
+You are not required to do anything in the web console at this point.
 
-4) *Diagnostics Tool* :
-OpenShift also provides a diagnostics tool to verify the cluster and run a series of checks for any errors in the host or cluster.
-
-The diagnostics were added to the 'openshift' binary so that wherever there is an OpenShift Origin server or client, the diagnostics can run in the exact same environment.
-
-To use the diagnostics tool, run this command on the master host. This runs all the available diagnostics, skipping any that do not apply. -
-
-[literal]
-$ oc adm diagnostics
-
-To run selective diagnostics, you can include names in the command -
-[literal]
-$ oc adm diagnostics NodeConfigCheck UnitStatus
-
-To run diagnostics where the master and node configurations are not in the expected locations, use the following command to specify the location - 
-[literal]
-$ oc adm diagnostics --master-config=<file_path> --node-config=<file_path>
+WARNING: You will receive a self-signed certificate error in your browser. When
+OpenShift is installed, by default, a CA and SSL certificates are generated for
+all inter-component communication within OpenShift, including the web console.
+It is possible to provide your own SSL certificates during the installation, and
+more information can be found in the
+link:https://docs.openshift.com/container-platform/3.5/install_config/install/advanced_install.html#advanced-install-custom-certificates[custom
+certificates] section of the installation documentation.

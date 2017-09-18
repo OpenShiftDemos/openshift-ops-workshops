@@ -42,4 +42,7 @@ cns_core_images:
   - rhgs3/rhgs-volmanager-rhel7:3.2.0-10
   - rhgs3/rhgs-server-rhel7:3.2.0-5
 
+other_images:
+  - docker.io/siamaksade/mapit
+
 ...

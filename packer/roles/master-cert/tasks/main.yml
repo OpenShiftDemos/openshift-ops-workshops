@@ -1,9 +1,19 @@
 ---
 
-  - name: install netcat
-    yum: name=nc state=present
+  - name: Ensure lab directory exists
+    file:
+      path: /opt/lab/helpers
+      state: directory
+      owner: cloud-user
+      group: cloud-user
+      mode: "u=rwx,g=r,o=r"
 
-  - name: create ca copy script
-    copy: src=idm-cert dest=/usr/local/bin/ mode=0755
+  - name: Copy idm certificate playbook
+    copy:
+      src: fetch_idm_cert.yml
+      dest: /opt/lab/helpers/
+      owner: cloud-user
+      group: cloud-user
+      mode: "u=rw,g=r,o=r"
 
 ...

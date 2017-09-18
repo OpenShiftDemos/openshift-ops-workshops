@@ -1,16 +1,76 @@
 ## Environment Overview
 
 You will be interacting with an OpenShift environment that is running on {{ ENVIRONMENT }}. The environment consists of the following systems:
-* {{ MASTERS }} master nodes
-* {{ INFRA }} infrastructure nodes
-* {{ NODES }} "application" nodes
 
-You will be installing OpenShift Container Platform v3.5 by using Ansible playbooks. The inventory file has alreayd been configured and you can view the contents of the file in the first lab module. It will give you information on how the hosts are configured and other information like cluster variables and platform variables.
+* 1 master node
+* 1 infrastructure node
+* 6 "application" nodes
+** 3 will run workload and the initial Container Native Storage instances
+** 3 will be added to the cluster later
+* 1 server running Red Hat Identity Management (IdM, for LDAP authentication)
 
-The nodes are named as -
-1) Master Node - Master1
-2) Infrastructure Node - InfraNode1
-3) Application Nodes - WorkerNode1, WorkerNode2, WorkerNode3
+.Lab Environment Overview
+[options="header"]
+|==============================================
+| Role     | Internal FQDN
+| Master Node       | {{MASTER_INTERNAL_FQDN}}
+| Infrastructure Node        | {{INFRA_INTERNAL_FQDN}}
+| Application Node #1        | {{NODE1_INTERNAL_FQDN}}
+| Application Node #2        | {{NODE2_INTERNAL_FQDN}}
+| Application Node #3        | {{NODE3_INTERNAL_FQDN}}
+| Application Node #4        | {{NODE4_INTERNAL_FQDN}}
+| Application Node #5        | {{NODE5_INTERNAL_FQDN}}
+| Application Node #6        | {{NODE6_INTERNAL_FQDN}}
+| IdM Server     |   | {{IDM_INTERNAL_FQDN}}
+|==============================================
 
-You will be using the Master node to install OpenShift and verify the installation. 
-Qwiklabs will be used to start the lab and the instances can be used to log in via AWS platform.
+All addresses are internal to the lab environment. The only system you publicly access via SSH and the browser is the OpenShift Master node:
+
+.Public Lab Access
+[options="header"]
+|==============================================
+| Role     | Public FQDN
+| Master Node       | {{MASTER_EXTERNAL_FQDN}}
+|==============================================
+
+You will be installing OpenShift Container Platform v3.5 using the advanced
+installation method, driven by Ansible playbooks. You will also install
+Container Native Storage.
+
+### Logging in
+
+You will only need to SSH into the master node to perform all of these
+exercises. If you are on Linux or macOS use the the private key (*PEM* file) you downloaded earlier. Make sure it has the right permissions to be used by the SSH client:
+
+[source,role=copypaste]
+----
+chmod 0400 ~/Downloads/<pem-file-name>
+----
+
+Log on to the master node as `cloud-user`:
+
+[source,role=copypaste]
+----
+ssh -i ~/Downloads/<pem-file-name> -l cloud-user {{MASTER_EXTERNAL_FQDN}}
+----
+
+The `cloud-user` account has password-less sudo privileges and SSH login on all systems using internal addressing from the table above.
+
+If you are on Windows using PuTTY you should have downloaded the appropriate private key file (*PPK* file) earlier.
+
+NOTE: Windows users are encouraged to use the
+link:https://www.chiark.greenend.org.uk/~sgtatham/putty/[PuTTY] client. Instructions for how
+to use SSH keys with PuTTY can be found in their
+link:https://the.earth.li/~sgtatham/putty/0.70/htmldoc/Chapter8.html#pubkey[documentation].
+
+## Conventions
+
+You will see various code and command blocks throughout these exercises. Some of
+the command blocks can be copy/pasted directly. Others will require modification
+of the command before execution. If you see a command block with a red border
+(see below), the command will require slight modification.
+
+[source,role=copypaste]
+----
+some command to modify
+----

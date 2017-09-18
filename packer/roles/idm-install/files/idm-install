@@ -2,7 +2,7 @@
 # get IP address
 myip=`ip -4 -o addr show eth0 | awk '-F[/ ]+' '{ print $4 }'`
 hostname=`hostname -s`
-mydomain=`hostname -d`
+mydomain=auth.`hostname -d`
 longname=`hostname`
 myrealm=$(echo $mydomain | tr [a-z] [A-Z])
 publicip=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
@@ -29,31 +29,6 @@ systemctl start ntpd
 systemctl enable ntpd
 systemctl start haveged
 
-echo -e "Iptables and firewalld configuration...\n"
-systemctl stop iptables
-systemctl mask iptables
-systemctl stop ip6tables
-systemctl mask ip6tables
-firewall-offline-cmd --direct --add-chain ipv4 filter ipa-server-chain 
-firewall-offline-cmd --direct --add-rule ipv4 filter INPUT 0 -m conntrack --ctstate NEW -j ipa-server-chain 
-firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 80 --jump ACCEPT 
-firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 443 --jump ACCEPT 
-firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 389 --jump ACCEPT 
-firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 636 --jump ACCEPT 
-firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 88 --jump ACCEPT 
-firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto tcp --destination-port 464 --jump ACCEPT 
-firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto udp --destination-port 88 --jump ACCEPT 
-firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0  --proto udp --destination-port 464 --jump ACCEPT 
-firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0 --proto tcp --destination-port 53 --jump ACCEPT 
-firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0 --proto udp --destination-port 53 --jump ACCEPT 
-firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0 --proto udp --destination-port 123 --jump ACCEPT 
-firewall-offline-cmd --direct --add-rule ipv4 filter ipa-server-chain 0 --proto tcp --destination-port 7389 --jump ACCEPT 
-systemctl start firewalld
-systemctl disabled iptables
-systemctl enable firewalld
-# may want to skip this next line
-# firewall-offline-cmd --direct --get-all-rules
-
 ipa-server-install --setup-dns --domain="$mydomain" --hostname="$myhostname" \
 --admin-password=ldapadmin --ds-password=ldapadmin --ip-address="$myip" \
 --realm="$myrealm" --no-forwarders --no-ntp -U
@@ -62,6 +37,18 @@ echo -e "Fixing IDM's DNS entries...\n"
 echo -e ldapadmin | kinit admin
 ipa dnsrecord-mod "$mydomain" idm --a-rec="$publicip"
 ipa dnsrecord-mod "$mydomain" ipa-ca --a-rec="$publicip"
+
+cat > /tmp/sysacccount.ldif << EOF
+dn: uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
+changetype: add
+objectclass: account
+objectclass: simplesecurityobject
+uid: system
+userPassword: bindingpassword
+EOF
+
+echo -e ldapadmin | kinit admin
+ldapmodify -x -D 'cn=Directory Manager' -w ldapadmin -f /tmp/sysacccount.ldif
 
 echo -e "Creating user groups...\n"
 ipa group-add ose-user --desc="Users with OpenShift access"
@@ -81,18 +68,15 @@ do
   # add user to OSE group
   ipa group-add-member ose-user --users=$user
   kdestroy
+  echo -e ldapadmin | kinit admin
   expect -c '
-    spawn kinit '"$user"'
+    spawn ipa user-mod '"$user"' --password
     expect {
-      -re ".*COM:" {
-        send "'"$userpw"'\r"
-        exp_continue
-      }
-      -re ".*password:" {
+      -re ".*Password" {
         send "'"$newpw"'\r"
         exp_continue
       }
-      -re ".*again:" {
+      -re ".*verify:" {
         send "'"$newpw"'\r"
       }
     }

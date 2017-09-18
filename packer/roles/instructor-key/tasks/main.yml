@@ -1,0 +1,23 @@
+---
+- name: create instructor account
+  user:
+    name: instructor
+    groups: wheel
+    append: yes
+    password: $6$vflpEFJa6AoKkqY3$LynSFEZFY/vKWbnZVV8aGToiBlsate96LALMWSB2X1IH6diHioito09FoFj9KNl0aNDZueHjhDy76Sy322bE8/
+
+- name: create ssh directory
+  file:
+    path: /home/instructor/.ssh
+    state: directory
+    mode: 0700
+
+- name: copy instructor key
+  copy: src=id_rsa.pub dest=/home/instructor/.ssh/
+
+- name: change permissions on key pair
+  file: path=/home/cloud-user/.ssh/{{ item }} owner=cloud-user group=cloud-user mode=0400
+  with_items:
+    - id_rsa.pub
+
+...

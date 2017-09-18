@@ -1,3 +1,66 @@
+config:
+  vars:
+    - name: OCP_ROUTING_SUFFIX
+      value: "apps.example.com"
+    - name: MASTER_HOSTNAME
+      value: "master"
+    - name: MASTER_EXTERNAL_FQDN
+      value: "master.example.com"
+    - name: MASTER_INTERNAL_FQDN
+      value: "master.internal.example.com"
+    - name: INFRA_INTERNAL_FQDN
+      value: "infra.internal.example.com"
+    - name: NODE1_HOSTNAME
+      value: "node01"
+    - name: NODE1_EXTERNAL_FQDN
+      value: "node01.example.com"
+    - name: NODE1_INTERNAL_FQDN
+      value: "node01.internal.example.com"
+    - name: NODE1_INTERNAL_IP
+      value: "192.168.0.101"
+    - name: NODE1_HOSTNAME
+      value: "node02"
+    - name: NODE2_EXTERNAL_FQDN
+      value: "node02.example.com"
+    - name: NODE2_INTERNAL_FQDN
+      value: "node02.internal.example.com"
+    - name: NODE2_INTERNAL_IP
+      value: "192.168.0.102"
+    - name: NODE3_HOSTNAME
+      value: "node03"
+    - name: NODE3_EXTERNAL_FQDN
+      value: "node03.example.com"
+    - name: NODE3_INTERNAL_FQDN
+      value: "node03.internal.example.com"
+    - name: NODE3_INTERNAL_IP
+      value: "192.168.0.103"
+    - name: NODE4_EXTERNAL_FQDN
+      value: "node04.example.com"
+    - name: NODE4_INTERNAL_FQDN
+      value: "node04.internal.example.com"
+    - name: NODE4_INTERNAL_IP
+      value: "192.168.0.104"
+    - name: NODE5_EXTERNAL_FQDN
+      value: "node05.example.com"
+    - name: NODE5_INTERNAL_FQDN
+      value: "node05.internal.example.com"
+    - name: NODE5_INTERNAL_IP
+      value: "192.168.0.105"
+    - name: NODE6_EXTERNAL_FQDN
+      value: "node06.example.com"
+    - name: NODE6_INTERNAL_FQDN
+      value: "node06.internal.example.com"
+    - name: NODE6_INTERNAL_IP
+      value: "192.168.0.106"
+    - name: IDM_INTERNAL_FQDN
+      value: "idm.internal.example.com"
+    - name: WEB_CONSOLE_URL
+      value: "https://master.example.com/console"
+    - name: API_HEALTH_URL
+      value: "https://openshift.example.com/healthz/ready"
+    - name: CODE_CLONE_LOCATION
+      value: "/opt/lab/code"
+
 modules:
   environment:
     name: Environment Overview
@@ -10,3 +73,53 @@ modules:
       ETHERPAD_ENABLED:
       NUM_USERS:
       ETHERPAD_URL_PREFIX:
+  installation:
+    name: Installation and Verification
+  cns-deploy:
+    name: Deploying Container Native Storage
+    requires:
+      - installation
+    vars:
+      NODE_BRICK_DEVICE: "/dev/xvdd"
+      CNS_NAMESPACE: "container-native-storage"
+      HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
+      HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
+      HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
+      CNS_STORAGECLASS: "cns-gold"
+  app-mgmt-basics:
+    name: Application Management Basics
+    requires:
+      - installation
+  cluster-mgmt-basics:
+    name: Cluster Management Basics
+    requires:
+      - installation
+  ldap-groupsync:
+    name: Using External Authentication Providers (LDAP)
+  template-quota-limits:
+    name: Project Template, Quota, and Limits
+    requires:
+      - installation
+  infra-mgmt-basics:
+    name: Infrastructure Management Basics
+    requires:
+      - installation
+      - cns-deploy
+    vars:
+      CNS_NAMESPACE: "container-native-storage"
+      CNS_STORAGECLASS: "cns-gold"
+  cns-management:
+    name: Container-native Storage Management
+    requires:
+      - installation
+      - cns-deploy
+      - infra-mgmt-basics
+    vars:
+      HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
+      CNS_STORAGECLASS: "cns-gold"
+      CNS_STORAGECLASS2: "cns-silver"
+      CNS_NAMESPACE: "container-native-storage"
+      NODE_BRICK_DEVICE: "/dev/xvdd"
+      NODE_BRICK_DEVICE2: "/dev/xvde"
+  skipping-ahead:
+    name: Skipping modules

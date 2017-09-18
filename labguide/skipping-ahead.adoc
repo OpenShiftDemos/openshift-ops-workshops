@@ -1,0 +1,43 @@
+[abstract]
+Skipping Modules
+--------
+While the Test Drive is designed to be an experience that is linear in nature,
+it is possible to skip modules. Skipping modules requires that you perform
+certain automation tasks that will actually "do" the exercise for you.
+
+For example, if you wanted to skip user and group configuration, later labs
+still rely on this being completed, so you must still make sure the steps have
+been executed.
+
+We provide automation of each module using Ansible playbooks that are located in
+the `{{ CODE_CLONE_LOCATION }}/tests` folder.
+
+The Automation Playbooks
+--------
+There are two file suffixes in the `tests` folder:
+
+* `*_verification.yml`
+* `*_automation.yml`
+
+The verification playbook is used as a part of our test-driven development
+methodology for the Test Drive. You will not need to use it, although examining
+it may provide some insight into how we evaluate whether or not things are still
+working after updates and upgrades.
+
+The important playbook is the `*_automation.yml` file. These playbooks will
+perform all of the same steps that are in each module's instructions. The
+filenames for the playbooks will resemble the module names. For example, if the
+module is called *Deploying Container Native Storage*, you will find a file
+called `cns-deploy_automation.yml`.
+
+Executing the Playbooks
+--------
+Executing the skip module playbooks is trivial. Given the example above, SSH
+into the master host and, from anywhere on the host:
+
+----
+ansible-playbook /opt/lab/code/tests/cns-deploy_automation.yml
+----
+
+Eventually, Ansible will complete. If you wish to skip another module, just run
+its corresponding automation playbooks as above.

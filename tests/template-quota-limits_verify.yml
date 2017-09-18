@@ -1,0 +1,24 @@
+---
+- name: Verifying project request template
+  hosts: masters
+  tasks:
+    - name: Login as system:admin to create projects
+      command: oc login -u system:admin
+
+    - name: Check for template-test project
+      command: oc get project template-test
+      register: template_out
+      ignore_errors: true
+      
+    - name: Checking the creation of a new project
+      command: oc new-project template-test
+      when: template_out | failed
+      
+    - name: Checking if quota is present for this project
+      command: oc get quota template-test-quota -n template-test
+      
+    - name: Checking if limitrange is present for the created project
+      command: oc get limits template-test-limits -n template-test
+
+    - name: Delete template-test project
+      command: oc delete project template-test

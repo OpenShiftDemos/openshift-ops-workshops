@@ -1,0 +1,57 @@
+---
+- name: Automating Application Management Basics module
+  hosts: masters
+  become_user: root
+  tasks:
+    - name: Login as system:admin
+      command: oc login -u system:admin
+
+    - name: Check for app-management project
+      command: oc get project app-management
+      register: app_project_out
+      ignore_errors: true
+
+    - name: Create app-management project
+      command: oc new-project app-management
+      when: app_project_out | failed
+
+    - name: Check for the sample application
+      command: oc get dc mapit
+      register: app_dc_out
+      ignore_errors: true
+
+    - name: Deploy the sample application
+      command: oc new-app docker.io/siamaksade/mapit -n app-management
+      when: app_dc_out | failed
+
+    - name: Wait for app to be running
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+      register: result
+      until: '"1" in result.stdout'
+      retries: 10
+      delay: 15
+
+    - name: Set mapit liveness probe
+      command: oc set probe dc/mapit --liveness --get-url=http://:8080/health --initial-delay-seconds=30
+
+    - name: Set mapit readiness probe
+      command: oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30
+
+    - name: Check for mapit route
+      command: oc get route mapit
+      register: mapit_route_out
+      ignore_errors: true
+
+    - name: Create mapit route
+      command: oc expose service mapit
+
+    - name: Scale to two instances
+      command: oc scale dc/mapit --replicas=2
+
+    - name: Wait for both app instances
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+      register: result
+      until: '"2" in result.stdout'
+      retries: 10
+      delay: 15
+

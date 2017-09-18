@@ -10,10 +10,8 @@
       - openssh-clients
       - expect 
       - ntp
-      - firewalld
       - ipa-server-dns
       - ipa-server
       - bind 
       - bind-dyndb-ldap
-      - haveged
 ...

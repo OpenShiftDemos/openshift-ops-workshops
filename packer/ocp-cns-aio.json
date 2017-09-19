@@ -8,7 +8,8 @@
     "gluster_pool": "{{env `GLUSTER_POOL`}}",
     "activation_key": "{{env `ACT_KEY`}}",
     "vpc_id": "{{env `VPC_ID`}}",
-    "subnet_id": "{{env `SUBNET_ID`}}"
+    "subnet_id": "{{env `SUBNET_ID`}}",
+    "instructor_pub_key_file": "{{ env `INSTRUCTOR_PUB_KEY_FILE` }}"
   },
   "builders": [{
     "communicator": "ssh",
@@ -48,7 +49,7 @@
     "playbook_file": "site.yml",
     "extra_arguments": [
         "--become",
-        "--extra-vars", "rhsm_org_id={{user `org_id`}} rhsm_act_key={{user `activation_key`}} gluster={{user `gluster_pool`}}"
+        "--extra-vars", "rhsm_org_id={{user `org_id`}} rhsm_act_key={{user `activation_key`}} gluster={{user `gluster_pool`}} instructor_pub_key_file={{user `instructor_pub_key_file` }}"
       ]
   }]
 }

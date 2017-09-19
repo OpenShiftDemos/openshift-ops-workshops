@@ -1,23 +1,41 @@
 ---
+
+- fail:
+    msg: "variable instructor_pub_key_file not defined"
+  when: instructor_pub_key_file is not defined
+
+- stat: path={{ instructor_pub_key_file }}
+  register: pub_key_file
+  delegate_to: localhost
+  become: false
+
+- fail:
+    msg: "{{ instructor_pub_key_file }} is not a valid file"
+  when: not pub_key_file.stat.exists
+
 - name: create instructor account
   user:
     name: instructor
     groups: wheel
     append: yes
-    password: $6$vflpEFJa6AoKkqY3$LynSFEZFY/vKWbnZVV8aGToiBlsate96LALMWSB2X1IH6diHioito09FoFj9KNl0aNDZueHjhDy76Sy322bE8/
+    generate_ssh_key: true
 
-- name: create ssh directory
-  file:
-    path: /home/instructor/.ssh
-    state: directory
-    mode: 0700
+- name: add supplied pub key to instructor's authorized keys
+  authorized_key:
+    user: instructor
+    state: present
+    key: "{{ lookup('file', instructor_pub_key_file) }}"
 
-- name: copy instructor key
-  copy: src=id_rsa.pub dest=/home/instructor/.ssh/
+- name: fetch instructor's own pub key
+  fetch:
+    src: /home/instructor/.ssh/id_rsa.pub
+    dest: fetch/instructor_key.pub
+    flat: yes
 
-- name: change permissions on key pair
-  file: path=/home/cloud-user/.ssh/{{ item }} owner=cloud-user group=cloud-user mode=0400
-  with_items:
-    - id_rsa.pub
+- name: add instructor's own key to authorized keys for effortless cross system login
+  authorized_key:
+    user: instructor
+    state: present
+    key: "{{ lookup('file', 'fetch/instructor_key.pub') }}"
 
 ...

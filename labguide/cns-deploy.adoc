@@ -227,8 +227,7 @@ cns-deploy -n {{CNS_NAMESPACE}} -g /opt/lab/support/topology.json --admin-key '{
 
 Answer the interactive prompts with *Y*.
 
-The deployment will take several minutes to complete. On the command line the
-output should look like this:
+The deployment will take several minutes to complete. Especially the step "Waiting for GlusterFS pods to start" might take some time. On the command line the output should look like this:
 
 [source]
 ----

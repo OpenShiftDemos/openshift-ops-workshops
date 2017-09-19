@@ -5,6 +5,7 @@
   roles:
     - { role: registered-host, tags: ['registered-host']}
     - { role: authorized-key, tags: ['authorized-key']}
+    - { role: instructor-key, tags: ['instructor-key']}
     - { role: aws-host, tags: ['aws-host']}
     - { role: ocp-installer, tags: ['ocp-installer']}
     - { role: docker-host, tags: ['docker-host']}

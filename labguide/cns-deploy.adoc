@@ -6,8 +6,7 @@ GlusterFS in turn is backed by local storage devices available to the OpenShift 
 This lab requires that you completed OpenShift installation in the previous module.
 
 ### Preparation for CNS
-All of the following tasks are carried out as the `cloud-user` user on the master node {{ MASTER_EXTERNAL_FQDN }}.
-node. Before the deployment a couple of simple prerequisites need to be fulfilled.
+All of the following tasks are carried out as the `cloud-user` user on the master node _{{ MASTER_EXTERNAL_FQDN }}_. Before the deployment a couple of simple prerequisites need to be fulfilled.
 
 #### Check the Prerequisites
 First, on the master, verify that the CNS deployment tool is installed. We will also use Ansible to apply the firewall configuration across all 3 nodes. Though not needed for CNS per se, in this lab it will help us simplify an otherwise tedious manual configuration step.
@@ -53,7 +52,7 @@ ansible cns -m ping
 ----
 
 This verifies the systems can be reached and configure via Ansible.
-For the firewall configuration in this lab is a preapred file in the `support` folder called `configure-firewall.yaml`. This is a short Ansible playbook that will configure the firewallto allow GlusterFS-related traffic (namely on ports 24007,24008, 2222 and 49152-49664 - all TCP), required for CNS. Run it with the following command:
+For the firewall configuration in this lab is a preapred file in the `support` folder called `configure-firewall.yaml`. This is a short Ansible playbook that will configure the firewall to allow GlusterFS-related traffic (namely on ports 24007,24008, 2222 and 49152-49664 - all TCP), required for CNS. Run it with the following command:
 
 [source]
 ----

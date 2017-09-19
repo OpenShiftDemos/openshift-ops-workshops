@@ -4,7 +4,7 @@
 
   roles:
     - { role: authorized-key, tags: ['authorized-key']}
-    - { role: instructor-key, tags: ['instructor-key']}
+    - { role: instructor-user, tags: ['instructor-user']}
     - { role: registered-host, tags: ['registered-host']}
     - { role: aws-host, tags: ['aws-host']}
     - { role: ocp-installer, tags: ['ocp-installer']}

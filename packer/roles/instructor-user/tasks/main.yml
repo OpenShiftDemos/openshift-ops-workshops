@@ -20,6 +20,12 @@
     append: yes
     generate_ssh_key: true
 
+- name: set password-less sudo for instructor
+  lineinfile:
+    line: "instructor            ALL=(ALL) NOPASSWD: ALL"
+    dest: /etc/sudoers
+    state: present
+
 - name: add supplied pub key to instructor's authorized keys
   authorized_key:
     user: instructor

@@ -834,7 +834,7 @@ NAME                         STATUS                     AGE
 <1> The nodes added in the previous lab
 
 Now we need to make sure, that these new systems have the right firewall ports
-opened. For simplicity, we will just re-execute the `configure-firewall.yml`
+opened. For simplicity, we will just re-execute the `configure-firewall.yaml`
 from the link:cns-deploy["Deploying  Container-native Storage"] module against
 these new systems.
 
@@ -857,11 +857,11 @@ inventory file `/etc/ansible/hosts` (they are prefixed with `#addcns_`):
 [...]
 ----
 
-Then execute the `configure-firewall.yml` playbook again:
+Then execute the `configure-firewall.yaml` playbook again:
 
 [source]
 ----
-ansible-playbook /opt/lab/support/configure-firewall.yml
+ansible-playbook /opt/lab/support/configure-firewall.yaml
 ----
 
 Next, add the following label to these nodes in order have the *DaemonSet* that

@@ -62,17 +62,17 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-e05b559b
+      ami: ami-6bd83411
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-cc03e8b4
+      ami: ami-beed10c6
     eu-west-1:
-      ami: ami-b9cd36c0
+      ami: ami-c89e52b1
     eu-central-1:
-      ami: ami-ab2e84c4
+      ami: ami-39219756
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
@@ -795,7 +795,6 @@ Resources:
                   openshift_master_cluster_public_hostname=openshift.${AWS::AccountId}.${PublicHostedZone}
                   openshift_router_selector='region=infra'
                   openshift_registry_selector='region=infra'
-                  osm_default_node_selector='region=apps'
                   openshift_examples_modify_imagestreams=true
                   openshift_metrics_install_metrics=false
                   #metrics_openshift_metrics_install_metrics=true
@@ -1306,6 +1305,7 @@ Resources:
                 MASTER_EXTERNAL_IP="${Master1.PublicIp}"
                 MASTER_INTERNAL_FQDN="master.internal.${PublicHostedZone}"
                 INFRA_INTERNAL_FQDN="infra.internal.${PublicHostedZone}"
+                INFRA_INTERNAL_IP="${InfraNode1.PrivateIp}"
                 NODE1_HOSTNAME="node01"
                 NODE1_EXTERNAL_FQDN="node01.${AWS::AccountId}.${PublicHostedZone}"
                 NODE1_INTERNAL_FQDN="node01.internal.${PublicHostedZone}"

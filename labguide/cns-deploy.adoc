@@ -6,8 +6,7 @@ GlusterFS in turn is backed by local storage devices available to the OpenShift 
 This lab requires that you completed OpenShift installation in the previous module.
 
 ### Preparation for CNS
-All of the following tasks are carried out as the `cloud-user` user on the master node {{ MASTER_EXTERNAL_FQDN }}.
-node. Before the deployment a couple of simple prerequisites need to be fulfilled.
+All of the following tasks are carried out as the `cloud-user` user on the master node _{{ MASTER_EXTERNAL_FQDN }}_. Before the deployment a couple of simple prerequisites need to be fulfilled.
 
 #### Check the Prerequisites
 First, on the master, verify that the CNS deployment tool is installed. We will also use Ansible to apply the firewall configuration across all 3 nodes. Though not needed for CNS per se, in this lab it will help us simplify an otherwise tedious manual configuration step.

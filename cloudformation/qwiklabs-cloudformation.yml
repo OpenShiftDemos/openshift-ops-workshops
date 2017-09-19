@@ -1305,6 +1305,7 @@ Resources:
                 MASTER_EXTERNAL_IP="${Master1.PublicIp}"
                 MASTER_INTERNAL_FQDN="master.internal.${PublicHostedZone}"
                 INFRA_INTERNAL_FQDN="infra.internal.${PublicHostedZone}"
+                INFRA_INTERNAL_IP="${InfraNode1.PrivateIp}"
                 NODE1_HOSTNAME="node01"
                 NODE1_EXTERNAL_FQDN="node01.${AWS::AccountId}.${PublicHostedZone}"
                 NODE1_INTERNAL_FQDN="node01.internal.${PublicHostedZone}"

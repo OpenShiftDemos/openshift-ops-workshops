@@ -10,6 +10,8 @@ config:
       value: "master.internal.example.com"
     - name: INFRA_INTERNAL_FQDN
       value: "infra.internal.example.com"
+    - name: INFRA_INTERNAL_IP
+      value: "192.168.0.99"
     - name: NODE1_HOSTNAME
       value: "node01"
     - name: NODE1_EXTERNAL_FQDN

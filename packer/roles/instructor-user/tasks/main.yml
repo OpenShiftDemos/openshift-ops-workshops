@@ -1,0 +1,47 @@
+---
+
+- fail:
+    msg: "variable instructor_pub_key_file not defined"
+  when: instructor_pub_key_file is not defined
+
+- stat: path={{ instructor_pub_key_file }}
+  register: pub_key_file
+  delegate_to: localhost
+  become: false
+
+- fail:
+    msg: "{{ instructor_pub_key_file }} is not a valid file"
+  when: not pub_key_file.stat.exists
+
+- name: create instructor account
+  user:
+    name: instructor
+    groups: wheel
+    append: yes
+    generate_ssh_key: true
+
+- name: set password-less sudo for instructor
+  lineinfile:
+    line: "instructor            ALL=(ALL) NOPASSWD: ALL"
+    path: /etc/sudoers
+    state: present
+
+- name: add supplied pub key to instructor's authorized keys
+  authorized_key:
+    user: instructor
+    state: present
+    key: "{{ lookup('file', instructor_pub_key_file) }}"
+
+- name: fetch instructor's own pub key
+  fetch:
+    src: /home/instructor/.ssh/id_rsa.pub
+    dest: fetch/instructor_key.pub
+    flat: yes
+
+- name: add instructor's own key to authorized keys for effortless cross system login
+  authorized_key:
+    user: instructor
+    state: present
+    key: "{{ lookup('file', 'fetch/instructor_key.pub') }}"
+
+...

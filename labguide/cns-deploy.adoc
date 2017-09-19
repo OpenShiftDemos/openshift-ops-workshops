@@ -1,19 +1,16 @@
-## Deploying Container Native Storage
-In this section you will set up container-native storage (CNS) in your
-environment. You will use this in link:cns-management["Container-native Storage
-Management"] lab to dynamically provision storage for containerized
-applications. It is provided by GlusterFS running in containers. + GlusterFS in
-turn is backed by local storage devices available to the OpenShift nodes.+ This
-lab requires that you completed OpenShift installation in the previous module.
+## Deploying Container-Native Storage
+In this section you will set up Container-Native Storage (CNS) in your
+environment. You will use this in link:../cns-management["Container-Native Storage Management"] lab to dynamically provision storage for containerized
+applications. It is provided by GlusterFS running in containers.
+GlusterFS in turn is backed by local storage devices available to the OpenShift nodes.
+This lab requires that you completed OpenShift installation in the previous module.
 
 ### Preparation for CNS
-All of the following tasks are carried out as the `root` user on the master
-node. You will now get ready to perform the CNS installation.
+All of the following tasks are carried out as the `cloud-user` user on the master node {{ MASTER_EXTERNAL_FQDN }}.
+node. Before the deployment a couple of simple prerequisites need to be fulfilled.
 
 #### Check the Prerequisites
-First, on the master, verify that the CNS deployment tool is installed. + We will also use
-Ansible and verify it's presence. Though not needed for CNS per se, in this lab
-it will help us simplify an otherwise tedious manual configuration step.
+First, on the master, verify that the CNS deployment tool is installed. We will also use Ansible to apply the firewall configuration across all 3 nodes. Though not needed for CNS per se, in this lab it will help us simplify an otherwise tedious manual configuration step.
 
 [source]
 ----
@@ -33,10 +30,9 @@ Installed Packages                cns-deploy.x86_64               4.0.0-19.el7rh
 Just as Ansible was used to install and configure OpenShift, you will configure
 Ansible to take care of certain CNS prerequisites and installation steps.
 
-There is a host group in `/etc/ansible/hosts` for the three nodes that will be
-run CNS. You will also see some hosts commented out for future use.
+There is a host group in `/etc/ansible/hosts` for the three nodes that will initially run CNS. There are three more hosts, currently commented out, for future use.
 
-You should be able to ping all the CNS hosts using Ansible:
+You should be able to "ping" the first 3 OpenShift App nodes using Ansible:
 
 [source]
 ----
@@ -56,18 +52,15 @@ ansible cns -m ping
 }
 ----
 
-There is a file in the `support` folder called `configure-firewall.yaml`. This
-is a short Ansible playbook that will configure the firewall on all the relevant
-OpenShift nodes to allow GlusterFS-related traffic, required for CNS. Run it
-with the following command:
+This verifies the systems can be reached and configure via Ansible.
+For the firewall configuration in this lab is a preapred file in the `support` folder called `configure-firewall.yaml`. This is a short Ansible playbook that will configure the firewallto allow GlusterFS-related traffic (namely on ports 24007,24008, 2222 and 49152-49664 - all TCP), required for CNS. Run it with the following command:
 
 [source]
 ----
 ansible-playbook /opt/lab/support/configure-firewall.yaml
 ----
 
-When the playbooks completes successfully, your output should look like the
-following:
+Feel free to examine the playbook file if you are curious. When the Ansible play completes successfully, your output should look like the following:
 
 [source]
 ----
@@ -111,11 +104,7 @@ Create a *Project* called `{{CNS_NAMESPACE}}`:
 oc new-project {{CNS_NAMESPACE}}
 ----
 
-CNS *Pods* need access to the physical block devices on the host. OpenShift's
-security model prevents that behavior by default. In order to provide the
-permissions required, you will need to enable a privileged operation mode for
-the *Pods*. Execute the following command, which will allow the `default`
-*ServiceAccount* to use the `privileged` *SecurityContextConstraint*:
+In CNS, the *Pods* running GlusterFS need access to the physical block devices on the host. OpenShift's security model prevents that behaviour by default. In order to provide the permissions required, you will need to enable a privileged operation mode for the *Pods*. Execute the following command, which will allow the `default` *ServiceAccount* to use the `privileged` *SecurityContextConstraint*:
 
 [source]
 ----
@@ -130,8 +119,8 @@ link:https://docs.openshift.com/container-platform/3.5/architecture/additional_c
 documentation] provides a deeper dive into these concepts.
 ====
 
-### Describe Container Native Storage Topology
-CNS will virtualize the locally attached block storage on the OpenShift nodes.
+### Describe Container-Native Storage Topology
+CNS will virtualize the locally attached block storage on the OpenShift nodes using GlusterFS.
 In order to deploy CNS, though, you will need to supply the CNS installer with
 information about where to find these nodes and what network and which block
 devices to use. This is done using a JSON file that describes the topology of
@@ -199,7 +188,7 @@ There has already been a JSON file defined for you:
     ]
 }
 ----
-<1> heketi uses this FQDN to identify the node in OpenShift (like oc get nodes)
+<1> heketi uses this FQDN to identify the node in OpenShift (e.g. oc get nodes)
 <2> the IP address of the node used for GlusterFS traffic
 <3> The failure domain of this node
 <4> The host's storage device(s) to for GlusterFS
@@ -216,7 +205,7 @@ replicated 3 times. By exposing information about the failure domains we can
 make sure that two copies are never stored on nodes in the same failure domain.
 The `zone` definitions are simply arbitrary, but unique integer values.
 
-### Install Container-native Storage
+### Install Container-Native Storage
 You are now ready to deploy CNS. Alongside CNS *Pods*, the API front-end
 known as *heketi* is deployed. To protect this API from unauthorized access we
 will define passwords for the `admin` and `user` role in heketi like below.
@@ -404,14 +393,14 @@ curl http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}/hello
 Hello from Heketi
 ----
 
-That's it. You have successfully provisioned Container-native Storage on
+That's it. You have successfully provisioned Container-Native Storage on
 OpenShift. CNS provides the basis to provide persistent storage to applications, as
-demonstrated in the link:cns-usage["Container-native Storage Management"]
+demonstrated in the link:../cns-management["Container-Native Storage Management"]
 module.
 
 CNS is available wherever OpenShift is deployed with no external dependencies.
 
-#### Exploring Container Native Storage
+#### Exploring Container-Native Storage
 Outside of the tight integration with OpenShift you can also work directly with
 the administrative interface of heketi. This done via the command line client.
 First, set the following environment variables to configure the client:
@@ -541,10 +530,22 @@ In our case, we want to provide the administrative password for CNS (the heketi
 API, specifically) so that OpenShift can use it when provisioning or deleting
 storage volumes.
 
-The definition of this *Secret* is in a file
-`/opt/lab/support/cns-secret.yaml`. It contains a base64-encoded version of
-the heketi admin password that you used earlier when deploying CNS. Make sure
-you are still in the `{{ CNS_NAMESPACE }}` *Project*:
+The definition of this *Secret* is in a file `/opt/lab/support/cns-secret.yaml`. Feel free you use `cat` the display review this file. It contains a base64-encoded version of the heketi admin password that you used earlier when deploying CNS.
+
+[source,yaml]
+./opt/lab/support/cns-secret.yaml
+----
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cns-secret
+  namespace: default
+data:
+  key: bXlTM2NyM3RwYXNzdzByZA==
+type: kubernetes.io/glusterfs
+----
+
+To create the *Secret* from this file, make sure you are still in the `{{ CNS_NAMESPACE }}` *Project*:
 
 [source]
 ----
@@ -558,10 +559,11 @@ Then, you can create (instantiate) the *Secret*:
 oc create -f /opt/lab/support/cns-secret.yaml
 ----
 
+The *Secret* now stores the credentials for the heketi service in a hashed form. The *StorageClass* will use this to authenticate against the heketi API.
+
 #### Create the Storage Class
 To tell OpenShift about the existence of a dynamic storage provider, you use a
-*StorageClass*. There is a definition file
-`/opt/lab/support/cns-storageclass.yaml` that describes the *StorageClass*
+*StorageClass*. There is a definition file `/opt/lab/support/cns-storageclass.yaml` that describes the *StorageClass*
 as well as references the *Secret* you just created. You will need to edit it
 appropriately. Open the file with your favorite editor, and substitute
 `INSERT-CLUSTER-ID-HERE` with the ID of your cluster.
@@ -590,7 +592,7 @@ parameters:
 <1> The HTTP route OpenShift uses to expose the heketi API
 <2> The only currently supported GlusterFS volume type: 3-way replication.
 <3> *Use your cluster UUID here!*
-<4> The namespace in which we created the secret file Before
+<4> The namespace in which we created the secret file before
 <5> The name of the secret which stores the heketi admin password
 
 Create the *StorageClass*:
@@ -601,11 +603,11 @@ oc create -f /opt/lab/support/cns-storageclass.yaml
 ----
 
 With these components in place, OpenShift can now dynamically provision storage
-capacity from Container Native Storage. The *StorageClass* has also been setup
+capacity from Container-Native Storage. The *StorageClass* has also been setup
 as the system-wide default so that requests that don't request a particular
-*StorageClass* will use this CNS one.
+*StorageClass* will use this one and end up being served by CNS.
 
-More information about dynamic storage probvisioning in OpenShift can be found
+More information about dynamic storage provisioning in OpenShift can be found
 in the
 link:https://docs.openshift.com/container-platform/3.5/install_config/persistent_storage/dynamically_provisioning_pvs.html[dynamic
 storage provisioning documentation].

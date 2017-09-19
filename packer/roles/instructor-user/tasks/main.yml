@@ -23,7 +23,7 @@
 - name: set password-less sudo for instructor
   lineinfile:
     line: "instructor            ALL=(ALL) NOPASSWD: ALL"
-    dest: /etc/sudoers
+    path: /etc/sudoers
     state: present
 
 - name: add supplied pub key to instructor's authorized keys

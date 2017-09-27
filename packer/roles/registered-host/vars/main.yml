@@ -8,5 +8,6 @@ rhsm_repos:
   - rhel-7-fast-datapath-rpms
   - rhel-7-server-ose-3.5-rpms
   - rh-gluster-3-for-rhel-7-server-rpms
+  - rhel-server-rhscl-7-rpms 
 
 ...

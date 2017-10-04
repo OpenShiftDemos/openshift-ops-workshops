@@ -9,4 +9,6 @@
   - name: start docker
     service: name=docker state=started enabled=yes
 
+  - name: install registry
+    yum: name=docker-distribution state=present
 ...

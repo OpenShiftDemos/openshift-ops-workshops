@@ -1,0 +1,4 @@
+docker tag registry.access.redhat.com/rhscl/python-35-rhel7 localhost:5000/rhscl/python-35-rhel7
+docker tag registry.access.redhat.com/rhscl/ruby-23-rhel7 localhost:5000/rhscl/ruby-23-rhel7
+docker push localhost:5000/rhscl/python-35-rhel7
+docker push localhost:5000/rhscl/ruby-23-rhel7

@@ -62,17 +62,17 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-b307f7c9 
+      ami: ami-f58d498f
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-3ce71e44
+      ami: ami-74609a0c
     eu-west-1:
-      ami: ami-4d7eb634
+      ami: ami-82ee39fb
     eu-central-1:
-      ami: ami-7f0fbf10
+      ami: ami-5bd86534
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
@@ -307,6 +307,10 @@ Resources:
       - IpProtocol: tcp
         FromPort: 49152
         ToPort: 49664
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 5000
+        ToPort: 5000
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
         FromPort: 389
@@ -795,6 +799,7 @@ Resources:
                   openshift_master_cluster_public_hostname=openshift.${AWS::AccountId}.${PublicHostedZone}
                   openshift_router_selector='region=infra'
                   openshift_registry_selector='region=infra'
+                  openshift_docker_insecure_registries=labguide.internal.${PublicHostedZone}
                   openshift_examples_modify_imagestreams=true
                   openshift_metrics_install_metrics=false
                   #metrics_openshift_metrics_install_metrics=true
@@ -1351,6 +1356,8 @@ Resources:
             - [ systemctl, daemon-reload ]
             - [ systemctl, enable, workshopper ]
             - [ systemctl, start, workshopper ]
+            - [ systemctl, start, docker-distribution ]
+            - /usr/local/bin/image-push
             - ansible localhost -m wait_for -a "port=22 host=${WorkerNode1.PrivateIp}"
             - ansible localhost -m wait_for -a "port=22 host=${WorkerNode2.PrivateIp}"
             - ansible localhost -m wait_for -a "port=22 host=${WorkerNode3.PrivateIp}"

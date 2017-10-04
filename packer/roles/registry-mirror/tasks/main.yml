@@ -18,4 +18,6 @@
   with_items:
     - "{{ other_images }}"
 
+- name: create image push script
+  copy: src=image-push dest=/usr/local/bin/ mode=770
 ...

@@ -6,7 +6,7 @@ some maintenance of nodes, as well as manipulating the multitenant network.
 
 ### Extending the cluster
 
-Log in as cluster administrator (it will not matter if you are `root` or not):
+Log in as cluster administrator:
 
 [source]
 ----

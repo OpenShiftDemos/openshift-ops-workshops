@@ -1,6 +1,6 @@
 [abstract]
 Skipping Modules
---------
+
 While the Test Drive is designed to be an experience that is linear in nature,
 it is possible to skip modules. Skipping modules requires that you perform
 certain automation tasks that will actually "do" the exercise for you.
@@ -12,32 +12,46 @@ been executed.
 We provide automation of each module using Ansible playbooks that are located in
 the `{{ CODE_CLONE_LOCATION }}/tests` folder.
 
-The Automation Playbooks
---------
-There are two file suffixes in the `tests` folder:
 
-* `*_verification.yml`
-* `*_automation.yml`
+.The Automation Playbooks
+[options="header"]
+|==============================================
+| Module     | Playbook
+|2. Installation and Verification| installation_automation.yaml
+|3. Deploying Container-Native Storage| cns-deploy_automation.yaml
+|4. Application Management Basics| app-mgmt-basics_automation.yaml
+|5. Project Request Template, Quotas, Limits|template-quota-limits_automation.yaml
+|6. Using External Authentication Providers (LDAP)|ldap-groupsync_automation.yaml
+|7. Infrastructure Management Basics|infra-mgmt_automation.yaml
+|8. Container-native Storage Management|cns-management_automation.yaml
+|==============================================
 
-The verification playbook is used as a part of our test-driven development
+Executing the skip module playbooks is trivial. They are self-contained Ansible playbooks that are run from the `{{ CODE_CLONE_LOCATION }}/tests` directory.
+
+There is a constraint that if you want to skip across multiple modules, **you need to skip all preceding modules in order**. For example, if you wanted to skip to Module 5 (that is skipping module 2-4), you would need to run the following:
+
+----
+cd {{ CODE_CLONE_LOCATION }}/tests/
+ansible-playbook installation_automation.yaml
+ansible-playbook cns-deploy_automation.yaml
+ansible-playbook app-mgmt-basics_automation.yaml
+----
+
+[WARNING]
+====
+Do not run playbooks without following above constraint of running them in order.
+====
+
+[IMPORTANT]
+====
+Do not run the `installation_automation.yaml` or `cns-deploy_automation.yaml` twice. It's not quite idempotent yet.
+====
+
+
+[TIP]
+====
+You will also notice some playbooks called `*_verify.yaml`. These verification playbooks are used as a part of our test-driven development
 methodology for the Test Drive. You will not need to use it, although examining
 it may provide some insight into how we evaluate whether or not things are still
 working after updates and upgrades.
-
-The important playbook is the `*_automation.yml` file. These playbooks will
-perform all of the same steps that are in each module's instructions. The
-filenames for the playbooks will resemble the module names. For example, if the
-module is called *Deploying Container Native Storage*, you will find a file
-called `cns-deploy_automation.yml`.
-
-Executing the Playbooks
---------
-Executing the skip module playbooks is trivial. Given the example above, SSH
-into the master host and, from anywhere on the host:
-
-----
-ansible-playbook /opt/lab/code/tests/cns-deploy_automation.yml
-----
-
-Eventually, Ansible will complete. If you wish to skip another module, just run
-its corresponding automation playbooks as above.
+====

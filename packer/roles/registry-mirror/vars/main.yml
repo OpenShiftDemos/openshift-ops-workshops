@@ -44,5 +44,7 @@ cns_core_images:
 
 other_images:
   - docker.io/siamaksade/mapit
+  - registry.access.redhat.com/rhscl/postgresql-95-rhel7 
+  - registry.access.redhat.com/rhscl/ruby-23-rhel7 
 
 ...

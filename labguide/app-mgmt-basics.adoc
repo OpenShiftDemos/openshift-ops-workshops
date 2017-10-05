@@ -35,7 +35,7 @@ out what to do. Users will commonly use this command to get OpenShift to launch
 existing images, to create builds of source code and ultimately deploy them, to
 instantiate templates, and so on.
 
-You will now launch a specific image that exists on Dockerhub 
+You will now launch a specific image that exists on Dockerhub
 
 [source]
 ----
@@ -66,7 +66,7 @@ of this command. We will take some time to explore the resources that were
 created.
 
 For more information on the capabilities of `new-app`, take a look at its help
-message by running `oc new-app -h`
+message by running `oc new-app -h`.
 
 #### Pods
 Pods are one or more containers deployed together on host. A pod is the
@@ -75,7 +75,7 @@ its own internal IP address on the SDN and will own the entire port range. The
 containers within pods can share local storage space and networking resources.
 
 Pods are treated as **static** objects by OpenShift, i.e., one cannot change the
-pod definition while running. 
+pod definition while running.
 
 You can get a list of pods:
 
@@ -133,9 +133,9 @@ Containers:
     Environment Variables:      <none>
 Conditions:
   Type          Status
-  Initialized   True 
-  Ready         True 
-  PodScheduled  True 
+  Initialized   True
+  Ready         True
+  PodScheduled  True
 Volumes:
   default-token-kthcr:
     Type:       Secret (a volume populated by a Secret)
@@ -167,7 +167,7 @@ The way that a *Service* maps to a set of *Pods* is via a system of *Labels* and
 protocols can be mapped.
 
 There is a lot more information about
-https://docs.openshift.com/latest/architecture/core_concepts/pods_and_services.html#services[Services],
+https://docs.openshift.com/container-platform/3.5/architecture/core_concepts/pods_and_services.html#services[Services],
 including the YAML format to make one by hand, in the official documentation.
 
 The `new-app` command used earlier caused a service to be created. You can see
@@ -296,7 +296,7 @@ Under the `metadata` section you should see the following:
   `deploymentconfig: mapit`.
 * The *Pod* has multiple *Labels*:
 ** `deploymentconfig: mapit`
-** `app: parksmap`
+** `app: mapit`
 ** `deployment: mapit-1`
 
 *Labels* are just key/value pairs. Any *Pod* in this *Project* that has a *Label* that
@@ -319,7 +319,7 @@ somehow die/exit are not automatically restarted. *ReplicationControllers* are
 how OpenShift "self heals".
 
 A *DeploymentConfiguration* (DC) defines how something in OpenShift should be
-deployed. From the https://docs.openshift.com/latest/architecture/core_concepts/deployments.html#deployments-and-deployment-configurations[deployments documentation]:
+deployed. From the https://docs.openshift.com/container-platform/3.5/architecture/core_concepts/deployments.html[deployments documentation]:
 
 [source]
 ----
@@ -373,7 +373,7 @@ the desired number, we can tell OpenShift that we want more or less *Pods*.
 
 #### Scaling the Application
 
-Let's scale our parksmap "application" up to 2 instances. We can do this with
+Let's scale our mapit "application" up to 2 instances. We can do this with
 the `scale` command.
 
 [source]
@@ -622,9 +622,9 @@ which is creating and/or modifying probes. The `mapit` application exposes an
 endpoint which we can check to see if it is alive and ready to respond. You can
 test it using `curl`:
 
-[source,role=copypaste]
+[source]
 ----
-curl mapit-app-management.apps.{{OCP_ROUTING_SUFFIX}}/health
+curl mapit-app-management.{{OCP_ROUTING_SUFFIX}}/health
 ----
 
 You will get some JSON as a response:

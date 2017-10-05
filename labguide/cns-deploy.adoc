@@ -36,7 +36,11 @@ You should be able to "ping" the first 3 OpenShift App nodes using Ansible:
 [source]
 ----
 ansible cns -m ping
+----
 
+This should result in the following:
+
+----
 {{NODE1_EXTERNAL_FQDN}} | SUCCESS => {
     "changed": false,
     "ping": "pong"
@@ -372,22 +376,32 @@ heketi    172.30.5.231   <none>        8080/TCP   31m
 ----
 
 In order to be able to use heketi outside of the OpenShift cluster (for
-monitoring/data gathering, or other automation), a *Route* has been created:
+monitoring/data gathering, or other automation), a *Route* has been created. Verify this is the case by running:
 
 [source]
 ----
 oc get route/heketi
+----
 
+This should output the details, as well as the public URL of the `Route` for the heketi API:
+
+[source]
+----
 NAME      HOST/PORT                                               PATH      SERVICES   PORT      TERMINATION   WILDCARD
 heketi    heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}             heketi     <all>                   None
 ----
 
-You may verify this with a trivial health check:
+You may verify the API is responding and heketi is alive with a trivial health check:
 
 [source]
 ----
 curl http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}/hello
+----
 
+This should return (likely without a line break)
+
+[source]
+----
 Hello from Heketi
 ----
 
@@ -418,7 +432,12 @@ managing:
 [source]
 ----
 heketi-cli cluster list
+----
 
+heketi will list all known clusters with internal UUIDs:
+
+[source]
+----
 Clusters:
 ec7a9c8be8327a54839236791bf7ba24 <1>
 ----
@@ -438,14 +457,19 @@ now ready to serve replicated, software-defined storage.
 *Please note the UUID for later reference in the next chapter.*
 ====
 
-To get more detailled information about the topology of your CNS cluster (i.e.
+To get more detailed information about the topology of your CNS cluster (i.e.
 nodes, devices and volumes heketi has discovered) run the following command
 (output abbreviated):
 
 [source]
 ----
 heketi-cli topology info
+----
 
+You will get a lengthy output that describes the GlusterFS cluster topology as it is known by heketi:
+
+[source]
+----
 Cluster Id: ec7a9c8be8327a54839236791bf7ba24
 
     Volumes

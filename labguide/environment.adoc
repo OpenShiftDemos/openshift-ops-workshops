@@ -1,6 +1,6 @@
 ## Environment Overview
 
-You will be interacting with an OpenShift environment that is running on {{ ENVIRONMENT }}. The environment consists of the following systems:
+You will be interacting with an OpenShift 3.5 cluster that is running on {{ ENVIRONMENT }}. During the lab you will also install Container-Native Storage 3.5. The complete environment consists of the following systems:
 
 * 1 master node
 * 1 infrastructure node
@@ -35,7 +35,9 @@ All addresses are internal to the lab environment. The only system you publicly 
 
 You will be installing OpenShift Container Platform v3.5 using the advanced
 installation method, driven by Ansible playbooks. You will also install
-Container Native Storage.
+Container Native Storage v3.5.
+
+Note that references to documentation will be specifically pointing to the 3.5 version but newer versions may be available at the time of reading this lab guide.
 
 ### Logging in
 

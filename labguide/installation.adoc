@@ -52,12 +52,17 @@ command:
 
 [source]
 ----
-ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+ansible-playbook -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
 ----
 
 This will take some time. You might want to go get a beverage or check your
 email. Come back in about 7-10 minutes. We have pre-cached as much of the
 content as possible to make the installation go quickly.
+
+[TIP]
+====
+The additional command-line switch `-i /etc/ansible/hosts` in the command above is actually redundant. It directs Ansible to use an inventory file at the supplied path. When omitted, Ansible will look at a number of default paths, among which is `/etc/ansible/hosts`.
+====
 
 A typical multi-host installation like this might take around an hour depending
 on the speed of your internet connection. Disconnected installation options are
@@ -72,7 +77,7 @@ perform to ensure that it went successfully.
 The installer is quite verbose, and can be made even more verbose. If you know
 anything about Ansible, the output should be familiar to you. In any case, so
 long as there are no fatal-type errors and all hosts exit "OK", the odds are
-good that the installation was succesful.
+good that the installation was successful.
 
 If you look in your terminal at the output of the installer, it should finish
 with something that looks like the following:
@@ -139,7 +144,7 @@ the internal image registry) run as workload inside the OpenShift environment,
 and you could see these things. However, we have not yet explored authentication
 topics, so you have no cluster administrator "human" accounts yet.
 
-Point your browser to {{WEB_CONSOLE_URL}} to verify that the web console is
+Point your browser to {{WEB_CONSOLE_URL}}[{{WEB_CONSOLE_URL}}, window="_blank"] to verify that the web console is
 available and responding. You can login using the user `teamuser1` with password `openshift`.
 You are not required to do anything in the web console at this point.
 

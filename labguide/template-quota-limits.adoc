@@ -1,6 +1,6 @@
 ## Project Request Template, Quotas, Limits
 In the Application Management Basics lab, you dealt with the fundamental
-building blocks of OpenShift, all contained within a *Project*. 
+building blocks of OpenShift, all contained within a *Project*.
 
 Out of the box, OpenShift does not restrict the quantity of objects or amount of
 resources (eg: CPU, memory) that they can consume within a *Project*. Further,
@@ -10,15 +10,7 @@ for a little restraint.
 
 [WARNING]
 ====
-Before continuing, make sure you are using logged into the system as the `root`
-user:
-
-[source]
-----
-sudo su -
-----
-
-Then, make sure you are using OpenShift as the cluster administrator:
+Before continuing, make sure you are using logged with the built-in system administrator account in OpenShift.
 
 [source]
 ----
@@ -62,7 +54,7 @@ there's no mention of quota or limits. You'll change that now.
 
 NOTE: *Templates* are a powerful tool that enable you to easily create reusable
 sets of OpenShift objects with powerful parameterization. They can be used to
-quickly deploy more complicated and related things into OpenShift, and can be a
+quickly deploy more complicated and related components into OpenShift, and can be a
 useful part of your organization's software development lifecycle (SDLC). More
 information can be found in the
 link:https://docs.openshift.com/container-platform/3.5/dev_guide/templates.html[template
@@ -154,12 +146,12 @@ Take a look at the sample `LimitRange` definition that we have provided in the
 ----
 - apiVersion: v1
   kind: LimitRange
-  metadata: 
+  metadata:
     name: ${PROJECT_NAME}-limits
     creationTimestamp: null
-  spec: 
-    limits: 
-      - 
+  spec:
+    limits:
+      -
         type: Container
         max: <1>
           cpu: 4000m
@@ -181,7 +173,7 @@ range documentation]. But, generally speaking:
 
 <1> `max` is the highest value that may be specified for limits and requests
 <2> `min` is the lowest value that may be specified for limits and requests
-<3> `default` is the maximum amount (limit) that the container may consum, when
+<3> `default` is the maximum amount (limit) that the container may consume, when
 nothing is specified
 <4> `defaultRequest` is the minimum amount that the container may consume, when
 nothing is specified
@@ -189,7 +181,7 @@ nothing is specified
 In addition to these topics, there are things like *Quality of Service Tiers* as
 well as a *Limit* : *Request* ratio. There is additionally more information in
 the
-link:https://docs.openshift.com/container-platform/3.5/dev_guide/compute_resources.html[comute
+link:https://docs.openshift.com/container-platform/3.5/dev_guide/compute_resources.html[compute
 resources] section of the documentation.
 
 For the sake of brevity, suffice it to say that there is a complex and powerful
@@ -200,7 +192,7 @@ coming up with sensible values for all of these settings.
 The settings we provide for you in these examples generally restrict projects to:
 
 * A total CPU quota of 4 cores (`4000m`) where
-** Individual containers 
+** Individual containers
 *** must use 4 cores or less
 *** cannot be defined with less than 10 milicores
 *** will default to a request of 100 milicores (if not specified)
@@ -228,7 +220,7 @@ quota] documentation. We will not cover multi-project quota in these exercises.
 
 ### Installing the Project Request Template
 OK, with this background in place, let's go ahead and actually tell OpenShift to
-use this new *Project Request Template*. 
+use this new *Project Request Template*.
 
 #### Create the Template
 As we discussed earlier, a *Template* is just another type of OpenShift object.
@@ -260,12 +252,12 @@ project-request                 5 (5 blank)   7
 
 #### Edit the `master-config.yaml`
 For this exercise, we have not already configured things for you. Use your
-favorite editor (`vim`, `vi`, `nano`, etc.) to edit the master's configuration
-file. For example:
+favourite editor (`vim`, `vi`, `nano`, etc.) to edit the master's configuration
+file using `sudo` privileges. For example:
 
 [source]
 ----
-sudo vi /etc/origin/master/master-config.yaml
+sudo vim /etc/origin/master/master-config.yaml
 ----
 
 WARNING: If you are unfamiliar with the `vi` editor, you should probably use the
@@ -289,11 +281,11 @@ projectConfig:
 
 #### Restart the Master
 Since you have made a configuration change to the master, you will need to
-restart its service. You can do so with the following command:
+restart its service. You can do so with the following command with `sudo` privileges:
 
 [source]
 ----
-systemctl restart atomic-openshift-master
+sudo systemctl restart atomic-openshift-master
 ----
 
 ### Test the Project Request Template
@@ -384,4 +376,3 @@ Before you continue, you may wish to delete the *Project* you just created:
 ----
 oc delete project template-test
 ----
-

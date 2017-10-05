@@ -50,7 +50,7 @@ oauthConfig:
     method: auto
   identityProviders:
   - challenge: true
-    login: true 
+    login: true
     mappingMethod: claim <1>
     name: idm <2>
     provider:
@@ -64,8 +64,8 @@ oauthConfig:
         - cn
         preferredUsername:
         - uid
-      bindDN: <4> uid=admin,cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com
-      bindPassword: <5> ldapadmin
+      bindDN: uid=admin,cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com <4>
+      bindPassword: ldapadmin <5>
       ca: /etc/origin/master/ipa-ca.crt <6>
       insecure: false
       kind: LDAPPasswordIdentityProvider
@@ -222,12 +222,24 @@ What happens if you list the *Users*?
 [source]
 ----
 oc get user
+----
 
-[root@master ~]# oc get user
+Two things can happen now. Either you get:
+
+----
+NAME         UID                                    FULL NAME        IDENTITIES
+fancyuser1   d0f11476-a9c3-11e7-a5b2-029466ad0702   OpenShift User   idm:uid=fancyuser1,cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
+----
+
+This is the case if you logged on to the UI before.
+
+Or, if you did not login with the UI before, you will get:
+
+----
 No resources found.
 ----
 
-Why are there no *Users* found? They are clearly listed in the *Group* definition.
+Why would there be no *Users* found? They are clearly listed in the *Group* definition.
 
 *Users* are not actually created until the first time they try to log in. What
 you are seeing in the *Group* definition is simply a placeholder telling
@@ -236,11 +248,11 @@ be associated with the *Group*.
 
 #### Change Group Policy
 In your environment, there are a special group of super developers called
-_fancy-dev_ who should have special `cluster-reader` privileges. This is a role
+_ose-fancy-dev_ who should have special `cluster-reader` privileges. This is a role
 that allows a user to view administrative-level information about the cluster.
 For example, they can see the list of all *Projects* in the cluster.
 
-Change the policy for the `fancy-dev` *Group*:
+Change the policy for the `ose-fancy-dev` *Group*:
 
 [source]
 ----
@@ -277,7 +289,7 @@ You will see:
 No resources found.
 ----
 
-Now, login as a member of `fancy-dev`:
+Now, login as a member of `ose-fancy-dev`:
 
 [source]
 ----
@@ -344,7 +356,7 @@ projects.
 #### Map Groups to Projects
 As you saw earlier, there are several roles within OpenShift that are
 preconfigured. When it comes to *Projects*, you similarly can grant view, edit,
-or administrative access. Let's give our `teamed-app` users access to edit the
+or administrative access. Let's give our `ose-teamed-app` users access to edit the
 development and testing projects:
 
 [source]
@@ -360,7 +372,7 @@ And then give them access to view production:
 oc adm policy add-role-to-group view ose-teamed-app -n app-prod
 ----
 
-Now, give the `fancy-dev` group edit access to the production project:
+Now, give the `ose-fancy-dev` group edit access to the production project:
 
 [source]
 ----
@@ -376,7 +388,7 @@ oc login -u normaluser1 -p openshift
 oc get projects
 ----
 
-Then, try `teamuser1` from the `teamed-app` group:
+Then, try `teamuser1` from the `ose-teamed-app` group:
 
 [source]
 ----

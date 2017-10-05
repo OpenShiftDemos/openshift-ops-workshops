@@ -62,17 +62,17 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-6bd83411
+      ami: ami-b307f7c9
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-beed10c6
+      ami: ami-3ce71e44
     eu-west-1:
-      ami: ami-c89e52b1
+      ami: ami-4d7eb634
     eu-central-1:
-      ami: ami-39219756
+      ami: ami-7f0fbf10
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
@@ -1327,6 +1327,7 @@ Resources:
                 NODE6_EXTERNAL_FQDN="node06.${AWS::AccountId}.${PublicHostedZone}"
                 NODE6_INTERNAL_FQDN="node06.internal.${PublicHostedZone}"
                 NODE6_INTERNAL_IP="${WorkerNode6.PrivateIp}"
+                IDM_INTERNAL_FQDN="idm.internal.${PublicHostedZone}"
                 WEB_CONSOLE_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
                 API_HEALTH_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                 NODE_BRICK_DEVICE="/dev/xvdd"

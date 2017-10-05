@@ -6,7 +6,7 @@ some maintenance of nodes, as well as manipulating the multitenant network.
 
 ### Extending the cluster
 
-Log in as cluster administrator (it will not matter if you are `root` or not):
+Log in as cluster administrator:
 
 [source]
 ----
@@ -46,10 +46,17 @@ the `scaleup` playbook.
 #### Configure the Installer
 Your environment already has 3 additional nodes, but you have not used
 them so far. They are already configured in the inventory file but commented out. +
-You will two several places where `#scaleup_` appears:
+Edit the file `/etc/ansible/hosts/` in an editor of your choice with `sudo` privileges, e.g.
 
-. in front of the `new_nodes` in the `OSEv3:children` group 
-.. removing the comment tells the installer to include that subgroup. 
+[source]
+----
+sudo vim /etc/ansible/hosts
+----
+
+There two places where `#scaleup_` appears:
+
+. in front of the `new_nodes` in the `OSEv3:children` group
+.. removing the comment tells the installer to include that subgroup.
 . in the actual `new_nodes` group, for each node's definition
 
 When finished, your inventory file should look like the following:
@@ -124,7 +131,7 @@ NAME                                          STATUS                     AGE
 
 TIP: When deploying a highly-available multi-master OpenShift environment, it is
 also possible to add new master nodes. There is a similar playbook to run. For
-more information on multi-master and HA setups, please refer to the 
+more information on multi-master and HA setups, please refer to the
 
 ### OpenShift Metrics
 _Metrics_ in OpenShift refers to the continuous collection of performance and
@@ -142,10 +149,15 @@ facilitated by running a specific playbook that is part of the
 solution when the cluster was initially installed.
 
 #### Configure the Installer
-Using your favorite editor, open the `/etc/ansible/hosts` file. In the
-`[OSEv3:vars]` section, you will find some directives that begin with
-`openshift_metrics`. Several are commented out, with the prefix `#metrics_`
-(similar to the comments used for extending the cluster).
+Using your favourite editor, open the `/etc/ansible/hosts` file with `sudo` privileges, e.g.
+
+[source]
+----
+sudo vim /etc/ansible/hosts
+----
+
+In the `[OSEv3:vars]` section, you will find some directives that begin with
+`openshift_metrics`. Several are commented out, with the prefix `#metrics_` (similar to the comments used for extending the cluster).
 
 `openshift_metrics_install_metrics=false` tells the installer *not* to install
 the metrics solution when it runs. Make sure that you delete that line. Then,
@@ -226,7 +238,7 @@ If you don't have it open, return to the OpenShift web console:
 
 *link:{{ WEB_CONSOLE_URL }}[]*
 
-You will want to be sure you are logged in as _fancyuser1_, who is a
+You will want to be sure you are logged in as `fancyuser1` with the password `openshift`, who is a
 `cluster-reader` and can see interesting *Projects*.
 
 [IMPORTANT]
@@ -234,10 +246,10 @@ You will want to be sure you are logged in as _fancyuser1_, who is a
 At this point the OpenShift UI will display an error message, stating
 that the metrics URL could not be reached:
 
-image:openshift-metrics-url-error.png[] 
+image:openshift-metrics-url-error.png[]
 
 This is because OpenShift generated a self-signed certificate for the Hawkular
-API. Go ahead and click the metrics URL https://metrics.{{ OCP_ROUTING_SUFFIX }}/ 
+API. Go ahead and click the metrics URL https://metrics.{{ OCP_ROUTING_SUFFIX }}/
 to access Hawkular and accept the untrusted certificate. Then, return to the
 OpenShift web console and refresh the page, and the metrics should begin to
 display.
@@ -368,7 +380,7 @@ on Open vSwitch. This SDN is used to provide connectivity between application
 components inside of the OpenShift environment. It comes with default network
 ranges pre-configured, although you can make changes to these should they
 conflict with your existing infrastructure, or for whatever other reason you may
-have. 
+have.
 
 When you installed OpenShift, there was an option set in the installer's
 configuration to enable the multitenant network plugin:

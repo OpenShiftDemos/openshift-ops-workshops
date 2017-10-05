@@ -1,6 +1,6 @@
 :experimental:
 
-## Storage Management
+## Container-Native Storage Management
 In this lab we are going to provide a view 'under the hood' of OpenShift
 `PersistentVolumes` provided by CNS. For this purpose we will examine volumes
 leveraged by example applications using different volume access modes.
@@ -8,13 +8,12 @@ leveraged by example applications using different volume access modes.
 ### A Simple CNS Use Case
 
 We are going to deploy a sample application that ships with OpenShift which
-creates a PVC as part of the deployment.  Log on to the system as `fancyuser1`
-und create a project with the name `my-database-app`.
+creates a PVC as part of the deployment.  Log on to the system as `fancyuser1`, using the password `openshift` and create a project with the name `my-database-app`.
 
 #### Create/Deploy the Application
 [source]
 ----
-oc login -u fancyuser1
+oc login -u fancyuser1 -p openshift
 oc new-project my-database-app
 ----
 
@@ -447,11 +446,11 @@ sharing a common storage repository.+ To highlight the difference this makes to
 non-shared storage we will first run this application without a PV.
 
 #### Deploy a New Application
-First log back in as _fancyuser1_ and create a new project:
+First log back in as `fancyuser1` using the password `openshift` and create a new project:
 
 [source]
 ----
-oc login -u fancyuser1
+oc login -u fancyuser1 -p openshift
 oc new-project my-shared-storage
 ----
 
@@ -839,7 +838,15 @@ from the link:cns-deploy["Deploying  Container-native Storage"] module against
 these new systems.
 
 First uncomment the additional nodes entries already prepared in the ansible
-inventory file `/etc/ansible/hosts` (they are prefixed with `#addcns_`):
+inventory file `/etc/ansible/hosts` (they are prefixed with `#addcns_`). +
+You need `sudo` privileges to do that:
+
+[source]
+----
+sudo vim /etc/ansible/hosts
+----
+
+Remove the comment to enable the new host group like so:
 
 [source,ini]
 ./etc/ansible/hosts
@@ -1011,7 +1018,7 @@ There is a file on your system `/opt/lab/support/second-cns-storageclass.yaml`.
 Open it with your favorite editor:
 
 [source,yaml]
-./opt/lab/support/second-cns-storageclass.yml
+./opt/lab/support/second-cns-storageclass.yaml
 ----
 apiVersion: storage.k8s.io/v1beta1
 kind: StorageClass
@@ -1034,7 +1041,7 @@ After you have correctly replaced your new cluster ID, create the `StorageClass`
 
 [source]
 ----
-oc create -f /opt/lab/support/second-cns-storageclass.yml
+oc create -f /opt/lab/support/second-cns-storageclass.yaml
 ----
 
 There is a *PersistentVolumeClaim* definition file that already has been placed
@@ -1184,7 +1191,7 @@ Management Hostname: {{NODE4_INTERNAL_FQDN}}
 Storage Hostname: {{NODE4_INTERNAL_IP}}
 Devices:
 Id:01c94798bf6b1af87974573b420c4dff   Name:{{NODE_BRICK_DEVICE}}           State:online    Size (GiB):9       Used (GiB):1       Free (GiB):8
-Id:da91a2f1c9f62d9916831de18cc09952   Name:{{NODE_BRICK_DEVIVCE2}}           State:online    Size (GiB):9       Used (GiB):1       Free (GiB):8
+Id:da91a2f1c9f62d9916831de18cc09952   Name:{{NODE_BRICK_DEVICE2}}           State:online    Size (GiB):9       Used (GiB):1       Free (GiB):8
 ----
 
 Notice the UUID of the device `{{NODE_BRICK_DEVICE}}` as shown.

@@ -46,7 +46,14 @@ the `scaleup` playbook.
 #### Configure the Installer
 Your environment already has 3 additional nodes, but you have not used
 them so far. They are already configured in the inventory file but commented out. +
-You will two several places where `#scaleup_` appears:
+Edit the file `/etc/ansible/hosts/` in an editor of your choice with `sudo` privileges, e.g.
+
+[source]
+----
+sudo vim /etc/ansible/hosts
+----
+
+There two places where `#scaleup_` appears:
 
 . in front of the `new_nodes` in the `OSEv3:children` group
 .. removing the comment tells the installer to include that subgroup.

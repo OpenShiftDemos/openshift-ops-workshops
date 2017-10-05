@@ -364,6 +364,20 @@ NAME                   AGE
 template-test-limits   2m
 ----
 
+### Configure Using the Installer
+While it is possible to configure the *ProjectRequestTemplate* using the advanced
+installer, you are still responsible for installing the template into the
+*Project* that you specify. For example, we could have specified the following:
+
+[source]
+----
+osm_project_request_template='default/project-request'
+----
+
+But, until a *Template* was created in the `default` *Project* called
+`project-request`, user *Project* creation would have failed due to a lack of
+the template. So, beware.
+
 ### Clean Up
 If you wish, you can deploy the application from the Application Management
 Basics lab again inside this `template-test` project to observe how the *Quota*

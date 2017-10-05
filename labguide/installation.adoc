@@ -144,7 +144,7 @@ the internal image registry) run as workload inside the OpenShift environment,
 and you could see these things. However, we have not yet explored authentication
 topics, so you have no cluster administrator "human" accounts yet.
 
-Point your browser to {{WEB_CONSOLE_URL}}[{{WEB_CONSOLE_URL}}, window="_blank"] to verify that the web console is
+Point your browser to {{WEB_CONSOLE_URL}} to verify that the web console is
 available and responding. You can login using the user `teamuser1` with password `openshift`.
 You are not required to do anything in the web console at this point.
 

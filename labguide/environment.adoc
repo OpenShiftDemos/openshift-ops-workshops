@@ -21,7 +21,7 @@ You will be interacting with an OpenShift 3.5 cluster that is running on {{ ENVI
 | Application Node #4        | {{NODE4_INTERNAL_FQDN}}
 | Application Node #5        | {{NODE5_INTERNAL_FQDN}}
 | Application Node #6        | {{NODE6_INTERNAL_FQDN}}
-| IdM Server     |   | {{IDM_INTERNAL_FQDN}}
+| IdM Server     |    {{IDM_INTERNAL_FQDN}}
 |==============================================
 
 All addresses are internal to the lab environment. The only system you publicly access via SSH and the browser is the OpenShift Master node:

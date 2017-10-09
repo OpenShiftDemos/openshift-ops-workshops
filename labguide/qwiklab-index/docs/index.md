@@ -1,6 +1,6 @@
 # Welcome to the OpenShift for Ops Test Drive
 
-Please follow below instructions to get started. In case of problems please reach out to testdrives (at) redhat.com.
+Please follow below instructions to get started. In case of problems please reach out to openshift-ops-testdrive (at) redhat.com.
 Completing the entire lab content will typically take between 2 and 3 hours.
 
 

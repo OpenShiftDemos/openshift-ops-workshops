@@ -170,7 +170,7 @@
       shell: oc get dc file-uploader -o jsonpath='{.status.availableReplicas}'
       register: php_app_scale_check
       until: php_app_scale_check.stdout == "3"
-      retries: 12
+      retries: 30
       delay: 10
 
     - name: add pvc to app deploymentconfig
@@ -180,14 +180,14 @@
       shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="file-uploader")].spec.template.spec.volumes[?(@.persistentVolumeClaim.claimName=="my-shared-storage")].name}'
       register: php_app_update_rc_check
       until: '"shared-storage" in php_app_update_rc_check.stdout'
-      retries: 12
+      retries: 30
       delay: 10
 
     - name: wait for php app to be fully redeployed
       shell: oc get rc file-uploader-$(oc get dc file-uploader -o jsonpath='{.status.latestVersion}') -o jsonpath='{.status.availableReplicas}'
       register: php_app_update_check
       until: php_app_update_check.stdout == "3"
-      retries: 12
+      retries: 30
       delay: 10
 
 - name: Verify RWX Persistent Storage Application
@@ -343,7 +343,7 @@
       register: check_daemonset_ready
       until: check_daemonset_ready.stdout|int == check_daemonset_desired.stdout|int
       failed_when: check_daemonset_ready.stdout == ""
-      retries: 12
+      retries: 30
       delay: 10
 
     - name: get first cluster-id from heketi
@@ -669,7 +669,7 @@
       shell: oc get rc docker-registry-$(oc get dc docker-registry -o jsonpath='{.status.latestVersion}') -o jsonpath='{.status.availableReplicas}'
       register: registry_scale_check
       until: registry_scale_check.stdout == "3"
-      retries: 12
+      retries: 30
       delay: 10
 
 - name: Verify Registry Persistent Storage

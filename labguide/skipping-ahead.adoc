@@ -1,5 +1,4 @@
-[abstract]
-Skipping Modules
+## Skipping Modules
 
 While the Test Drive is designed to be an experience that is linear in nature,
 it is possible to skip modules. Skipping modules requires that you perform

@@ -1,24 +1,30 @@
 ## Deploying Container-Native Storage
 In this section you will set up Container-Native Storage (CNS) in your
-environment. You will use this in link:../cns-management["Container-Native Storage Management"] lab to dynamically provision storage for containerized
-applications. It is provided by GlusterFS running in containers.
-GlusterFS in turn is backed by local storage devices available to the OpenShift nodes.
-This lab requires that you completed OpenShift installation in the previous module.
+environment. You will use this in link:../cns-management["Container-Native
+Storage Management"] lab to dynamically provision storage for containerized
+applications. It is provided by GlusterFS running in containers. GlusterFS in
+turn is backed by local storage devices available to the OpenShift nodes.
+This lab requires that you completed OpenShift installation in the previous
+module.
 
 ### Preparation for CNS
-All of the following tasks are carried out as the `cloud-user` user on the master node _{{ MASTER_EXTERNAL_FQDN }}_. Before the deployment a couple of simple prerequisites need to be fulfilled.
+All of the following tasks are carried out as the `cloud-user` user on the
+master node _{{ MASTER_EXTERNAL_FQDN }}_. Before the deployment a couple of
+simple prerequisites need to be fulfilled.
 
 #### Check the Prerequisites
-First, on the master, verify that the CNS deployment tool is installed. We will also use Ansible to apply the firewall configuration across all 3 nodes. Though not needed for CNS per se, in this lab it will help us simplify an otherwise tedious manual configuration step.
+First, on the master, verify that the CNS deployment tool is installed. We
+will also use Ansible to apply the firewall configuration across all 3 nodes.
+Though not needed for CNS per se, in this lab it will help us simplify an
+otherwise tedious manual configuration step.
 
-[source]
+[source,bash]
 ----
 yum list installed cns-deploy
 ----
 
 The command should return the following:
 
-[source]
 ----
 Loaded plugins: product-id, search-disabled-repos, subscription-manager
 This system is not registered with an entitlement server. You can use subscription-manager to register.
@@ -29,11 +35,12 @@ Installed Packages                cns-deploy.x86_64               4.0.0-19.el7rh
 Just as Ansible was used to install and configure OpenShift, you will configure
 Ansible to take care of certain CNS prerequisites and installation steps.
 
-There is a host group in `/etc/ansible/hosts` for the three nodes that will initially run CNS. There are three more hosts, currently commented out, for future use.
+There is a host group in `/etc/ansible/hosts` for the three nodes that will
+initially run CNS. There are three more hosts, currently commented out, for
+future use.
 
 You should be able to "ping" the first 3 OpenShift App nodes using Ansible:
 
-[source]
 ----
 ansible cns -m ping
 ----
@@ -55,17 +62,21 @@ This should result in the following:
 }
 ----
 
-This verifies the systems can be reached and configure via Ansible.
-For the firewall configuration in this lab is a preapred file in the `support` folder called `configure-firewall.yaml`. This is a short Ansible playbook that will configure the firewall to allow GlusterFS-related traffic (namely on ports 24007,24008, 2222 and 49152-49664 - all TCP), required for CNS. Run it with the following command:
+This verifies the systems can be reached and configure via Ansible. For the
+firewall configuration in this lab is a preapred file in the `support` folder
+called `configure-firewall.yaml`. This is a short Ansible playbook that will
+configure the firewall to allow GlusterFS-related traffic (namely on ports
+24007,24008, 2222 and 49152-49664 - all TCP), required for CNS. Run it with
+the following command:
 
-[source]
+[source,bash]
 ----
 ansible-playbook /opt/lab/support/configure-firewall.yaml
 ----
 
-Feel free to examine the playbook file if you are curious. When the Ansible play completes successfully, your output should look like the following:
+Feel free to examine the playbook file if you are curious. When the Ansible
+play completes successfully, your output should look like the following:
 
-[source]
 ----
 PLAY [nodes] *******************************************************************
 
@@ -95,21 +106,21 @@ It makes sense to create a dedicated *Project* to hold the *Pods* that CNS will
 use to provide storage inside the OpenShift environment. First, log-in as the
 cluster administrator:
 
-[source]
+[source,bash]
 ----
 oc login -u system:admin
 ----
 
 Create a *Project* called `{{CNS_NAMESPACE}}`:
 
-[source]
+[source,bash]
 ----
 oc new-project {{CNS_NAMESPACE}}
 ----
 
 In CNS, the *Pods* running GlusterFS need access to the physical block devices on the host. OpenShift's security model prevents that behaviour by default. In order to provide the permissions required, you will need to enable a privileged operation mode for the *Pods*. Execute the following command, which will allow the `default` *ServiceAccount* to use the `privileged` *SecurityContextConstraint*:
 
-[source]
+[source,bash]
 ----
 oc adm policy add-scc-to-user privileged -z default
 ----
@@ -224,7 +235,7 @@ will define passwords for the `admin` and `user` role in heketi like below.
 #### Run the CNS deployer
 Next start the deployment routine with the following command:
 
-[source]
+[source,bash]
 ----
 cns-deploy -n {{CNS_NAMESPACE}} -g /opt/lab/support/topology.json --admin-key '{{HEKETI_ADMIN_PW}}' --user-key '{{HEKETI_USER_PW}}'
 ----
@@ -233,7 +244,6 @@ Answer the interactive prompts with *Y*.
 
 The deployment will take several minutes to complete. Especially the step "Waiting for GlusterFS pods to start" might take some time. On the command line the output should look like this:
 
-[source]
 ----
 Welcome to the deployment tool for GlusterFS on Kubernetes and OpenShift.
 
@@ -330,10 +340,14 @@ the components are in place.
 While still in the `{{CNS_NAMESPACE}}` project on the CLI list all running
 *Pods*:
 
-[source]
+[source,bash]
 ----
 oc get pods -o wide
+----
 
+You will see something like:
+
+----
 NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
 glusterfs-37vn8   1/1       Running   0          3m       {{NODE1_INTERNAL_IP}}         {{NODE1_INTERNAL_FQDN}} <1>
 glusterfs-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}         {{NODE2_INTERNAL_FQDN}} <1>
@@ -367,10 +381,14 @@ image::cns_diagram_heketi.png[]
 #### Examine heketi
 To expose heketi's API a *Service* named _heketi_ has been created:
 
-[source]
+[source,bash]
 ----
 oc get service/heketi
+----
 
+You will see something like:
+
+----
 NAME      CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
 heketi    172.30.5.231   <none>        8080/TCP   31m
 ----
@@ -378,14 +396,12 @@ heketi    172.30.5.231   <none>        8080/TCP   31m
 In order to be able to use heketi outside of the OpenShift cluster (for
 monitoring/data gathering, or other automation), a *Route* has been created. Verify this is the case by running:
 
-[source]
 ----
 oc get route/heketi
 ----
 
 This should output the details, as well as the public URL of the `Route` for the heketi API:
 
-[source]
 ----
 NAME      HOST/PORT                                               PATH      SERVICES   PORT      TERMINATION   WILDCARD
 heketi    heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}             heketi     <all>                   None
@@ -393,14 +409,13 @@ heketi    heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}             heketi    
 
 You may verify the API is responding and heketi is alive with a trivial health check:
 
-[source]
+[source,bash]
 ----
 curl http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}/hello
 ----
 
 This should return (likely without a line break)
 
-[source]
 ----
 Hello from Heketi
 ----
@@ -417,7 +432,7 @@ Outside of the tight integration with OpenShift you can also work directly with
 the administrative interface of heketi. This done via the command line client.
 First, set the following environment variables to configure the client:
 
-[source]
+[source,bash]
 ----
 export HEKETI_CLI_SERVER=http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
 export HEKETI_CLI_USER=admin
@@ -429,14 +444,13 @@ You'll notice how we use the route that OpenShift created for the heketi
 the `cns-deploy` command also set, you can query heketi about the clusters it's
 managing:
 
-[source]
+[source,bash]
 ----
 heketi-cli cluster list
 ----
 
 heketi will list all known clusters with internal UUIDs:
 
-[source]
 ----
 Clusters:
 ec7a9c8be8327a54839236791bf7ba24 <1>
@@ -461,14 +475,13 @@ To get more detailed information about the topology of your CNS cluster (i.e.
 nodes, devices and volumes heketi has discovered) run the following command
 (output abbreviated):
 
-[source]
+[source,bash]
 ----
 heketi-cli topology info
 ----
 
 You will get a lengthy output that describes the GlusterFS cluster topology as it is known by heketi:
 
-[source]
 ----
 Cluster Id: ec7a9c8be8327a54839236791bf7ba24
 
@@ -569,14 +582,14 @@ type: kubernetes.io/glusterfs
 
 To create the *Secret* from this file, make sure you are still in the `{{ CNS_NAMESPACE }}` *Project*:
 
-[source]
+[source,bash]
 ----
 oc project {{ CNS_NAMESPACE }}
 ----
 
 Then, you can create (instantiate) the *Secret*:
 
-[source]
+[source,bash]
 ----
 oc create -f /opt/lab/support/cns-secret.yaml
 ----
@@ -619,7 +632,7 @@ parameters:
 
 Create the *StorageClass*:
 
-[source]
+[source,bash]
 ----
 oc create -f /opt/lab/support/cns-storageclass.yaml
 ----

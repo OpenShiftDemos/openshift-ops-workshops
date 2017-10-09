@@ -41,6 +41,7 @@ future use.
 
 You should be able to "ping" the first 3 OpenShift App nodes using Ansible:
 
+[source,bash]
 ----
 ansible cns -m ping
 ----

@@ -397,6 +397,7 @@ heketi    172.30.5.231   <none>        8080/TCP   31m
 In order to be able to use heketi outside of the OpenShift cluster (for
 monitoring/data gathering, or other automation), a *Route* has been created. Verify this is the case by running:
 
+[source,bash]
 ----
 oc get route/heketi
 ----

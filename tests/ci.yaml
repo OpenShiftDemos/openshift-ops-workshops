@@ -1,0 +1,15 @@
+
+---
+- include: installation_automation.yaml
+- include: installation_verify.yaml
+- include: cns-deploy_automation.yaml
+- include: cns-deploy_verify.yaml
+- include: app-mgmt-basics_automation.yaml
+- include: app-mgmt-basics_verify.yaml
+- include: template-quota-limits_automation.yaml
+- include: template-quota-limits_verify.yaml
+- include: ldap-groupsync_automation.yaml
+- include: ldap-groupsync_verify.yaml
+- include: infra-mgmt_automation.yaml
+- include: cns-management_automation.yaml
+- include: cns-management_verify.yaml

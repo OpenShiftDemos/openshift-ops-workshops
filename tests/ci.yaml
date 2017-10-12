@@ -9,7 +9,7 @@
 - include: template-quota-limits_automation.yaml
 - include: template-quota-limits_verify.yaml
 - include: ldap-groupsync_automation.yaml
-- include: ldap-groupsync_verify.yaml
+- include: ldap-groupsync_verification.yaml
 - include: infra-mgmt_automation.yaml
 - include: cns-management_automation.yaml
 - include: cns-management_verify.yaml

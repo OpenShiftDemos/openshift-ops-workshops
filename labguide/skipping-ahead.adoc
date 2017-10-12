@@ -25,10 +25,16 @@ the `{{ CODE_CLONE_LOCATION }}/tests` folder.
 |8. Container-native Storage Management|cns-management_automation.yaml
 |==============================================
 
-Executing the skip module playbooks is trivial. They are self-contained Ansible playbooks that are run from the `{{ CODE_CLONE_LOCATION }}/tests` directory.
+Executing the skip module playbooks is trivial. They are self-contained
+Ansible playbooks that are run from the `{{ CODE_CLONE_LOCATION }}/tests`
+directory.
 
-There is a constraint that if you want to skip across multiple modules, **you need to skip all preceding modules in order**. For example, if you wanted to skip to Module 5 (that is skipping module 2-4), you would need to run the following:
+There is a constraint that if you want to skip across multiple modules, **you
+need to skip all preceding modules in order**. For example, if you wanted to
+skip to Module 5 (that is skipping module 2-4), you would need to run the
+following:
 
+[source,bash]
 ----
 cd {{ CODE_CLONE_LOCATION }}/tests/
 ansible-playbook installation_automation.yaml
@@ -49,8 +55,9 @@ Do not run the `installation_automation.yaml` or `cns-deploy_automation.yaml` tw
 
 [TIP]
 ====
-You will also notice some playbooks called `*_verify.yaml`. These verification playbooks are used as a part of our test-driven development
-methodology for the Test Drive. You will not need to use it, although examining
-it may provide some insight into how we evaluate whether or not things are still
-working after updates and upgrades.
+You will also notice some playbooks called `*_verify.yaml`. These
+verification playbooks are used as a part of our test-driven development
+methodology for the Test Drive. You will not need to use it, although
+examining it may provide some insight into how we evaluate whether or not
+things are still working after updates and upgrades.
 ====

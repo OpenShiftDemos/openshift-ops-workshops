@@ -23,7 +23,7 @@ them, and users may be able to access multiple *Projects*.
 
 For this exercise, first create a *Project* to hold our resources:
 
-[source]
+[source,bash]
 ----
 oc new-project app-management
 ----
@@ -37,14 +37,13 @@ instantiate templates, and so on.
 
 You will now launch a specific image that exists on Dockerhub
 
-[source]
+[source,bash]
 ----
 oc new-app docker.io/siamaksade/mapit
 ----
 
 The output will look like:
 
-[source]
 ----
 --> Found Docker image 9eca6ec (11 days old) from docker.io for "docker.io/siamaksade/mapit"
 
@@ -79,14 +78,13 @@ pod definition while running.
 
 You can get a list of pods:
 
-[source]
+[source,bash]
 ----
 oc get pods
 ----
 
 And you will see something like the following:
 
-[source]
 ----
 NAME            READY     STATUS    RESTARTS   AGE
 mapit-1-6lczv   1/1       Running   0          3m
@@ -98,14 +96,13 @@ which you will learn about shortly. Your name will be slightly different.
 The `describe` command will give you more information on the details of a pod.
 In the case of the pod name above:
 
-[source,role=copypaste]
+[source,bash,role=copypaste]
 ----
 oc describe pod mapit-1-6lczv
 ----
 
 And you will see output similar to the following:
 
-[source]
 ----
 Name:                   mapit-1-6lczv
 Namespace:              app-management
@@ -173,14 +170,13 @@ including the YAML format to make one by hand, in the official documentation.
 The `new-app` command used earlier caused a service to be created. You can see
 the current list of services in a project with:
 
-[source]
+[source,bash]
 ----
 oc get services
 ----
 
 You will see something like the following:
 
-[source]
 ----
 NAME      CLUSTER-IP     EXTERNAL-IP   PORT(S)                      AGE
 mapit     172.30.3.117   <none>        8080/TCP,8778/TCP,9779/TCP   14m
@@ -193,14 +189,13 @@ the service is deleted. Your service IP will likely be different.
 Just like with pods, you can `describe` services, too. In fact, you can
 `describe` most objects in OpenShift:
 
-[source]
+[source,bash]
 ----
 oc describe service mapit
 ----
 
 You will see something like the following:
 
-[source]
 ----
 Name:                   mapit
 Namespace:              app-management
@@ -224,14 +219,13 @@ this data can be represented as serializable data objects (JSON, YAML).
 
 Take a look at the YAML output for the service:
 
-[source]
+[source,bash]
 ----
 oc get service mapit -o yaml
 ----
 
 You will see something like the following:
 
-[source]
 ----
 apiVersion: v1
 kind: Service
@@ -276,14 +270,13 @@ It is also of interest to view the YAML of the *Pod* to understand how OpenShift
 wires components together. Go back and find the name of your `mapit` *Pod*, and
 then execute the following:
 
-[source,role=copypaste]
+[source,bash,role=copypaste]
 ----
 oc get pod mapit-1-6lczv -o yaml
 ----
 
 Under the `metadata` section you should see the following:
 
-[source]
 ----
   labels:
     app: mapit
@@ -321,7 +314,6 @@ how OpenShift "self heals".
 A *DeploymentConfiguration* (DC) defines how something in OpenShift should be
 deployed. From the https://docs.openshift.com/container-platform/3.5/architecture/core_concepts/deployments.html[deployments documentation]:
 
-[source]
 ----
 Building on replication controllers, OpenShift adds expanded support for the
 software development and deployment lifecycle with the concept of deployments.
@@ -346,10 +338,14 @@ Now that we know the background of what a *ReplicatonController* and
 look at the *DeploymentConfig* (DC) that was created for you when you told
 OpenShift to stand up the `mapit` image:
 
-[source]
+[source,bash]
 ----
-$ oc get dc
+oc get dc
+----
 
+You will see something like the following:
+
+----
 NAME      REVISION   DESIRED   CURRENT   TRIGGERED BY
 mapit     1          1         1         config,image(mapit:latest)
 ----
@@ -359,10 +355,14 @@ To get more details, we can look into the *ReplicationController* (*RC*).
 Take a look at the *ReplicationController* (RC) that was created for you when
 you told OpenShift to stand up the `mapit` image:
 
-[source]
+[source,bash]
 ----
-$ oc get rc
+oc get rc
+----
 
+You will see something like the following:
+
+----
 NAME      DESIRED   CURRENT   READY     AGE
 mapit-1   1         1         1         4h
 ----
@@ -376,17 +376,21 @@ the desired number, we can tell OpenShift that we want more or less *Pods*.
 Let's scale our mapit "application" up to 2 instances. We can do this with
 the `scale` command.
 
-[source]
+[source,bash]
 ----
 oc scale --replicas=2 dc/mapit
 ----
 
 To verify that we changed the number of replicas, issue the following command:
 
-[source]
+[source,bash]
 ----
-$ oc get rc
+oc get rc
+----
 
+You will see something like the following:
+
+----
 NAME         DESIRED   CURRENT   READY     AGE
 mapit-1      2         2         0         4h
 ----
@@ -394,10 +398,14 @@ mapit-1      2         2         0         4h
 You can see that we now have 2 replicas. Let's verify the number of pods with
 the `oc get pods` command:
 
-[source]
+[source,bash]
 ----
-$ oc get pods
+oc get pods
+----
 
+You will see something like the following:
+
+----
 NAME            READY     STATUS    RESTARTS   AGE
 mapit-1-6lczv   1/1       Running   0          4h
 mapit-1-rq6t6   1/1       Running   0          1m
@@ -406,14 +414,13 @@ mapit-1-rq6t6   1/1       Running   0          1m
 And lastly, let's verify that the *Service* that we learned about in the
 previous lab accurately reflects two endpoints:
 
-[source]
+[source,bash]
 ----
 oc describe svc mapit
 ----
 
-You will see something like the following output:
+You will see something like the following:
 
-[source]
 ----
 Name:                   mapit
 Namespace:              app-management
@@ -433,14 +440,13 @@ No events.
 
 Another way to look at a *Service*'s endpoints is with the following:
 
-[source]
+[source,bash]
 ----
 oc get endpoints mapit
 ----
 
 And you will see something like the following:
 
-[source]
 ----
 NAME      ENDPOINTS                                                     AGE
 mapit     10.128.2.3:9779,10.129.0.3:9779,10.128.2.3:8080 + 3 more...   4h
@@ -479,10 +485,14 @@ Since we have two *Pods* running right now, let's see what happens if we
 "accidentally" kill one. Run the `oc get pods` command again, and choose a *Pod*
 name. Then, do the following:
 
-[source,role=copypaste]
+[source,bash,role=copypaste]
 ----
-$ oc delete pod mapit-1-6lczv && oc get pods
+oc delete pod mapit-1-6lczv && oc get pods
+----
 
+And you will see something like the following:
+
+----
 pod "mapit-1-6lczv" deleted
 NAME            READY     STATUS              RESTARTS   AGE
 mapit-1-6lczv   1/1       Terminating         0          4h
@@ -515,7 +525,7 @@ Do you remember setting up the router? You probably don't. That's because the
 installer settings created a router for you! The router lives in the `default`
 *Project*, and you can see something about it with the following command:
 
-[source]
+[source,bash]
 ----
 oc describe dc router -n default
 ----
@@ -526,19 +536,27 @@ the *Service* via the command line. If you remember from earlier, your *Service*
 name is `mapit`. With the *Service* name, creating a *Route* is a simple
 one-command task:
 
-[source]
+[source,bash]
 ----
-$ oc expose service mapit
+oc expose service mapit
+----
 
+You will see:
+
+----
 route "mapit" exposed
 ----
 
 Verify the *Route* was created with the following command:
 
-[source]
+[source,bash]
 ----
-$ oc get route
+oc get route
+----
 
+You will see something like:
+
+----
 NAME      HOST/PORT                                                            PATH      SERVICES   PORT       TERMINATION   WILDCARD
 mapit     mapit-app-management.{{OCP_ROUTING_SUFFIX}}             mapit      8080-tcp                 None
 ----
@@ -553,7 +571,7 @@ How does this work? Firstly, the `ROUTINGSUBDOMAIN` can be configured at install
 time. We did this for you. In the `/etc/ansible/hosts` file you will find the
 following line:
 
-[source]
+[source,yaml]
 ----
 openshift_master_default_subdomain={{OCP_ROUTING_SUFFIX}}
 ----
@@ -573,7 +591,7 @@ If you take a step back to examine everything you've done so far, in three
 commands you deployed an application, scaled it, and made it accessible to the
 outside world:
 
-[source]
+[source,bash]
 ----
 oc new-app docker.io/siamaksade/mapit
 oc scale --replicas=2 dc/mapit
@@ -584,7 +602,7 @@ oc expose service mapit
 Before we continue, go ahead and scale your application down to a single
 instance:
 
-[source]
+[source,bash]
 ----
 oc scale --replicas=1 dc/mapit
 ----
@@ -622,14 +640,14 @@ which is creating and/or modifying probes. The `mapit` application exposes an
 endpoint which we can check to see if it is alive and ready to respond. You can
 test it using `curl`:
 
-[source]
+[source,bash]
 ----
 curl mapit-app-management.{{OCP_ROUTING_SUFFIX}}/health
 ----
 
 You will get some JSON as a response:
 
-[source]
+[source,json]
 ----
 {"status":"UP","diskSpace":{"status":"UP","total":10724835328,"free":10257825792,"threshold":10485760}}
 ----
@@ -637,17 +655,21 @@ You will get some JSON as a response:
 We can ask OpenShift to probe this endpoint for liveness with the following
 command:
 
-[source]
+[source,bash]
 ----
 oc set probe dc/mapit --liveness --get-url=http://:8080/health --initial-delay-seconds=30
 ----
 
 You can then see that this probe is defined in the `oc describe` output:
 
-[source]
+[source,bash]
 ----
-$ oc describe dc mapit
+oc describe dc mapit
+----
 
+You will see a section like:
+
+----
 ...
  Containers:
    mapit:
@@ -662,7 +684,7 @@ $ oc describe dc mapit
 
 Similarly, you can set a readiness probe in the same manner:
 
-[source]
+[source,bash]
 ----
 oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30
 ----

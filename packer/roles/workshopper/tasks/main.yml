@@ -4,7 +4,7 @@
 
   - name: Pulling the workshopper docker image
     docker_image:
-      name: osevg/workshopper:0.1
+      name: osevg/workshopper:0.2
 
   - name: put the systemd-docker binary file at /usr/bin
     copy:

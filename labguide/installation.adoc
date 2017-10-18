@@ -33,7 +33,6 @@ First, let's examine the provided installer configuration file.
 #### Look at the file
 Use `cat`, `less`, or an editor to look at the `/etc/ansible/hosts` file:
 
-[source,bash]
 ----
 cat /etc/ansible/hosts
 ----
@@ -54,7 +53,6 @@ Since we have pre-configured the installer for you, you can simply run it.
 Launching the advanced installation is as simple as executing the following
 command:
 
-[source,bash]
 ----
 ansible-playbook -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
 ----
@@ -118,7 +116,6 @@ is preconfigured for cluster administrator access.
 Execute the following command to see a list of the *Nodes* that OpenShift knows
 about:
 
-[source,bash]
 ----
 oc get nodes
 ----

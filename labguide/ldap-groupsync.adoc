@@ -35,7 +35,6 @@ The installation of OpenShift already included setting up LDAP authentication in
 the inventory file. As the `root` user on the master host, examine the master
 config with `cat`, `less`, or your favorite editor:
 
-[source,bash]
 ----
 cat /etc/origin/master/master-config.yaml
 ----
@@ -125,7 +124,6 @@ the various groups.
 We have provided a `groupsync` configuration file for you already. Using `cat`,
 `less`, or your favorite editor, look at the following file:
 
-[source,bash]
 ----
 cat /opt/lab/support/groupsync.yaml
 ----
@@ -145,14 +143,12 @@ Now that you understand how the `groupsync` is configured, first make sure you
 are logged in as the `root` user. Then, make sure you are logged in as a cluster
 administrator:
 
-[source,bash]
 ----
 oc login -u system:admin
 ----
 
 And then execute the `groupsync`:
 
-[source,bash]
 ----
 oc adm groups sync --sync-config=/opt/lab/support/groupsync.yaml --confirm
 ----
@@ -172,7 +168,6 @@ output of the help with `oc adm groups sync -h`.
 
 If you want to see the *Groups* that were created, execute the following:
 
-[source,bash]
 ----
 oc get groups
 ----
@@ -189,7 +184,6 @@ ose-user         normaluser1, fancyuser1, fancyuser2, teamuser1, teamuser2
 
 Take a look at a specific group in YAML:
 
-[source,bash]
 ----
 oc get group ose-fancy-dev -o yaml
 ----
@@ -222,7 +216,6 @@ has listed the users who are in the group.
 
 What happens if you list the *Users*?
 
-[source,bash]
 ----
 oc get user
 ----
@@ -256,7 +249,6 @@ For example, they can see the list of all *Projects* in the cluster.
 
 Change the policy for the `ose-fancy-dev` *Group*:
 
-[source,bash]
 ----
 oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
 ----
@@ -272,14 +264,12 @@ policies] documentation.
 #### Examine `cluster-reader` policy
 Go ahead and login as a regular user:
 
-[source,bash]
 ----
 oc login -u normaluser1 -p openshift
 ----
 
 Then, try to list *Projects*:
 
-[source,bash]
 ----
 oc get projects
 ----
@@ -292,7 +282,6 @@ No resources found.
 
 Now, login as a member of `ose-fancy-dev`:
 
-[source,bash]
 ----
 oc login -u fancyuser1 -p openshift
 ----
@@ -316,14 +305,12 @@ Platform can work.
 #### Create Projects for Collaboration
 Make sure you login as the cluster administrator:
 
-[source,bash]
 ----
 oc login -u system:admin
 ----
 
 Then, create several *Projects* for people to collaborate:
 
-[source,bash]
 ----
 oc adm new-project app-dev --display-name="Application Development"
 oc adm new-project app-test --display-name="Application Testing"
@@ -359,7 +346,6 @@ preconfigured. When it comes to *Projects*, you similarly can grant view, edit,
 or administrative access. Let's give our `ose-teamed-app` users access to edit the
 development and testing projects:
 
-[source,bash]
 ----
 oc adm policy add-role-to-group edit ose-teamed-app -n app-dev
 oc adm policy add-role-to-group edit ose-teamed-app -n app-test
@@ -367,14 +353,12 @@ oc adm policy add-role-to-group edit ose-teamed-app -n app-test
 
 And then give them access to view production:
 
-[source,bash]
 ----
 oc adm policy add-role-to-group view ose-teamed-app -n app-prod
 ----
 
 Now, give the `ose-fancy-dev` group edit access to the production project:
 
-[source,bash]
 ----
 oc adm policy add-role-to-group edit ose-fancy-dev -n app-prod
 ----
@@ -382,7 +366,6 @@ oc adm policy add-role-to-group edit ose-fancy-dev -n app-prod
 #### Examine Group Access
 Log in as `normaluser1` and see what *Projects* you can see:
 
-[source,bash]
 ----
 oc login -u normaluser1 -p openshift
 oc get projects
@@ -390,7 +373,6 @@ oc get projects
 
 Then, try `teamuser1` from the `ose-teamed-app` group:
 
-[source,bash]
 ----
 oc login -u teamuser1 -p openshift
 oc get projects
@@ -399,7 +381,6 @@ oc get projects
 You did not grant the team users edit access to the production project. Go ahead
 and try to create something in the production project as `teamuser1`:
 
-[source,bash]
 ----
 oc project app-prod
 oc new-app docker.io/siamaksade/mapit
@@ -407,7 +388,6 @@ oc new-app docker.io/siamaksade/mapit
 
 You will see that it will not work:
 
-[source,bash]
 ----
 --> Found Docker image 338a303 (3 weeks old) from docker.io for "docker.io/siamaksade/mapit"
 

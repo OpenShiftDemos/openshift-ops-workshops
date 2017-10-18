@@ -8,16 +8,21 @@ some maintenance of nodes, as well as manipulating the multitenant network.
 
 Log in as cluster administrator:
 
-[source]
+[source,bash]
 ----
 oc login -u system:admin
 ----
 
 Verify your cluster currently consists of 5 nodes, of which one is marked as _Not Schedulable_ (the Master).
 
-[source]
+[source,bash]
 ----
 oc get nodes
+----
+
+You should see:
+
+----
 NAME                                          STATUS                     AGE
 {{ INFRA_INTERNAL_FQDN }}    Ready                      1h
 {{ MASTER_INTERNAL_FQDN }}   Ready,SchedulingDisabled   1h
@@ -30,9 +35,14 @@ Use the label specified as the default node selector for pods in the inventory
 file  `/etc/ansible/hosts` to verify that your cluster currently has 3
 application nodes:
 
-[source]
+[source,bash]
 ----
 oc get nodes -l region=apps
+----
+
+You should see:
+
+----
 NAME                                          STATUS                     AGE
 {{ NODE1_INTERNAL_FQDN }}   Ready                      1h
 {{ NODE2_INTERNAL_FQDN }}   Ready                      1h
@@ -48,7 +58,7 @@ Your environment already has 3 additional nodes, but you have not used
 them so far. They are already configured in the inventory file but commented out. +
 Edit the file `/etc/ansible/hosts/` in an editor of your choice with `sudo` privileges, e.g.
 
-[source]
+[source,bash]
 ----
 sudo vim /etc/ansible/hosts
 ----
@@ -78,15 +88,19 @@ new_nodes
 {{ NODE6_INTERNAL_FQDN }} openshift_node_labels="{'region': 'apps'}" openshift_hostname={{ NODE6_INTERNAL_FQDN }} openshift_public_hostname={{ NODE6_EXTERNAL_FQDN }}
 
 ...
-
 ----
 
 Now that these hosts are properly defined (uncommented), you can use Ansible to
 verify that they are, in fact, online:
 
-[source]
+[source,bash]
 ----
 ansible new_nodes -m ping
+----
+
+You will see:
+
+----
 {{ NODE5_INTERNAL_FQDN }} | SUCCESS => {
     "changed": false,
     "ping": "pong"
@@ -109,7 +123,7 @@ already taken care of.
 #### Run the Playbook to Extend the Cluster
 To extend your cluster run the following playbook:
 
-[source]
+[source,bash]
 ----
 ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml
 ----
@@ -117,9 +131,14 @@ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-no
 The playbook takes 1-2 minutes to complete. When done verify the amount of
 application nodes known to OpenShift has been increased from 3 to 6:
 
-[source]
+[source,bash]
 ----
 oc get nodes -l region=apps
+----
+
+You will see:
+
+----
 NAME                                          STATUS                     AGE
 {{ NODE1_INTERNAL_FQDN }}   Ready                      1h
 {{ NODE2_INTERNAL_FQDN }}   Ready                      1h
@@ -129,9 +148,12 @@ NAME                                          STATUS                     AGE
 {{ NODE6_INTERNAL_FQDN }}   Ready                      1m
 ----
 
-TIP: When deploying a highly-available multi-master OpenShift environment, it is
+[TIP]
+====
+When deploying a highly-available multi-master OpenShift environment, it is
 also possible to add new master nodes. There is a similar playbook to run. For
 more information on multi-master and HA setups, please refer to the
+====
 
 ### OpenShift Metrics
 _Metrics_ in OpenShift refers to the continuous collection of performance and
@@ -151,7 +173,7 @@ solution when the cluster was initially installed.
 #### Configure the Installer
 Using your favourite editor, open the `/etc/ansible/hosts` file with `sudo` privileges, e.g.
 
-[source]
+[source,bash]
 ----
 sudo vim /etc/ansible/hosts
 ----
@@ -181,7 +203,7 @@ openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }}
 There is a specific playbook included with the installer that will handle metrics. It can
 be run like so:
 
-[source]
+[source,bash]
 ----
 ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
 ----
@@ -202,10 +224,15 @@ on CNS should come in a future release.
 Once the installation playbook has completed, you can then verify that the
 metrics components are running in the `openshift-infra` *Project*:
 
-[source]
+[source,bash]
 ----
 oc login -u system:admin -n openshift-infra
 oc get pods -o wide
+----
+
+You will see something like:
+
+----
 NAME                         READY     STATUS    RESTARTS   AGE       IP           NODE
 hawkular-cassandra-1-6gv0d   1/1       Running   0          3m        10.129.0.7   node02.internal.aws.testdrive.openshift.com
 hawkular-metrics-zkp0h       1/1       Running   0          3m        10.130.0.8   node03.internal.aws.testdrive.openshift.com
@@ -226,7 +253,7 @@ run on specific *Nodes* in the cluster that user workload cannot run on. The
 configuration options for metrics support this, and those options look like the
 following:
 
-[source]
+[source,ini]
 ----
 openshift_metrics_hawkular_nodeselector={"region":"infra"}
 openshift_metrics_cassandra_nodeselector={"region":"infra"}
@@ -258,7 +285,6 @@ When working properly, it looks like this:
 
 .The OpenShift UI will show history metrics for applications
 image::openshift-metrics-overview.png[]
-
 ====
 
 In the context of a specific *Pod*, the _Metrics_ tab in the UI will show CPU,
@@ -311,7 +337,7 @@ openshift_logging_public_master_url=https://kibana.{{ OCP_ROUTING_SUFFIX }}
 With these settings in place executing the `openshift-logging` Ansible playbook
 that ships as part of the `openshift-ansible` installer:
 
-[source]
+[source,bash]
 ----
 ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml
 ----
@@ -319,16 +345,21 @@ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cl
 Once the installation finishes, log in as the cluster administrator, using the
 `logging` *Project*:
 
-[source]
+[source,bash]
 ----
 oc login -u system:admin -n logging
 ----
 
 Verify the logging stack components are up and running:
 
-[source]
+[source,bash]
 ----
 oc get pods -o wide
+----
+
+You will see something like:
+
+----
 NAME                          READY     STATUS    RESTARTS   AGE       IP            NODE
 logging-curator-1-cnpt8       1/1       Running   0          5m        10.131.2.8    node04.internal.aws.testdrive.openshift.com
 logging-es-yeqpfrm5-1-l9k0t   1/1       Running   0          5m        10.129.0.16   node02.internal.aws.testdrive.openshift.com
@@ -347,9 +378,14 @@ The _Fluentd_ *Pods* are deployed as part of a *DaemonSet*, which is a mechanism
 to ensure that specific *Pods* run on specific *Nodes* in the cluster at all
 times:
 
-[source]
+[source,bash]
 ----
 oc get daemonset
+----
+
+You will see something like:
+
+----
 NAME              DESIRED   CURRENT   READY     NODE-SELECTOR                AGE
 logging-fluentd   5         5         5         logging-infra-fluentd=true   9m
 ----
@@ -357,9 +393,14 @@ logging-fluentd   5         5         5         logging-infra-fluentd=true   9m
 To reach the _Kibana_ user interface, first determine its public access URL by
 querying the *Route* that got set up to expose Kibana's *Service*:
 
-[source]
+[source,bash]
 ----
 oc get route/logging-kibana
+----
+
+You will see something like:
+
+----
 NAME             HOST/PORT                                              PATH      SERVICES         PORT      TERMINATION          WILDCARD
 logging-kibana   kibana.apps.{{ OCP_ROUTING_SUFFIX }}             logging-kibana   <all>     reencrypt/Redirect   None
 ----
@@ -385,7 +426,7 @@ have.
 When you installed OpenShift, there was an option set in the installer's
 configuration to enable the multitenant network plugin:
 
-[source]
+[source,ini]
 ----
 os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
 ----
@@ -408,7 +449,7 @@ implementations make use of appc/CNI, which is outside the scope of this lab.
 Only users with cluster administration privileges can manipulate *Project*
 networks. First, make sure you are logged in as the cluster administrator:
 
-[source]
+[source,bash]
 ----
 oc login -u system:admin
 ----
@@ -416,7 +457,7 @@ oc login -u system:admin
 Then, execute a script that we have prepared for you. It will create two
 *Projects* and then deploy a *DeploymentConfig* with a *Pod* for you:
 
-[source]
+[source,bash]
 ----
 bash /opt/lab/support/net-proj.sh
 ----
@@ -425,7 +466,7 @@ bash /opt/lab/support/net-proj.sh
 Two *Projects* were created for you, `netproj-a` and `netproj-b`. Execute the
 following command to see the network namespaces:
 
-[source]
+[source,bash]
 ----
 oc get netnamespaces
 ----
@@ -460,7 +501,7 @@ Now that you have some networks and pods, you will need to find the IP address
 of the pod in the `netproj-b` *Project*. The following command will show you the
 IP address:
 
-[source]
+[source,bash]
 ----
 bash /opt/lab/support/podbip.sh
 ----
@@ -469,7 +510,7 @@ The output will simply be the IP address of the pod in the `netproj-b` project.
 The everyday way to do this would be with a combination of the `get` and
 `describe` verbs. Feel free to do the following to verify what the script did:
 
-[source,role=copypaste]
+[source,bash,role=copypaste]
 ----
 oc get pod -n netproj-b
 oc describe pod ose-1-f0deb
@@ -483,7 +524,7 @@ you found above. It will look something like _10.1.4.12_.
 
 Export the IP address of your pod into a shell variable like so:
 
-[source,role=copypaste]
+[source,bash,role=copypaste]
 ----
 export POD_B_IP=10.1.4.12
 ----
@@ -499,14 +540,14 @@ connectivity between the two *Pods* you created.
 
 Get the name of the *Pod* running in the `netproj-a` *Project*:
 
-[source]
+[source,bash]
 ----
 oc get pods -n netproj-a
 ----
 
 Then, export the *Pod* ID as a shell variable:
 
-[source,role=copypaste]
+[source,bash,role=copypaste]
 ----
 export POD_A_NAME=ose-1-q9mt5
 ----
@@ -516,14 +557,13 @@ Be sure to use the name that you saw in the output of your command.
 Now, go ahead and `exec` a `ping` command inside *Pod* A, trying to reach *Pod*
 B:
 
-[source]
+[source,bash]
 ----
 oc exec -n netproj-a $POD_A_NAME -- ping -c1 -W1 $POD_B_IP
 ----
 
 Your `ping` output should look like the following:
 
-[source]
 ----
 PING 10.129.0.10 (10.129.0.10) 56(84) bytes of data.
 
@@ -535,7 +575,7 @@ You will see 100% packet loss (your `ping` command sends 1 packet, waits 1 secon
 and gets no response). This is because the networks are not connected to one
 another. Now simply execute the following:
 
-[source]
+[source,bash]
 ----
 ping -c1 -W1 $POD_B_IP
 ----
@@ -549,21 +589,21 @@ logged in to an OpenShift host can "see" and touch everything on the SDN.
 #### Join the Networks
 Now it’s time to join the networks. Execute the following:
 
-[source]
+[source,bash]
 ----
 oc get netnamespace
 ----
 
 Take note of the network IDs for `netproj-a` and `netproj-b`. Then:
 
-[source]
+[source,bash]
 ----
 oc adm pod-network join-projects netproj-a --to=netproj-b
 ----
 
 And then look at the network IDs again:
 
-[source]
+[source,bash]
 ----
 oc get netnamespace
 ----
@@ -574,14 +614,13 @@ You should see that the network IDs of the two projects are now the same.
 Now that the projects are joined, your `ping` between the pods should work.
 Execute the original `ping` test again:
 
-[source]
+[source,bash]
 ----
 oc exec -n netproj-a $POD_A_NAME -- ping -c1 -W1 $POD_B_IP
 ----
 
 This time, your packet should reach its destination:
 
-[source]
 ----
 PING 10.129.0.10 (10.129.0.10) 56(84) bytes of data.
 64 bytes from 10.129.0.10: icmp_seq=1 ttl=64 time=1.07 ms
@@ -594,7 +633,7 @@ rtt min/avg/max/mdev = 1.075/1.075/1.075/0.000 ms
 #### Isolate Projects
 Now, go ahead and isolate (unjoin) the projects, and then run your `ping` again:
 
-[source]
+[source,bash]
 ----
 oc adm pod-network isolate-projects netproj-a
 oc exec -n netproj-a $POD_A_NAME -- ping -c1 -W1 $POD_B_IP
@@ -618,14 +657,14 @@ marking it as non-schedulable following by _evacuation_ of all pods on the node.
 These operations require elevated privileges. Ensure you are logged in as
 cluster admin:
 
-[source]
+[source,bash]
 ----
 oc login -u system:admin
 ----
 
 You will see by now that there are pods running on almost all of your nodes:
 
-[source]
+[source,bash]
 ----
 oc get pods --all-namespaces -o wide
 ----
@@ -637,14 +676,13 @@ like so:
 Mark node `{{ NODE2_INTERNAL_FQDN }}` as non-schedulable to prevent the
 schedulers in the system to place any new workloads on it:
 
-[source]
+[source,bash]
 ----
 oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=false
 ----
 
 The output of the command will show that the node is now not schedulable:
 
-[source]
 ----
 NAME                                          STATUS                     AGE
 {{ NODE2_INTERNAL_FQDN }}   Ready,SchedulingDisabled   4h
@@ -653,7 +691,7 @@ NAME                                          STATUS                     AGE
 Marking the node out like this did not impact the pods it is running. List those
 pods:
 
-[source]
+[source,bash]
 ----
 oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
 ----
@@ -665,7 +703,7 @@ The next step is to evacuate the *Pods* to other nodes in the cluster. You can
 first simulate what actions the system would perform during evacuation with the
 following command:
 
-[source]
+[source,bash]
 ----
 oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --evacuate --dry-run
 ----
@@ -682,7 +720,7 @@ handle such situations transparently.
 
 Start the evacuation process like this:
 
-[source]
+[source,bash]
 ----
 oadm manage-node {{ NODE2_INTERNAL_FQDN }} --evacuate
 ----
@@ -691,7 +729,7 @@ After a few moments, all of the *Pods*, except those for Fluentd and Container
 Native Storage, previously running on `{{ NODE2_INTERNAL_FQDN }}` should have
 terminated and been launched elsewhere.
 
-[source]
+[source,bash]
 ----
 oc get pods --all-namespaces -o wide
 ----
@@ -704,14 +742,13 @@ CNS and logging will come back up automatically.
 Now that our maintenance is complete, the node is still non-schedulable. Let's
 fix that:
 
-[source]
+[source,bash]
 ----
 oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=true
 ----
 
 Now the node will be able to have workload scheduled on it again:
 
-[source]
 ----
 NAME                                          STATUS    AGE
 {{ NODE2_INTERNAL_FQDN }}   Ready     4h

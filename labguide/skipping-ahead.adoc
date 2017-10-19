@@ -34,7 +34,6 @@ need to skip all preceding modules in order**. For example, if you wanted to
 skip to Module 5 (that is skipping module 2-4), you would need to run the
 following:
 
-[source,bash]
 ----
 cd {{ CODE_CLONE_LOCATION }}/tests/
 ansible-playbook installation_automation.yaml

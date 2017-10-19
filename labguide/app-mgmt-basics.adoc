@@ -23,7 +23,6 @@ them, and users may be able to access multiple *Projects*.
 
 For this exercise, first create a *Project* to hold our resources:
 
-[source,bash]
 ----
 oc new-project app-management
 ----
@@ -37,7 +36,6 @@ instantiate templates, and so on.
 
 You will now launch a specific image that exists on Dockerhub
 
-[source,bash]
 ----
 oc new-app docker.io/siamaksade/mapit
 ----
@@ -78,7 +76,6 @@ pod definition while running.
 
 You can get a list of pods:
 
-[source,bash]
 ----
 oc get pods
 ----
@@ -170,7 +167,6 @@ including the YAML format to make one by hand, in the official documentation.
 The `new-app` command used earlier caused a service to be created. You can see
 the current list of services in a project with:
 
-[source,bash]
 ----
 oc get services
 ----
@@ -189,7 +185,6 @@ the service is deleted. Your service IP will likely be different.
 Just like with pods, you can `describe` services, too. In fact, you can
 `describe` most objects in OpenShift:
 
-[source,bash]
 ----
 oc describe service mapit
 ----
@@ -219,7 +214,6 @@ this data can be represented as serializable data objects (JSON, YAML).
 
 Take a look at the YAML output for the service:
 
-[source,bash]
 ----
 oc get service mapit -o yaml
 ----
@@ -338,7 +332,6 @@ Now that we know the background of what a *ReplicatonController* and
 look at the *DeploymentConfig* (DC) that was created for you when you told
 OpenShift to stand up the `mapit` image:
 
-[source,bash]
 ----
 oc get dc
 ----
@@ -355,7 +348,6 @@ To get more details, we can look into the *ReplicationController* (*RC*).
 Take a look at the *ReplicationController* (RC) that was created for you when
 you told OpenShift to stand up the `mapit` image:
 
-[source,bash]
 ----
 oc get rc
 ----
@@ -376,14 +368,12 @@ the desired number, we can tell OpenShift that we want more or less *Pods*.
 Let's scale our mapit "application" up to 2 instances. We can do this with
 the `scale` command.
 
-[source,bash]
 ----
 oc scale --replicas=2 dc/mapit
 ----
 
 To verify that we changed the number of replicas, issue the following command:
 
-[source,bash]
 ----
 oc get rc
 ----
@@ -398,7 +388,6 @@ mapit-1      2         2         0         4h
 You can see that we now have 2 replicas. Let's verify the number of pods with
 the `oc get pods` command:
 
-[source,bash]
 ----
 oc get pods
 ----
@@ -414,7 +403,6 @@ mapit-1-rq6t6   1/1       Running   0          1m
 And lastly, let's verify that the *Service* that we learned about in the
 previous lab accurately reflects two endpoints:
 
-[source,bash]
 ----
 oc describe svc mapit
 ----
@@ -440,7 +428,6 @@ No events.
 
 Another way to look at a *Service*'s endpoints is with the following:
 
-[source,bash]
 ----
 oc get endpoints mapit
 ----
@@ -525,7 +512,6 @@ Do you remember setting up the router? You probably don't. That's because the
 installer settings created a router for you! The router lives in the `default`
 *Project*, and you can see something about it with the following command:
 
-[source,bash]
 ----
 oc describe dc router -n default
 ----
@@ -536,7 +522,6 @@ the *Service* via the command line. If you remember from earlier, your *Service*
 name is `mapit`. With the *Service* name, creating a *Route* is a simple
 one-command task:
 
-[source,bash]
 ----
 oc expose service mapit
 ----
@@ -549,7 +534,6 @@ route "mapit" exposed
 
 Verify the *Route* was created with the following command:
 
-[source,bash]
 ----
 oc get route
 ----
@@ -591,7 +575,6 @@ If you take a step back to examine everything you've done so far, in three
 commands you deployed an application, scaled it, and made it accessible to the
 outside world:
 
-[source,bash]
 ----
 oc new-app docker.io/siamaksade/mapit
 oc scale --replicas=2 dc/mapit
@@ -602,7 +585,6 @@ oc expose service mapit
 Before we continue, go ahead and scale your application down to a single
 instance:
 
-[source,bash]
 ----
 oc scale --replicas=1 dc/mapit
 ----
@@ -640,7 +622,6 @@ which is creating and/or modifying probes. The `mapit` application exposes an
 endpoint which we can check to see if it is alive and ready to respond. You can
 test it using `curl`:
 
-[source,bash]
 ----
 curl mapit-app-management.{{OCP_ROUTING_SUFFIX}}/health
 ----
@@ -655,14 +636,12 @@ You will get some JSON as a response:
 We can ask OpenShift to probe this endpoint for liveness with the following
 command:
 
-[source,bash]
 ----
 oc set probe dc/mapit --liveness --get-url=http://:8080/health --initial-delay-seconds=30
 ----
 
 You can then see that this probe is defined in the `oc describe` output:
 
-[source,bash]
 ----
 oc describe dc mapit
 ----
@@ -684,7 +663,6 @@ You will see a section like:
 
 Similarly, you can set a readiness probe in the same manner:
 
-[source,bash]
 ----
 oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30
 ----

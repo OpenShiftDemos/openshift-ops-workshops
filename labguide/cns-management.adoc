@@ -14,7 +14,6 @@ name `my-database-app`.
 
 #### Create/Deploy the Application
 
-[source,bash]
 ----
 oc login -u fancyuser1 -p openshift
 oc new-project my-database-app
@@ -24,7 +23,6 @@ The example applications ships in form of ready-to-use resource templates. Enter
 the following command to look at the template for a sample Ruby on Rails
 application with a PostgreSQL database:
 
-[source,bash]
 ----
 oc get template/rails-pgsql-persistent -n openshift -o yaml
 ----
@@ -42,7 +40,6 @@ a time.
 If you want to see more about the parameters or other details of this template,
 you can execute the following:
 
-[source,bash]
 ----
 oc describe template rails-pgsql-persistent -n openshift
 ----
@@ -53,7 +50,6 @@ The storage size parameter in the template is called `VOLUME_CAPACITY`. The
 into the appropriate OpenShift objects. We will specify that we want _5Gi_ of
 storage as part of deploying a new app from the template as follows:
 
-[source,bash]
 ----
 oc new-app rails-pgsql-persistent -p VOLUME_CAPACITY=5Gi
 ----
@@ -184,7 +180,6 @@ the *Pod* list.
 You should now also see a PVC that has been issued and now being in the _Bound_
 state.
 
-[source,bash]
 ----
 oc get pvc
 ----
@@ -208,7 +203,6 @@ Now go ahead and try out the application. The overview page in the OpenShift UI
 will tell you the *Route* which has been deployed as well. Otherwise get it on
 the CLI like this:
 
-[source,bash]
 ----
 oc get route
 ----
@@ -241,21 +235,18 @@ the *Service* was automatically exposed. This is a good practice.
 Now let's take a look at how this was deployed on the GlusterFS side. First you
 need to acquire necessary permissions:
 
-[source,bash]
 ----
 oc login -u system:admin
 ----
 
 Select the example project of the user `fancyuser1` if not already/still selected:
 
-[source,bash]
 ----
 oc project my-database-app
 ----
 
 Look at the PVC to determine the PV:
 
-[source,bash]
 ----
 oc get pvc
 ----
@@ -275,7 +266,6 @@ Your PV name will be different as it's dynamically generated.
 Look at the details of the PV bound to the PVC, in this case
 `pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8`:
 
-[source,bash]
 ----
 oc describe pv/pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8
 ----
@@ -306,14 +296,12 @@ Note the GlusterFS volume name, in this case *vol_e8fe7f46fedf7af7628feda0dcbf2f
 
 Now let's switch to the namespace we used for CNS deployment:
 
-[source,bash]
 ----
 oc project container-native-storage
 ----
 
 Look at the GlusterFS pods running and pick one (which one is not important):
 
-[source,bash]
 ----
 oc get pods -o wide
 ----
@@ -331,7 +319,6 @@ heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}} 
 Remember the IP address of the pod you select, for example: *{{NODE1_INTERNAL_IP}}* of pod *glusterfs-37vn8*. +
 Log on to the selected GlusterFS pod with a remote terminal session like so:
 
-[source,bash]
 ----
 oc rsh glusterfs-37vn8
 ----
@@ -339,7 +326,6 @@ oc rsh glusterfs-37vn8
 You have now access to this container's namespace which has the GlusterFS CLI utilities installed. +
 Let's use them to list all known volumes:
 
-[source,bash]
 ----
 sh-4.2# gluster volume list
 ----
@@ -357,7 +343,6 @@ vol_f2e8fda1d42a41efabbb4d4a3b4a5659
 
 Query GlusterFS about the topology of this volume:
 
-[source,bash]
 ----
 sh-4.2# gluster volume info vol_e8fe7f46fedf7af7628feda0dcbf2f60
 ----
@@ -401,7 +386,6 @@ You can even look at this yourself, by listing the files in the brick directory.
 Select the brick's directory (the path starting with `/var/lib/heketi/...`)
 marked in the output above:
 
-[source,bash]
 ----
 sh-4.2# ls -ahl /var/lib/heketi/mounts/vg_0246fd563709384a3cbc3f3bbeeb87a9/brick_684a01f8993f241a92db02b117e0b912/brick
 ----
@@ -419,7 +403,6 @@ drwx------.  20 1000080000 2001 8.0K Jun  6 14:46 userdata
 
 Then, try looking at the data folder:
 
-[source,bash]
 ----
 sh-4.2# ls -ahl /var/lib/heketi/mounts/vg_0246fd563709384a3cbc3f3bbeeb87a9/brick_684a01f8993f241a92db02b117e0b912/brick/userdata
 ----
@@ -476,7 +459,6 @@ normal local filesystem.
 
 You may now exit your remote session to the GlusterFS pod.
 
-[source,bash]
 ----
 sh-4.2# exit
 ----
@@ -496,7 +478,6 @@ non-shared storage we will first run this application without a PV.
 #### Deploy a New Application
 First log back in as `fancyuser1` using the password `openshift` and create a new project:
 
-[source,bash]
 ----
 oc login -u fancyuser1 -p openshift
 oc new-project my-shared-storage
@@ -504,7 +485,6 @@ oc new-project my-shared-storage
 
 Next deploy the example application:
 
-[source,bash]
 ----
 oc new-app openshift/php:7.0~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
 ----
@@ -539,7 +519,6 @@ You will see something like:
 
 Watch and wait for the application to be deployed:
 
-[source,bash]
 ----
 oc logs -f bc/file-uploader
 ----
@@ -563,7 +542,6 @@ You should kbd:[Ctrl + c] out of the tail mode once you see _Push successful_.
 
 When the build is completed ensure the pods are running:
 
-[source,bash]
 ----
 oc get pods
 ----
@@ -582,14 +560,12 @@ Note the name of the single pod currently running the app, in the example above
 builder container and is not relevant for us. A service has been created for our
 app but not exposed externally via a *Route* yet. Let's fix this:
 
-[source,bash]
 ----
 oc expose svc/file-uploader
 ----
 
 Check the *Route* that has been created:
 
-[source,bash]
 ----
 oc get route
 ----
@@ -624,14 +600,12 @@ After uploading a file validate it has been stored locally in the container by
 following the link _List uploaded files_ in the browser or logging into it via a
 remote session (using the name noted earlier):
 
-[source,bash]
 ----
 oc rsh file-uploader-1-k2v0d
 ----
 
 Once inside:
 
-[source,bash]
 ----
 sh-4.2$ cd uploaded
 sh-4.2$ pwd
@@ -668,21 +642,18 @@ terminates.
 
 Let's see when this become a problem. Exit out of the container shell:
 
-[source,bash]
 ----
 sh-4.2$ exit
 ----
 
 Let's scale the deployment to 3 instances of the app:
 
-[source,bash]
 ----
 oc scale dc/file-uploader --replicas=3
 ----
 
 Eventually, the additional *Pods* get spawned:
 
-[source,bash]
 ----
 oc get pods
 ----
@@ -707,14 +678,12 @@ generated.
 When you log on to one of the new instances (one of the ones with an age much
 smaller than the others) you will see they have no data:
 
-[source,bash]
 ----
 oc rsh file-uploader-1-3cgh1
 ----
 
 And then:
 
-[source,bash]
 ----
 sh-4.2$ cd uploaded
 sh-4.2$ pwd
@@ -757,7 +726,6 @@ This command will:
 For more information on what `oc volume` is capable of, look at its help output
 with `oc volume -h`. Now, let's look at the result of adding the volume:
 
-[source,bash]
 ----
 oc get pvc
 ----
@@ -781,7 +749,6 @@ pods will mount the volume identified by the PVC under
 
 You can watch the redeployment like this:
 
-[source,bash]
 ----
 oc logs dc/file-uploader -f
 ----
@@ -823,7 +790,6 @@ seeing the logs for this deployer in the above example (`Scaling up...`).
 
 The new config `file-uploader-2` will have 3 pods all sharing the same storage.
 
-[source,bash]
 ----
 oc get pods
 ----
@@ -844,7 +810,6 @@ from within all application pods. In the browser the application behaves
 seamlessly as it circles through the pods between browser sessions (if you use
 an incognito session or a different browser).
 
-[source,bash]
 ----
 oc rsh file-uploader-2-jd22b
 sh-4.2$ ls -lh uploaded
@@ -908,7 +873,6 @@ implement Option B.
 The following action require elevated privileges in OpenShift. Login as cluster
 admin and change to the CNS namespace:
 
-[source,bash]
 ----
 oc login -u system:admin
 oc project container-native-storage
@@ -916,7 +880,6 @@ oc project container-native-storage
 
 First, identify the newly added nodes - the easiest way is to look at their uptime:
 
-[source,bash]
 ----
 oc get nodes
 ----
@@ -945,7 +908,6 @@ First uncomment the additional nodes entries already prepared in the ansible
 inventory file `/etc/ansible/hosts` (they are prefixed with `#addcns_`). +
 You need `sudo` privileges to do that:
 
-[source,bash]
 ----
 sudo vim /etc/ansible/hosts
 ----
@@ -970,7 +932,6 @@ Remove the comment to enable the new host group like so:
 
 Then execute the `configure-firewall.yaml` playbook again:
 
-[source,bash]
 ----
 ansible-playbook /opt/lab/support/configure-firewall.yaml
 ----
@@ -978,7 +939,6 @@ ansible-playbook /opt/lab/support/configure-firewall.yaml
 Next, add the following label to these nodes in order have the *DaemonSet* that
 CNS is based upon schedule new GlusterFS pods on them:
 
-[source,bash]
 ----
 oc get daemonset
 ----
@@ -992,7 +952,6 @@ glusterfs   3         3         3         storagenode=glusterfs   3h
 <1> The label definition the *DaemonSet* uses to select the nodes which run a
   GlusterFS pod.
 
-[source,bash]
 ----
 oc label node/{{NODE4_INTERNAL_FQDN}} storagenode=glusterfs
 oc label node/{{NODE5_INTERNAL_FQDN}} storagenode=glusterfs
@@ -1003,7 +962,6 @@ The *DaemonSet* will detect that new nodes have these labels, and GlusterFS
 *Pods* will be launched on the newly labeled nodes. Wait for these *Pods* to be
 in `Ready` state:
 
-[source,bash]
 ----
 oc get pods -o wide
 ----
@@ -1039,7 +997,6 @@ original 3 nodes we started with, and then newly added nodes.
 
 Initialize the heketi-cli with environment variables like so:
 
-[source,bash]
 ----
 export HEKETI_CLI_SERVER=http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
 export HEKETI_CLI_USER=admin
@@ -1049,7 +1006,6 @@ export HEKETI_CLI_KEY={{HEKETI_ADMIN_PW}}
 This avoids repetitive command switches with heketi-cli. Use the heketi client
 to load the new topology. Make sure you are currently in `/opt/lab/support`:
 
-[source,bash]
 ----
 heketi-cli topology load --json=/opt/lab/support/topology-extended.json
 ----
@@ -1074,7 +1030,6 @@ And you will see something like:
 With this you've successfully initialized a second CNS storage cluster that is
 managed by heketi. You can query heketi for the new topology:
 
-[source,bash]
 ----
 heketi-cli topology info
 ----
@@ -1160,7 +1115,6 @@ requests to it. *Replace it with the ID of your cluster!*
 
 After you have correctly replaced your new cluster ID, create the `StorageClass`:
 
-[source,bash]
 ----
 oc create -f /opt/lab/support/second-cns-storageclass.yaml
 ----
@@ -1187,7 +1141,6 @@ spec:
 
 You can create it with the following:
 
-[source,bash]
 ----
 oc create -f /opt/lab/support/cns-silver-pvc.yaml
 ----
@@ -1198,7 +1151,6 @@ UUID in the `clusterid` parameter of the *StorageClass*.
 
 You can see that this claim is automatically bound:
 
-[source,bash]
 ----
 oc get pvc
 ----
@@ -1229,7 +1181,6 @@ The nodes of the second cluster, have an additional, unused storage device
 `{{NODE_BRICK_DEVICE2}}`. To add them we need to know their node IDs. + With the
 environment variables for `heketi-cli` still set run:
 
-[source,bash]
 ----
 heketi-cli node list | grep ca777ae0285ef6d8cd7237c862bd591c
 Id:33e0045354db4be29b18728cbe817605	Cluster:ca777ae0285ef6d8cd7237c862bd591c
@@ -1248,7 +1199,6 @@ For each node in the output (eg: `33e0045354db4be29b18728cbe817605`,
 `d8443e7ee8314c0c9fb4d8274a370bbd`, and `caaed3927e424b22b1a89d261f7617ad`), go
 ahhead and `device add` the additional block device:
 
-[source,bash]
 ----
 heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=33e0045354db4be29b18728cbe817605
 Device added successfully
@@ -1267,7 +1217,6 @@ The node UUIDs will be different for you since they are automatically generated.
 
 You can now verify the presence of these new devices by running:
 
-[source,bash]
 ----
 heketi-cli topology info
 ----
@@ -1290,7 +1239,6 @@ topology).
 The first step is to, again, determine the CNS node's internal UUID in heketi's
 database:
 
-[source,bash]
 ----
 heketi-cli topology info | grep -B4 {{NODE4_INTERNAL_FQDN}}
 ----
@@ -1393,7 +1341,6 @@ to issue a `remove` operation before.
 
 You can now check that the device is gone from the topology by running:
 
-[source,bash]
 ----
 heketi-cli topology info
 ----
@@ -1439,7 +1386,6 @@ storage for the registry before starting to really use your cluster.
 
 Make sure you are logged in as `system:admin` in the `default` namespace:
 
-[source,bash]
 ----
 oc login -u system:admin -n default
 ----
@@ -1448,7 +1394,6 @@ Just like with the file uploader example, you can simply add a volume (and have
 its *PersistentVolumeClaim* created automatically) with the `oc volume` command.
 Execute the following:
 
-[source,bash]
 ----
 oc volume dc/docker-registry --add --name=registry-storage -t pvc \
 --claim-mode=ReadWriteMany --claim-size=10Gi \
@@ -1475,7 +1420,6 @@ using CNS for the storage for the registry, fully supported.
 
 Observe the registry deployment get updated:
 
-[source,bash]
 ----
 oc get pod -w
 ----
@@ -1485,7 +1429,6 @@ Remember to kbd:[Ctrl + c] when you are done watching the *Pods* redeploy.
 After a couple of seconds a new deployment of the registry should be available.
 Verify a new version of the registry's *DeploymentConfig* is running:
 
-[source,bash]
 ----
 oc get dc/docker-registry
 ----
@@ -1502,7 +1445,6 @@ this is shared storage this also allows you to scale out the registry pods.
 
 You can scale the registry like this:
 
-[source,bash]
 ----
 oc scale dc/docker-registry --replicas=3
 ----
@@ -1510,7 +1452,6 @@ oc scale dc/docker-registry --replicas=3
 After a short while you should see 3 healthy registry pods in the default
 *Project*:
 
-[source,bash]
 ----
 oc get pods
 ----

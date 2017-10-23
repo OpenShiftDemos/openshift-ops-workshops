@@ -21,7 +21,11 @@ the
 link:https://docs.openshift.com/container-platform/3.5/install_config/install/quick_install.html[installation
 section] of the product documentation.
 
-At this point *you should be logged in as `cloud-user` on the OpenShift Master node* via SSH.
+[NOTE]
+====
+At this point you should be logged in as `cloud-user` on the OpenShift Master
+node via SSH.
+====
 
 ### Examining the provided Ansible inventory file
 First, let's examine the provided installer configuration file.
@@ -29,7 +33,6 @@ First, let's examine the provided installer configuration file.
 #### Look at the file
 Use `cat`, `less`, or an editor to look at the `/etc/ansible/hosts` file:
 
-[source]
 ----
 cat /etc/ansible/hosts
 ----
@@ -50,7 +53,6 @@ Since we have pre-configured the installer for you, you can simply run it.
 Launching the advanced installation is as simple as executing the following
 command:
 
-[source]
 ----
 ansible-playbook -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
 ----
@@ -61,7 +63,10 @@ content as possible to make the installation go quickly.
 
 [TIP]
 ====
-The additional command-line switch `-i /etc/ansible/hosts` in the command above is actually redundant. It directs Ansible to use an inventory file at the supplied path. When omitted, Ansible will look at a number of default paths, among which is `/etc/ansible/hosts`.
+The additional command-line switch `-i /etc/ansible/hosts` in the command
+above is actually redundant. It directs Ansible to use an inventory file at
+the supplied path. When omitted, Ansible will look at a number of default
+paths, among which is `/etc/ansible/hosts`.
 ====
 
 A typical multi-host installation like this might take around an hour depending
@@ -82,11 +87,10 @@ good that the installation was successful.
 If you look in your terminal at the output of the installer, it should finish
 with something that looks like the following:
 
-[source]
 ----
 PLAY RECAP ***********************************************************************************
-infra.internal.aws.testdrive.openshift.com : ok=241  changed=53   unreachable=0    failed=0
-localhost                  : ok=11   changed=0    unreachable=0    failed=0
+infra.internal.aws.testdrive.openshift.com  : ok=241  changed=53   unreachable=0    failed=0
+localhost                                   : ok=11   changed=0    unreachable=0    failed=0
 master.internal.aws.testdrive.openshift.com : ok=703  changed=157  unreachable=0    failed=0
 node01.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0
 node02.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0
@@ -112,14 +116,12 @@ is preconfigured for cluster administrator access.
 Execute the following command to see a list of the *Nodes* that OpenShift knows
 about:
 
-[source]
 ----
 oc get nodes
 ----
 
 The output should look something like the following:
 
-[source]
 ----
 NAME                          STATUS                     AGE
 {{INFRA_INTERNAL_FQDN}}     Ready                      1m

@@ -1,6 +1,6 @@
 
 ---
-- include: installation_automation.yaml
+- include: /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
 - include: installation_verify.yaml
 - include: cns-deploy_automation.yaml
 - include: cns-deploy_verify.yaml

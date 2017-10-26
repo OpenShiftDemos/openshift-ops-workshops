@@ -746,8 +746,9 @@ Resources:
           DeleteOnTermination: 'true'
       UserData:
         Fn::Base64:
-          !Sub |
-            - #cloud-config
+          !Sub
+            - |
+              #cloud-config
               cloud_config_modules:
               - disk_setup
               - mounts
@@ -1294,8 +1295,9 @@ Resources:
         Value: !Join [ ., [labguide, !Ref 'AWS::AccountId', !Ref 'PublicHostedZone' ] ]
       UserData:
         Fn::Base64:
-          !Sub |
-            - #cloud-config
+          !Sub
+            - |
+              #cloud-config
               cloud_config_modules:
               - disk_setup
               - mounts

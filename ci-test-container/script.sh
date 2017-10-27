@@ -11,8 +11,7 @@ export NSS_WRAPPER_GROUP=/etc/group
 export QWIKLAB_API_ENDPOINT='https://redhat.qwiklab.com/api/v1'
 
 # start lab instance and store its details into a json file
-echo "starting lab instance"
-http POST $QWIKLAB_API_ENDPOINT/focuses/run_lab auth_token=$QWIKLAB_API_TOKEN focus:='{"id":"70"}' > /tmp/lab_details.json
+http --ignore-stdin POST $QWIKLAB_API_ENDPOINT/focuses/run_lab auth_token=$QWIKLAB_API_TOKEN focus:='{"id":"70"}' > /tmp/lab_details.json
 
 # qwiklab api returns 200 sometimes even if there's an error
 # the error means we didn't provision, so we can exit without issue
@@ -20,7 +19,6 @@ grep -iq 'access denied' /tmp/lab_details.json
 
 if [ $? == 0 ]
 then
-  echo "found access denied error"
   exit 255
 fi
 
@@ -40,7 +38,7 @@ COUNTER=1
 SUCCESS=0
 while [ $COUNTER -lt 5 ]
 do
-  export CREATE_STATUS=`http POST $QWIKLAB_API_ENDPOINT/lab_instances/get_lab_instance/ \
+  export CREATE_STATUS=`http --ignore-stdin POST $QWIKLAB_API_ENDPOINT/lab_instances/get_lab_instance/ \
   auth_token=$QWIKLAB_API_TOKEN lab_instance:='{"id": "'$LAB_ID'"}' | jq -r .response.aws_cf_state`
              
   if [ $CREATE_STATUS == "CREATE_COMPLETE" ]
@@ -56,7 +54,7 @@ done
 if [ $SUCCESS != 1 ]
 then
   # didn't get a completed deployment, so ask for teardown and abort
-  http POST $QWIKLAB_API_TOKEN/lab_instances/end_lab_instance \
+  http --ignore-stdin POST $QWIKLAB_API_TOKEN/lab_instances/end_lab_instance \
   auth_token=$QWIKLAB_API_TOKEN lab_instance:='{"id":"'$LAB_ID'"}'
   exit 255
 fi
@@ -72,8 +70,7 @@ then
   SUCCESS=0  
 fi
 
-
-http POST $QWIKLAB_API_TOKEN/lab_instances/end_lab_instance \
+http --ignore-stdin POST $QWIKLAB_API_ENDPOINT/lab_instances/end_lab_instance \
 auth_token=$QWIKLAB_API_TOKEN lab_instance:='{"id":"'$LAB_ID'"}'
 
 if [ $SUCCESS == 1 ]

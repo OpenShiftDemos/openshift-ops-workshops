@@ -7,7 +7,6 @@ RUN yum -y install epel-release && \
 
 WORKDIR /opt
 ENTRYPOINT /opt/script.sh
-ADD ./resty /opt/resty
 ADD ./script.sh /opt/script.sh
 
 RUN chmod g+x /opt/* && chmod g+w /opt

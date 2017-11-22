@@ -3,11 +3,12 @@
 The following items must be exported before launching Packer
 
 ```
-ORG_ID=8675309
-ACT_KEY=openshift_admin
-VPC_ID=vpc-432dbae5
-SUBNET_ID=subnet-823va32
-GLUSTER_POOL=2a25f92256981319015966f0783a253c
+AWS_ACCESS_KEY_ID=<your-aws-access-key>
+AWS_SECRET_ACCESS_KEY=<your-aws-secret-key>
+ORG_ID=<your-rhsm-org-id>
+ACT_KEY=<your-act-key-with-access-to-ocp-and-rhgs-subs>
+VPC_ID=<any-aws-vpc-id-with-internet-access>
+SUBNET_ID=<any-subnet-with-internet-access-on-vpc>
 ```
 
 ## Launching Packer

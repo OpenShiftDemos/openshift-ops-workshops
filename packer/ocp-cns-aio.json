@@ -31,7 +31,7 @@
     }],
     "ami_name": "ocp-cns-aio-{{timestamp}}",
     "ami_regions": ["eu-west-1", "eu-central-1", "us-east-1", "us-west-2"],
-    "ami_groups": ["XXX"],
+    "ami_users": ["XXXX"],
     "ami_description": "OCP 3.5 / CNS 3.5 with all core container images available locally for use by Qwiklabs",
     "tags": {
       "Name": "ocp-cns-qwiklabs",

@@ -28,7 +28,7 @@ You also need the CSV file containing all the Red Hat fleet accounts reserved on
 awk 'BEGIN { FS=","; OFS=","; } {print $1}' ~/Downloads/redhat_new_fleet_hosted_zones.csv | sed -n -e 's/^\([0-9].*\)\.aws\.testdrive\.openshift\.com\./\"\1\"/p' | paste -d, -s - -
 ```
 
-Replace XXX into "ami_groups": ["XXX"] in ocp-cns-aio.json with this value.
+Replace XXXX into "ami_users": ["XXXX"] in ocp-cns-aio.json with this value.
 
 ### Launching Packer
 

@@ -2,8 +2,8 @@
   "variables": {
     "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
-    "aws_region": "us-east-1",
-    "aws_ami": "ami-563ca440",
+    "aws_region": "{{env `AWS_REGION`}}",
+    "aws_ami": "{{env `AWS_AMI`}}",
     "org_id": "{{env `ORG_ID`}}",
     "activation_key": "{{env `ACT_KEY`}}",
     "vpc_id": "{{env `VPC_ID`}}",
@@ -31,7 +31,7 @@
     }],
     "ami_name": "ocp-cns-aio-{{timestamp}}",
     "ami_regions": ["eu-west-1", "eu-central-1", "us-east-1", "us-west-2"],
-    "ami_groups": ["all"],
+    "ami_groups": ["XXX"],
     "ami_description": "OCP 3.5 / CNS 3.5 with all core container images available locally for use by Qwiklabs",
     "tags": {
       "Name": "ocp-cns-qwiklabs",

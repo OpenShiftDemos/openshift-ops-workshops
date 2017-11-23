@@ -64,6 +64,11 @@ Parameters:
     Default: master
     ConstraintDescription: Must be the name of a branch in the GitHub repository we are using in various cloud-init modules.
 
+  AmiId:
+    Type: String
+    Default: openshift
+    ConstraintDescription: Must be the name of the GitHub account/organization that hosts a repo/fork called "openshift-cns-testdrive".
+
 Mappings:
   AWSRegion2AMI:
     us-east-1:
@@ -774,7 +779,7 @@ Resources:
               runcmd:
               - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
               - mkdir -p /var/lib/etcd
-              - git clone -b ${RepoBranch} https://github.com/openshift/openshift-cns-testdrive.git /opt/lab/code
+              - git clone -b ${RepoBranch} https://github.com/${RepoAccount}/openshift-cns-testdrive.git /opt/lab/code
               - chown -R cloud-user:cloud-user /opt/lab
               - cp /opt/lab/code/support/* /opt/lab/support/
               - chown -R cloud-user:cloud-user /opt/lab
@@ -1130,6 +1135,7 @@ Resources:
               mounts:
               - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
             - { RepoBranch: !Ref QwiklabId }
+            - { RepoAccount: !Ref AmiId }
 
 
   InfraNode1:
@@ -1306,8 +1312,8 @@ Resources:
                 path: /etc/sysconfig/docker-storage-setup
                 owner: root:root
               - content: |
-                  WORKSHOPS_URLS="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/${RepoBranch}/labguide/_ocp_admin_testdrive.yaml"
-                  CONTENT_URL_PREFIX="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/${RepoBranch}/labguide"
+                  WORKSHOPS_URLS="https://raw.githubusercontent.com/${RepoAccount}/openshift-cns-testdrive/${RepoBranch}/labguide/_ocp_admin_testdrive.yaml"
+                  CONTENT_URL_PREFIX="https://raw.githubusercontent.com/${RepoAccount}/openshift-cns-testdrive/${RepoBranch}/labguide"
                   OCP_ROUTING_SUFFIX="apps.${AWS::AccountId}.${PublicHostedZone}"
                   MASTER_HOSTNAME="master"
                   MASTER_EXTERNAL_FQDN="master.${AWS::AccountId}.${PublicHostedZone}"
@@ -1373,6 +1379,7 @@ Resources:
               - ansible localhost -m wait_for -a "port=80 host=localhost"
               - 'curl -X PUT -H "Content-Type:" --data-binary "{ \"Status\" : \"SUCCESS\", \"Reason\": \"Configuration Complete\", \"UniqueId\": \"GuideNode\",\"Data\": \"GuideNode has reached all instances and generated lab guide\" }" "${WaitHandle}"'
             - { RepoBranch: !Ref QwiklabId }
+            - { RepoAccount: !Ref AmiId }
 
   WorkerNode1:
     Type: AWS::EC2::Instance

@@ -64,11 +64,6 @@ Parameters:
     Default: master
     ConstraintDescription: Must be the name of a branch in the GitHub repository we are using in various cloud-init modules.
 
-  AmiId:
-    Type: String
-    Default: openshift
-    ConstraintDescription: The name of the GitHub account/organization that hosts a repo/fork called "openshift-cns-testdrive."
-
 Mappings:
   AWSRegion2AMI:
     us-east-1:
@@ -1134,7 +1129,7 @@ Resources:
 
               mounts:
               - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
-            - { RepoBranch: !Ref QwiklabId, RepoAccount: !Ref AmiId }
+            - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
 
 
   InfraNode1:
@@ -1377,7 +1372,8 @@ Resources:
               - ansible master -m wait_for -a "path=/etc/origin/master/ipa-ca.crt timeout=600"
               - ansible localhost -m wait_for -a "port=80 host=localhost"
               - 'curl -X PUT -H "Content-Type:" --data-binary "{ \"Status\" : \"SUCCESS\", \"Reason\": \"Configuration Complete\", \"UniqueId\": \"GuideNode\",\"Data\": \"GuideNode has reached all instances and generated lab guide\" }" "${WaitHandle}"'
-            - { RepoBranch: !Ref QwiklabId, RepoAccount: !Ref AmiId }
+            - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
+
 
   WorkerNode1:
     Type: AWS::EC2::Instance

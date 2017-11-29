@@ -1,3 +1,7 @@
+---
+hide_toc: true
+---
+
 # Welcome to the OpenShift for Ops Test Drive
 
 Please follow below instructions to get started. In case of problems please reach out to openshift-ops-testdrive (at) redhat.com.
@@ -14,43 +18,34 @@ For this lab you need to fulfill the following pre-requisites:
 
 ## 2. How to start your Test Drive
 
-To start the Test Drive press <b><span style="background-color:#909e33; color:white; font-size: 120%">&nbsp;&nbsp;Start Lab&nbsp;&nbsp;</span></b> button in the top bar.
+To start the Test Drive press ![START button](img/qwiklab-start-button.png) button in the top bar.
 
-The lab will cost you 10 credits. Upon initial registration you have 40 credits in total. You can use remaining credits to again run this Test Drive or other Red Hat Test Drives.
-
-![Launching a lab with credits](img/qwiklab-credit-approval.png)
-
-If you see a link called "BUY CREDITS" you have run out of credits. Please contact us in this case.
+In total you can start the lab **5** times. Then your quota of free lab environments has reached it's limit. Contact us if you want to run even more labs.
 
 ## 3. Download Access Key
 
-Immediately after pressing the <b><span style="background-color:#909e33; color:white; font-size: 120%">&nbsp;&nbsp;Start Lab&nbsp;&nbsp;</span></b> button, a pane labeled <b><span style="background-color:#777777; color:white; font-size: 120%">&nbsp;&nbsp;Connect&nbsp;&nbsp;</span></b> will rollover presenting your custom SSH access key to download.
+Immediately after pressing the ![START button](img/qwiklab-start-button.png) button, the download links for the SSH keys will become active (blue) in the left hand pane in a section labeled "Connection Details":
 
 ![Download SSH access keys](img/qwiklab-pem-key.png)
 
-Download the *PEM* key to your computer if you are using regular OpenSSH on the command line Linux or macOS. Choose *PPK* if you are using PuTTY on Windows.
-
-Click <b><span style="background-color:#777777; color:white; font-size: 120%">&nbsp;&nbsp;Connect&nbsp;&nbsp;</span></b> button again to hide the pane.
+Download the *PEM* key to your computer if you are using regular OpenSSH on the command line with Linux or macOS. Choose *Download PPK* if you are using PuTTY on Windows.
 
 ## 4. Wait for lab provisioning to complete
 
-When you started your Test Drive the lab environment provision process initiated in the background. During provisioning you can monitor progress in the top navigation bar
+When you started your Test Drive the lab environment provision process initiated in the background. During provisioning you can monitor progress in the top bar above this guide:
 
 ![Monitoring Lab Provisioning Progress](img/qwiklab-progress-bar.png)
 
 In total provisioning usually takes about 5 minutes and should not exceed 10 minutes.
-When your lab infrastructure is ready this progress bar disappears. Upon launch you will see a button to end your lab session and countdown until automatic shutdown:
+When your lab infrastructure is ready this progress bar disappears. Upon launch you will see a button to end your lab session and a countdown until automatic shutdown:
 
 ![Lab timer](img/qwiklab-end-button.png)
 
 ## 5. How to access your personalized lab guide
 
-This lab features a personalized lab guide which is ready as soon as the environment is provisioned. The button will appear on the right side of your screen as soon as that is the case.
+This lab features a personalized lab guide which is ready as soon as the environment is provisioned. A field called "LabGuide" will appear on the left hand side of your screen as soon as that is the case.
 
-To access it, click the <span style="background-color:#0087cf; color:white; font-size: 120%">&nbsp;&nbsp;Addl. Info&nbsp;&nbsp;</span> button on the right.
-
-If it is not visible wait for your lab environment to complete provisioning!
-An additional roll-over menu appears from the right similar to the screen shot below.
+To access it, copy the complete URL of the lab guide from the field (or simply press the copy button next to it) in the left pane to your clipboard:
 
 ![Accessing the lab guide](img/qwiklab-labguide-url.png)
 

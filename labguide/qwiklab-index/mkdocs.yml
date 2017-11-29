@@ -3,7 +3,9 @@ site_url: 'https://dmesser.github.io/openshift-cns-testdrive/'
 site_favicon: 'img/favicon.ico'
 copyright: 'Copyright ©2017 Red Hat, Inc.'
 
-theme: 'readthedocs'
+theme:
+  name: 'readthedocs'
+  custom_dir: 'custom_theme'
 extra:
   logo: 'img/shadowman_rgb.png'
   palette:

@@ -28,3 +28,4 @@ static-inventory
 id_rsa*
 instructor_key*
 labguide/qwiklab-index/site
+ci-test-container/qwiklab-secret.yaml

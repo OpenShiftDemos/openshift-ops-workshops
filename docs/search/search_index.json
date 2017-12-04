@@ -1,0 +1,39 @@
+{
+    "docs": [
+        {
+            "location": "/", 
+            "text": "Welcome to the OpenShift for Ops Test Drive\n\n\nPlease follow below instructions to get started. In case of problems please reach out to openshift-ops-testdrive (at) redhat.com.\nCompleting the entire lab content will typically take between 2 and 3 hours.\n\n\n1. Pre-requisites\n\n\nFor this lab you need to fulfill the following pre-requisites:\n\n\n\n\n\n\nWorkstation with Internet access\n\n\n\n\n\n\nSSH client supporting authentication with a private key\n\n\n\n\n\n\n2. How to start your Test Drive\n\n\nTo start the Test Drive press \n button in the top bar.\n\n\nIn total you can start the lab \n5\n times. Then your quota of free lab environments has reached it's limit. Contact us if you want to run even more labs.\n\n\n3. Download Access Key\n\n\nImmediately after pressing the \n button, the download links for the SSH keys will become active (blue) in the left hand pane in a section labeled \"Connection Details\":\n\n\n\n\nDownload the \nPEM\n key to your computer if you are using regular OpenSSH on the command line with Linux or macOS. Choose \nDownload PPK\n if you are using PuTTY on Windows.\n\n\n4. Wait for lab provisioning to complete\n\n\nWhen you started your Test Drive the lab environment provision process initiated in the background. During provisioning you can monitor progress in the top bar above this guide:\n\n\n\n\nIn total provisioning usually takes about 5 minutes and should not exceed 10 minutes.\nWhen your lab infrastructure is ready this progress bar disappears. Upon launch you will see a button to end your lab session and a countdown until automatic shutdown:\n\n\n\n\n5. How to access your personalized lab guide\n\n\nThis lab features a personalized lab guide which is ready as soon as the environment is provisioned. A field called \"LabGuide\" will appear on the left hand side of your screen as soon as that is the case.\n\n\nTo access it, copy the complete URL of the lab guide from the field (or simply press the copy button next to it) in the left pane to your clipboard:\n\n\n\n\nOpen the URL in a new tab to view your personalized lab guide!\nIt will walk you through the rest of the lab show you how to access your environment.\n\n\nHave fun!", 
+            "title": "Overview"
+        }, 
+        {
+            "location": "/#welcome-to-the-openshift-for-ops-test-drive", 
+            "text": "Please follow below instructions to get started. In case of problems please reach out to openshift-ops-testdrive (at) redhat.com.\nCompleting the entire lab content will typically take between 2 and 3 hours.", 
+            "title": "Welcome to the OpenShift for Ops Test Drive"
+        }, 
+        {
+            "location": "/#1-pre-requisites", 
+            "text": "For this lab you need to fulfill the following pre-requisites:    Workstation with Internet access    SSH client supporting authentication with a private key", 
+            "title": "1. Pre-requisites"
+        }, 
+        {
+            "location": "/#2-how-to-start-your-test-drive", 
+            "text": "To start the Test Drive press   button in the top bar.  In total you can start the lab  5  times. Then your quota of free lab environments has reached it's limit. Contact us if you want to run even more labs.", 
+            "title": "2. How to start your Test Drive"
+        }, 
+        {
+            "location": "/#3-download-access-key", 
+            "text": "Immediately after pressing the   button, the download links for the SSH keys will become active (blue) in the left hand pane in a section labeled \"Connection Details\":   Download the  PEM  key to your computer if you are using regular OpenSSH on the command line with Linux or macOS. Choose  Download PPK  if you are using PuTTY on Windows.", 
+            "title": "3. Download Access Key"
+        }, 
+        {
+            "location": "/#4-wait-for-lab-provisioning-to-complete", 
+            "text": "When you started your Test Drive the lab environment provision process initiated in the background. During provisioning you can monitor progress in the top bar above this guide:   In total provisioning usually takes about 5 minutes and should not exceed 10 minutes.\nWhen your lab infrastructure is ready this progress bar disappears. Upon launch you will see a button to end your lab session and a countdown until automatic shutdown:", 
+            "title": "4. Wait for lab provisioning to complete"
+        }, 
+        {
+            "location": "/#5-how-to-access-your-personalized-lab-guide", 
+            "text": "This lab features a personalized lab guide which is ready as soon as the environment is provisioned. A field called \"LabGuide\" will appear on the left hand side of your screen as soon as that is the case.  To access it, copy the complete URL of the lab guide from the field (or simply press the copy button next to it) in the left pane to your clipboard:   Open the URL in a new tab to view your personalized lab guide!\nIt will walk you through the rest of the lab show you how to access your environment.  Have fun!", 
+            "title": "5. How to access your personalized lab guide"
+        }
+    ]
+}

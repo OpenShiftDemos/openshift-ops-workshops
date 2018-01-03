@@ -15,9 +15,9 @@
       - bash-completion
       - atomic-openshift-clients
       - dnsmasq
-      - atomic-openshift-utils
-      - atomic-openshift-excluder-3.7.14-1.git.0.4b35b2d.el7.noarch
-      - atomic-openshift-docker-excluder-3.7.14-1.git.0.4b35b2d.el7.noarch
+      - atomic-openshift-utils-3.7.14-1.git.0.4b35b2d.el7.noarch 
+      - atomic-openshift-excluder-3.7.14-1.git.0.593a50e.el7.noarch
+      - atomic-openshift-docker-excluder-3.7.14-1.git.0.593a50e.el7.noarch
       - haveged
 
   - name: remove firewalld

@@ -4,9 +4,9 @@ deploy_mirror: false
 
 src_registry: registry.access.redhat.com
 
-ose_minor_tag: v3.5.5.26
-ose_major_tag: 3.5.0
-ose_release_tag: 3.5
+ose_minor_tag: v3.7.14-5
+ose_major_tag: 3.7.0
+ose_release_tag: 3.7
 
 ose_core_images:
   - openshift3/ose:latest
@@ -39,8 +39,8 @@ ose_infra_images:
   - openshift3/registry-console:{{ ose_release_tag }}
 
 cns_core_images:
-  - rhgs3/rhgs-volmanager-rhel7:3.2.0-10
-  - rhgs3/rhgs-server-rhel7:3.2.0-5
+  - rhgs3/rhgs-volmanager-rhel7:3.3.0-362
+  - rhgs3/rhgs-server-rhel7:3.3.0-362
 
 other_images:
   - docker.io/siamaksade/mapit

@@ -7,6 +7,7 @@ src_registry: registry.access.redhat.com
 ose_minor_tag: v3.7.14-5
 ose_major_tag: 3.7.0
 ose_release_tag: 3.7
+ose_deployer_tag: v3.6.173.0.63 
 
 ose_core_images:
   - openshift3/ose:latest
@@ -26,17 +27,17 @@ ose_infra_images:
   - openshift3/ose-docker-builder:{{ ose_minor_tag }}
   - openshift3/ose-pod:{{ ose_minor_tag }}
   - openshift3/ose-docker-registry:{{ ose_minor_tag }}
-  - openshift3/logging-deployer:{{ ose_minor_tag }}
+  - openshift3/logging-deployer:{{ ose_deployer_tag }}
   - openshift3/logging-elasticsearch:{{ ose_minor_tag }}
   - openshift3/logging-kibana:{{ ose_minor_tag }}
   - openshift3/logging-fluentd:{{ ose_minor_tag }}
   - openshift3/logging-curator:{{ ose_minor_tag }}
   - openshift3/logging-auth-proxy:{{ ose_minor_tag }}
-  - openshift3/metrics-deployer:{{ ose_minor_tag }}
+  - openshift3/metrics-deployer:{{ ose_deployer_tag }}
   - openshift3/metrics-hawkular-metrics:{{ ose_minor_tag }}
   - openshift3/metrics-cassandra:{{ ose_minor_tag }}
   - openshift3/metrics-heapster:{{ ose_minor_tag }}
-  - openshift3/registry-console:{{ ose_release_tag }}
+  - openshift3/registry-console:{{ ose_minor_tag }}
 
 cns_core_images:
   - rhgs3/rhgs-volmanager-rhel7:3.3.0-362

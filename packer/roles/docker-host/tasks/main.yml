@@ -1,12 +1,20 @@
 ---
+  - name: enable extras
+    shell: subscription-manager repos --enable rhel-7-server-extras-rpms
 
   - name: install docker
     yum: name=docker state=present
+
+  - name: install dependencies
+    yum: name=docker-python state=present
 
   - name: create docker storage config
     copy: src=docker-storage-setup dest=/etc/sysconfig/
 
   - name: start docker
     service: name=docker state=started enabled=yes
+
+  - name: disable extras
+    shell: subscription-manager repos --disable rhel-7-server-extras-rpms
 
 ...

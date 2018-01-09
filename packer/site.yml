@@ -6,8 +6,8 @@
     - { role: authorized-key, tags: ['authorized-key']}
     - { role: instructor-user, tags: ['instructor-user']}
     - { role: registered-host, tags: ['registered-host']}
-    - { role: aws-host, tags: ['aws-host']}
     - { role: ocp-installer, tags: ['ocp-installer']}
+    - { role: aws-host, tags: ['aws-host']}
     - { role: docker-host, tags: ['docker-host']}
     - { role: registry-mirror, tags: ['registry-mirror']}
     - { role: ansible-host, tags: ['ansible-host']}

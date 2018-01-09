@@ -1,9 +1,5 @@
 ---
 
-- name: install dependencies
-  yum: name=docker-python state=present
-
-
 - name: download ose container images
   docker_image:
     name: "{{ src_registry }}/{{ item }}"

@@ -67,17 +67,17 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-93045de9
+      ami: ami-98520be2 
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-48348030
+      ami: ami-473b8f3f 
     eu-west-1:
-      ami: ami-cef261b7
+      ami: ami-a3ea79da
     eu-central-1:
-      ami: ami-66be2c09
+      ami: ami-1cac3e73
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
@@ -800,10 +800,11 @@ Resources:
                     os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
                     openshift_master_default_subdomain=apps.${AWS::AccountId}.${PublicHostedZone}
                     openshift_master_cluster_public_hostname=openshift.${AWS::AccountId}.${PublicHostedZone}
+                    openshift_disable_check=memory_availability
                     openshift_router_selector='region=infra'
                     openshift_registry_selector='region=infra'
                     openshift_examples_modify_imagestreams=true
-                    openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift Packages', 'baseurl': 'https://master.internal.aws.testdrive.openshift.com', 'enabled': 1, 'gpgcheck': 0}]
+                    openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift_Packages', 'baseurl': 'http://master.internal.aws.testdrive.openshift.com/repo', 'enabled': 1, 'gpgcheck': 0}]
                     openshift_metrics_install_metrics=false
                     #metrics_openshift_metrics_install_metrics=true
                     #metrics_openshift_metrics_cassandra_storage_type=pv

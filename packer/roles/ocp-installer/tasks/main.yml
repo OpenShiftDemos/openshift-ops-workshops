@@ -8,17 +8,23 @@
       - git
       - net-tools
       - bind-utils
-      - etcd
-      - docker
       - iptables-services
       - bridge-utils
       - bash-completion
-      - atomic-openshift-clients
       - dnsmasq
-      - atomic-openshift-utils-3.7.14-1.git.0.4b35b2d.el7.noarch 
+      - haveged
+      - openshift-ansible-roles-3.7.14-1.git.0.4b35b2d.el7.noarch
+      - openshift-ansible-docs-3.7.14-1.git.0.4b35b2d.el7.noarch
+      - openshift-ansible-lookup-plugins-3.7.14-1.git.0.4b35b2d.el7.noarch
+      - openshift-ansible-filter-plugins-3.7.14-1.git.0.4b35b2d.el7.noarch
+      - openshift-ansible-3.7.14-1.git.0.4b35b2d.el7.noarch
+      - atomic-openshift-utils-3.7.14-1.git.0.4b35b2d.el7.noarch
+      - atomic-openshift-3.7.14-1.git.0.593a50e.el7.x86_64
       - atomic-openshift-excluder-3.7.14-1.git.0.593a50e.el7.noarch
       - atomic-openshift-docker-excluder-3.7.14-1.git.0.593a50e.el7.noarch
-      - haveged
+      - openshift-ansible-callback-plugins-3.7.14-1.git.0.4b35b2d.el7.noarch
+      - openshift-ansible-playbooks-3.7.14-1.git.0.4b35b2d.el7.noarch
+      - atomic-openshift-clients-3.7.14-1.git.0.593a50e.el7.x86_64
 
   - name: remove firewalld
     yum: name=firewalld state=absent

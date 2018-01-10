@@ -8,5 +8,6 @@
     with_items:
       - python-pip
       - python-setuptools
+      - haveged
 
 ...

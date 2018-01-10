@@ -67,17 +67,17 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-a2bbe2d8
+      ami: ami-59f8a123
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-3300b44b 
+      ami: ami-aef94ed6 
     eu-west-1:
-      ami: ami-a4a231dd
+      ami: ami-4b47d432
     eu-central-1:
-      ami: ami-1149db7e
+      ami: ami-1079eb7f
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:

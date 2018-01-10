@@ -1,8 +1,5 @@
 ---
 
-- name: install ansible
-  yum: name=ansible-2.3.2.0-2.el7.noarch state=present
-
 - name: disable tty requirement for cloud-user
   lineinfile:
     line: Defaults:cloud-user !requiretty

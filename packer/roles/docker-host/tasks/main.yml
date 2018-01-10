@@ -11,6 +11,12 @@
   - name: create docker storage config
     copy: src=docker-storage-setup dest=/etc/sysconfig/
 
+  - name: install skopeo while extras enabled
+    yum: name=skopeo state=present
+
+  - name: install python-docker-py while extras enabled
+    yum: name=python-docker-py state=present
+
   - name: start docker
     service: name=docker state=started enabled=yes
 

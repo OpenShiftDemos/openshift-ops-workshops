@@ -15,6 +15,7 @@
     - { role: inventory-fixup-script, tags: ['inventory-fixup-script']}
     - { role: idm-install, tags: ['idm-install']}
     - { role: cns-deploy, tags: ['cns-deploy']}
+    - { role: etcd-workaround, tags: ['etcd-workaround']}
     - { role: workshopper, tags: ['workshopper']}
 
   tasks:

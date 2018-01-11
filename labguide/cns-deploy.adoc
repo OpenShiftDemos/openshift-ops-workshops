@@ -238,6 +238,12 @@ Answer the interactive prompts with *Y*.
 
 The deployment will take several minutes to complete. Especially the step "Waiting for GlusterFS pods to start" might take some time. On the command line the output should look like this:
 
+
+[NOTE]
+====
+Some of the output below contains auto-generated data, so references to UUIDs and pod
+names might be slightly different for you.
+====
 ----
 Welcome to the deployment tool for GlusterFS on Kubernetes and OpenShift.
 
@@ -320,10 +326,30 @@ Ready to create and provide GlusterFS volumes.
 <5> Node block devices are formatted as physical LVM volumes for later use by GlusterFS.
 <6> heketi is deployed in a pod as well.
 
-[NOTE]
+
+[WARNING]
 ====
-Some of the output contains auto-generated data, so references to UUIDs and pod
-names might be slightly different for you.
+Due to the type of environment we are running this lab (system clock skew can occur temporarily) in, it is possible that the `cns-deploy` calls fails with an error like this:
+
+----
+[...]
+Waiting for GlusterFS pods to start ... OK
+service "deploy-heketi" created
+route "deploy-heketi" created
+deploymentconfig "deploy-heketi" created
+Waiting for deploy-heketi pod to start ... OK
+Error: Unable to get topology information: Token used before issued
+Error loading the cluster topology.
+----
+
+In this case, clean up the installation with this command:
+
+----
+cns-deploy -n {{CNS_NAMESPACE}} -g /opt/lab/support/topology.json --admin-key '{{HEKETI_ADMIN_PW}}' --user-key '{{HEKETI_USER_PW}}' --abort
+----
+
+And re-run the command without the `--abort` switch.
+
 ====
 
 ### Verifying and Exploring CNS

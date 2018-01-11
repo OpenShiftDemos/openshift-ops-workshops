@@ -1,8 +1,5 @@
 ---
 
-- name: install ansible
-  yum: name=ansible state=present
-
 - name: disable tty requirement for cloud-user
   lineinfile:
     line: Defaults:cloud-user !requiretty

@@ -1,9 +1,5 @@
 ---
 
-- name: install dependencies
-  yum: name=docker-python state=present
-
-
 - name: download ose container images
   docker_image:
     name: "{{ src_registry }}/{{ item }}"
@@ -17,5 +13,26 @@
     name: "{{ item }}"
   with_items:
     - "{{ other_images }}"
+
+- name: install local repository packages
+  yum: name={{ item }} state=present
+  with_items:
+    - httpd 
+    - createrepo
+    - yum-utils
+
+- name: make repository directory
+  file: state=directory owner=apache group=apache mode=755 path=/var/www/html/repo
+
+- name: Download package
+  shell: yum reinstall --downloadonly "{{ item }}" --downloaddir=/var/www/html/repo
+  with_items:
+    - atomic-openshift-3.7.14-1.git.0.593a50e.el7.x86_64
+
+- name: own repository items
+  file: state=directory owner=apache group=apache mode=755 recurse=yes path=/var/www/html/repo
+
+- name: createrepo
+  shell: createrepo /var/www/html/repo
 
 ...

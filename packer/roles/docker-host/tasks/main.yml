@@ -1,12 +1,26 @@
 ---
+  - name: enable extras
+    shell: subscription-manager repos --enable rhel-7-server-extras-rpms
 
   - name: install docker
     yum: name=docker state=present
 
+  - name: install dependencies
+    yum: name=docker-python state=present
+
   - name: create docker storage config
     copy: src=docker-storage-setup dest=/etc/sysconfig/
 
+  - name: install skopeo while extras enabled
+    yum: name=skopeo state=present
+
+  - name: install python-docker-py while extras enabled
+    yum: name=python-docker-py state=present
+
   - name: start docker
     service: name=docker state=started enabled=yes
+
+  - name: disable extras
+    shell: subscription-manager repos --disable rhel-7-server-extras-rpms
 
 ...

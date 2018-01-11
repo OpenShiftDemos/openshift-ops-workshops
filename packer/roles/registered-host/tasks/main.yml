@@ -48,6 +48,9 @@
 - name: disable all default repositories
   shell: subscription-manager repos --disable="*"
 
+- name: attach pool because rcook system is hacky 
+  shell: subscription-manager attach --pool={{ GLUSTER_POOL }} 
+
 - name: enable all required repositories
   shell: subscription-manager repos --enable {{ rhsm_repos | join(" --enable ") }}
 

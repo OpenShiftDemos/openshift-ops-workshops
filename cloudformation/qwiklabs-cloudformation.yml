@@ -806,7 +806,6 @@ Resources:
                     openshift_examples_modify_imagestreams=true
                     openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift_Packages', 'baseurl': 'http://master.internal.aws.testdrive.openshift.com/repo', 'enabled': 1, 'gpgcheck': 0}]
                     openshift_metrics_install_metrics=false
-                    openshift_metrics_install_metrics=false
                     openshift_enable_service_catalog=false
                     #metrics_openshift_metrics_install_metrics=true
                     #metrics_openshift_metrics_cassandra_storage_type=pv

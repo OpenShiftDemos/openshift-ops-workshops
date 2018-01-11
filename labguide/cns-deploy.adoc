@@ -329,7 +329,7 @@ Ready to create and provide GlusterFS volumes.
 
 [WARNING]
 ====
-Due to the type of environment we are deploying in, it is possible that the `cns-deploy` calls fails with an error like this:
+Due to the type of environment we are running this lab (system clock skew can occur temporarily) in, it is possible that the `cns-deploy` calls fails with an error like this:
 
 ----
 [...]

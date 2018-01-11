@@ -67,17 +67,17 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-55faa22f 
+      ami: ami-cd055eb7
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-cba81fb3 
+      ami: ami-d48235ac 
     eu-west-1:
-      ami: ami-4fde4c36
+      ami: ami-c3e270ba
     eu-central-1:
-      ami: ami-331f8d5c
+      ami: ami-3a33a155
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
@@ -806,6 +806,8 @@ Resources:
                     openshift_examples_modify_imagestreams=true
                     openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift_Packages', 'baseurl': 'http://master.internal.aws.testdrive.openshift.com/repo', 'enabled': 1, 'gpgcheck': 0}]
                     openshift_metrics_install_metrics=false
+                    openshift_metrics_install_metrics=false
+                    openshift_enable_service_catalog=false
                     #metrics_openshift_metrics_install_metrics=true
                     #metrics_openshift_metrics_cassandra_storage_type=pv
                     #metrics_openshift_metrics_cassandra_pvc_size=10Gi

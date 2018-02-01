@@ -342,13 +342,29 @@ Error: Unable to get topology information: Token used before issued
 Error loading the cluster topology.
 ----
 
-In this case, clean up the installation with this command:
+In this case, clean up the installation with these commands:
 
 ----
 cns-deploy -n {{CNS_NAMESPACE}} -g /opt/lab/support/topology.json --admin-key '{{HEKETI_ADMIN_PW}}' --user-key '{{HEKETI_USER_PW}}' --abort
+
+ansible cns -m shell -a "dd if=/dev/zero of=/dev/xvdd bs=1M count=100 oflag=direct"
 ----
 
 And re-run the command without the `--abort` switch.
+
+It is also possible that the deployment routine doesn't wait long enough for the cluster to come up and `cns-deploy` may fail with this message:
+
+----
+[...]
+service "heketi" created
+route "heketi" created
+deploymentconfig "heketi" created
+Waiting for heketi pod to start ... OK
+Failed to communicate with heketi service.
+Please verify that a router has been properly configured.
+----
+
+This error is due to timeout set too short. It can safely be ignored. Please proceed with the below instructions where we will explicitly verify that the service is indeed up and responding to API requests.
 
 ====
 

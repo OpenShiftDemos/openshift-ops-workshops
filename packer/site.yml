@@ -14,7 +14,7 @@
     - { role: master-cert, tags: ['master-cert']}
     - { role: inventory-fixup-script, tags: ['inventory-fixup-script']}
     - { role: idm-install, tags: ['idm-install']}
-    - { role: cns-deploy, tags: ['cns-deploy']}
+    - { role: container-native-storage, tags: ['container-native-storage']}
     - { role: etcd-workaround, tags: ['etcd-workaround']}
     - { role: workshopper, tags: ['workshopper']}
 

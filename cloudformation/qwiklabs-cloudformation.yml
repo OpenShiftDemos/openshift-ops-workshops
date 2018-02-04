@@ -432,7 +432,6 @@ Resources:
         ToPort: 65535
         CidrIp: 0.0.0.0/0
 
-
   MasterSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -1078,7 +1077,6 @@ Resources:
               mounts:
               - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
-
 
   InfraNode1:
     Type: AWS::EC2::Instance

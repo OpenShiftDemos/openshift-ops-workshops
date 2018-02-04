@@ -1,9 +1,0 @@
-@@ -58,6 +58,8 @@
-         labels:
-           glusterfs: heketi-pod
-       spec:
-+        nodeSelector:
-+          region: infra
-         serviceAccountName: heketi-service-account
-         containers:
-         - name: heketi

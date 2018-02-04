@@ -1,9 +1,0 @@
-@@ -64,6 +64,8 @@
-           glusterfs: heketi-pod
-           deploy-heketi: support
-       spec:
-+        nodeSelector:
-+          region: infra
-         serviceAccountName: heketi-service-account
-         containers:
-         - name: deploy-heketi

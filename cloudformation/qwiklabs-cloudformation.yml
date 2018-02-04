@@ -73,7 +73,7 @@ Mappings:
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-d48235ac 
+      ami: ami-d48235ac
     eu-west-1:
       ami: ami-c3e270ba
     eu-central-1:
@@ -786,6 +786,7 @@ Resources:
                     masters
                     nodes
                     etcd
+                    glusterfs
                     #scaleup_new_nodes
 
                     [OSEv3:vars]
@@ -805,6 +806,9 @@ Resources:
                     openshift_registry_selector='region=infra'
                     openshift_examples_modify_imagestreams=true
                     openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift_Packages', 'baseurl': 'http://master.internal.aws.testdrive.openshift.com/repo', 'enabled': 1, 'gpgcheck': 0}]
+                    openshift_storage_glusterfs_namespace=app-storage
+                    openshift_storage_glusterfs_storageclass=true
+                    openshift_storage_glusterfs_block_deploy=false
                     openshift_metrics_install_metrics=false
                     openshift_enable_service_catalog=false
                     #metrics_openshift_metrics_install_metrics=true
@@ -836,15 +840,15 @@ Resources:
                     #scaleup_node05.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node05.internal.${PublicHostedZone} openshift_public_hostname=node05.${AWS::AccountId}.${PublicHostedZone}
                     #scaleup_node06.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node06.internal.${PublicHostedZone} openshift_public_hostname=node06.${AWS::AccountId}.${PublicHostedZone}
 
-                    [cns]
-                    node01.internal.${PublicHostedZone}
-                    node02.internal.${PublicHostedZone}
-                    node03.internal.${PublicHostedZone}
-                    #addcns_node04.internal.${PublicHostedZone}
-                    #addcns_node05.internal.${PublicHostedZone}
-                    #addcns_node06.internal.${PublicHostedZone}
+                    [glusterfs]
+                    node01.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode1.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
+                    node02.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode2.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
+                    node03.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode3.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
+                    #addcns_node04.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode1.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
+                    #addcns_node05.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode2.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
+                    #addcns_node06.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode3.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
 
-                    [cns:vars]
+                    [glusterfs:vars]
                     ansible_become=true
 
                     [idm]

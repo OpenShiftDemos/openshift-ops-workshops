@@ -1058,22 +1058,6 @@ Resources:
                   path: /opt/lab/support/second-cns-storageclass.yaml
                   owner: cloud-user:cloud-user
 
-                - content: |
-                    kind: PersistentVolumeClaim
-                    apiVersion: v1
-                    metadata:
-                      name: my-container-storage-silver
-                      annotations:
-                        volume.beta.kubernetes.io/storage-class: cns-silver
-                    spec:
-                      accessModes:
-                      - ReadWriteOnce
-                      resources:
-                        requests:
-                          storage: 1Gi
-                  path: /opt/lab/support/cns-silver-pvc.yaml
-                  owner: cloud-user:cloud-user
-
               mounts:
               - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }

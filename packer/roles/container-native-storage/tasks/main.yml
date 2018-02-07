@@ -1,0 +1,72 @@
+---
+
+- name: install CNS deployment tools
+  yum: name={{ item }} state=present
+  with_items:
+    - cns-deploy-5.0.0-59.el7rhgs
+    - heketi-client-5.0.0-19.el7rhgs
+
+###
+### Temporary workaround until openshift-ansible is able to fully deploy
+### gluster-block
+###
+
+- name: install dependencies
+  yum: name={{ item }} state=present
+  with_items:
+    - iscsi-initiator-utils
+    - device-mapper-multipath
+
+- name: enable multipathing
+  shell: mpathconf --enable
+  args:
+    creates: /etc/multipath.conf
+
+- name: configure iscsi multipathing
+  blockinfile:
+    path: /etc/multipath.conf
+    block: |
+     devices {
+              device {
+                      vendor "LIO-ORG"
+                      user_friendly_names "yes"
+                      path_grouping_policy "failover"
+                      path_selector "round-robin 0"
+                      failback immediate
+                      path_checker "tur"
+                      prio "const"
+                      no_path_retry 120
+                      rr_weight "uniform"
+              }
+      }
+
+- name: load required kernel modules
+  modprobe: name={{ item }} state=present
+  with_items:
+    - dm_thin_pool
+    - dm_multipath
+    - target_core_user
+
+- name: ensure kernel modules load a boot
+  lineinfile:
+    path: /etc/modules-load.d/{{ item }}.conf
+    line: "{{ item }}"
+    create: yes
+  with_items:
+    - dm_thin_pool
+    - dm_multipath
+    - target_core_user
+
+- name: copy gluster-block post-deploy fixes playbook
+  copy:
+    src: gluster-block-post-deploy-fixes.yml 
+    dest: /opt/lab/support/
+
+- name: start and enable rpcbind service
+  service: name=rpcbind state=started enabled=yes
+
+###
+### End Workaround
+###
+
+...

@@ -364,7 +364,7 @@ Failed to communicate with heketi service.
 Please verify that a router has been properly configured.
 ----
 
-This error is due to timeout set too short. It can safely be ignored. Please proceed with the below instructions where we will explicitly verify that the service is indeed up and responding to API requests.
+This error is due to a timeout set too short. It can safely be ignored. Please proceed with the below instructions where we will explicitly verify that the service is indeed up and responding to API requests.
 
 ====
 

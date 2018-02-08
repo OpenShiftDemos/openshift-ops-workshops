@@ -83,7 +83,7 @@ Mappings:
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: NOT_SUPPORTED
+      ami: ami-c1783cbd
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:

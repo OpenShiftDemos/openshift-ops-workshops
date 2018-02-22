@@ -1387,7 +1387,7 @@ Resources:
               - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
               - ansible master -m wait_for -a "path=/etc/origin/master/ipa-ca.crt timeout=600"
               - ansible localhost -m wait_for -a "port=80 host=localhost"
-              - ansible-playbok /usr/share/ansible/openshift_ansible/playbooks/deploy_cluster.yml
+              - ansible-playbok /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
               - 'curl -X PUT -H "Content-Type:" --data-binary "{ \"Status\" : \"SUCCESS\", \"Reason\": \"Configuration Complete\", \"UniqueId\": \"GuideNode\",\"Data\": \"GuideNode has reached all instances and generated lab guide\" }" "${WaitHandle}"'
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
 

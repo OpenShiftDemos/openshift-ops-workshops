@@ -41,7 +41,7 @@ future use.
 You should be able to "ping" the first 3 OpenShift App nodes using Ansible:
 
 ----
-ansible cns -m ping
+ansible glusterfs -m ping
 ----
 
 This should result in the following:

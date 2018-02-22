@@ -1384,6 +1384,7 @@ Resources:
               - ansible localhost -m wait_for -a "port=22 host=${WorkerNode5.PrivateIp}"
               - ansible localhost -m wait_for -a "port=22 host=${WorkerNode6.PrivateIp}"
               - ansible localhost -m wait_for -a "port=22 host=${InfraNode1.PrivateIp}"
+              - ansible localhost -m wait_for -a "port=22 host=${Master1.PrivateIp}"
               - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
               - ansible masters -m wait_for -a "path=/etc/origin/master/ipa-ca.crt timeout=600"
               - ansible localhost -m wait_for -a "port=80 host=localhost"

@@ -1190,6 +1190,8 @@ Resources:
 
   GuideNode:
     Type: AWS::EC2::Instance
+    DependsOn:
+      - Route53Records
     Properties:
       ImageId:
         Fn::FindInMap:

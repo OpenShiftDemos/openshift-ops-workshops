@@ -748,10 +748,6 @@ Resources:
           !Sub
             - |
               #cloud-config
-              cloud_config_modules:
-              - disk_setup
-              - mounts
-              - runcmd
 
               fs_setup:
               - label: etcd_storage
@@ -760,7 +756,6 @@ Resources:
                 partition: auto
 
               fqdn: master.internal.${PublicHostedZone}
-
 
               write_files:
               - content: |
@@ -772,28 +767,28 @@ Resources:
                 owner: root:root
 
               - content: |
-                    kind: LDAPSyncConfig
-                    apiVersion: v1
-                    url: ldap://idm.internal.aws.testdrive.openshift.com
-                    ca: /etc/origin/master/ipa-ca.crt
-                    bindDN: uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
-                    bindPassword: bindingpassword
-                    rfc2307:
-                      groupsQuery:
-                        baseDN: cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
-                        derefAliases: never
-                        filter: '(|(cn=ose-*))'
-                      groupUIDAttribute: dn
-                      groupNameAttributes:
-                      - cn
-                      groupMembershipAttributes:
-                      - member
-                      usersQuery:
-                        baseDN: cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
-                        derefAliases: never
-                      userUIDAttribute: dn
-                      userNameAttributes:
-                      - uid
+                  kind: LDAPSyncConfig
+                  apiVersion: v1
+                  url: ldap://idm.internal.aws.testdrive.openshift.com
+                  ca: /etc/origin/master/ipa-ca.crt
+                  bindDN: uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
+                  bindPassword: bindingpassword
+                  rfc2307:
+                    groupsQuery:
+                      baseDN: cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
+                      derefAliases: never
+                      filter: '(|(cn=ose-*))'
+                    groupUIDAttribute: dn
+                    groupNameAttributes:
+                    - cn
+                    groupMembershipAttributes:
+                    - member
+                    usersQuery:
+                      baseDN: cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
+                      derefAliases: never
+                    userUIDAttribute: dn
+                    userNameAttributes:
+                    - uid
                   path: /opt/lab/support/groupsync.yaml
                   owner: cloud-user:cloud-user
 

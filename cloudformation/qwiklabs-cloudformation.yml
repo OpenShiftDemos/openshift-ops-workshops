@@ -765,7 +765,6 @@ Resources:
                   EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
                 path: /etc/sysconfig/docker-storage-setup
                 owner: root:root
-
               - content: |
                   kind: LDAPSyncConfig
                   apiVersion: v1
@@ -791,7 +790,6 @@ Resources:
                     - uid
                   path: /opt/lab/support/groupsync.yaml
                   owner: cloud-user:cloud-user
-
               - content: |
                   {
                       "clusters": [
@@ -903,7 +901,6 @@ Resources:
                   }
                 path: /opt/lab/support/topology-extended.json
                 owner: cloud-user:cloud-user
-
               - content: |
                   OCP_ROUTING_SUFFIX: "apps.${AWS::AccountId}.${PublicHostedZone}"
                   NODE_BRICK_DEVICE: "/dev/xvdd"
@@ -929,7 +926,6 @@ Resources:
                   WEB_CONSOLE_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
                   API_HEALTH_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                 path: /opt/lab/environment.yml
-
               - content: |
                   apiVersion: storage.k8s.io/v1beta1
                   kind: StorageClass
@@ -948,25 +944,23 @@ Resources:
                     secretName: "cns-secret"
                 path: /opt/lab/support/cns-storageclass.yaml
                 owner: cloud-user:cloud-user
-
               - content: |
-                    apiVersion: storage.k8s.io/v1beta1
-                    kind: StorageClass
-                    metadata:
-                      name: cns-silver
-                      annotations:
-                    provisioner: kubernetes.io/glusterfs
-                    parameters:
-                      resturl: "http://heketi-container-native-storage.apps.${AWS::AccountId}.${PublicHostedZone}"
-                      restauthenabled: "true"
-                      restuser: "admin"
-                      volumetype: "replicate:3"
-                      clusterid: "INSERT-CLUSTER-ID-HERE"
-                      secretNamespace: "default"
-                      secretName: "cns-secret"
-                  path: /opt/lab/support/second-cns-storageclass.yaml
-                  owner: cloud-user:cloud-user
-
+                  apiVersion: storage.k8s.io/v1beta1
+                  kind: StorageClass
+                  metadata:
+                    name: cns-silver
+                    annotations:
+                  provisioner: kubernetes.io/glusterfs
+                  parameters:
+                    resturl: "http://heketi-container-native-storage.apps.${AWS::AccountId}.${PublicHostedZone}"
+                    restauthenabled: "true"
+                    restuser: "admin"
+                    volumetype: "replicate:3"
+                    clusterid: "INSERT-CLUSTER-ID-HERE"
+                    secretNamespace: "default"
+                    secretName: "cns-secret"
+                path: /opt/lab/support/second-cns-storageclass.yaml
+                owner: cloud-user:cloud-user
               - content: |
                   [OSEv3:children]
                   masters

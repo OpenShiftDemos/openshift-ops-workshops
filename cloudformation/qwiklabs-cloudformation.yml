@@ -723,7 +723,6 @@ Resources:
         - ami
       InstanceType:
         Ref: MasterInstanceType
-      SubnetId: !Ref PublicSubnet1
       NetworkInterfaces:
         - NetworkInterfaceId: !Ref Master1NetworkInterface
           DeviceIndex: '0'
@@ -1102,7 +1101,6 @@ Resources:
         - ami
       InstanceType:
         Ref: InfraInstanceType
-      SubnetId: !Ref PublicSubnet1
       NetworkInterfaces:
         - NetworkInterfaceId: !Ref InfraNode1NetworkInterface
           DeviceIndex: '0'
@@ -1188,7 +1186,6 @@ Resources:
         - ami
       InstanceType:
         Ref: IdmInstanceType
-      SubnetId: !Ref PublicSubnet1
       NetworkInterfaces:
         - NetworkInterfaceId: !Ref IdmNode1NetworkInterface
           DeviceIndex: '0'
@@ -1248,7 +1245,6 @@ Resources:
         - ami
       InstanceType:
         Ref: GuideInstanceType
-      SubnetId: !Ref PublicSubnet1
       NetworkInterfaces:
         - NetworkInterfaceId: !Ref SupportNodeNetworkInterface
           DeviceIndex: '0'
@@ -1464,7 +1460,6 @@ Resources:
         - ami
       InstanceType:
         Ref: WorkerInstanceType
-      SubnetId: !Ref PublicSubnet1
       NetworkInterfaces:
         - NetworkInterfaceId: !Ref WorkerNode1NetworkInterface
           DeviceIndex: '0'
@@ -1557,7 +1552,6 @@ Resources:
         - ami
       InstanceType:
         Ref: WorkerInstanceType
-      SubnetId: !Ref PublicSubnet2
       NetworkInterfaces:
         - NetworkInterfaceId: !Ref WorkerNode2NetworkInterface
           DeviceIndex: '0'
@@ -1650,7 +1644,6 @@ Resources:
         - ami
       InstanceType:
         Ref: WorkerInstanceType
-      SubnetId: !Ref PublicSubnet3
       NetworkInterfaces:
         - NetworkInterfaceId: !Ref WorkerNode3NetworkInterface
           DeviceIndex: '0'
@@ -1841,7 +1834,6 @@ Resources:
         - ami
       InstanceType:
         Ref: CNSInstanceType
-      SubnetId: !Ref PublicSubnet2
       NetworkInterfaces:
         - NetworkInterfaceId: !Ref WorkerNode5NetworkInterface
           DeviceIndex: '0'
@@ -1939,7 +1931,6 @@ Resources:
         - ami
       InstanceType:
         Ref: CNSInstanceType
-      SubnetId: !Ref PublicSubnet3
       NetworkInterfaces:
         - NetworkInterfaceId: !Ref WorkerNode6NetworkInterface
           DeviceIndex: '0'

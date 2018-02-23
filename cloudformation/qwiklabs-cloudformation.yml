@@ -153,7 +153,6 @@ Resources:
       DhcpOptionsId:
         Ref: DhcpOptions
 
-
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -530,16 +529,16 @@ Resources:
   InternalRoute53Records:
     Type: AWS::Route53::RecordSetGroup
     DependsOn:
-      - Master1
-      - InfraNode1
-      - IdmNode1
-      - WorkerNode1
-      - WorkerNode2
-      - WorkerNode3
-      - WorkerNode4
-      - WorkerNode5
-      - WorkerNode6
       - InternalDNS
+      - Master1NetworkInterface
+      - InfraNode1NetworkInterface
+      - IdmNode1NetworkInterface
+      - WorkerNode1NetworkInterface
+      - WorkerNode2NetworkInterface
+      - WorkerNode3NetworkInterface
+      - WorkerNode4NetworkInterface
+      - WorkerNode5NetworkInterface
+      - WorkerNode6NetworkInterface
     Properties:
       HostedZoneName: !Join ['', [internal., !Ref 'PublicHostedZone', .]]
       RecordSets:
@@ -547,62 +546,62 @@ Resources:
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt Master1.PrivateIp
+          - !GetAtt Master1NetworkInterface.PrimaryPrivateIpAddress
 
         - Name: !Join ['', [infra.internal., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt InfraNode1.PrivateIp
+          - !GetAtt InfraNode1NetworkInterface.PrimaryPrivateIpAddress
 
         - Name: !Join ['', [idm.internal., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt IdmNode1.PrivateIp
+          - !GetAtt IdmNode1NetworkInterface.PrimaryPrivateIpAddress
 
         - Name: !Join ['', [support.internal., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt GuideNode.PrivateIp
+          - !GetAtt SupportNodeNetworkInterface.PrimaryPrivateIpAddress
 
         - Name: !Join ['', [node01.internal., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt WorkerNode1.PrivateIp
+          - !GetAtt WorkerNode1NetworkInterface.PrimaryPrivateIpAddress
 
         - Name: !Join ['', [node02.internal., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt WorkerNode2.PrivateIp
+          - !GetAtt WorkerNode2NetworkInterface.PrimaryPrivateIpAddress
 
         - Name: !Join ['', [node03.internal., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt WorkerNode3.PrivateIp
+          - !GetAtt WorkerNode3NetworkInterface.PrimaryPrivateIpAddress
 
         - Name: !Join ['', [node04.internal., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt WorkerNode4.PrivateIp
+          - !GetAtt WorkerNode4NetworkInterface.PrimaryPrivateIpAddress
 
 
         - Name: !Join ['', [node05.internal., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt WorkerNode5.PrivateIp
+          - !GetAtt WorkerNode5NetworkInterface.PrimaryPrivateIpAddress
 
         - Name: !Join ['', [node06.internal., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt WorkerNode6.PrivateIp
+          - !GetAtt WorkerNode6NetworkInterface.PrimaryPrivateIpAddress
 
   Route53Records:
     Type: AWS::Route53::RecordSetGroup
@@ -616,6 +615,7 @@ Resources:
       - WorkerNode4
       - WorkerNode5
       - WorkerNode6
+      - SupportNode
     Properties:
       HostedZoneName: !Join ['', [!Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
       RecordSets:
@@ -653,7 +653,7 @@ Resources:
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt GuideNode.PublicIp
+          - !GetAtt SupportNode.PublicIp
 
         - Name: !Join ['', [node01., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
@@ -696,10 +696,29 @@ Resources:
 
   WaitCondition:
     Type: AWS::CloudFormation::WaitCondition
-    DependsOn: GuideNode
+    DependsOn: SupportNode
     Properties:
       Handle: !Ref WaitHandle
       Timeout: '1800'
+
+  Master1NetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      GroupSet:
+        - !Ref MasterSecurityGroup
+      SourceDestCheck: 'false'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  Master1NetworkInterfaceAttach:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    Properties:
+      InstanceId: !Ref Master1
+      NetworkInterfaceId: !Ref Master1NetworkInterface
+      DeviceIndex: 0
 
   Master1:
     Type: AWS::EC2::Instance
@@ -711,12 +730,8 @@ Resources:
         - ami
       InstanceType:
         Ref: MasterInstanceType
-      SubnetId:
-        Ref: PublicSubnet1
       KeyName:
         Ref: KeyName
-      SecurityGroupIds:
-        - !GetAtt MasterSecurityGroup.GroupId
       Tags:
       - Key: Application
         Value:
@@ -1068,6 +1083,25 @@ Resources:
               - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
 
+  InfraNode1NetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      GroupSet:
+        - !Ref NodeSecurityGroup
+      SourceDestCheck: 'false'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  InfraNode1NetworkInterfaceAttach:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    Properties:
+      InstanceId: !Ref InfraNode1
+      NetworkInterfaceId: !Ref InfraNode1NetworkInterface
+      DeviceIndex: 0
+
   InfraNode1:
     Type: AWS::EC2::Instance
     Properties:
@@ -1078,12 +1112,8 @@ Resources:
         - ami
       InstanceType:
         Ref: InfraInstanceType
-      SubnetId:
-        Ref: PublicSubnet1
       KeyName:
         Ref: KeyName
-      SecurityGroupIds:
-        - !GetAtt NodeSecurityGroup.GroupId
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -1142,6 +1172,25 @@ Resources:
               default_user:
                 name: cloud-user
 
+  IdmNode1NetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      GroupSet:
+        - !Ref IdmSecurityGroup
+      SourceDestCheck: 'false'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  IdmNode1NetworkInterfaceAttach:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    Properties:
+      InstanceId: !Ref IdmNode1
+      NetworkInterfaceId: !Ref IdmNode1NetworkInterface
+      DeviceIndex: 0
+
   IdmNode1:
     Type: AWS::EC2::Instance
     Properties:
@@ -1156,8 +1205,6 @@ Resources:
         Ref: PublicSubnet1
       KeyName:
         Ref: KeyName
-      SecurityGroupIds:
-        - !GetAtt IdmSecurityGroup.GroupId
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -1188,10 +1235,29 @@ Resources:
             - /usr/local/bin/idm-install > /var/log/idm-install.log
             - reboot
 
-  GuideNode:
+  SupportNodeNetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      GroupSet:
+        - !Ref NodeSecurityGroup
+      SourceDestCheck: 'false'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  SupportNodeNetworkInterfaceAttach:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    Properties:
+      InstanceId: !Ref SupportNode
+      NetworkInterfaceId: !Ref SupportNodeNetworkInterface
+      DeviceIndex: 0
+
+  SupportNode:
     Type: AWS::EC2::Instance
     DependsOn:
-      - Route53Records
+      - InternalRoute53Records
     Properties:
       ImageId:
         Fn::FindInMap:
@@ -1200,12 +1266,8 @@ Resources:
         - ami
       InstanceType:
         Ref: GuideInstanceType
-      SubnetId:
-        Ref: PublicSubnet1
       KeyName:
         Ref: KeyName
-      SecurityGroupIds:
-        - !GetAtt NodeSecurityGroup.GroupId
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -1391,8 +1453,27 @@ Resources:
               - ansible masters -m wait_for -a "path=/etc/origin/master/ipa-ca.crt timeout=600"
               - ansible localhost -m wait_for -a "port=80 host=localhost"
               - ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
-              - 'curl -X PUT -H "Content-Type:" --data-binary "{ \"Status\" : \"SUCCESS\", \"Reason\": \"Configuration Complete\", \"UniqueId\": \"GuideNode\",\"Data\": \"GuideNode has reached all instances and generated lab guide\" }" "${WaitHandle}"'
+              - 'curl -X PUT -H "Content-Type:" --data-binary "{ \"Status\" : \"SUCCESS\", \"Reason\": \"Configuration Complete\", \"UniqueId\": \"SupportNode\",\"Data\": \"SupportNode has reached all instances and generated lab guide\" }" "${WaitHandle}"'
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
+
+  WorkerNode1NetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      GroupSet:
+        - !Ref NodeSecurityGroup
+      SourceDestCheck: 'false'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  WorkerNode1NetworkInterfaceAttach:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    Properties:
+      InstanceId: !Ref WorkerNode1
+      NetworkInterfaceId: !Ref WorkerNode1NetworkInterface
+      DeviceIndex: 0
 
   WorkerNode1:
     Type: AWS::EC2::Instance
@@ -1404,12 +1485,8 @@ Resources:
         - ami
       InstanceType:
         Ref: WorkerInstanceType
-      SubnetId:
-        Ref: PublicSubnet1
       KeyName:
         Ref: KeyName
-      SecurityGroupIds:
-        - !GetAtt NodeSecurityGroup.GroupId
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -1475,6 +1552,25 @@ Resources:
               default_user:
                 name: cloud-user
 
+  WorkerNode2NetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      GroupSet:
+        - !Ref NodeSecurityGroup
+      SourceDestCheck: 'false'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  WorkerNode2NetworkInterfaceAttach:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    Properties:
+      InstanceId: !Ref WorkerNode2
+      NetworkInterfaceId: !Ref WorkerNode2NetworkInterface
+      DeviceIndex: 0
+
   WorkerNode2:
     Type: AWS::EC2::Instance
     Properties:
@@ -1485,12 +1581,8 @@ Resources:
         - ami
       InstanceType:
         Ref: WorkerInstanceType
-      SubnetId:
-        Ref: PublicSubnet2
       KeyName:
         Ref: KeyName
-      SecurityGroupIds:
-        - !GetAtt NodeSecurityGroup.GroupId
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -1555,6 +1647,25 @@ Resources:
             system_info:
               default_user:
                 name: cloud-user
+
+  WorkerNode3NetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref PublicSubnet3
+      GroupSet:
+        - !Ref NodeSecurityGroup
+      SourceDestCheck: 'false'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  WorkerNode3NetworkInterfaceAttach:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    Properties:
+      InstanceId: !Ref WorkerNode3
+      NetworkInterfaceId: !Ref WorkerNode3NetworkInterface
+      DeviceIndex: 0
 
   WorkerNode3:
     Type: AWS::EC2::Instance
@@ -1637,6 +1748,25 @@ Resources:
               default_user:
                 name: cloud-user
 
+  WorkerNode4NetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      GroupSet:
+        - !Ref NodeSecurityGroup
+      SourceDestCheck: 'false'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  WorkerNode4NetworkInterfaceAttach:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    Properties:
+      InstanceId: !Ref WorkerNode4
+      NetworkInterfaceId: !Ref WorkerNode4NetworkInterface
+      DeviceIndex: 0
+
   WorkerNode4:
     Type: AWS::EC2::Instance
     Properties:
@@ -1647,12 +1777,8 @@ Resources:
         - ami
       InstanceType:
         Ref: CNSInstanceType
-      SubnetId:
-        Ref: PublicSubnet1
       KeyName:
         Ref: KeyName
-      SecurityGroupIds:
-        - !GetAtt NodeSecurityGroup.GroupId
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -1723,6 +1849,25 @@ Resources:
               default_user:
                 name: cloud-user
 
+  WorkerNode5NetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      GroupSet:
+        - !Ref NodeSecurityGroup
+      SourceDestCheck: 'false'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  WorkerNode5NetworkInterfaceAttach:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    Properties:
+      InstanceId: !Ref WorkerNode5
+      NetworkInterfaceId: !Ref WorkerNode5NetworkInterface
+      DeviceIndex: 0
+
   WorkerNode5:
     Type: AWS::EC2::Instance
     Properties:
@@ -1733,12 +1878,8 @@ Resources:
         - ami
       InstanceType:
         Ref: CNSInstanceType
-      SubnetId:
-        Ref: PublicSubnet2
       KeyName:
         Ref: KeyName
-      SecurityGroupIds:
-        - !GetAtt NodeSecurityGroup.GroupId
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -1809,6 +1950,25 @@ Resources:
               default_user:
                 name: cloud-user
 
+  WorkerNode6NetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref PublicSubnet3
+      GroupSet:
+        - !Ref NodeSecurityGroup
+      SourceDestCheck: 'false'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
+  WorkerNode6NetworkInterfaceAttach:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    Properties:
+      InstanceId: !Ref WorkerNode6
+      NetworkInterfaceId: !Ref WorkerNode6NetworkInterface
+      DeviceIndex: 0
+
   WorkerNode6:
     Type: AWS::EC2::Instance
     Properties:
@@ -1819,12 +1979,8 @@ Resources:
         - ami
       InstanceType:
         Ref: CNSInstanceType
-      SubnetId:
-        Ref: PublicSubnet3
       KeyName:
         Ref: KeyName
-      SecurityGroupIds:
-        - !GetAtt NodeSecurityGroup.GroupId
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:

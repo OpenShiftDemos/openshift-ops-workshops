@@ -1024,7 +1024,11 @@ Resources:
                     openshift_storage_glusterfs_namespace=storage
                     openshift_storage_glusterfs_storageclass=true
                     openshift_storage_glusterfs_storageclass_default=true
-                    openshift_storage_glusterfs_block_deploy=false
+                    openshift_storage_glusterfs_block_deploy=true
+                    openshift_storage_glusterfs_block_host_vol_size=30
+                    openshift_hosted_registry_storage_volume_size=10Gi
+                    openshift_hosted_registry_storage_glusterfs_swap=true
+                    openshift_hosted_registry_storage_glusterfs_swapcopy=true
                     openshift_metrics_install_metrics=false
                     openshift_enable_service_catalog=false
                     #metrics_openshift_metrics_install_metrics=true

@@ -1049,6 +1049,8 @@ Resources:
                   name: cloud-user
 
               runcmd:
+              - ansible --become localhost -m file -a "path=/tmp/ansible.log state=touch mode=0777"
+              - ansible --become localhost -m lineinfile -a "path=/etc/ansible/ansible.cfg regexp='^log_path' line='log_path = /tmp/ansible.log' state=present"
               - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
               - mkdir -p /var/lib/etcd
               - git clone -b ${RepoBranch} https://github.com/${RepoAccount}/openshift-cns-testdrive.git /opt/lab/code

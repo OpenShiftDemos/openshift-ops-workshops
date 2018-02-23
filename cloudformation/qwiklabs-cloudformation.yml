@@ -797,164 +797,164 @@ Resources:
                   path: /opt/lab/support/groupsync.yaml
                   owner: cloud-user:cloud-user
 
-                - content: |
-                    {
-                        "clusters": [
-                            {
-                                "nodes": [
-                                    {
-                                        "node": {
-                                            "hostnames": {
-                                                "manage": [
-                                                    "node01.internal.${PublicHostedZone}"
-                                                ],
-                                                "storage": [
-                                                    "${WorkerNode1.PrivateIp}"
-                                                ]
-                                            },
-                                            "zone": 1
-                                        },
-                                        "devices": [
-                                            "/dev/xvdd"
-                                        ]
-                                    },
-                                    {
-                                        "node": {
-                                            "hostnames": {
-                                                "manage": [
-                                                    "node02.internal.${PublicHostedZone}"
-                                                ],
-                                                "storage": [
-                                                    "${WorkerNode2.PrivateIp}"
-                                                ]
-                                            },
-                                            "zone": 2
-                                        },
-                                        "devices": [
-                                            "/dev/xvdd"
-                                        ]
-                                    },
-                                    {
-                                        "node": {
-                                            "hostnames": {
-                                                "manage": [
-                                                    "node03.internal.${PublicHostedZone}"
-                                                ],
-                                                "storage": [
-                                                    "${WorkerNode3.PrivateIp}"
-                                                ]
-                                            },
-                                            "zone": 3
-                                        },
-                                        "devices": [
-                                            "/dev/xvdd"
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "nodes": [
-                                    {
-                                        "node": {
-                                            "hostnames": {
-                                                "manage": [
-                                                    "node04.internal.${PublicHostedZone}"
-                                                ],
-                                                "storage": [
-                                                    "${WorkerNode4.PrivateIp}"
-                                                ]
-                                            },
-                                            "zone": 1
-                                        },
-                                        "devices": [
-                                            "/dev/xvdd"
-                                        ]
-                                    },
-                                    {
-                                        "node": {
-                                            "hostnames": {
-                                                "manage": [
-                                                    "node05.internal.${PublicHostedZone}"
-                                                ],
-                                                "storage": [
-                                                    "${WorkerNode5.PrivateIp}"
-                                                ]
-                                            },
-                                            "zone": 2
-                                        },
-                                        "devices": [
-                                            "/dev/xvdd"
-                                        ]
-                                    },
-                                    {
-                                        "node": {
-                                            "hostnames": {
-                                                "manage": [
-                                                    "node06.internal.${PublicHostedZone}"
-                                                ],
-                                                "storage": [
-                                                    "${WorkerNode6.PrivateIp}"
-                                                ]
-                                            },
-                                            "zone": 3
-                                        },
-                                        "devices": [
-                                            "/dev/xvdd"
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                  path: /opt/lab/support/topology-extended.json
-                  owner: cloud-user:cloud-user
+              - content: |
+                  {
+                      "clusters": [
+                          {
+                              "nodes": [
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "node01.internal.${PublicHostedZone}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode1.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 1
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  },
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "node02.internal.${PublicHostedZone}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode2.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 2
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  },
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "node03.internal.${PublicHostedZone}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode3.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 3
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  }
+                              ]
+                          },
+                          {
+                              "nodes": [
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "node04.internal.${PublicHostedZone}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode4.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 1
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  },
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "node05.internal.${PublicHostedZone}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode5.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 2
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  },
+                                  {
+                                      "node": {
+                                          "hostnames": {
+                                              "manage": [
+                                                  "node06.internal.${PublicHostedZone}"
+                                              ],
+                                              "storage": [
+                                                  "${WorkerNode6.PrivateIp}"
+                                              ]
+                                          },
+                                          "zone": 3
+                                      },
+                                      "devices": [
+                                          "/dev/xvdd"
+                                      ]
+                                  }
+                              ]
+                          }
+                      ]
+                  }
+                path: /opt/lab/support/topology-extended.json
+                owner: cloud-user:cloud-user
 
-                - content: |
-                    OCP_ROUTING_SUFFIX: "apps.${AWS::AccountId}.${PublicHostedZone}"
-                    NODE_BRICK_DEVICE: "/dev/xvdd"
-                    NODE_BRICK_DEVICE2: "/dev/xvde"
-                    CNS_NAMESPACE: "container-native-storage"
-                    HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
-                    HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
-                    HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
-                    CNS_STORAGECLASS: "cns-gold"
-                    CNS_STORAGECLASS2: "cns-silver"
-                    NODE4_EXTERNAL_FQDN: "node04.${AWS::AccountId}.${PublicHostedZone}"
-                    NODE5_EXTERNAL_FQDN: "node05.${AWS::AccountId}.${PublicHostedZone}"
-                    NODE6_EXTERNAL_FQDN: "node06.${AWS::AccountId}.${PublicHostedZone}"
-                    MASTER_INTERNAL_FQDN: "master.internal.${PublicHostedZone}"
-                    INFRA_INTERNAL_FQDN: "infra.internal.${PublicHostedZone}"
-                    NODE1_INTERNAL_FQDN: "node01.internal.${PublicHostedZone}"
-                    NODE2_INTERNAL_FQDN: "node02.internal.${PublicHostedZone}"
-                    NODE3_INTERNAL_FQDN: "node03.internal.${PublicHostedZone}"
-                    NODE4_INTERNAL_FQDN: "node04.internal.${PublicHostedZone}"
-                    NODE5_INTERNAL_FQDN: "node05.internal.${PublicHostedZone}"
-                    NODE6_INTERNAL_FQDN: "node06.internal.${PublicHostedZone}"
-                    IDM_INTERNAL_FQDN: "idm.internal.${PublicHostedZone}"
-                    WEB_CONSOLE_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
-                    API_HEALTH_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
-                  path: /opt/lab/environment.yml
+              - content: |
+                  OCP_ROUTING_SUFFIX: "apps.${AWS::AccountId}.${PublicHostedZone}"
+                  NODE_BRICK_DEVICE: "/dev/xvdd"
+                  NODE_BRICK_DEVICE2: "/dev/xvde"
+                  CNS_NAMESPACE: "container-native-storage"
+                  HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
+                  HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
+                  HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
+                  CNS_STORAGECLASS: "cns-gold"
+                  CNS_STORAGECLASS2: "cns-silver"
+                  NODE4_EXTERNAL_FQDN: "node04.${AWS::AccountId}.${PublicHostedZone}"
+                  NODE5_EXTERNAL_FQDN: "node05.${AWS::AccountId}.${PublicHostedZone}"
+                  NODE6_EXTERNAL_FQDN: "node06.${AWS::AccountId}.${PublicHostedZone}"
+                  MASTER_INTERNAL_FQDN: "master.internal.${PublicHostedZone}"
+                  INFRA_INTERNAL_FQDN: "infra.internal.${PublicHostedZone}"
+                  NODE1_INTERNAL_FQDN: "node01.internal.${PublicHostedZone}"
+                  NODE2_INTERNAL_FQDN: "node02.internal.${PublicHostedZone}"
+                  NODE3_INTERNAL_FQDN: "node03.internal.${PublicHostedZone}"
+                  NODE4_INTERNAL_FQDN: "node04.internal.${PublicHostedZone}"
+                  NODE5_INTERNAL_FQDN: "node05.internal.${PublicHostedZone}"
+                  NODE6_INTERNAL_FQDN: "node06.internal.${PublicHostedZone}"
+                  IDM_INTERNAL_FQDN: "idm.internal.${PublicHostedZone}"
+                  WEB_CONSOLE_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
+                  API_HEALTH_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
+                path: /opt/lab/environment.yml
 
-                - content: |
-                    apiVersion: storage.k8s.io/v1beta1
-                    kind: StorageClass
-                    metadata:
-                      name: cns-gold
-                      annotations:
-                        storageclass.beta.kubernetes.io/is-default-class: "true"
-                    provisioner: kubernetes.io/glusterfs
-                    parameters:
-                      resturl: "http://heketi-container-native-storage.apps.${AWS::AccountId}.${PublicHostedZone}"
-                      restauthenabled: "true"
-                      restuser: "admin"
-                      volumetype: "replicate:3"
-                      clusterid: "INSERT-CLUSTER-ID-HERE"
-                      secretNamespace: "default"
-                      secretName: "cns-secret"
-                  path: /opt/lab/support/cns-storageclass.yaml
-                  owner: cloud-user:cloud-user
+              - content: |
+                  apiVersion: storage.k8s.io/v1beta1
+                  kind: StorageClass
+                  metadata:
+                    name: cns-gold
+                    annotations:
+                      storageclass.beta.kubernetes.io/is-default-class: "true"
+                  provisioner: kubernetes.io/glusterfs
+                  parameters:
+                    resturl: "http://heketi-container-native-storage.apps.${AWS::AccountId}.${PublicHostedZone}"
+                    restauthenabled: "true"
+                    restuser: "admin"
+                    volumetype: "replicate:3"
+                    clusterid: "INSERT-CLUSTER-ID-HERE"
+                    secretNamespace: "default"
+                    secretName: "cns-secret"
+                path: /opt/lab/support/cns-storageclass.yaml
+                owner: cloud-user:cloud-user
 
-                - content: |
+              - content: |
                     apiVersion: storage.k8s.io/v1beta1
                     kind: StorageClass
                     metadata:
@@ -1732,7 +1732,7 @@ Resources:
         - !Ref NodeSecurityGroup
       SourceDestCheck: 'false'
       Tags:
-      - Key: Application
+      - Key: Applicatioxn
         Value:
           Ref: AWS::StackId
 

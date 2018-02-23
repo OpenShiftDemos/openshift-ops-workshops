@@ -1022,6 +1022,7 @@ Resources:
                     openshift_docker_insecure_registries=support.internal.aws.testdrive.openshift.com:5000
                     openshift_docker_additional_registries=support.internal.aws.testdrive.openshift.com:5000
                     openshift_storage_glusterfs_namespace=storage
+                    openshift_storage_glusterfs_heketi_admin_key=myS3cr3tpassw0rd
                     openshift_storage_glusterfs_storageclass=true
                     openshift_storage_glusterfs_storageclass_default=true
                     openshift_storage_glusterfs_block_deploy=true

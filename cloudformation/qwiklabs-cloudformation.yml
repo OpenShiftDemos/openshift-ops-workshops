@@ -1201,8 +1201,6 @@ Resources:
         - ami
       InstanceType:
         Ref: IdmInstanceType
-      SubnetId:
-        Ref: PublicSubnet1
       KeyName:
         Ref: KeyName
       BlockDeviceMappings:
@@ -1677,12 +1675,8 @@ Resources:
         - ami
       InstanceType:
         Ref: WorkerInstanceType
-      SubnetId:
-        Ref: PublicSubnet3
       KeyName:
         Ref: KeyName
-      SecurityGroupIds:
-        - !GetAtt NodeSecurityGroup.GroupId
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:

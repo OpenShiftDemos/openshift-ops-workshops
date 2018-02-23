@@ -1359,7 +1359,6 @@ Resources:
               - ansible localhost -m wait_for -a "port=80 host=localhost"
               - ansible all -i master.internal.aws.testdrive.openshift.com, -m fetch -a "src=/etc/ansible/hosts dest=/etc/ansible/hosts flat=yes"
               - ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
-              - ansible masters -m copy -a "src=/etc/ansible/hosts dest=/etc/ansible/hosts owner=cloud-user group=cloud-user mode=0755"
               - 'curl -X PUT -H "Content-Type:" --data-binary "{ \"Status\" : \"SUCCESS\", \"Reason\": \"Configuration Complete\", \"UniqueId\": \"SupportNode\",\"Data\": \"SupportNode has reached all instances and generated lab guide\" }" "${WaitHandle}"'
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
 

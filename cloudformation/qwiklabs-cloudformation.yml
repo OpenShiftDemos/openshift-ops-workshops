@@ -687,9 +687,6 @@ Resources:
 
   WaitCondition:
     Type: AWS::CloudFormation::WaitCondition
-    DependsOn:
-      - SupportNode
-      - Master1
     Properties:
       Handle: !Ref WaitHandle
       Timeout: '1800'

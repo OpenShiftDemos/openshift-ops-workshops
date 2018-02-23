@@ -47,7 +47,7 @@ Parameters:
       - t2.medium
     ConstraintDescription: Must be a valid EC2 instance type.
 
-  GuideInstanceType:
+  SupportInstanceType:
     Type: String
     Default: t2.small
     AllowedValues:
@@ -700,6 +700,7 @@ Resources:
     Properties:
       Handle: !Ref WaitHandle
       Timeout: '1800'
+      Count: '2'
 
   Master1NetworkInterface:
     Type: AWS::EC2::NetworkInterface
@@ -715,6 +716,8 @@ Resources:
 
   Master1:
     Type: AWS::EC2::Instance
+    DependsOn:
+      - InternalRoute53Records
     Properties:
       ImageId:
         Fn::FindInMap:
@@ -778,103 +781,7 @@ Resources:
                 path: /etc/sysconfig/docker-storage-setup
                 owner: root:root
 
-              users:
-              - default
-
-              system_info:
-                default_user:
-                  name: cloud-user
-
-              runcmd:
-              - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
-              - mkdir -p /var/lib/etcd
-              - git clone -b ${RepoBranch} https://github.com/${RepoAccount}/openshift-cns-testdrive.git /opt/lab/code
-              - chown -R cloud-user:cloud-user /opt/lab
-              - cp /opt/lab/code/support/* /opt/lab/support/
-              - chown -R cloud-user:cloud-user /opt/lab
-              - systemctl start httpd
-
-              write_files:
-                - content: |
-                    [OSEv3:children]
-                    masters
-                    nodes
-                    etcd
-                    glusterfs
-                    #scaleup_new_nodes
-
-                    [OSEv3:vars]
-                    ansible_become=true
-                    deployment_type=openshift-enterprise
-                    containerized=true
-                    openshift_master_api_port=443
-                    openshift_master_console_port=443
-                    openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com', 'bindPassword': 'bindingpassword', 'ca': '/etc/origin/master/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com)'}]
-                    os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
-                    openshift_disable_check=memory_availability,disk_availability,docker_storage,package_version,docker_image_availability,package_availability
-                    openshift_master_default_subdomain=apps.${AWS::AccountId}.${PublicHostedZone}
-                    openshift_master_cluster_public_hostname=openshift.${AWS::AccountId}.${PublicHostedZone}
-                    openshift_router_selector='region=infra'
-                    openshift_registry_selector='region=infra'
-                    openshift_examples_modify_imagestreams=true
-                    openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift_Packages', 'baseurl': 'http://master.internal.aws.testdrive.openshift.com/repo', 'enabled': 1, 'gpgcheck': 0}]
-                    openshift_docker_insecure_registries=support.internal.aws.testdrive.openshift.com:5000
-                    openshift_docker_additional_registries=support.internal.aws.testdrive.openshift.com:5000
-                    openshift_storage_glusterfs_namespace=app-storage
-                    openshift_storage_glusterfs_storageclass=true
-                    openshift_storage_glusterfs_block_deploy=false
-                    openshift_metrics_install_metrics=false
-                    openshift_enable_service_catalog=false
-                    #metrics_openshift_metrics_install_metrics=true
-                    #metrics_openshift_metrics_cassandra_storage_type=pv
-                    #metrics_openshift_metrics_cassandra_pvc_size=10Gi
-                    #metrics_openshift_metrics_hawkular_hostname=metrics.apps.${AWS::AccountId}.${PublicHostedZone}
-                    openshift_logging_install_logging=false
-                    #logging_openshift_logging_install_logging=true
-                    #logging_openshift_logging_namespace=logging
-                    #logging_openshift_logging_es_pvc_size=10Gi
-                    #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
-                    #logging_openshift_logging_public_master_url=https://kibana.apps.${AWS::AccountId}.${PublicHostedZone}
-                    openshift_web_console_version=v3.9
-                    openshift_web_console_prefix='support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-'
-
-                    [etcd]
-                    master.internal.${PublicHostedZone}
-
-                    [masters]
-                    master.internal.${PublicHostedZone}
-
-                    [nodes]
-                    master.internal.${PublicHostedZone} openshift_hostname=master.internal.${PublicHostedZone} openshift_public_hostname=master.${AWS::AccountId}.${PublicHostedZone}
-                    infra.internal.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}" openshift_hostname=infra.internal.${PublicHostedZone} openshift_public_hostname=infra.${AWS::AccountId}.${PublicHostedZone}
-                    node01.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node01.internal.${PublicHostedZone} openshift_public_hostname=node01.${AWS::AccountId}.${PublicHostedZone}
-                    node02.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node02.internal.${PublicHostedZone} openshift_public_hostname=node02.${AWS::AccountId}.${PublicHostedZone}
-                    node03.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"  openshift_hostname=node03.internal.${PublicHostedZone} openshift_public_hostname=node03.${AWS::AccountId}.${PublicHostedZone}
-
-                    #scaleup_[new_nodes]
-                    #scaleup_node04.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node04.internal.${PublicHostedZone} openshift_public_hostname=node04.${AWS::AccountId}.${PublicHostedZone}
-                    #scaleup_node05.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node05.internal.${PublicHostedZone} openshift_public_hostname=node05.${AWS::AccountId}.${PublicHostedZone}
-                    #scaleup_node06.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node06.internal.${PublicHostedZone} openshift_public_hostname=node06.${AWS::AccountId}.${PublicHostedZone}
-
-                    [glusterfs]
-                    node01.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode1.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
-                    node02.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode2.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
-                    node03.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode3.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
-                    #addcns_node04.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode1.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
-                    #addcns_node05.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode2.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
-                    #addcns_node06.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode3.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
-
-                    [glusterfs:vars]
-                    ansible_become=true
-
-                    [idm]
-                    idm.internal.${PublicHostedZone}
-
-                    [idm:vars]
-                    ansible_become=true
-                  path: /etc/ansible/hosts
-
-                - content: |
+              - content: |
                     kind: LDAPSyncConfig
                     apiVersion: v1
                     url: ldap://idm.internal.aws.testdrive.openshift.com
@@ -1075,6 +982,114 @@ Resources:
                   path: /opt/lab/support/second-cns-storageclass.yaml
                   owner: cloud-user:cloud-user
 
+              - content: |
+                  [OSEv3:children]
+                  masters
+                  nodes
+                  etcd
+                  glusterfs
+                  #scaleup_new_nodes
+
+                  [OSEv3:vars]
+                  ansible_become=true
+                  deployment_type=openshift-enterprise
+                  containerized=true
+                  openshift_master_api_port=443
+                  openshift_master_console_port=443
+                  openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com', 'bindPassword': 'bindingpassword', 'ca': '/etc/origin/master/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com)'}]
+                  os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
+                  openshift_disable_check=memory_availability,disk_availability,docker_storage,package_version,docker_image_availability,package_availability
+                  openshift_master_default_subdomain=apps.${AWS::AccountId}.${PublicHostedZone}
+                  openshift_master_cluster_public_hostname=openshift.${AWS::AccountId}.${PublicHostedZone}
+                  openshift_router_selector='region=infra'
+                  openshift_registry_selector='region=infra'
+                  openshift_examples_modify_imagestreams=true
+                  openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift_Packages', 'baseurl': 'http://master.internal.aws.testdrive.openshift.com/repo', 'enabled': 1, 'gpgcheck': 0}]
+                  openshift_docker_insecure_registries=support.internal.aws.testdrive.openshift.com:5000
+                  openshift_docker_additional_registries=support.internal.aws.testdrive.openshift.com:5000
+                  openshift_storage_glusterfs_namespace=storage
+                  openshift_storage_glusterfs_storageclass=true
+                  openshift_storage_glusterfs_block_deploy=false
+                  openshift_metrics_install_metrics=false
+                  openshift_enable_service_catalog=false
+                  #metrics_openshift_metrics_install_metrics=true
+                  #metrics_openshift_metrics_cassandra_storage_type=pv
+                  #metrics_openshift_metrics_cassandra_pvc_size=10Gi
+                  #metrics_openshift_metrics_hawkular_hostname=metrics.apps.${AWS::AccountId}.${PublicHostedZone}
+                  openshift_logging_install_logging=false
+                  #logging_openshift_logging_install_logging=true
+                  #logging_openshift_logging_namespace=logging
+                  #logging_openshift_logging_es_pvc_size=10Gi
+                  #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
+                  #logging_openshift_logging_public_master_url=https://kibana.apps.${AWS::AccountId}.${PublicHostedZone}
+                  openshift_web_console_version=v3.9
+                  openshift_web_console_prefix='support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-'
+
+                  [etcd]
+                  master.internal.${PublicHostedZone}
+
+                  [masters]
+                  master.internal.${PublicHostedZone}
+
+                  [nodes]
+                  master.internal.${PublicHostedZone} openshift_hostname=master.internal.${PublicHostedZone} openshift_public_hostname=master.${AWS::AccountId}.${PublicHostedZone}
+                  infra.internal.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}" openshift_hostname=infra.internal.${PublicHostedZone} openshift_public_hostname=infra.${AWS::AccountId}.${PublicHostedZone}
+                  node01.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node01.internal.${PublicHostedZone} openshift_public_hostname=node01.${AWS::AccountId}.${PublicHostedZone}
+                  node02.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node02.internal.${PublicHostedZone} openshift_public_hostname=node02.${AWS::AccountId}.${PublicHostedZone}
+                  node03.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"  openshift_hostname=node03.internal.${PublicHostedZone} openshift_public_hostname=node03.${AWS::AccountId}.${PublicHostedZone}
+
+                  #scaleup_[new_nodes]
+                  #scaleup_node04.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node04.internal.${PublicHostedZone} openshift_public_hostname=node04.${AWS::AccountId}.${PublicHostedZone}
+                  #scaleup_node05.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node05.internal.${PublicHostedZone} openshift_public_hostname=node05.${AWS::AccountId}.${PublicHostedZone}
+                  #scaleup_node06.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node06.internal.${PublicHostedZone} openshift_public_hostname=node06.${AWS::AccountId}.${PublicHostedZone}
+
+                  [glusterfs]
+                  node01.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode1.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
+                  node02.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode2.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
+                  node03.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode3.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
+                  #addcns_node04.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode1.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
+                  #addcns_node05.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode2.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
+                  #addcns_node06.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode3.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
+
+                  [glusterfs:vars]
+                  ansible_become=true
+
+                  [idm]
+                  idm.internal.${PublicHostedZone}
+
+                  [idm:vars]
+                  ansible_become=true
+                path: /etc/ansible/hosts
+                owner: cloud-user:cloud-user
+
+              users:
+              - default
+
+              system_info:
+                default_user:
+                  name: cloud-user
+
+              runcmd:
+              - ansible-playbook /opt/lab/helpers/fetch_idm_cert.yml
+              - mkdir -p /var/lib/etcd
+              - git clone -b ${RepoBranch} https://github.com/${RepoAccount}/openshift-cns-testdrive.git /opt/lab/code
+              - chown -R cloud-user:cloud-user /opt/lab
+              - cp /opt/lab/code/support/* /opt/lab/support/
+              - chown -R cloud-user:cloud-user /opt/lab
+              - systemctl start httpd
+              - ansible localhost -m wait_for -a "port=22 host=${WorkerNode1.PrivateIp}"
+              - ansible localhost -m wait_for -a "port=22 host=${WorkerNode2.PrivateIp}"
+              - ansible localhost -m wait_for -a "port=22 host=${WorkerNode3.PrivateIp}"
+              - ansible localhost -m wait_for -a "port=22 host=${WorkerNode4.PrivateIp}"
+              - ansible localhost -m wait_for -a "port=22 host=${WorkerNode5.PrivateIp}"
+              - ansible localhost -m wait_for -a "port=22 host=${WorkerNode6.PrivateIp}"
+              - ansible localhost -m wait_for -a "port=22 host=${InfraNode1.PrivateIp}"
+              - ansible localhost -m wait_for -a "port=22 host=${Master1.PrivateIp}"
+              - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
+              - ansible localhost -m wait_for -a "path=/etc/origin/master/ipa-ca.crt timeout=600"
+              - ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+              - 'curl -X PUT -H "Content-Type:" --data-binary "{ \"Status\" : \"SUCCESS\", \"Reason\": \"Configuration Complete\", \"UniqueId\": \"SupportNode\",\"Data\": \"OpenShift installation routine has finished successfully.\" }" "${WaitHandle}"'
+
               mounts:
               - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
@@ -1235,8 +1250,6 @@ Resources:
 
   SupportNode:
     Type: AWS::EC2::Instance
-    DependsOn:
-      - InternalRoute53Records
     Properties:
       ImageId:
         Fn::FindInMap:
@@ -1244,7 +1257,7 @@ Resources:
         - Ref: AWS::Region
         - ami
       InstanceType:
-        Ref: GuideInstanceType
+        Ref: SupportInstanceType
       NetworkInterfaces:
         - NetworkInterfaceId: !Ref SupportNodeNetworkInterface
           DeviceIndex: '0'
@@ -1331,85 +1344,7 @@ Resources:
                   HEKETI_USER_PW="mys3rs3cr3tpassw0rd"
                 path: /etc/sysconfig/workshopper
                 owner: root:root
-              - content: |
-                  [OSEv3:children]
-                  masters
-                  nodes
-                  etcd
-                  glusterfs
-                  #scaleup_new_nodes
 
-                  [OSEv3:vars]
-                  ansible_become=true
-                  deployment_type=openshift-enterprise
-                  containerized=true
-                  openshift_master_api_port=443
-                  openshift_master_console_port=443
-                  openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com', 'bindPassword': 'bindingpassword', 'ca': '/etc/origin/master/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com)'}]
-                  os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
-                  openshift_disable_check=memory_availability,disk_availability,docker_storage,package_version,docker_image_availability,package_availability
-                  openshift_master_default_subdomain=apps.${AWS::AccountId}.${PublicHostedZone}
-                  openshift_master_cluster_public_hostname=openshift.${AWS::AccountId}.${PublicHostedZone}
-                  openshift_router_selector='region=infra'
-                  openshift_registry_selector='region=infra'
-                  openshift_examples_modify_imagestreams=true
-                  openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift_Packages', 'baseurl': 'http://master.internal.aws.testdrive.openshift.com/repo', 'enabled': 1, 'gpgcheck': 0}]
-                  openshift_docker_insecure_registries=support.internal.aws.testdrive.openshift.com:5000
-                  openshift_docker_additional_registries=support.internal.aws.testdrive.openshift.com:5000
-                  openshift_storage_glusterfs_namespace=app-storage
-                  openshift_storage_glusterfs_storageclass=true
-                  openshift_storage_glusterfs_block_deploy=false
-                  openshift_metrics_install_metrics=false
-                  openshift_enable_service_catalog=false
-                  #metrics_openshift_metrics_install_metrics=true
-                  #metrics_openshift_metrics_cassandra_storage_type=pv
-                  #metrics_openshift_metrics_cassandra_pvc_size=10Gi
-                  #metrics_openshift_metrics_hawkular_hostname=metrics.apps.${AWS::AccountId}.${PublicHostedZone}
-                  openshift_logging_install_logging=false
-                  #logging_openshift_logging_install_logging=true
-                  #logging_openshift_logging_namespace=logging
-                  #logging_openshift_logging_es_pvc_size=10Gi
-                  #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
-                  #logging_openshift_logging_public_master_url=https://kibana.apps.${AWS::AccountId}.${PublicHostedZone}
-                  openshift_web_console_version=v3.9
-                  openshift_web_console_prefix='support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-'
-
-                  [etcd]
-                  master.internal.${PublicHostedZone}
-
-                  [masters]
-                  master.internal.${PublicHostedZone}
-
-                  [nodes]
-                  master.internal.${PublicHostedZone} openshift_hostname=master.internal.${PublicHostedZone} openshift_public_hostname=master.${AWS::AccountId}.${PublicHostedZone}
-                  infra.internal.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}" openshift_hostname=infra.internal.${PublicHostedZone} openshift_public_hostname=infra.${AWS::AccountId}.${PublicHostedZone}
-                  node01.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node01.internal.${PublicHostedZone} openshift_public_hostname=node01.${AWS::AccountId}.${PublicHostedZone}
-                  node02.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node02.internal.${PublicHostedZone} openshift_public_hostname=node02.${AWS::AccountId}.${PublicHostedZone}
-                  node03.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"  openshift_hostname=node03.internal.${PublicHostedZone} openshift_public_hostname=node03.${AWS::AccountId}.${PublicHostedZone}
-
-                  #scaleup_[new_nodes]
-                  #scaleup_node04.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node04.internal.${PublicHostedZone} openshift_public_hostname=node04.${AWS::AccountId}.${PublicHostedZone}
-                  #scaleup_node05.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node05.internal.${PublicHostedZone} openshift_public_hostname=node05.${AWS::AccountId}.${PublicHostedZone}
-                  #scaleup_node06.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node06.internal.${PublicHostedZone} openshift_public_hostname=node06.${AWS::AccountId}.${PublicHostedZone}
-
-                  [glusterfs]
-                  node01.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode1.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
-                  node02.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode2.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
-                  node03.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode3.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
-                  #addcns_node04.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode1.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
-                  #addcns_node05.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode2.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
-                  #addcns_node06.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode3.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
-
-                  [glusterfs:vars]
-                  ansible_become=true
-
-                  [idm]
-                  idm.internal.${PublicHostedZone}
-
-                  [idm:vars]
-                  ansible_become=true
-                path: /etc/ansible/hosts
-                owner: cloud-user:cloud-user
 
               users:
               - default
@@ -1423,18 +1358,7 @@ Resources:
               - [ systemctl, enable, workshopper ]
               - [ systemctl, start, workshopper ]
               - [ systemctl, start, docker-distribution ]
-              - ansible localhost -m wait_for -a "port=22 host=${WorkerNode1.PrivateIp}"
-              - ansible localhost -m wait_for -a "port=22 host=${WorkerNode2.PrivateIp}"
-              - ansible localhost -m wait_for -a "port=22 host=${WorkerNode3.PrivateIp}"
-              - ansible localhost -m wait_for -a "port=22 host=${WorkerNode4.PrivateIp}"
-              - ansible localhost -m wait_for -a "port=22 host=${WorkerNode5.PrivateIp}"
-              - ansible localhost -m wait_for -a "port=22 host=${WorkerNode6.PrivateIp}"
-              - ansible localhost -m wait_for -a "port=22 host=${InfraNode1.PrivateIp}"
-              - ansible localhost -m wait_for -a "port=22 host=${Master1.PrivateIp}"
-              - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
-              - ansible masters -m wait_for -a "path=/etc/origin/master/ipa-ca.crt timeout=600"
               - ansible localhost -m wait_for -a "port=80 host=localhost"
-              - ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
               - 'curl -X PUT -H "Content-Type:" --data-binary "{ \"Status\" : \"SUCCESS\", \"Reason\": \"Configuration Complete\", \"UniqueId\": \"SupportNode\",\"Data\": \"SupportNode has reached all instances and generated lab guide\" }" "${WaitHandle}"'
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
 

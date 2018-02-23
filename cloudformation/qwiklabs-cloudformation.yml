@@ -508,15 +508,6 @@ Resources:
     Type: "AWS::Route53::HostedZone"
     DependsOn:
       - VPC
-      - Master1
-      - InfraNode1
-      - IdmNode1
-      - WorkerNode1
-      - WorkerNode2
-      - WorkerNode3
-      - WorkerNode4
-      - WorkerNode5
-      - WorkerNode6
     Properties:
       HostedZoneConfig:
         Comment: "Internal Hosted Zone"
@@ -696,7 +687,9 @@ Resources:
 
   WaitCondition:
     Type: AWS::CloudFormation::WaitCondition
-    DependsOn: SupportNode
+    DependsOn:
+      - SupportNode
+      - Master1
     Properties:
       Handle: !Ref WaitHandle
       Timeout: '1800'

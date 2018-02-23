@@ -3,7 +3,7 @@
 - name: copy cfn-signal script
   copy:
     src: cfn-signal.sh
-    dest: /usr/local/bin
+    dest: /usr/local/bin/
     owner: root
     group: root
     mode: "u=rwx,g=rx,o=rx"

@@ -1736,7 +1736,6 @@ Resources:
         - ami
       InstanceType:
         Ref: CNSInstanceType
-      SubnetId: !Ref PublicSubnet1
       NetworkInterfaces:
         - NetworkInterfaceId: !Ref WorkerNode4NetworkInterface
           DeviceIndex: '0'

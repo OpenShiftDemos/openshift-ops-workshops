@@ -281,6 +281,14 @@ Resources:
       GroupDescription: Firewall definition for OpenShift Node
       SecurityGroupIngress:
       - IpProtocol: tcp
+        FromPort: 111
+        ToPort: 111
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 3260
+        ToPort: 3260
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
         FromPort: 4789
         ToPort: 4789
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
@@ -307,6 +315,10 @@ Resources:
       - IpProtocol: tcp
         FromPort: 24007
         ToPort: 24008
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 24010
+        ToPort: 24010
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
         FromPort: 49152

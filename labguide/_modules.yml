@@ -77,17 +77,11 @@ modules:
       ETHERPAD_URL_PREFIX:
   installation:
     name: Installation and Verification
-  cns-deploy:
-    name: Deploying Container Native Storage
-    requires:
-      - installation
     vars:
       NODE_BRICK_DEVICE: "/dev/xvdd"
-      CNS_NAMESPACE: "container-native-storage"
+      CNS_NAMESPACE: "storage"
       HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
-      HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
       HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
-      CNS_STORAGECLASS: "cns-gold"
   app-mgmt-basics:
     name: Application Management Basics
     requires:
@@ -106,7 +100,6 @@ modules:
     name: Infrastructure Management Basics
     requires:
       - installation
-      - cns-deploy
     vars:
       CNS_NAMESPACE: "container-native-storage"
       CNS_STORAGECLASS: "cns-gold"
@@ -114,7 +107,6 @@ modules:
     name: Container-native Storage Management
     requires:
       - installation
-      - cns-deploy
       - infra-mgmt-basics
     vars:
       HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"

@@ -1351,6 +1351,8 @@ Resources:
               - [ systemctl, enable, workshopper ]
               - [ systemctl, start, workshopper ]
               - [ systemctl, start, docker-distribution ]
+              - ansible --become localhost -m file -a "path=/tmp/ansible.log state=touch mode=0777"
+              - ansible --become localhost -m lineinfile -a "path=/etc/ansible/ansible.cfg regexp='^log_path' line='log_path = /tmp/ansible.log' state=present"
               - ansible localhost -m wait_for -a "port=22 host=${WorkerNode1.PrivateIp}"
               - ansible localhost -m wait_for -a "port=22 host=${WorkerNode2.PrivateIp}"
               - ansible localhost -m wait_for -a "port=22 host=${WorkerNode3.PrivateIp}"

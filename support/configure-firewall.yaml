@@ -1,4 +1,4 @@
-- hosts: cns
+- hosts: glusterfs
 
   tasks:
 

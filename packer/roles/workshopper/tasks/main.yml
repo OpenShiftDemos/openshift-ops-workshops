@@ -24,11 +24,4 @@
       src: workshopper
       dest: /etc/sysconfig/
 
-  - name: start workshopper systemd service
-    systemd:
-      daemon_reload: yes
-      name: workshopper
-      enabled: no
-      state: started
-
 ...

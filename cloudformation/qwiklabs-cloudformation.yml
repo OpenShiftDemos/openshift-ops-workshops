@@ -153,7 +153,6 @@ Resources:
       DhcpOptionsId:
         Ref: DhcpOptions
 
-
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -282,15 +281,23 @@ Resources:
       GroupDescription: Firewall definition for OpenShift Node
       SecurityGroupIngress:
       - IpProtocol: tcp
+        FromPort: 111
+        ToPort: 111
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 3260
+        ToPort: 3260
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
         FromPort: 4789
         ToPort: 4789
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
-        FromPort: 3260 
+        FromPort: 3260
         ToPort: 3260
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
-        FromPort: 111 
+        FromPort: 111
         ToPort: 111
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
@@ -320,6 +327,10 @@ Resources:
       - IpProtocol: tcp
         FromPort: 24007
         ToPort: 24008
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 24010
+        ToPort: 24010
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
         FromPort: 49152
@@ -542,16 +553,16 @@ Resources:
   InternalRoute53Records:
     Type: AWS::Route53::RecordSetGroup
     DependsOn:
-      - Master1
-      - InfraNode1
-      - IdmNode1
-      - WorkerNode1
-      - WorkerNode2
-      - WorkerNode3
-      - WorkerNode4
-      - WorkerNode5
-      - WorkerNode6
       - InternalDNS
+      - Master1NetworkInterface
+      - InfraNode1NetworkInterface
+      - IdmNode1NetworkInterface
+      - WorkerNode1NetworkInterface
+      - WorkerNode2NetworkInterface
+      - WorkerNode3NetworkInterface
+      - WorkerNode4NetworkInterface
+      - WorkerNode5NetworkInterface
+      - WorkerNode6NetworkInterface
     Properties:
       HostedZoneName: !Join ['', [internal., !Ref 'PublicHostedZone', .]]
       RecordSets:
@@ -559,7 +570,7 @@ Resources:
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt Master1NetworkInterface.PrimaryPrivateIpAddress 
+          - !GetAtt Master1NetworkInterface.PrimaryPrivateIpAddress
 
         - Name: !Join ['', [infra.internal., !Ref 'PublicHostedZone', .]]
           Type: A
@@ -666,7 +677,7 @@ Resources:
           Type: A
           TTL: '900'
           ResourceRecords:
-          - !GetAtt GuideNode.PublicIp
+          - !GetAtt SupportNode.PublicIp
 
         - Name: !Join ['', [node01., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
@@ -714,7 +725,18 @@ Resources:
       Handle: !Ref WaitHandle
       Timeout: '1800'
 
-            
+  Master1NetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      GroupSet:
+        - !Ref MasterSecurityGroup
+      SourceDestCheck: 'false'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+
   Master1:
     Type: AWS::EC2::Instance
     Properties:

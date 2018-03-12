@@ -37,7 +37,7 @@ link:https://docs.openshift.com/container-platform/3.9/install_config/install/ad
 installer's documentation].
 
 The top-level playbook in `/usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml` triggers the installation of the cluster and all of it's components. It's idempotent, which means you can execute this playbook multiple times without harm. This also allows to deploy additional components after the initial install by simply modifying the configuration in `/etc/ansible/hosts` and re-run the installer.
-In addition to this there are playbooks that only deploy a specific component or service which makes them faster to execute.
+In addition to this, there are playbooks that only deploy a specific components or services which makes them faster to execute.
 
 [TIP]
 ====
@@ -54,7 +54,7 @@ this preconfigured config. Otherwise, anyone who can `sudo` on the master has
 super user privileges on the entire cluster.
 
 #### Login on the master
-Additionally, your account,`cloud-user`, is preconfigured for cluster administrator access as well.
+Additionally, your Linux system account on the master, `cloud-user`, is preconfigured to access this OpenShift "super administrator" without password.
 Type the following command to login as the internal super-user on OpenShift:
 
 ----

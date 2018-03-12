@@ -12,7 +12,6 @@ modules:
   activate:
   - environment
   - installation
-  - cns-deploy
   - app-mgmt-basics
   - template-quota-limits
   - ldap-groupsync

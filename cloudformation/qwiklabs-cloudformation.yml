@@ -1321,8 +1321,8 @@ Resources:
                 path: /etc/sysconfig/docker-storage-setup
                 owner: root:root
               - content: |
-                  WORKSHOPS_URLS="https://raw.githubusercontent.com/${RepoAccount}/openshift-cns-testdrive/${RepoBranch}/support/_ocp_admin_testdrive.yaml"
-                  CONTENT_URL_PREFIX="https://raw.githubusercontent.com/${RepoAccount}/openshift-cns-testdrive/${RepoBranch}/support"
+                  WORKSHOPS_URLS="https://raw.githubusercontent.com/${RepoAccount}/openshift-cns-testdrive/${RepoBranch}/labguide/_ocp_admin_testdrive.yaml"
+                  CONTENT_URL_PREFIX="https://raw.githubusercontent.com/${RepoAccount}/openshift-cns-testdrive/${RepoBranch}/labguide"
                   OCP_ROUTING_SUFFIX="apps.${AWS::AccountId}.${PublicHostedZone}"
                   MASTER_HOSTNAME="master"
                   MASTER_EXTERNAL_FQDN="master.${AWS::AccountId}.${PublicHostedZone}"

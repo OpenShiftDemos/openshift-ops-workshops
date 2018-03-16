@@ -666,3 +666,39 @@ Similarly, you can set a readiness probe in the same manner:
 ----
 oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30
 ----
+
+### Add Storage to the Application
+
+The `mapit` application currently doesn't leverage any persistent storage. If the pod dies, so does all the content inside the container.
+
+[NOTE]
+====
+The directories that make up the containers internal filesystem come are a blend of the read-only layers of the container image and the top-most writable layer that is added as soon as a container instance is started from the image.
+The writable layer is disposed once the container is deleted which happens regularly in a container orchestration environment.
+====
+
+If a pod in OpenShift would need reliable storage ,for example to host a database, we would need to supply **persistent** volume to the pod. This type of storage outlives the container, i.e. it persists when the pod dies.
+
+We will talk about this concept in more detail later. But let's imagine for a moment, the `mapit` application needs persistent storage available under the `/app-storage` directory inside the container.
+
+Here's how you would instruct OpenShift to create a *PersistentVolume* object, which represents external, persistent storage, and have it *mounted* inside the container's filesystem:
+
+----
+oc volume dc/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi --claim-name=mapit-storage --mount-path=/app-storage
+----
+
+The output looks like this:
+
+----
+persistentvolumeclaims/mapit-storage
+deploymentconfig "mapit" updated
+----
+
+In the first step a *PersistentVolumeClaim* was created. This object represents a request for storage of a certain kind, with a certain capacity from the user to OpenShift.
+Next the `DeploymentConfig` of `mapit` is updated to reference this storage and make it available under the `/app-storage` directory inside the pod.
+
+We will look at how this storage was provisioned automatically in the background using *Red Hat Container-native Storage* later.
+
+Suffice to say, a 1GiB GlusterFS volume has been created and made available to the pod.
+
+Log on to the pod using the remote-shell capability of the `oc` client:

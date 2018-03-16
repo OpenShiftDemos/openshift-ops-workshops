@@ -134,7 +134,7 @@ In your environment Red Hat Container-native Storage was installed as part of Op
 We will now use a command line client on the *master* to talk via this server to container storage cluster. It's password protected, so let's export a couple of environment variables first to configure the client:
 
 ----
-export HEKETI_CLI_SERVER=http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+export HEKETI_CLI_SERVER=http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
 export HEKETI_CLI_USER=admin
 export HEKETI_CLI_KEY={{HEKETI_ADMIN_PW}}
 ----

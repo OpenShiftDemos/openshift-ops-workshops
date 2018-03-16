@@ -77,13 +77,13 @@ This should output the details, as well as the public URL of the `Route` for the
 
 ----
 NAME      HOST/PORT                                               PATH      SERVICES   PORT      TERMINATION   WILDCARD
-heketi    heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}             heketi     <all>                   None
+heketi    heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}             heketi     <all>                   None
 ----
 
 You may verify the API is responding and heketi is alive with a trivial health check:
 
 ----
-curl http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}/hello
+curl http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}/hello
 ----
 
 This should return (likely without a line break)
@@ -1087,7 +1087,7 @@ original 3 nodes we started with, and then newly added nodes.
 Initialize the heketi-cli with environment variables like so:
 
 ----
-export HEKETI_CLI_SERVER=http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+export HEKETI_CLI_SERVER=http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
 export HEKETI_CLI_USER=admin
 export HEKETI_CLI_KEY={{HEKETI_ADMIN_PW}}
 ----
@@ -1191,7 +1191,7 @@ metadata:
   name: cns-silver
 provisioner: kubernetes.io/glusterfs
 parameters:
-  resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+  resturl: "http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
   restauthenabled: "true"
   restuser: "admin"
   volumetype: "replicate:3"

@@ -14,7 +14,7 @@
             - "{{NODE4_INTERNAL_FQDN}}"
             - "{{NODE5_INTERNAL_FQDN}}"
             - "{{NODE6_INTERNAL_FQDN}}"
-          heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+          heketi_resturl: "http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
           heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
           cns_storageclass2: "{{CNS_STORAGECLASS2}}"
           ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"

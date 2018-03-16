@@ -4,7 +4,7 @@ metadata:
   name: {{cns_storageclass2}}
 provisioner: kubernetes.io/glusterfs
 parameters:
-  resturl: "http://heketi-{{cns_namespace}}.{{ocp_routing_suffix}}"
+  resturl: "http://heketi-storage-{{cns_namespace}}.{{ocp_routing_suffix}}"
   restauthenabled: "true"
   restuser: "admin"
   volumetype: "replicate:3"

@@ -102,7 +102,7 @@
           ocp_routing_suffix: "{{ OCP_ROUTING_SUFFIX | default('apps.unset.ocp-admin.aws.openshifttestdrive.com') }}"
 
       - set_fact:
-          heketi_route: "heketi-{{cns_namespace}}.{{ocp_routing_suffix}}"
+          heketi_route: "heketi-storage-{{cns_namespace}}.{{ocp_routing_suffix}}"
 
       - name: check heketi route
         shell: oc get route -n {{cns_namespace}} -o jsonpath='{$.items[?(@.metadata.name=="heketi")].spec.host}'

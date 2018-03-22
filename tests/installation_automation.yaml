@@ -87,7 +87,8 @@
         node2_fqdn: "{{ NODE2_INTERNAL_FQDN }}"
         node3_fqdn: "{{ NODE3_INTERNAL_FQDN }}"
 
-    - assert:
+    - name: ensure nodes are present
+      assert:
         that:
           - "infra_fqdn in nodes.stdout"
           - "master_fqdn in nodes.stdout"
@@ -109,7 +110,8 @@
         HEKETI_CLI_USER: admin
         HEKETI_CLI_KEY: "{{ heketi_admin_pw }}"
 
-    - assert:
+    - name: ensure there is a CNS cluster with file and block enabled
+      assert:
         that:
           - "'[file][block]' in heketi.stdout"
 

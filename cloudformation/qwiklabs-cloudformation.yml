@@ -1078,7 +1078,7 @@ Resources:
                     master.internal.${PublicHostedZone}
 
                     [nodes]
-                    master.internal.${PublicHostedZone} openshift_hostname=master.internal.${PublicHostedZone} openshift_public_hostname=master.${AWS::AccountId}.${PublicHostedZone}
+                    master.internal.${PublicHostedZone} openshift_hostname=master.internal.${PublicHostedZone} openshift_public_hostname=master.${AWS::AccountId}.${PublicHostedZone} openshift_schedulable=false
                     infra.internal.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}" openshift_hostname=infra.internal.${PublicHostedZone} openshift_public_hostname=infra.${AWS::AccountId}.${PublicHostedZone}
                     node01.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node01.internal.${PublicHostedZone} openshift_public_hostname=node01.${AWS::AccountId}.${PublicHostedZone}
                     node02.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node02.internal.${PublicHostedZone} openshift_public_hostname=node02.${AWS::AccountId}.${PublicHostedZone}

@@ -1356,7 +1356,7 @@ Resources:
                   API_HEALTH_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                   NODE_BRICK_DEVICE="/dev/xvdd"
                   NODE_BRICK_DEVICE2="/dev/xvde"
-                  CNS_NAMESPACE="container-native-storage"
+                  CNS_NAMESPACE="storage"
                   CNS_STORAGECLASS="cns-gold"
                   CNS_STORAGECLASS2="cns-silver"
                   HEKETI_ADMIN_PW="myS3cr3tpassw0rd"

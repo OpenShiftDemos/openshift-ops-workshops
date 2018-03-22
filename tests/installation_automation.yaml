@@ -45,7 +45,9 @@
 
     - assert:
         that:
-          - "'true' in master.stdout"
+          - "'true' in item.stdout"
+      with_items:
+        - "{{ master.results }}"
 
     - name: Validate the public address
       uri:

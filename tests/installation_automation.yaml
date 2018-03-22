@@ -31,7 +31,10 @@
 
     - assert:
         that:
-          - "'Ready' in status_of_node.stdout"
+          - "'Ready' in item.stdout"
+      with_items:
+        - "{{ status_of_node.results }}"
+
 
     - name: Checking if master node is unschedulable
       command: oc get -o jsonpath='{.spec.unschedulable}' node {{ item }}
@@ -67,8 +70,8 @@
 
     - assert:
         that:
-          - "'Logged into \\"https://master.internal.aws.testdrive.openshift.com:443\\" as \\"system:admin\\" using existing credentials.' in login.stdout"
-          - "'Using project \\"default\\".' in login.stdout"
+          - "'Logged into \"https://master.internal.aws.testdrive.openshift.com:443\" as \"system:admin\" using existing credentials.' in login.stdout"
+          - "'Using project \"default\".' in login.stdout"
 
     - name: list all nodes
       shell: oc get nodes
@@ -102,7 +105,7 @@
       environment:
         HEKETI_CLI_SERVER: http://heketi-storage-{{ cns_namespace }}.{{ ocp_routing_suffix} }
         HEKETI_CLI_USER: admin
-        HEKETI_CLI_KEY: {{ heketi_admin_pw }}
+        HEKETI_CLI_KEY: "{{ heketi_admin_pw }}"
 
     - assert:
         that:
@@ -114,6 +117,6 @@
       environment:
         HEKETI_CLI_SERVER: http://heketi-storage-{{ cns_namespace }}.{{ ocp_routing_suffix} }
         HEKETI_CLI_USER: admin
-        HEKETI_CLI_KEY: {{ heketi_admin_pw }}
+        HEKETI_CLI_KEY: "{{ heketi_admin_pw }}"
 
 ...

@@ -49,9 +49,10 @@ Parameters:
 
   GuideInstanceType:
     Type: String
-    Default: t2.small
+    Default: t2.medium
     AllowedValues:
       - t2.small
+      - t2.medium
     ConstraintDescription: Must be a valid EC2 instance type.
 
   KeyName:

@@ -105,7 +105,7 @@
       register: heketi
       changed_when: false
       environment:
-        HEKETI_CLI_SERVER: http://heketi-storage-{{ cns_namespace }}.{{ ocp_routing_suffix} }
+        HEKETI_CLI_SERVER: http://heketi-storage-{{ cns_namespace }}.{{ ocp_routing_suffix }}
         HEKETI_CLI_USER: admin
         HEKETI_CLI_KEY: "{{ heketi_admin_pw }}"
 

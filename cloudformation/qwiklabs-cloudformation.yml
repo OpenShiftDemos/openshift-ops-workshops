@@ -1073,6 +1073,7 @@ Resources:
                     #logging_openshift_logging_es_pvc_size=10Gi
                     #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
                     #logging_openshift_logging_public_master_url=https://kibana.apps.${AWS::AccountId}.${PublicHostedZone}
+                    openshift_web_console_nodeselector={'region':'infra'}
                     openshift_web_console_version=v3.9
                     openshift_web_console_prefix='support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-'
 

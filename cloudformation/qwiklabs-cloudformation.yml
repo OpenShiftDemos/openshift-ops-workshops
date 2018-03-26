@@ -1396,6 +1396,8 @@ Resources:
               - ansible master.internal.aws.testdrive.openshift.com, -m wait_for -a "path=/etc/origin/master/ipa-ca.crt timeout=600"
               - ansible localhost -m wait_for -a "port=80 host=localhost"
               - ansible localhost -m docker_image -a "name=localhost:5000/openshift3/ose-deployer:v3.9.14-1 repository=localhost:5000/openshift3/ose-deployer:v3.9.14 push=yes"
+              - ansible localhost -m docker_image -a "name=localhost:5000/openshift3/ose-haproxy-router:v3.9.14-1 repository=localhost:5000/openshift3/ose-haproxy-router:v3.9.14 push=yes"
+              - ansible localhost -m docker_image -a "name=localhost:5000/openshift3/ose-docker-registry:v3.9.14-1 repository=localhost:5000/openshift3/ose-docker-registry:v3.9.14 push=yes"
               - ansible all -i master.internal.aws.testdrive.openshift.com, -m fetch -a "src=/etc/ansible/hosts dest=/etc/ansible/hosts flat=yes"
               - "ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml ; /usr/local/bin/cfn-signal.sh $? '${WaitHandle}'"
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }

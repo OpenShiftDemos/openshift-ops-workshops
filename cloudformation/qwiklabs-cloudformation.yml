@@ -1030,7 +1030,7 @@ Resources:
                     #scaleup_new_nodes
 
                     [OSEv3:vars]
-                    openshift_image_tag=v3.9.13-1
+                    openshift_image_tag=v3.9.14-1
                     ansible_become=true
                     deployment_type=openshift-enterprise
                     containerized=true

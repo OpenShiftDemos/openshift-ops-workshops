@@ -51,7 +51,7 @@ Parameters:
     Type: String
     Default: m4.large 
     AllowedValues:
-      - t2.small
+      - m4.large 
     ConstraintDescription: Must be a valid EC2 instance type.
 
   KeyName:

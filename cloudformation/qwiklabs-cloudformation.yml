@@ -49,7 +49,7 @@ Parameters:
 
   GuideInstanceType:
     Type: String
-    Default: t2.small
+    Default: m4.large 
     AllowedValues:
       - t2.small
     ConstraintDescription: Must be a valid EC2 instance type.

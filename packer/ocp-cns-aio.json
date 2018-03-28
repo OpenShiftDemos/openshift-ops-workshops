@@ -6,7 +6,6 @@
     "aws_ami": "{{env `AWS_AMI`}}",
     "org_id": "{{env `ORG_ID`}}",
     "upstream_cns_mirror": "{{env `upstream_cns_mirror`}}",
-    "extra_pools": "{{env `extra_pools`}}",
     "activation_key": "{{env `ACT_KEY`}}",
     "vpc_id": "{{env `VPC_ID`}}",
     "subnet_id": "{{env `SUBNET_ID`}}",

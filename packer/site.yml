@@ -17,6 +17,7 @@
     - { role: container-native-storage, tags: ['container-native-storage']}
     - { role: workshopper, tags: ['workshopper']}
     - { role: local-repo, tags: ['local-repo']}
+    - { role: hardcoded-user, tags: ['hardcoded-user']}
 
   tasks:
 

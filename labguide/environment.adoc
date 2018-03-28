@@ -44,6 +44,10 @@ Note that references to product documentation will be specifically pointing
 to the 3.5 versions, but newer software and documentation versions may be
 available.
 
+## How to get support
+
+In case of technical or functional problems please reach out to mailto:openshift-ops-testdrive@redhat.com[openshift-ops-testdrive@redhat.com]. This is a ticket based system where you will be able to reach the authors and supporters of this Test Drive Experience.
+
 ## Conventions
 You will see various code and command blocks throughout these exercises. Some of
 the command blocks can be copy/pasted directly. Others will require modification

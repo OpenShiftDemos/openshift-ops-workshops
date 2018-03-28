@@ -1,0 +1,28 @@
+---
+ose_packages:
+  - vim
+  - wget
+  - git
+  - net-tools
+  - bind-utils
+  - iptables-services
+  - bridge-utils
+  - bash-completion
+  - dnsmasq
+  - openshift-ansible-roles
+  - openshift-ansible-docs
+  - openshift-ansible
+  - atomic-openshift-utils
+  - atomic-openshift
+  - atomic-openshift-excluder
+  - atomic-openshift-docker-excluder
+  - openshift-ansible-playbooks
+  - atomic-openshift-clients
+
+storage_packages:
+  - nfs-utils
+  - glusterfs-fuse
+  - ceph-common
+  - iscsi-initiator-utils
+
+...

@@ -5,6 +5,8 @@
     "aws_region": "{{env `AWS_REGION`}}",
     "aws_ami": "{{env `AWS_AMI`}}",
     "org_id": "{{env `ORG_ID`}}",
+    "upstream_cns_mirror": "{{env `upstream_cns_mirror`}}",
+    "extra_pools": "{{env `extra_pools`}}",
     "activation_key": "{{env `ACT_KEY`}}",
     "vpc_id": "{{env `VPC_ID`}}",
     "subnet_id": "{{env `SUBNET_ID`}}",
@@ -32,14 +34,14 @@
     "ami_name": "ocp-cns-aio-{{timestamp}}",
     "ami_regions": ["eu-west-1", "eu-central-1", "us-east-1", "us-west-2", "ap-southeast-1"],
     "ami_users": ["XXXX"],
-    "ami_description": "OCP 3.5 / CNS 3.5 with all core container images available locally for use by Qwiklabs",
+    "ami_description": "OCP 3.9 / CNS 3.9 with all core container images available locally for use by Qwiklabs",
     "tags": {
       "Name": "ocp-cns-qwiklabs",
       "Platform": "Red Hat Enterprise Linux",
-      "Release": "3.5.0",
-      "OS_Version": "Red Hat Enterprise Linux 7.3",
-      "OCP_Version": "OpenShift Enterprise 3.5",
-      "CNS_Version": "Container-Native Storage 3.5"
+      "Release": "3.9.0",
+      "OS_Version": "Red Hat Enterprise Linux 7.4",
+      "OCP_Version": "OpenShift Enterprise 3.9",
+      "CNS_Version": "Container-Native Storage 3.9"
     }
   }],
   "provisioners": [{
@@ -48,7 +50,7 @@
     "playbook_file": "site.yml",
     "extra_arguments": [
         "--become",
-        "--extra-vars", "rhsm_org_id={{user `org_id`}} rhsm_act_key={{user `activation_key`}} instructor_pub_key_file={{user `instructor_pub_key_file` }}"
+        "--extra-vars", "rhsm_org_id={{user `org_id`}} rh_upstream_cns_mirror={{user `upstream_cns_mirror`}} rhsm_act_key={{user `activation_key`}} instructor_pub_key_file={{user `instructor_pub_key_file` }}"
       ]
   }]
 }

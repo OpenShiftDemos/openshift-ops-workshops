@@ -66,6 +66,10 @@ For more information on the capabilities of `new-app`, take a look at its help
 message by running `oc new-app -h`.
 
 #### Pods
+
+.OpenShift Pods
+image::openshift_pod.png[]
+
 Pods are one or more containers deployed together on host. A pod is the
 smallest compute unit you can define, deploy and manage. Each pod is allocated
 its own internal IP address on the SDN and will own the entire port range. The
@@ -142,6 +146,9 @@ node the pod is running on, the internal IP address of the pod, various labels,
 and other information about what is going on.
 
 #### Services
+.OpenShift Service
+image::openshift_service.png[]
+
 *Services* provide a convenient abstraction layer inside OpenShift to find a
 group of like *Pods*. They also act as an internal proxy/load balancer between
 those *Pods* and anything else that needs to access them from inside the
@@ -495,6 +502,8 @@ almost immediately detected that the current state (1 *Pod*) didn't match the
 desired state (2 *Pods*), and it fixed it by scheduling another *Pod*.
 
 ### Background: Routes
+.OpenShift Route
+image::openshift_route.png[]
 
 While *Services* provide internal abstraction and load balancing within an
 OpenShift environment, sometimes clients (users, systems, devices, etc.)

@@ -43,13 +43,13 @@ ose_infra_images:
   - "openshift3/registry-console:{{ ose_minor_tag }}"
 
 cns_core_images:
-  - "rhgs3/rhgs-volmanager-rhel7:v3.9"
-  - "rhgs3/rhgs-server-rhel7:v3.9"
-  - "rhgs3/rhgs-s3-server-rhel7:v3.9"
-  - "rhgs3/rhgs-gluster-block-prov-rhel7:v3.9"
+  - "rhgs3/rhgs-volmanager-rhel7:v{{ ose_release_tag }}"
+  - "rhgs3/rhgs-server-rhel7:v{{ ose_release_tag }}"
+  - "rhgs3/rhgs-s3-server-rhel7:v{{ ose_release_tag }}"
+  - "rhgs3/rhgs-gluster-block-prov-rhel7:v{{ ose_release_tag }}"
 
 other_images:
-  - "rhscl/postgresql-95-rhel7" 
+  - "rhscl/postgresql-95-rhel7"
   - "rhscl/ruby-23-rhel7"
 
 non_rh_images:

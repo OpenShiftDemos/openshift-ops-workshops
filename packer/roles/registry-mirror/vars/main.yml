@@ -1,50 +1,57 @@
 ---
 
 deploy_mirror: false
-
-src_registry: registry.access.redhat.com
-
-ose_minor_tag: v3.5.5.26
-ose_major_tag: 3.5.0
-ose_release_tag: 3.5
+image_src: registry.access.redhat.com
+ose_minor_tag: v3.9.14-2
+ose_major_tag: 3.9.14
+ose_release_tag: 3.9
+ose_deployer_tag: latest
+image_source: registry.access.redhat.com
 
 ose_core_images:
-  - openshift3/ose:latest
-  - openshift3/ose:{{ ose_minor_tag }}
-  - openshift3/ose:v{{ ose_release_tag }}
-  - openshift3/node:latest
-  - openshift3/node:{{ ose_minor_tag }}
-  - openshift3/node:v{{ ose_release_tag }}
-  - openshift3/openvswitch:latest
-  - openshift3/openvswitch:{{ ose_minor_tag }}
+  - "openshift3/ose:latest"
+  - "openshift3/ose:{{ ose_minor_tag }}"
+  - "openshift3/ose:v{{ ose_major_tag }}"
+  - "openshift3/node:latest"
+  - "openshift3/node:{{ ose_minor_tag }}"
+  - "openshift3/node:v{{ ose_major_tag }}"
+  - "openshift3/openvswitch:latest"
+  - "openshift3/ose-web-console:v{{ ose_release_tag }}"
+  - "openshift3/openvswitch:v{{ ose_major_tag }}"
+  - "openshift3/openvswitch:{{ ose_minor_tag }}"
+  - "openshift3/openvswitch:v{{ ose_release_tag }}"
   - rhel7/etcd:latest
 
 ose_infra_images:
-  - openshift3/ose-haproxy-router:{{ ose_minor_tag }}
-  - openshift3/ose-deployer:{{ ose_minor_tag }}
-  - openshift3/ose-sti-builder:{{ ose_minor_tag }}
-  - openshift3/ose-docker-builder:{{ ose_minor_tag }}
-  - openshift3/ose-pod:{{ ose_minor_tag }}
-  - openshift3/ose-docker-registry:{{ ose_minor_tag }}
-  - openshift3/logging-deployer:{{ ose_minor_tag }}
-  - openshift3/logging-elasticsearch:{{ ose_major_tag }}
-  - openshift3/logging-kibana:{{ ose_major_tag }}
-  - openshift3/logging-fluentd:{{ ose_major_tag }}
-  - openshift3/logging-curator:{{ ose_major_tag }}
-  - openshift3/logging-auth-proxy:{{ ose_major_tag }}
-  - openshift3/metrics-deployer:{{ ose_minor_tag }}
-  - openshift3/metrics-hawkular-metrics:{{ ose_major_tag }}
-  - openshift3/metrics-cassandra:{{ ose_major_tag }}
-  - openshift3/metrics-heapster:{{ ose_major_tag }}
-  - openshift3/registry-console:{{ ose_release_tag }}
+  - "openshift3/ose-haproxy-router:v{{ ose_major_tag }}"
+  - "openshift3/ose-deployer:{{ ose_minor_tag }}"
+  - "openshift3/ose-sti-builder:{{ ose_minor_tag }}"
+  - "openshift3/ose-docker-builder:{{ ose_minor_tag }}"
+  - "openshift3/ose-pod:{{ ose_minor_tag }}"
+  - "openshift3/ose-pod:v{{ ose_major_tag }}"
+  - "openshift3/ose-docker-registry:{{ ose_minor_tag }}"
+  - "openshift3/logging-deployer:{{ ose_deployer_tag }}"
+  - "openshift3/logging-elasticsearch:{{ ose_minor_tag }}"
+  - "openshift3/logging-kibana:{{ ose_minor_tag }}"
+  - "openshift3/logging-fluentd:{{ ose_minor_tag }}"
+  - "openshift3/logging-curator:{{ ose_minor_tag }}"
+  - "openshift3/logging-auth-proxy:v{{ ose_major_tag }}"
+  - "openshift3/metrics-deployer:{{ ose_deployer_tag }}"
+  - "openshift3/metrics-hawkular-metrics:{{ ose_minor_tag }}"
+  - "openshift3/metrics-cassandra:{{ ose_minor_tag }}"
+  - "openshift3/metrics-heapster:{{ ose_minor_tag }}"
+  - "openshift3/registry-console:{{ ose_minor_tag }}"
 
 cns_core_images:
-  - rhgs3/rhgs-volmanager-rhel7:3.2.0-10
-  - rhgs3/rhgs-server-rhel7:3.2.0-5
+  - "rhgs3/rhgs-volmanager-rhel7:v3.9"
+  - "rhgs3/rhgs-server-rhel7:v3.9"
+  - "rhgs3/rhgs-s3-server-rhel7:v3.9"
+  - "rhgs3/rhgs-gluster-block-prov-rhel7:v3.9"
 
 other_images:
-  - docker.io/siamaksade/mapit
-  - registry.access.redhat.com/rhscl/postgresql-95-rhel7 
-  - registry.access.redhat.com/rhscl/ruby-23-rhel7 
+  - "rhscl/postgresql-95-rhel7" 
+  - "rhscl/ruby-23-rhel7"
 
+non_rh_images:
+  - "siamaksade/mapit"
 ...

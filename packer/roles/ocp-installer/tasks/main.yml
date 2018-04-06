@@ -1,43 +1,49 @@
 ---
+- name: install local repository packages
+  yum: name={{ item }} state=present
+  with_items:
+    - httpd
+    - createrepo
+    - yum-utils
 
-  - name: install ose base packages
-    yum: name={{ item }} state=present
-    with_items:
-      - vim
-      - wget
-      - git
-      - net-tools
-      - bind-utils
-      - etcd
-      - docker
-      - iptables-services
-      - bridge-utils
-      - bash-completion
-      - atomic-openshift-clients
-      - dnsmasq
-      - atomic-openshift-utils
-      - atomic-openshift-excluder-3.5.5.26-1.git.0.276cbb4.el7
-      - atomic-openshift-docker-excluder-3.5.5.26-1.git.0.276cbb4.el7
-      - haveged
+- name: make repository directory
+  file: state=directory owner=apache group=apache mode=755 path=/var/www/html/repo
 
-  - name: remove firewalld
-    yum: name=firewalld state=absent
+- name: start httpd
+  service: name=httpd state=restarted
 
-  - name: install ose storage packages
-    yum: name={{ item }} state=present
-    with_items:
-      - nfs-utils
-      - glusterfs-fuse
-      - ceph-common
-      - iscsi-initiator-utils
+- name: Download package
+  shell: yum install --downloadonly "{{ item }}" --downloaddir=/var/www/html/repo
+  with_items:
+    - "{{ ose_packages }}"
+    - "{{ storage_packages }}"
 
-  - name: remove openshift packages from filter
-    shell: atomic-openshift-excluder unexclude
+- name: own repository items
+  file: state=directory owner=apache group=apache mode=755 recurse=yes path=/var/www/html/repo
 
-  - name: create iptables config
-    copy: src=iptables dest=/etc/sysconfig/
+- name: createrepo
+  shell: createrepo /var/www/html/repo
 
-  - name: restart iptables 
-    service: name=iptables state=started enabled=yes
+- name: install ose base packages
+  yum: name={{ item }} state=present
+  with_items:
+  - "{{ ose_packages }}"
+
+- name: remove firewalld
+  yum: name=firewalld state=absent
+
+- name: install ose storage packages
+  yum: name={{ item }} state=present
+  with_items:
+  - "{{ storage_packages }}"
+
+- name: remove openshift packages from filter
+  shell: atomic-openshift-excluder unexclude
+
+- name: create iptables config
+  copy: src=iptables dest=/etc/sysconfig/
+
+- name: restart iptables 
+  service: name=iptables state=started enabled=yes
 
 ...

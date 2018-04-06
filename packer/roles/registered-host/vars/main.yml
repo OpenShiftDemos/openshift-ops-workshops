@@ -5,8 +5,9 @@ disable_rhui: true
 rhsm_repos:
   - rhel-7-server-rpms
   - rhel-7-fast-datapath-rpms
-  - rhel-7-server-ose-3.7-rpms
+  - rhel-7-server-ose-3.9-rpms
   - rh-gluster-3-for-rhel-7-server-rpms
   - rhel-server-rhscl-7-rpms 
+  - rhel-7-server-ansible-2.4-rpms
 
 ...

@@ -3,12 +3,14 @@
   user:
     name: student
     state: present
-    password: $6$bhFt7ggi$SMQ8rYcB7vAm9hghHbMaLyfDq721tBC5JlIyoeHBDeMrcKeL7U9KOQybbXBC.v4EHk0QwXxTwEKc4FbytwA5K 
+    password: $6$bhFt7ggi$SMQ8rYcB7vAm9hghHbMaLyfDq721tBC5JlIyoeHBDeMrcKeL7U9KOQybbXBC.v4EHk0QwXxTwEKc4FbytwA5K
     group: wheel
     append: yes
 
-
-- name: force allowed ssh access
-  shell: "sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config"
+- name: allow password auth via ssh
+  lineinfile:
+  path: /etc/ssh/sshd_config
+  line: "PasswordAuthentication yes"
+  regexp: "^(#?)(\s?)PasswordAuthentication (yes|no)$"
 
 ...

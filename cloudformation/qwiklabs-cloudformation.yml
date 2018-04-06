@@ -67,23 +67,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-cbd07eb6
+      ami: ami-918e27ec
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-82e582fa
+      ami: ami-233b5d5b
     eu-west-1:
-      ami: ami-69095010
+      ami: ami-fa9dc483
     eu-central-1:
-      ami: ami-ee792705
+      ami: ami-ec81df07
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-76a5800a
+      ami: ami-1d9fba61
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -1048,6 +1048,10 @@ Resources:
                     openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift_Packages', 'baseurl': 'http://master.internal.aws.testdrive.openshift.com/repo', 'enabled': 1, 'gpgcheck': 0}]
                     openshift_docker_insecure_registries=support.internal.aws.testdrive.openshift.com:5000
                     openshift_docker_additional_registries=support.internal.aws.testdrive.openshift.com:5000
+                    openshift_storage_glusterfs_version=v3.9
+                    openshift_storage_glusterfs_heketi_version=v3.9
+                    openshift_storage_glusterfs_block_version=v3.9
+                    openshift_storage_glusterfs_s3_version=v3.9
                     openshift_storage_glusterfs_namespace=storage
                     openshift_storage_glusterfs_heketi_admin_key=myS3cr3tpassw0rd
                     openshift_storage_glusterfs_storageclass=true
@@ -1072,7 +1076,6 @@ Resources:
                     #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
                     #logging_openshift_logging_public_master_url=https://kibana.apps.${AWS::AccountId}.${PublicHostedZone}
                     openshift_web_console_nodeselector={'region':'infra'}
-                    openshift_web_console_version=v3.9
                     openshift_web_console_prefix='support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-'
 
                     [etcd]

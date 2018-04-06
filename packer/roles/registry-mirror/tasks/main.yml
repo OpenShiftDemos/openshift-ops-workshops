@@ -36,4 +36,12 @@
     push: yes
   with_items:
     - "{{ non_rh_images }}"
+
+- name: retag cns images
+  docker_image:
+    name: "{{ image_source }}/{{ item }}"
+    repository: "localhost:5000/{{ item | replace(cns_release_tag, 'latest')}}"
+    push: yes
+  with_items:
+    - "{{ cns_core_images }}"
 ...

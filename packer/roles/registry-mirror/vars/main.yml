@@ -5,6 +5,7 @@ image_src: registry.access.redhat.com
 ose_minor_tag: v3.9.14-2
 ose_major_tag: 3.9.14
 ose_release_tag: 3.9
+cns_release_tag: "v{{ ose_release_tag }}"
 ose_deployer_tag: latest
 image_source: registry.access.redhat.com
 
@@ -43,10 +44,10 @@ ose_infra_images:
   - "openshift3/registry-console:{{ ose_minor_tag }}"
 
 cns_core_images:
-  - "rhgs3/rhgs-volmanager-rhel7:v{{ ose_release_tag }}"
-  - "rhgs3/rhgs-server-rhel7:v{{ ose_release_tag }}"
-  - "rhgs3/rhgs-s3-server-rhel7:v{{ ose_release_tag }}"
-  - "rhgs3/rhgs-gluster-block-prov-rhel7:v{{ ose_release_tag }}"
+  - "rhgs3/rhgs-volmanager-rhel7:{{ cns_release_tag }}"
+  - "rhgs3/rhgs-server-rhel7:{{ cns_release_tag }}"
+  - "rhgs3/rhgs-s3-server-rhel7:{{ cns_release_tag }}"
+  - "rhgs3/rhgs-gluster-block-prov-rhel7:{{ cns_release_tag }}"
 
 other_images:
   - "rhscl/postgresql-95-rhel7"

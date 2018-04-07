@@ -11,6 +11,6 @@
   lineinfile:
   path: /etc/ssh/sshd_config
   line: "PasswordAuthentication yes"
-  regexp: "^(#?)(\s?)PasswordAuthentication (yes|no)$"
+  regexp: "^(#?)(\\s?)PasswordAuthentication (yes|no)$"
 
 ...

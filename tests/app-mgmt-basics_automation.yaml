@@ -38,7 +38,9 @@
       command: oc get deploymentconfig mapit
 
     - name: Check for replicationcontroller
-      command: oc get replicationcontroller mapit
+      command: oc get replicationcontroller -l app=mapit
+      register: rc_check
+      failed_when: rc_check.stdout == "No resources found."
 
     - name: Scale to two instances
       command: oc scale dc/mapit --replicas=2

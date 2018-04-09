@@ -8,23 +8,64 @@
 
     - name: Check for app-management project
       command: oc get project app-management
-      register: app_project_out
+      register: app_project_check
       ignore_errors: true
 
     - name: Create app-management project
       command: oc new-project app-management
-      when: app_project_out | failed
+      when: app_project_check is failed
 
     - name: Check for the sample application
       command: oc get dc mapit
-      register: app_dc_out
+      register: app_dc_check
       ignore_errors: true
 
     - name: Deploy the sample application
       command: oc new-app docker.io/siamaksade/mapit -n app-management
-      when: app_dc_out | failed
+      when: app_dc_check is failed
 
     - name: Wait for app to be running
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+      register: result
+      until: '"1" in result.stdout'
+      retries: 10
+      delay: 15
+
+    - name: Check for service to be available
+      command: oc get service mapit
+
+    - name: Check for deploymentconfig
+      command: oc get deploymentconfig mapit
+
+    - name: Check for replicationcontroller
+      command: oc get replicationcontroller mapit
+
+    - name: Scale to two instances
+      command: oc scale dc/mapit --replicas=2
+
+    - name: Wait for both app instances
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+      register: result
+      until: '"2" in result.stdout'
+      retries: 10
+      delay: 15
+
+    - name: Check for mapit route
+      command: oc get route mapit
+      register: mapit_route_check
+      ignore_errors: true
+
+    - name: Create mapit route
+      command: oc expose service mapit
+      when: mapit_route_check is success
+
+    - name: Check again for mapit route
+      command: oc get route mapit
+
+    - name: Scale down to 1 instance
+      command: oc scale dc/mapit --replicas=1
+
+    - name: Wait for app instances
       command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
       register: result
       until: '"1" in result.stdout'
@@ -37,21 +78,9 @@
     - name: Set mapit readiness probe
       command: oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30
 
-    - name: Check for mapit route
-      command: oc get route mapit
-      register: mapit_route_out
-      ignore_errors: true
-
-    - name: Create mapit route
-      command: oc expose service mapit
-
-    - name: Scale to two instances
-      command: oc scale dc/mapit --replicas=2
-
-    - name: Wait for both app instances
-      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+    - name: Wait for app instances
+      command: oc get dc mapit -o jsonpath='{.status.readyReplicas}' -n app-management
       register: result
-      until: '"2" in result.stdout'
+      until: '"1" in result.stdout'
       retries: 10
       delay: 15
-

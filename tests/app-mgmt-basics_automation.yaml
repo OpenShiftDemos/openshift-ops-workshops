@@ -138,7 +138,7 @@
 
     - name: Verify DeploymentConfig revision
       assert:
-        - that:
-            - "{{ mapit_revision.stdout == '3' }}"
+        that:
+          - "{{ mapit_revision.stdout == '3' }}"
       tags:
         - mapit-verify

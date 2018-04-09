@@ -35,20 +35,6 @@
       with_items:
         - "{{ status_of_node.results }}"
 
-
-    - name: Checking if master node is unschedulable
-      command: oc get -o jsonpath='{.spec.unschedulable}' node {{ item }}
-      with_items:
-        - "{{ groups.masters }}"
-      register: master
-      changed_when: false
-
-    - assert:
-        that:
-          - "'true' in item.stdout"
-      with_items:
-        - "{{ master.results }}"
-
     - name: Validate the public address
       uri:
         url: "{{ api_health_url }}"

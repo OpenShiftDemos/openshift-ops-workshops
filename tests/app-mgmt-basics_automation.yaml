@@ -18,7 +18,7 @@
       command: oc new-project app-management
       when: app_project_check is failed
       tags:
-        - mapit-verify
+        - mapit-deploy
 
     - name: Check for the sample application
       command: oc get dc mapit
@@ -26,6 +26,7 @@
       ignore_errors: true
       tags:
         - mapit-deploy
+        - mapit-verify
 
     - name: Deploy the sample application
       command: oc new-app docker.io/siamaksade/mapit -n app-management

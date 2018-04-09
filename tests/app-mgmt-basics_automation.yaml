@@ -5,24 +5,33 @@
   tasks:
     - name: Login as system:admin
       command: oc login -u system:admin
+      tags: always
 
     - name: Check for app-management project
       command: oc get project app-management
       register: app_project_check
       ignore_errors: true
+      tags:
+        - mapit-deploy
 
     - name: Create app-management project
       command: oc new-project app-management
       when: app_project_check is failed
+      tags:
+        - mapit-verify
 
     - name: Check for the sample application
       command: oc get dc mapit
       register: app_dc_check
       ignore_errors: true
+      tags:
+        - mapit-deploy
 
     - name: Deploy the sample application
       command: oc new-app docker.io/siamaksade/mapit -n app-management
       when: app_dc_check is failed
+      tags:
+        - mapit-deploy
 
     - name: Wait for app to be running
       command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
@@ -30,20 +39,34 @@
       until: '"1" in result.stdout'
       retries: 10
       delay: 15
+      tags:
+        - mapit-deploy
+        - mapit-verify
 
     - name: Check for service to be available
       command: oc get service mapit
+      tags:
+        - mapit-deploy
+        - mapit-verify
 
     - name: Check for deploymentconfig
       command: oc get deploymentconfig mapit
+      tags:
+        - mapit-deploy
+        - mapit-verify
 
     - name: Check for replicationcontroller
       command: oc get replicationcontroller -l app=mapit
       register: rc_check
       failed_when: rc_check.stdout == "No resources found."
+      tags:
+        - mapit-deploy
+        - mapit-verify
 
     - name: Scale to two instances
       command: oc scale dc/mapit --replicas=2
+      tags:
+        - mapit-deploy
 
     - name: Wait for both app instances
       command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
@@ -51,21 +74,32 @@
       until: '"2" in result.stdout'
       retries: 10
       delay: 15
+      tags:
+        - mapit-deploy
 
     - name: Check for mapit route
       command: oc get route mapit
       register: mapit_route_check
       ignore_errors: true
+      tags:
+        - mapit-deploy
 
     - name: Create mapit route
       command: oc expose service mapit
       when: mapit_route_check is failed
+      tags:
+        - mapit-deploy
 
     - name: Check again for mapit route
       command: oc get route mapit
+      tags:
+        - mapit-deploy
+        - mapit-verify
 
     - name: Scale down to 1 instance
       command: oc scale dc/mapit --replicas=1
+      tags:
+        - mapit-deploy
 
     - name: Wait for app instances
       command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
@@ -73,12 +107,19 @@
       until: '"1" in result.stdout'
       retries: 10
       delay: 15
+      tags:
+        - mapit-deploy
+        - mapit-verify
 
     - name: Set mapit liveness probe
       command: oc set probe dc/mapit --liveness --get-url=http://:8080/health --initial-delay-seconds=30
+      tags:
+        - mapit-deploy
 
     - name: Set mapit readiness probe
       command: oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30
+      tags:
+        - mapit-deploy
 
     - name: Wait for app instances
       command: oc get dc mapit -o jsonpath='{.status.readyReplicas}' -n app-management
@@ -86,3 +127,18 @@
       until: '"1" in result.stdout'
       retries: 10
       delay: 15
+      tags:
+        - mapit-deploy
+
+    - name: Check for DeploymentConfig revision
+      command: oc get dc mapit -o jsonpath='{.status.latestVersion}'
+      register: mapit_revision
+      tags:
+        - mapit-verify
+
+    - name: Verify DeploymentConfig revision
+      assert:
+        - that:
+            - "{{ mapit_revision.stdout == '3' }}"
+      tags:
+        - mapit-verify

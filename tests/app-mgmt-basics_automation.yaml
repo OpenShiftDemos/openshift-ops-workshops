@@ -59,7 +59,7 @@
 
     - name: Create mapit route
       command: oc expose service mapit
-      when: mapit_route_check is success
+      when: mapit_route_check is failed
 
     - name: Check again for mapit route
       command: oc get route mapit

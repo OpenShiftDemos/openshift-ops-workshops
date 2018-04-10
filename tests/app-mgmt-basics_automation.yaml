@@ -132,13 +132,13 @@
         - mapit-deploy
 
     - name: Check for existing mapit storage
-      command: oc get dc mapit -o yaml
+      command: oc get dc mapit -o json
       register: mapit_dc_cmd
       tags:
         - mapit-deploy
 
     - set_fact:
-        mapit_dc: "{{ mapit_dc_cmd.stdout | from_yaml }}"
+        mapit_dc: "{{ mapit_dc_cmd.stdout | from_json }}"
       tags:
         - mapit-deploy
 
@@ -149,14 +149,14 @@
         - mapit-deploy
 
     - name: Check for deployed mapit storage
-      command: oc get dc mapit -o yaml
+      command: oc get dc mapit -o json
       register: mapit_dc_cmd2
       tags:
         - mapit-deploy
         - mapit-verify
 
     - set_fact:
-        mapit_dc2: "{{ mapit_dc_cmd2.stdout | from_yaml }}"
+        mapit_dc2: "{{ mapit_dc_cmd2.stdout | from_json }}"
       tags:
         - mapit-deploy
         - mapit-verify

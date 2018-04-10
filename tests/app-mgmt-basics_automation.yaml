@@ -165,6 +165,9 @@
         that:
           - mapit_dc2.spec.template.spec.volumes is defined
           - mapit_dc2.spec.template.spec.volumes|length == 1
+      tags:
+        - mapit-deploy
+        - mapit-verify
 
     - name: Check for DeploymentConfig revision
       command: oc get dc mapit -o jsonpath='{.status.latestVersion}'

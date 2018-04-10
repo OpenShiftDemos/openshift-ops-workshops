@@ -131,15 +131,37 @@
       tags:
         - mapit-deploy
 
-    - name: Check for DeploymentConfig revision
-      command: oc get dc mapit -o jsonpath='{.status.latestVersion}'
-      register: mapit_revision
+    - name: Check for existing mapit storage
+      command: oc get dc mapit -o yaml
+      register: mapit_dc_cmd
       tags:
+        - mapit-deploy
+
+    - set_fact:
+        mapit_dc: "{{ mapit_dc_cmd | from_yaml }}"
+      tags:
+        - mapit-deploy
+
+    - name: Add storage to mapit app
+      command: oc volume dc/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi --claim-name=mapit-storage --mount-path=/app-storage
+      when: mapit_dc.spec.template.spec.volumes is not defined
+      tags:
+        - mapit-deploy
+
+    - name: Check for deployed mapit storage
+      command: oc get dc mapit -o yaml
+      register: mapit_dc_cmd2
+      tags:
+        - mapit-deploy
         - mapit-verify
 
-    - name: Verify DeploymentConfig revision
-      assert:
-        that:
-          - "{{ mapit_revision.stdout == '3' }}"
+    - set_fact:
+        mapit_dc2: "{{ mapit_dc_cmd2 | from_yaml }}"
       tags:
+        - mapit-deploy
         - mapit-verify
+
+    - assert:
+        that:
+          - mapit_dc2.spec.template.spec.volumes is defined
+          - mapit_dc2.spec.template.spec.volumes|length == 1

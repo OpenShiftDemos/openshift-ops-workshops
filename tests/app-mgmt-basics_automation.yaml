@@ -131,7 +131,27 @@
       tags:
         - mapit-deploy
 
-    - name: Check for existing mapit storage
+    - name: Check for a PVC called 'mapit-storage'
+      shell: oc get pvc/mapit-storage -o json
+      register: check_mapit_pvc
+      ignore_errors: true
+      tags:
+        - mapit-deploy
+
+    - set_fact:
+        existing_mapit_pvc: "{{ check_mapit_pvc.stdout|from_json }}"
+      tags:
+        - mapit-deploy
+
+    - name: ensure pvc is bound
+      assert:
+        that:
+          - existing_mapit_pvc.status.phase == "Bound"
+      when: check_mapit_pvc is success
+      tags:
+        - mapit-deploy
+
+    - name: Check for existing mapit storage configuration
       command: oc get dc mapit -o json
       register: mapit_dc_cmd
       tags:
@@ -144,11 +164,13 @@
 
     - name: Add storage to mapit app
       command: oc volume dc/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi --claim-name=mapit-storage --mount-path=/app-storage
-      when: mapit_dc.spec.template.spec.volumes is not defined
+      when:
+        - mapit_dc.spec.template.spec.volumes is not defined
+        - check_mapit_pvc is failed
       tags:
         - mapit-deploy
 
-    - name: Check for deployed mapit storage
+    - name: Check for deployed mapit storage configuration
       command: oc get dc mapit -o json
       register: mapit_dc_cmd2
       tags:
@@ -165,6 +187,29 @@
         that:
           - mapit_dc2.spec.template.spec.volumes is defined
           - mapit_dc2.spec.template.spec.volumes|length == 1
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: Check for a PVC called 'mapit-storage'
+      shell: oc get pvc/mapit-storage -o json
+      register: check_mapit_pvc
+      ignore_errors: true
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - set_fact:
+        mapit_pvc: "{{ check_mapit_pvc.stdout|from_json }}"
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: ensure pvc is bound
+      assert:
+        that:
+          - existing_mapit_pvc.status.phase == "Bound"
+      when: check_mapit_pvc is success
       tags:
         - mapit-deploy
         - mapit-verify

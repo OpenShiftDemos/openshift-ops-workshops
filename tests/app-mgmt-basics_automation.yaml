@@ -140,6 +140,7 @@
 
     - set_fact:
         existing_mapit_pvc: "{{ check_mapit_pvc.stdout|from_json }}"
+      when: check_mapit_pvc is success
       tags:
         - mapit-deploy
 

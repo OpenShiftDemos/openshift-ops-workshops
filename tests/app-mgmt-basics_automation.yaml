@@ -207,10 +207,12 @@
         - mapit-deploy
         - mapit-verify
 
-    - name: ensure pvc is bound
-      assert:
-        that:
-          - existing_mapit_pvc.status.phase == "Bound"
+    - name: wait for pvc to be bound
+      command: oc get pvc/mapit-storage -o jsonpath='{$.status.phase}'
+      register: mapit_pvc
+      until: mapit_pvc.stdout == "Bound"
+      retries: 10
+      delay: 15
       tags:
         - mapit-deploy
         - mapit-verify

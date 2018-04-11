@@ -201,6 +201,7 @@
 
     - set_fact:
         mapit_pvc: "{{ check_mapit_pvc.stdout|from_json }}"
+      when: check_mapit_pvc is success
       tags:
         - mapit-deploy
         - mapit-verify
@@ -209,7 +210,6 @@
       assert:
         that:
           - existing_mapit_pvc.status.phase == "Bound"
-      when: check_mapit_pvc is success
       tags:
         - mapit-deploy
         - mapit-verify

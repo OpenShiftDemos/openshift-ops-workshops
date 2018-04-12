@@ -50,6 +50,23 @@
         - mapit-deploy
         - mapit-verify
 
+    - name: Check for endpoints
+      command: oc get endpoints mapit -o json
+      register: mapit_endpoints_json
+      tags:
+        - mapit-deploy
+
+    - set_fact:
+        mapit_endpoints: "{{ mapit_endpoints_json | from_json }}"
+
+    - assert:
+        that:
+          - mapit_endpoints.subsets | length == 1
+          - mapit_endpoints.subsets[0].addresses.ports | length == 3
+          - mapit_endpoints.subsets[0].addresses.ports[0].port == "8080"
+          - mapit_endpoints.subsets[0].addresses.ports[1].port == "9779"
+          - mapit_endpoints.subsets[0].addresses.ports[2].port == "8778"
+
     - name: Check for deploymentconfig
       command: oc get deploymentconfig mapit
       tags:
@@ -226,6 +243,6 @@
     - name: Verify DeploymentConfig revision
       assert:
         that:
-          - "{{ mapit_revision.stdout == '4' }}"
+          - "{{ mapit_revision.stdout == '3' }}"
       tags:
         - mapit-verify

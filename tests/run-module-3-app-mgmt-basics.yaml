@@ -315,7 +315,7 @@
         - mapit-verify
 
     - name: create test file in directory mount
-      command: oc rsh {{ mapit_pod_1.stdout }} cat "Hello World from OpenShift" > /app-storage/hello.txt
+      command: oc rsh {{ mapit_pod_1.stdout }} echo "Hello World from OpenShift" > /app-storage/hello.txt
       tags:
         - mapit-deploy
         - mapit-verify

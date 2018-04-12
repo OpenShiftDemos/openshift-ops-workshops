@@ -58,14 +58,19 @@
 
     - set_fact:
         mapit_endpoints: "{{ mapit_endpoints_json.stdout | from_json }}"
+      tags:
+        - mapit-deploy
 
     - assert:
         that:
           - mapit_endpoints.subsets | length == 1
+          - mapit_endpoints.subsets[0].addresses | length == 1
           - mapit_endpoints.subsets[0].ports | length == 3
           - mapit_endpoints.subsets[0].ports[0].port == 8080
           - mapit_endpoints.subsets[0].ports[1].port == 9779
           - mapit_endpoints.subsets[0].ports[2].port == 8778
+      tags:
+        - mapit-deploy
 
     - name: Check for deploymentconfig
       command: oc get deploymentconfig mapit
@@ -92,6 +97,28 @@
       until: '"2" in result.stdout'
       retries: 10
       delay: 15
+      tags:
+        - mapit-deploy
+
+    - name: Check for endpoints
+      command: oc get endpoints mapit -o json
+      register: mapit_endpoints_json_v2
+      tags:
+        - mapit-deploy
+
+    - set_fact:
+        mapit_endpoints_v2: "{{ mapit_endpoints_json_v2.stdout | from_json }}"
+      tags:
+        - mapit-deploy
+
+    - assert:
+        that:
+          - mapit_endpoints_v2.subsets | length == 1
+          - mapit_endpoints_v2.subsets[0].addresses | length == 2
+          - mapit_endpoints_v2.subsets[0].ports | length == 3
+          - mapit_endpoints_v2.subsets[0].ports[0].port == 8080
+          - mapit_endpoints_v2.subsets[0].ports[1].port == 9779
+          - mapit_endpoints_v2.subsets[0].ports[2].port == 8778
       tags:
         - mapit-deploy
 
@@ -147,6 +174,31 @@
       delay: 15
       tags:
         - mapit-deploy
+
+    - name: Check for endpoints
+      command: oc get endpoints mapit -o json
+      register: mapit_endpoints_json_v3
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - set_fact:
+        mapit_endpoints_v3: "{{ mapit_endpoints_json_v3.stdout | from_json }}"
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - assert:
+        that:
+          - mapit_endpoints_v3.subsets | length == 1
+          - mapit_endpoints_v3.subsets[0].addresses | length == 1
+          - mapit_endpoints_v3.subsets[0].ports | length == 3
+          - mapit_endpoints_v3.subsets[0].ports[0].port == 8080
+          - mapit_endpoints_v3.subsets[0].ports[1].port == 9779
+          - mapit_endpoints_v3.subsets[0].ports[2].port == 8778
+      tags:
+        - mapit-deploy
+        - mapit-verify
 
     - name: Check for a PVC called 'mapit-storage'
       shell: oc get pvc/mapit-storage -o json

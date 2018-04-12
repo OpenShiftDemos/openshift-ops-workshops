@@ -196,7 +196,7 @@
     - assert:
         that:
           - mapit_endpoints_v3.subsets | length == 1
-          - mapit_endpoints_v3.subsets[0].addresses | length == 1
+          - mapit_endpoints_v3.subsets[0].addresses | length >= 1
           - mapit_endpoints_v3.subsets[0].ports | length == 3
           - mapit_endpoints_v3.subsets[0].ports[0].port == 8080
           - mapit_endpoints_v3.subsets[0].ports[1].port == 9779

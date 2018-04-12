@@ -68,6 +68,7 @@
           - mapit_endpoints.subsets[0].ports[0].port == 8080
           - mapit_endpoints.subsets[0].ports[1].port == 9779
           - mapit_endpoints.subsets[0].ports[2].port == 8778
+      when: app_dc_check is failed
       tags:
         - mapit-deploy
 

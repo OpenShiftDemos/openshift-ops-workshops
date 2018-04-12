@@ -315,7 +315,7 @@
         - mapit-verify
 
     - name: create test file in directory mount
-      command: oc rsh {{ mapit_pod_1.stdout }} echo "Hello World from OpenShift" > /app-storage/hello.txt
+      command: oc rsh {{ mapit_pod_1.stdout }} touch /app-storage/hello.txt
       tags:
         - mapit-deploy
         - mapit-verify
@@ -356,9 +356,8 @@
         - mapit-verify
 
     - name: check for directory mount
-      command: oc rsh {{ item.metadata.name }} cat /app-storage/hello.txt
+      command: oc rsh {{ item.metadata.name }} ls -ahl /app-storage/hello.txt
       register: result
-      failed_when: "{{ 'Hello World from OpenShift' not in result.stdout }}"
       with_items: "{{ mapit_pods['items'] }}"
       tags:
         - mapit-deploy

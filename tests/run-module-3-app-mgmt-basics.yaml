@@ -305,6 +305,7 @@
       register: mapit_revision
       tags:
         - mapit-deploy
+        - mapit-verify
 
     - name: get pod name for latest deployment config
       command: oc get pod -o jsonpath='{.items[0].metadata.name}' -l deployment=mapit-{{ mapit_revision.stdout | int }} -n app-management

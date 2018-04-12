@@ -43,6 +43,12 @@
       tags:
         - mapit-deploy
 
+    - name: Check for the dc to be available
+      command: oc get dc mapit -n app-management
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
     - name: Check for service to be available
       command: oc get service mapit -n app-management
       tags:

@@ -295,6 +295,6 @@
     - name: Verify DeploymentConfig revision
       assert:
         that:
-          - "{{ mapit_revision.stdout == '3' }}"
+          - "{{ mapit_revision.stdout | int >= 3 }}"
       tags:
         - mapit-verify

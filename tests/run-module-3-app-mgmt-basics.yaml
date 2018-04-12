@@ -57,7 +57,7 @@
         - mapit-deploy
 
     - set_fact:
-        mapit_endpoints: "{{ mapit_endpoints_json | from_json }}"
+        mapit_endpoints: "{{ mapit_endpoints_json.stdout | from_json }}"
 
     - assert:
         that:

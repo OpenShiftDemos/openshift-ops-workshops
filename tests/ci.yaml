@@ -1,10 +1,7 @@
 
 ---
-- include: run_module_2_installation.yaml
-- include: cns-deploy_automation.yaml
-- include: cns-deploy_verify.yaml
-- include: app-mgmt-basics_automation.yaml
-- include: app-mgmt-basics_verify.yaml
+- include: run-module-2-installation.yaml
+- include: run-module-3-app-mgmt-basics.yaml
 - include: template-quota-limits_automation.yaml
 - include: template-quota-limits_verify.yaml
 - include: ldap-groupsync_automation.yaml

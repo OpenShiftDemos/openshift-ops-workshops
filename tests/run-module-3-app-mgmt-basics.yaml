@@ -62,10 +62,10 @@
     - assert:
         that:
           - mapit_endpoints.subsets | length == 1
-          - mapit_endpoints.subsets[0].addresses.ports | length == 3
-          - mapit_endpoints.subsets[0].addresses.ports[0].port == "8080"
-          - mapit_endpoints.subsets[0].addresses.ports[1].port == "9779"
-          - mapit_endpoints.subsets[0].addresses.ports[2].port == "8778"
+          - mapit_endpoints.subsets[0].ports | length == 3
+          - mapit_endpoints.subsets[0].ports[0].port == "8080"
+          - mapit_endpoints.subsets[0].ports[1].port == "9779"
+          - mapit_endpoints.subsets[0].ports[2].port == "8778"
 
     - name: Check for deploymentconfig
       command: oc get deploymentconfig mapit

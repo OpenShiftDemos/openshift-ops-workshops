@@ -36,13 +36,12 @@
 
     - name: Wait for app to be running
       command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
-      register: result
-      until: '"1" in result.stdout'
+      register: mapit_dc
+      until: 'mapit_dc.stdout | int >= 1'
       retries: 10
       delay: 15
       tags:
         - mapit-deploy
-        - mapit-verify
 
     - name: Check for service to be available
       command: oc get service mapit

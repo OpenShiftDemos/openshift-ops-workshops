@@ -23,11 +23,11 @@
 
     - name: read master config from files
       set_fact:
-        master-config-file: "{{ lookup('file', '/etc/origin/master/master-config.yaml') }}"
-        master-config: "{{ master-config-file | from_yaml }}"
+        master_config_file: "{{ lookup('file', '/etc/origin/master/master-config.yaml') }}"
+        master_config: "{{ master-config-file | from_yaml }}"
 
     - set_fact:
-        master-config.projectConfig.projectRequestTemplate: "default/project-request"
+        master_config.projectConfig.projectRequestTemplate: "default/project-request"
 
     - name: output new master config
       template:

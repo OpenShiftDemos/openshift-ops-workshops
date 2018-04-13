@@ -32,7 +32,10 @@
     - name: output new master config
       template:
         src: templates/master-config.yaml.j2
-        dest: /tmp/master-config.yaml
+        dest: /etc/origin/master/master-config.yaml
+        user: root
+        group: root
+        mode: 0600
       vars:
         newProjectRequestTemplate: "default/project-request"
 

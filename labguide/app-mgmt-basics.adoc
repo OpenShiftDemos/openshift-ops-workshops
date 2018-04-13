@@ -677,7 +677,7 @@ The directories that make up the containers internal filesystem come are a blend
 The writable layer is disposed once the container is deleted which happens regularly in a container orchestration environment.
 ====
 
-If a pod in OpenShift would need reliable storage, for example to host a database, we would need to supply **persistent** volume to the pod. This type of storage outlives the container, i.e. it persists when the pod dies.
+If a pod in OpenShift would need reliable storage, for example to host a database, we would need to supply **persistent** volume to the pod. This type of storage outlives the container, i.e. it persists when the pod dies. It typically comes from an external storage system.
 
 We will talk about this concept in more detail later. But let's imagine for a moment, the `mapit` application needs persistent storage available under the `/app-storage` directory inside the container.
 
@@ -710,7 +710,7 @@ NAME      REVISION   DESIRED   CURRENT   TRIGGERED BY
 mapit     4          1         1         config,image(mapit:latest)
 ----
 
-Likely, depending when you ran the command you may or may not also see that the new pods as still being spawned:
+Likely, depending when you ran the command you may or may not see that the new pod is still being spawned:
 
 ----
 oc get pod
@@ -727,7 +727,7 @@ We will look at how this storage was provisioned automatically in the background
 
 Suffice to say, a 1GiB GlusterFS volume has been created and made available to the pod.
 
-Log on to the new pods (**your pod names will be different**) using the remote-shell capability of the `oc` client:
+Log on to the new pod (**your pod names will be different**) using the remote-shell capability of the `oc` client:
 
 [source,none,role=copypaste]
 ----

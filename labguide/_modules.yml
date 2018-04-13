@@ -101,8 +101,8 @@ modules:
     requires:
       - installation
     vars:
-      CNS_NAMESPACE: "storage"
-      CNS_STORAGECLASS: "cns-gold"
+      CNS_STORAGECLASS: "glusterfs-storage"
+      CNS_BLOCK_STORAGECLASS: "glusterfs-storage-block"
   cns-management:
     name: Container-native Storage Management
     requires:
@@ -110,7 +110,8 @@ modules:
       - infra-mgmt-basics
     vars:
       HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
-      CNS_STORAGECLASS: "cns-gold"
+      CNS_STORAGECLASS: "glusterfs-storage"
+      CNS_BLOCK_STORAGECLASS: "glusterfs-storage-block"
       CNS_STORAGECLASS2: "cns-silver"
       CNS_NAMESPACE: "storage"
       NODE_BRICK_DEVICE: "/dev/xvdd"

@@ -93,12 +93,12 @@ oc get nodes
 The output should look something like the following:
 
 ----
-NAME                          STATUS                     AGE      VERSION
-{{INFRA_INTERNAL_FQDN}}     Ready                      1m         v1.9.1+a0ce1bc657
-{{MASTER_INTERNAL_FQDN}}    Ready,SchedulingDisabled   1m         v1.9.1+a0ce1bc657
-{{NODE1_INTERNAL_FQDN}}    Ready                      1m          v1.9.1+a0ce1bc657
-{{NODE2_INTERNAL_FQDN}}    Ready                      1m          v1.9.1+a0ce1bc657
-{{NODE3_INTERNAL_FQDN}}    Ready                      1m           v1.9.1+a0ce1bc657
+NAME                                          STATUS    ROLES     AGE
+{{ INFRA_INTERNAL_FQDN }}    Ready     <none>    1m
+{{ MASTER_INTERNAL_FQDN }}   Ready     master    1m
+{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1m
+{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1m
+{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1m
 ----
 
 All of the systems listed in the `[nodes]` group in the `/etc/ansible/hosts`

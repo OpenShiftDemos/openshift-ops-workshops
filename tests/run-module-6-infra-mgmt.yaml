@@ -3,6 +3,12 @@
   hosts: localhost
   become: true
   tasks:
+    - include_vars: /opt/lab/environment.yml
+
+      - set_fact:
+          cns_storageclass: "{{ CNS_STORAGECLASS }}"
+          cns_block_storageclass: "{{ CNS_BLOCK_STORAGECLASS }}"
+
     - name: Login as system:admin
       command: oc login -u system:admin
 
@@ -60,8 +66,22 @@
       tags:
         - metrics
 
+    - name: Remove gluster-file as the system-wide default
+      command: oc patch storageclass {{ cns_storageclass }} \
+      -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+      tags:
+        - metrics
+        - logging
+
+    - name: Set gluster-block as the system-wide default
+      command: oc patch storageclass {{ cns_block_storageclass }} \
+      -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+      tags:
+        - metrics
+        - logging
+
     - name: Run the metrics installation playbook
-      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
+      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-metrics/config.yml
       when: hawkular_cassandra_service | failed
       tags:
         - metrics
@@ -127,7 +147,7 @@
         - logging
 
     - name: Run the logging installation playbook
-      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml
+      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-logging/config.yml
       when: logging_es_cluster_service | failed
       tags:
         - logging
@@ -179,6 +199,20 @@
       tags:
         - logging
         - logging_test
+
+    - name: Remove gluster-block as the system-wide default
+      command: oc patch storageclass {{ cns_block_storageclass }} \
+      -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+      tags:
+        - metrics
+        - logging
+
+    - name: Set gluster-file as the system-wide default
+      command: oc patch storageclass {{ cns_storageclass }} \
+      -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+      tags:
+        - metrics
+        - logging
 
     # failure of this command (nonzero exit) means it isn't
     - name: Check that multitenant SDN is installed by looking for netnamespaces

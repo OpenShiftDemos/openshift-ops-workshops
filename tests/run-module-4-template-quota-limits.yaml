@@ -22,9 +22,9 @@
         - quota-deploy
 
     - name: read master config from files
-      include_vars:
-        file: /etc/origin/master/master-config.yaml
-        name: master-config
+      set_fact:
+        master-config-file: "{{ lookup('file', '/etc/origin/master/master-config.yaml') }}"
+        master-config: "{{ master-config-file | from_yaml }}"
 
     - set_fact:
         master-config.projectConfig.projectRequestTemplate: "default/project-request"

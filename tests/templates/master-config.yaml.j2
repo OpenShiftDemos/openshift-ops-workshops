@@ -1,2 +1,2 @@
-{% do master_config['projectConfig']['projectRequestTemplate'] = newProjectRequestTemplate %}
+{% set x=master_config.__setitem__('projectConfig.projectRequestTemplate', newProjectRequestTemplate) %}
 {{ master_config | to_nice_yaml }}

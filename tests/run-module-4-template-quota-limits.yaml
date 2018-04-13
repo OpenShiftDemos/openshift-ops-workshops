@@ -22,9 +22,12 @@
         - quota-deploy
 
     - name: read master config from files
-      set_fact:
-        master_config_file: "{{ lookup('file', '/etc/origin/master/master-config.yaml') }}"
-        master_config: "{{ master-config-file | from_yaml }}"
+      slurp:
+        src: /etc/origin/master/master-config.yaml
+      register: master_config_file
+
+    - set_fact:
+        master_config: "{{ master_config_file['content'] | b64decode | from_yaml }}"
 
     - set_fact:
         master_config.projectConfig.projectRequestTemplate: "default/project-request"

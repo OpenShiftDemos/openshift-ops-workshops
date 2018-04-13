@@ -21,7 +21,7 @@
       tags:
         - quota-deploy
 
-    - name: read master config from files
+    - name: read master config from file
       slurp:
         src: /etc/origin/master/master-config.yaml
       register: master_config_file
@@ -33,11 +33,13 @@
       template:
         src: templates/master-config.yaml.j2
         dest: /etc/origin/master/master-config.yaml
-        user: root
+        owner: root
         group: root
         mode: 0600
       vars:
         newProjectRequestTemplate: "default/project-request"
+      tags:
+        - quota-deploy
 
     # - name: modify the master-config.yaml to create project request template
     #   lineinfile:

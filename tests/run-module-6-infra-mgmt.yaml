@@ -5,9 +5,9 @@
   tasks:
     - include_vars: /opt/lab/environment.yml
 
-      - set_fact:
-          cns_storageclass: "{{ CNS_STORAGECLASS }}"
-          cns_block_storageclass: "{{ CNS_BLOCK_STORAGECLASS }}"
+    - set_fact:
+        cns_storageclass: "{{ CNS_STORAGECLASS }}"
+        cns_block_storageclass: "{{ CNS_BLOCK_STORAGECLASS }}"
 
     - name: Login as system:admin
       command: oc login -u system:admin

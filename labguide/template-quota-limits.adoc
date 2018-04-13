@@ -99,8 +99,10 @@ volume claims, and *Pods*. Take a look at the `ResourceQuota` section from the
       requests.cpu: 4000m <3>
       requests.memory: 8Gi <4>
       resourcequotas: 1
-      requests.storage: 25Gi <5>
+      requests.storage: 50Gi <5>
       persistentvolumeclaims: 5 <6>
+      glusterfs-storage.storageclass.storage.k8s.io/requests.storage: 25Gi <7>
+      glusterfs-storage-block.storageclass.storage.k8s.io/persistentvolumeclaims: 0 <8>
 ----
 
 <1> While only one quota can be defined in a *Project*, it still needs a unique
@@ -114,6 +116,8 @@ documentation].
 when we get to the *LimitRange* object.
 <5> Across all persistent volume claims in a project, the sum of storage requested cannot exceed this value.
 <6> The total number of persistent volume claims in a project.
+<7> This settings limits the amount of storage that can be provisioned using the `glusterfs-storage` *StorageClass*.
+<8> Setting the amount of **PersistentVolumeClaims** to `0` the use of the **StorageClass** `glusterfs-storage-block` is not allowed in this project.
 
 For more details on the available quota options, refer back to the
 link:https://docs.openshift.com/container-platform/3.5/admin_guide/quota.html[quota
@@ -275,7 +279,7 @@ Since you have made a configuration change to the master, you will need to
 restart its service. You can do so with the following command with `sudo` privileges:
 
 ----
-sudo systemctl restart atomic-openshift-master
+sudo systemctl restart atomic-openshift-master-api
 ----
 
 ### Test the Project Request Template
@@ -316,15 +320,16 @@ Description:    <none>
 Status:         Active
 Node Selector:  <none>
 Quota:
-        Name:                   template-test-quota
-        Resource                Used    Hard
-        --------                ----    ----
-        persistentvolumeclaims  0       5
-        pods                    0       10
-        requests.cpu            0       4
-        requests.memory         0       4Gi
-        requests.storage        0       25Gi
-        resourcequotas          1       1
+Resource								Used	Hard
+--------								----	----
+glusterfs-block.storageclass.storage.k8s.io/persistentvolumeclaims	0	0
+glusterfs.storageclass.storage.k8s.io/requests.storage			0	25Gi
+persistentvolumeclaims							0	5
+pods									0	10
+requests.cpu								0	4
+requests.memory								0	8Gi
+requests.storage							0	50Gi
+resourcequotas								1	1
 Resource limits:
         Name:           template-test-limits
         Type            Resource        Min     Max     Default

@@ -29,13 +29,12 @@
     - set_fact:
         master_config: "{{ master_config_file['content'] | b64decode | from_yaml }}"
 
-    - set_fact:
-        master_config.projectConfig.projectRequestTemplate: "default/project-request"
-
     - name: output new master config
       template:
         src: templates/master-config.yaml.j2
         dest: /tmp/master-config.yaml
+      vars:
+        newProjectRequestTemplate: "default/project-request"
 
     # - name: modify the master-config.yaml to create project request template
     #   lineinfile:

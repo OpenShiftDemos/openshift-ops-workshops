@@ -40,12 +40,14 @@
       ignore_errors: true
       tags:
         - quota-deploy
+        - quota-verify
 
     - name: Creating the creation of a new project
       command: oc new-project template-test
       when: template_out | failed
       tags:
         - quota-deploy
+        - quota-verify
 
     - name: Check again for template-test project
       command: oc get project template-test
@@ -64,6 +66,6 @@
 
     - name: Delete template-test project
       command: oc delete project template-test
-
       tags:
         - quota-deploy
+        - quota-verify

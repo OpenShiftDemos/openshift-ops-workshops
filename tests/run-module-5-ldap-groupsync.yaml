@@ -9,7 +9,6 @@
     - block:
       - name: Login as system:admin
         command: oc login -u system:admin
-        tags:
 
       - name: Sync all of the LDAP groups
         command: oc adm groups sync --sync-config=/opt/lab/support/groupsync.yaml --confirm

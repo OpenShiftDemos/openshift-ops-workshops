@@ -21,13 +21,26 @@
       tags:
         - quota-deploy
 
-    - name: modify the master-config.yaml to create project request template
-      lineinfile:
-        line: '  projectRequestTemplate: "default/project-request"'
-        regexp: '  projectRequestTemplate: ""'
-        path: /etc/origin/master/master-config.yaml
-      tags:
-        - quota-deploy
+    - name: read master config from files
+      include_vars:
+        file: /etc/origin/master/master-config.yaml
+        name: master-config
+
+    - set_fact:
+        master-config.projectConfig.projectRequestTemplate: "default/project-request"
+
+    - name: output new master config
+      template:
+        src: templates/master-config.yaml.j2
+        dest: /tmp/master-config.yaml
+
+    # - name: modify the master-config.yaml to create project request template
+    #   lineinfile:
+    #     line: '  projectRequestTemplate: "default/project-request"'
+    #     regexp: '  projectRequestTemplate: ""'
+    #     path: /etc/origin/master/master-config.yaml
+    #   tags:
+    #     - quota-deploy
 
     - name: Restart the service for changes to apply
       command: systemctl restart atomic-openshift-master-api

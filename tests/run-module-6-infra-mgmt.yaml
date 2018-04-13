@@ -67,15 +67,13 @@
         - metrics
 
     - name: Remove gluster-file as the system-wide default
-      command: oc patch storageclass {{ cns_storageclass }} \
-      -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+      command: oc patch storageclass {{ cns_storageclass }} -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
       tags:
         - metrics
         - logging
 
     - name: Set gluster-block as the system-wide default
-      command: oc patch storageclass {{ cns_block_storageclass }} \
-      -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+      command: oc patch storageclass {{ cns_block_storageclass }} -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
       tags:
         - metrics
         - logging

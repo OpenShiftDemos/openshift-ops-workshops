@@ -28,7 +28,7 @@
         - scaleup
 
     - name: Run the scaleup playbook
-      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml
+      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-node/scaleup.yml
       when: node_present | failed
       tags:
         - scaleup

@@ -37,8 +37,8 @@
     "tags": {
       "Name": "ocp-cns-qwiklabs",
       "Platform": "Red Hat Enterprise Linux",
-      "Release": "3.9.0",
-      "OS_Version": "Red Hat Enterprise Linux 7.4",
+      "Release": "3.9.1",
+      "OS_Version": "Red Hat Enterprise Linux 7.5",
       "OCP_Version": "OpenShift Enterprise 3.9",
       "CNS_Version": "Container-Native Storage 3.9"
     }

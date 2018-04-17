@@ -735,16 +735,6 @@ Resources:
       Handle: !Ref PostDeployWaitHandle
       Timeout: '1800'
 
-  IdmWaitHandle:
-    Type: AWS::CloudFormation::WaitConditionHandle
-
-  IdmWaitCondition:
-    Type: AWS::CloudFormation::WaitCondition
-    DependsOn: SupportNode
-    Properties:
-      Handle: !Ref IdmWaitHandle
-      Timeout: '1800'
-
   Master1NetworkInterface:
     Type: AWS::EC2::NetworkInterface
     Properties:
@@ -1280,7 +1270,7 @@ Resources:
             fqdn: idm.internal.${PublicHostedZone}
 
             runcmd:
-            - "/usr/local/bin/idm-install > /var/log/idm-install.log ; export exitCode = $? ; systemctl start network ; /usr/local/bin/cfn-signal.sh $exitCode '${IdmWaitHandle}'"
+            - /usr/local/bin/idm-install > /var/log/idm-install.log
             - reboot
 
   SupportNodeNetworkInterface:

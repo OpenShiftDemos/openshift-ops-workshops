@@ -1280,7 +1280,7 @@ Resources:
             fqdn: idm.internal.${PublicHostedZone}
 
             runcmd:
-            - "/usr/local/bin/idm-install > /var/log/idm-install.log ; /usr/local/bin/cfn-signal.sh $? '${IdmWaitHandle}'"
+            - "/usr/local/bin/idm-install ; /usr/local/bin/cfn-signal.sh $? '${IdmWaitHandle}'"
             - reboot
 
   SupportNodeNetworkInterface:

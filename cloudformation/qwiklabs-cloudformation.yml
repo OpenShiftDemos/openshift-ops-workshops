@@ -1009,6 +1009,7 @@ Resources:
                     #cnsinfra_openshift_storage_glusterfs_registry_block_version=v3.9
                     #cnsinfra_openshift_storage_glusterfs_registry_s3_version=v3.9
                     #cnsinfra_openshift_storage_glusterfs_registry_namespace=infra-storage
+                    #cnsinfra_openshift_storage_glusterfs_registry_heketi_admin_key=myS3cr3tpassw0rd
                     #cnsinfra_openshift_storage_glusterfs_registry_storageclass=true
                     #cnsinfra_openshift_storage_glusterfs_registry_storageclass_default=false
                     #cnsinfra_openshift_storage_glusterfs_registry_block_deploy=true

@@ -76,6 +76,6 @@
     creates: /etc/systemd/system/multi-user.target.wants/rpcbind.service
 
 - name: start and enable rpcbind service
-      service: name=rpcbind state=started enabled=yes
+  service: name=rpcbind state=started enabled=yes
 
 ...

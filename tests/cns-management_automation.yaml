@@ -280,11 +280,11 @@
           - "{{NODE5_INTERNAL_FQDN}}"
           - "{{NODE6_INTERNAL_FQDN}}"
 
-     - name: adding host
-       add_host:
-         hostname: "{{ item }}"
-         groups: new_cns_nodes
-       with_items: "{{ new_cns_nodes_internal_fqdn }}"
+    - name: adding host
+      add_host:
+        hostname: "{{ item }}"
+        groups: new_cns_nodes
+      with_items: "{{ new_cns_nodes_internal_fqdn }}"
 
 - name: Prepare for CNS
   hosts: new_cns_nodes

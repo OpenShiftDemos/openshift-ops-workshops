@@ -428,17 +428,11 @@
       shell: oc login -u system:admin -n {{ cns_namespace }}
       changed_when: false
 
-    - name: reload inventory from file
-      meta: refresh_inventory
-
-    - name: ensure additional CNS nodes are configured in the inventory
-      fail:
-        msg: node {{ item }} is not part of the cns group in the inventory
-      when: item not in groups['cns']
-      with_items: "{{ new_cns_nodes_internal_fqdn }}"
-
     - set_fact:
         iptables_rules:
+          - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24010 -j ACCEPT"
+          - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 3260 -j ACCEPT"
+          - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 111 -j ACCEPT"
           - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT"
           - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT"
           - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT"
@@ -454,6 +448,8 @@
         - "{{ new_cns_nodes_internal_fqdn }}"
       changed_when: False
       become: true
+
+    # ensure other tasks in the configure-for-cns-tasks.yaml have been successful
 
     - name: ensure additional storage nodes have correct label
       shell: oc get nodes -l storagenode=glusterfs -o jsonpath='{$.items[?(@.metadata.name=="{{ item }}")].metadata.name}'

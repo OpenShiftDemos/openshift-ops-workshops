@@ -12,16 +12,18 @@ Parameters:
 
   InfraInstanceType:
     Type: String
-    Default: m4.large
+    Default: t2.large
     AllowedValues:
+      - t2.large
       - m4.large
       - m4.xlarge
     ConstraintDescription: Must be a valid EC2 instance type.
 
   WorkerInstanceType:
     Type: String
-    Default: m4.large
+    Default: t2.large
     AllowedValues:
+      - t2.large
       - m4.large
       - m4.xlarge
 
@@ -34,8 +36,9 @@ Parameters:
 
   MasterInstanceType:
     Type: String
-    Default: m4.large
+    Default: t2.large
     AllowedValues:
+      - t2.xlarge
       - m4.large
       - m4.xlarge
     ConstraintDescription: Must be a valid EC2 instance type.
@@ -49,8 +52,9 @@ Parameters:
 
   SupportInstanceType:
     Type: String
-    Default: m4.large
+    Default: t2.large
     AllowedValues:
+      - t2.large
       - m4.large
     ConstraintDescription: Must be a valid EC2 instance type.
 

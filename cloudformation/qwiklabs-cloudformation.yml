@@ -38,6 +38,7 @@ Parameters:
     Type: String
     Default: t2.large
     AllowedValues:
+      - t2.large
       - t2.xlarge
       - m4.large
       - m4.xlarge

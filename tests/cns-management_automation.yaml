@@ -84,9 +84,11 @@
       when: postgresql_pvc.status.phase != "Bound"
 
     - name: ensure pvc is issued against CNS
-      fail:
-        msg: pvc is not satisfied from StorageClass {{ cns_storageclass }}
-      when: postgresql_pvc.metadata.annotations['volume.beta.kubernetes.io/storage-provisioner'] != 'kubernetes.io/glusterfs' or postgresql_pv.spec.storageClassName != cns_storageclass
+      assert:
+        that:
+          - postgresql_pvc.metadata.annotations['volume.beta.kubernetes.io/storage-provisioner'] != 'kubernetes.io/glusterfs'
+          - postgresql_pv.spec.storageClassName != cns_storageclass
+        msg: pvc is not served from StorageClass {{ cns_storageclass }}
 
     - name: check pv is exists
       shell: oc get pv/{{ postgresql_pvc.spec.volumeName }} -o json

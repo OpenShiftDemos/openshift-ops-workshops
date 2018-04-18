@@ -1,9 +1,9 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: my-container-storage-silver
+  name: my-container-storage-second
   annotations:
-    volume.kubernetes.io/storage-class: cns-silver
+    volume.kubernetes.io/storage-class: glusterfs-storage-second
 spec:
   accessModes:
   - ReadWriteOnce

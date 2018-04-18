@@ -14,5 +14,5 @@ modules:
   - template-quota-limits
   - ldap-groupsync
   - infra-mgmt-basics
-  - cns-management
+  - cns
   - skipping-ahead

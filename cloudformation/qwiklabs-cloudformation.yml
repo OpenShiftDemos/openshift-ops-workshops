@@ -872,58 +872,6 @@ Resources:
                                         "node": {
                                             "hostnames": {
                                                 "manage": [
-                                                    "node01.internal.${PublicHostedZone}"
-                                                ],
-                                                "storage": [
-                                                    "${WorkerNode1.PrivateIp}"
-                                                ]
-                                            },
-                                            "zone": 1
-                                        },
-                                        "devices": [
-                                            "/dev/xvdd"
-                                        ]
-                                    },
-                                    {
-                                        "node": {
-                                            "hostnames": {
-                                                "manage": [
-                                                    "node02.internal.${PublicHostedZone}"
-                                                ],
-                                                "storage": [
-                                                    "${WorkerNode2.PrivateIp}"
-                                                ]
-                                            },
-                                            "zone": 2
-                                        },
-                                        "devices": [
-                                            "/dev/xvdd"
-                                        ]
-                                    },
-                                    {
-                                        "node": {
-                                            "hostnames": {
-                                                "manage": [
-                                                    "node03.internal.${PublicHostedZone}"
-                                                ],
-                                                "storage": [
-                                                    "${WorkerNode3.PrivateIp}"
-                                                ]
-                                            },
-                                            "zone": 3
-                                        },
-                                        "devices": [
-                                            "/dev/xvdd"
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "nodes": [
-                                    {
-                                        "node": {
-                                            "hostnames": {
-                                                "manage": [
                                                     "node04.internal.${PublicHostedZone}"
                                                 ],
                                                 "storage": [
@@ -972,7 +920,7 @@ Resources:
                             }
                         ]
                     }
-                  path: /opt/lab/support/topology-extended.json
+                  path: /opt/lab/support/topology-new.json
                   owner: cloud-user:cloud-user
 
                 - content: |
@@ -1117,9 +1065,6 @@ Resources:
                     node01.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode1.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
                     node02.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode2.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
                     node03.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode3.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
-                    #addcns_node04.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode1.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
-                    #addcns_node05.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode2.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
-                    #addcns_node06.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode3.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
 
                     [glusterfs:vars]
                     ansible_become=true

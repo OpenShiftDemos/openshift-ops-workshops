@@ -1,65 +1,65 @@
 config:
   vars:
     - name: OCP_ROUTING_SUFFIX
-      value: "apps.example.com"
+      value: "apps.external.aws.testdrive.openshift.com"
     - name: MASTER_HOSTNAME
       value: "master"
     - name: MASTER_EXTERNAL_FQDN
-      value: "master.example.com"
+      value: "master.external.aws.testdrive.openshift.com"
     - name: MASTER_INTERNAL_FQDN
-      value: "master.internal.example.com"
+      value: "master.internal.aws.testdrive.openshift.com"
     - name: INFRA_INTERNAL_FQDN
-      value: "infra.internal.example.com"
+      value: "infra.internal.aws.testdrive.openshift.com"
     - name: INFRA_INTERNAL_IP
       value: "192.168.0.99"
     - name: NODE1_HOSTNAME
       value: "node01"
     - name: NODE1_EXTERNAL_FQDN
-      value: "node01.example.com"
+      value: "node01.external.aws.testdrive.openshift.com"
     - name: NODE1_INTERNAL_FQDN
-      value: "node01.internal.example.com"
+      value: "node01.internal.aws.testdrive.openshift.com"
     - name: NODE1_INTERNAL_IP
       value: "192.168.0.101"
     - name: NODE1_HOSTNAME
       value: "node02"
     - name: NODE2_EXTERNAL_FQDN
-      value: "node02.example.com"
+      value: "node02.external.aws.testdrive.openshift.com"
     - name: NODE2_INTERNAL_FQDN
-      value: "node02.internal.example.com"
+      value: "node02.internal.aws.testdrive.openshift.com"
     - name: NODE2_INTERNAL_IP
       value: "192.168.0.102"
     - name: NODE3_HOSTNAME
       value: "node03"
     - name: NODE3_EXTERNAL_FQDN
-      value: "node03.example.com"
+      value: "node03.external.aws.testdrive.openshift.com"
     - name: NODE3_INTERNAL_FQDN
-      value: "node03.internal.example.com"
+      value: "node03.internal.aws.testdrive.openshift.com"
     - name: NODE3_INTERNAL_IP
       value: "192.168.0.103"
     - name: NODE4_EXTERNAL_FQDN
-      value: "node04.example.com"
+      value: "node04.external.aws.testdrive.openshift.com"
     - name: NODE4_INTERNAL_FQDN
-      value: "node04.internal.example.com"
+      value: "node04.internal.aws.testdrive.openshift.com"
     - name: NODE4_INTERNAL_IP
       value: "192.168.0.104"
     - name: NODE5_EXTERNAL_FQDN
-      value: "node05.example.com"
+      value: "node05.external.aws.testdrive.openshift.com"
     - name: NODE5_INTERNAL_FQDN
-      value: "node05.internal.example.com"
+      value: "node05.internal.aws.testdrive.openshift.com"
     - name: NODE5_INTERNAL_IP
       value: "192.168.0.105"
     - name: NODE6_EXTERNAL_FQDN
-      value: "node06.example.com"
+      value: "node06.external.aws.testdrive.openshift.com"
     - name: NODE6_INTERNAL_FQDN
-      value: "node06.internal.example.com"
+      value: "node06.internal.aws.testdrive.openshift.com"
     - name: NODE6_INTERNAL_IP
       value: "192.168.0.106"
     - name: IDM_INTERNAL_FQDN
-      value: "idm.internal.example.com"
+      value: "idm.internal.aws.testdrive.openshift.com"
     - name: WEB_CONSOLE_URL
-      value: "https://master.example.com/console"
+      value: "https://master.external.aws.testdrive.openshift.com/console"
     - name: API_HEALTH_URL
-      value: "https://openshift.example.com/healthz/ready"
+      value: "https://openshift.external.aws.testdrive.openshift.com/healthz/ready"
     - name: CODE_CLONE_LOCATION
       value: "/opt/lab/code"
 
@@ -103,8 +103,8 @@ modules:
     vars:
       CNS_STORAGECLASS: "glusterfs-storage"
       CNS_BLOCK_STORAGECLASS: "glusterfs-storage-block"
-  cns-management:
-    name: Container-native Storage Management
+  cns:
+    name: Container-native Storage
     requires:
       - installation
       - infra-mgmt-basics
@@ -112,7 +112,7 @@ modules:
       HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
       CNS_STORAGECLASS: "glusterfs-storage"
       CNS_BLOCK_STORAGECLASS: "glusterfs-storage-block"
-      CNS_STORAGECLASS2: "cns-silver"
+      CNS_STORAGECLASS2: "glusterfs-storage-second"
       CNS_NAMESPACE: "storage"
       NODE_BRICK_DEVICE: "/dev/xvdd"
       NODE_BRICK_DEVICE2: "/dev/xvde"

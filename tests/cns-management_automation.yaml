@@ -190,6 +190,10 @@
       retries: 30
       delay: 10
 
+    # check current capacity of 1Gi of "uploaded" directory in the pods
+
+    # extend PVC to 5Gi
+
 - name: Verify RWX Persistent Storage Application
   hosts: localhost
   tags:
@@ -260,6 +264,38 @@
       failed_when: get_file_uploader_pvc_name.stdout != file_uploader_pvc.metadata.name
       changed_when: false
 
+    # verify new capacity of 5Gi of "uploaded" directory in the pods
+
+- name: Add node04-node06 to playbook
+  hosts: localhost
+  tags:
+    - cns_example
+    - cns_extend
+  tasks:
+    - include_vars: /opt/lab/environment.yml
+
+    - set_fact:
+        new_cns_nodes_internal_fqdn:
+          - "{{NODE4_INTERNAL_FQDN}}"
+          - "{{NODE5_INTERNAL_FQDN}}"
+          - "{{NODE6_INTERNAL_FQDN}}"
+
+     - name: adding host
+       add_host:
+         hostname: "{{ item }}"
+         groups: new_cns_nodes
+       with_items: "{{ new_cns_nodes_internal_fqdn }}"
+
+- name: Prepare for CNS
+  hosts: new_cns_nodes
+  tags:
+    - cns_example
+    - cns_extend
+  tasks:
+
+    - import_taks: ../support/configure-for-cns-tasks.yaml
+
+
 - name: Extend CNS
   hosts: localhost
   become: true
@@ -289,44 +325,6 @@
 
     - name: change to cns namespace
       shell: oc project {{cns_namespace}}
-
-    - name: uncomment additional cns lines
-      replace:
-        regexp: '#addcns_'
-        replace: ''
-        path: /etc/ansible/hosts
-      tags:
-        - scaleup
-
-    - name: insert iptables rules required for GlusterFS
-      blockinfile:
-        dest: /etc/sysconfig/iptables
-        block: |
-          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT
-          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
-          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
-          -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
-        insertbefore: "^COMMIT"
-      delegate_to: "{{ item }}"
-      with_items: "{{ new_cns_nodes_internal_fqdn }}"
-      become: true
-
-    - name: insert iptables rules required for GlusterFS
-      lineinfile:
-        dest: /etc/sysconfig/iptables
-        line: ':OS_FIREWALL_ALLOW - [0:0]'
-        insertbefore: "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"
-      delegate_to: "{{ item }}"
-      with_items: "{{ new_cns_nodes_internal_fqdn }}"
-      become: true
-
-    - name: reload iptables
-      systemd:
-        name: iptables
-        state: reloaded
-      delegate_to: "{{ item }}"
-      with_items: "{{ new_cns_nodes_internal_fqdn }}"
-      become: true
 
     - name: label storage nodes
       shell: oc label node/{{ item }} storagenode=glusterfs

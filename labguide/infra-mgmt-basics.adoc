@@ -37,6 +37,11 @@ application nodes:
 oc get nodes -l region=apps
 ----
 
+[TIP]
+====
+The `-l` switch works for many subcommands of the `oc` utility and filters the output matching objects that carry the supplied key-value-pair as a `label`. 
+====
+
 You should see:
 
 ----

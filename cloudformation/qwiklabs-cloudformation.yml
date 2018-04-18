@@ -975,8 +975,8 @@ Resources:
                     nodes
                     etcd
                     glusterfs
-                    #cnsinfra_glusterfs_registry
                     #scaleup_new_nodes
+                    #cnsinfra_glusterfs_registry
 
                     [OSEv3:vars]
                     ansible_become=true
@@ -1691,7 +1691,7 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdd
           Ebs:
-            VolumeSize: '10'
+            VolumeSize: '50'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvde
@@ -1788,7 +1788,7 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdd
           Ebs:
-            VolumeSize: '10'
+            VolumeSize: '50'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvde
@@ -1880,7 +1880,7 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdc
           Ebs:
-            VolumeSize: '10'
+            VolumeSize: '50'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvdd

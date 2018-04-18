@@ -110,7 +110,7 @@
       register: pv_volume_path
 
     - name: check gluster volume of pv
-      shell: oc exec -n {{ cns_namespace }} $(oc get pod -n {{ cns_namespace }} --no-headers | head -1 | awk '{print $1}') -- gluster vol info {{ pv_volume_path.stdout }}
+      shell: oc exec -n {{ cns_namespace }} $(oc get pods -n {{ cns_namespace }} -o jsonpath='{.items[0].metadata.name}' -l glusterfs=storage-pod) -- gluster vol info {{ pv_volume_path.stdout }}
       changed_when: false
 
     - name: check health of postgres-db deployment

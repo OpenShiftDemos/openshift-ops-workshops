@@ -685,7 +685,7 @@ Pushed 2/5 layers, 40% complete
 Push successful
 ----
 
-The command prompt returhs out of the tail mode once you see _Push successful_.
+The command prompt returns out of the tail mode once you see _Push successful_.
 
 [NOTE]
 ====
@@ -1049,14 +1049,12 @@ You will see something like:
 NAME                DESIRED   CURRENT   READY     NODE-SELECTOR           AGE
 glusterfs-storage   3         3         3         glusterfs=storage-host  6h
 ----
-<1> The label definition the *DaemonSet* uses to select the nodes which run a
-  GlusterFS pod.
 
 [TIP]
 ====
 What's a `DaemonSet` again?
 
-A `DaemonSet` in OpenShift is a special kind of replication controller that ensures that exactly one pod is running on all nodes of a certain kind. the kind of node is determined by a label-selector.
+A `DaemonSet` in OpenShift is a special kind of replication controller that ensures that exactly one pod is running on all nodes of a certain kind. the kind of node is determined by a label-selector. In the above example that's all nodes carrying the label `glusterfs=storage-host`.
 You have already seen `DaemonSets` as part of the Logging deploy in the link:infra-mgmt-basics["Infrastructure Management Module"] controlling the placement of _Fluentd_ pods.
 ====
 

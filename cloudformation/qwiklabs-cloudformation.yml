@@ -1002,13 +1002,17 @@ Resources:
                     openshift_storage_glusterfs_heketi_admin_key=myS3cr3tpassw0rd
                     openshift_storage_glusterfs_storageclass=true
                     openshift_storage_glusterfs_storageclass_default=true
-                    openshift_storage_glusterfs_block_deploy=true
-                    openshift_storage_glusterfs_block_host_vol_size=30
-                    openshift_storage_glusterfs_block_storageclass=true
-                    # openshift_hosted_registry_storage_kind=glusterfs
-                    # openshift_hosted_registry_storage_volume_size=10Gi
-                    # openshift_hosted_registry_storage_glusterfs_swap=false
-                    # openshift_hosted_registry_storage_glusterfs_swapcopy=false
+                    openshift_storage_glusterfs_block_deploy=false
+                    #cnsinfra_openshift_storage_glusterfs_registry_namespace=infra-storage
+                    #cnsinfra_openshift_storage_glusterfs_registry_storageclass=true
+                    #cnsinfra_openshift_storage_glusterfs_registry_storageclass_default=false
+                    #cnsinfra_openshift_storage_glusterfs_registry_block_deploy=true
+                    #cnsinfra_openshift_storage_glusterfs_registry_block_storageclass=true
+                    #cnsinfra_openshift_storage_glusterfs_registry_block_storageclass_default=false
+                    #cnsinfra_openshift_storage_glusterfs_registry_block_host_vol_create=true
+                    #cnsinfra_openshift_storage_glusterfs_registry_block_host_vol_size=30
+                    #cnsinfra_openshift_hosted_registry_storage_kind=glusterfs
+                    #cnsinfra_openshift_hosted_registry_storage_volume_size=10Gi
                     openshift_metrics_install_metrics=false
                     openshift_enable_service_catalog=false
                     #metrics_openshift_metrics_install_metrics=true
@@ -1049,8 +1053,16 @@ Resources:
                     node02.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode2.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
                     node03.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode3.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
 
+                    #cnsinfra_[glusterfs_registry]
+                    #cnsinfra_node04.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode4.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
+                    #cnsinfra_node05.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode5.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
+                    #cnsinfra_node06.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode6.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
+
                     [glusterfs:vars]
                     ansible_become=true
+
+                    #cnsinfra_[glusterfs_registry:vars]
+                    #cnsinfra_ansible_become=true
 
                     [idm]
                     idm.internal.${PublicHostedZone}

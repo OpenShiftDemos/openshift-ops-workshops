@@ -86,8 +86,8 @@
     - name: ensure pvc is issued against CNS
       assert:
         that:
-          - postgresql_pvc.metadata.annotations['volume.beta.kubernetes.io/storage-provisioner'] != 'kubernetes.io/glusterfs'
-          - postgresql_pv.spec.storageClassName != cns_storageclass
+          - postgresql_pvc.metadata.annotations['volume.beta.kubernetes.io/storage-provisioner'] == 'kubernetes.io/glusterfs'
+          - postgresql_pv.spec.storageClassName == cns_storageclass
         msg: pvc is not served from StorageClass {{ cns_storageclass }}
 
     - name: check pv is exists
@@ -99,9 +99,11 @@
         postgresql_pv: "{{ get_postgresql_pv.stdout|from_json }}"
 
     - name: check pv is provided by CNS
-      fail:
+      assert:
+        that:
+          - postgresql_pv.metadata.annotations['pv.kubernetes.io/provisioned-by'] == 'kubernetes.io/glusterfs'
+          - postgresql_pv.spec.storageClassName == cns_storageclass
         msg: pv is not provided by {{ cns_storageclass }}
-      when: postgresql_pv.metadata.annotations['pv.kubernetes.io/provisioned-by'] != 'kubernetes.io/glusterfs' or postgresql_pv.spec.storageClassName != cns_storageclass
 
     - name: get volume path of pv for app
       shell: oc get pv $(oc get pvc -n my-database-app postgresql -o jsonpath='{.spec.volumeName}') -o jsonpath='{.spec.glusterfs.path}'

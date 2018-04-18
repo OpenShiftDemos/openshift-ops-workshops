@@ -459,7 +459,7 @@
       changed_when: false
 
     - name: check daemonset is scaled to 6 nodes
-      shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.desiredNumberScheduled}'
+      shell: oc get daemonset -l glusterfs=storage-daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs-storage")].status.desiredNumberScheduled}'
       register: check_daemonset_desired
       failed_when:
         - check_daemonset_desired.stdout != "6"

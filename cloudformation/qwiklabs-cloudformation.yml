@@ -975,6 +975,7 @@ Resources:
                     nodes
                     etcd
                     glusterfs
+                    #cnsinfra_glusterfs_registry
                     #scaleup_new_nodes
 
                     [OSEv3:vars]

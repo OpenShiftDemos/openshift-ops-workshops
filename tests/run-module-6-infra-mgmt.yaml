@@ -4,10 +4,12 @@
   become: true
   tasks:
     - include_vars: /opt/lab/environment.yml
+      tags: always
 
     - set_fact:
         cns_storageclass: "{{ CNS_STORAGECLASS }}"
         cns_block_storageclass: "{{ CNS_BLOCK_STORAGECLASS }}"
+      tags: always
 
     - name: Login as system:admin
       command: oc login -u system:admin

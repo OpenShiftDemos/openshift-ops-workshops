@@ -316,13 +316,13 @@
     - set_fact:
         cns_namespace: "{{ CNS_NAMESPACE }}"
         cns_storageclass: "{{ CNS_STORAGECLASS }}"
+        cns_storageclass2: "{{CNS_STORAGECLASS2}}"
         new_cns_nodes_internal_fqdn:
           - "{{NODE4_INTERNAL_FQDN}}"
           - "{{NODE5_INTERNAL_FQDN}}"
           - "{{NODE6_INTERNAL_FQDN}}"
         heketi_resturl: "http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
-        cns_storageclass2: "{{CNS_STORAGECLASS2}}"
         ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
         node_brick_device: "{{ NODE_BRICK_DEVICE }}"
         node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
@@ -335,17 +335,17 @@
       shell: oc project {{cns_namespace}}
 
     - name: label storage nodes
-      shell: oc label node/{{ item }} storagenode=glusterfs
+      shell: oc label node/{{ item }} glusterfs=storage-host
       with_items: "{{ new_cns_nodes_internal_fqdn }}"
 
     - name: check daemonset
-      shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.desiredNumberScheduled}' -n {{cns_namespace}}
+      shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs-storage")].status.desiredNumberScheduled}' -n {{cns_namespace}}
       register: check_daemonset_desired
       failed_when: check_daemonset_desired.stdout == ""
       changed_when: False
 
     - name: wait for daemonset to have desired nodes ready
-      shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.numberReady}' -n {{cns_namespace}}
+      shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs-storage")].status.numberReady}' -n {{cns_namespace}}
       register: check_daemonset_ready
       until: check_daemonset_ready.stdout|int == check_daemonset_desired.stdout|int
       failed_when: check_daemonset_ready.stdout == ""
@@ -363,7 +363,7 @@
         cns_clusterid_1: "{{heketi_cluster_first.clusters|first}}"
 
     - name: load new topology
-      shell: heketi-cli topology --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} load --json=/opt/lab/support/topology-extended.json
+      shell: heketi-cli topology --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} load --json=/opt/lab/support/topology-new.json
 
     - name: get second cluster-id from heketi
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster list --json
@@ -376,12 +376,15 @@
         cns_clusterid_2: "{{heketi_cluster_second.clusters|difference([cns_clusterid_1])|first}}"
 
     - name: create storage class file from template
-      template:
-        src: ../templates/cns-storageclass-silver.yml.j2
-        dest: /tmp/cns-storageclass-silver.yml
+      shell: oc get storageclass {{ cns_storageclass }} -o json \
+      | jq ".parameters=(.parameters + {\"clusterid\": \"{{ cns_clusterid_2 }}\"})" \
+      | jq '.metadata.name = "{{ cns_storageclass2 }}"' \
+      | jq '.metadata.annotations."storageclass.kubernetes.io/is-default-class" = "false"' > /tmp/glusterfs-storage-second.json
+      args:
+        creates: /tmp/glusterfs-storage-second.json
 
-    - name: create storage class
-      shell: oc create -f /tmp/cns-storageclass-silver.yml
+    - name: create second storage class
+      shell: oc create -f/tmp/glusterfs-storage-second.json
 
     - name: query nodes of second cns cluster
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster info {{ cns_clusterid_2 }} --json
@@ -390,9 +393,13 @@
     - set_fact:
         cns_cluster_info: "{{ heketi_cluster_node_list.stdout|from_json }}"
 
-    - name: add additional devices to second CNS cluster
-      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device add --name={{ node_brick_device2 }} --node={{ item }}
-      with_items: "{{ cns_cluster_info.nodes }}"
+    - assert:
+        that:
+          - cns_cluster_info.nodes | length == 3
+
+    # - name: add additional devices to second CNS cluster
+    #   shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device add --name={{ node_brick_device2 }} --node={{ item }}
+    #   with_items: "{{ cns_cluster_info.nodes }}"
 
 - name: Verify Extended CNS
   hosts: localhost

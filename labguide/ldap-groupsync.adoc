@@ -68,7 +68,7 @@ oauthConfig:
       ca: /etc/origin/master/ipa-ca.crt <6>
       insecure: false
       kind: LDAPPasswordIdentityProvider
-      url: <7>ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com)
+      url: ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com) <7>
   ...
 ----
 

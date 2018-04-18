@@ -1,5 +1,0 @@
-- hosts: all
-
-  tasks:
-
-    - import_tasks: configure-for-cns-tasks.yaml

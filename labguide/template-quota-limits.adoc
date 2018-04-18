@@ -101,8 +101,8 @@ volume claims, and *Pods*. Take a look at the `ResourceQuota` section from the
       resourcequotas: 1
       requests.storage: 50Gi <5>
       persistentvolumeclaims: 5 <6>
-      glusterfs-storage.storageclass.storage.k8s.io/requests.storage: 25Gi <7>
-      glusterfs-storage-block.storageclass.storage.k8s.io/persistentvolumeclaims: 0 <8>
+      {{ CNS_STORAGECLASS }}.storageclass.storage.k8s.io/requests.storage: 25Gi <7>
+      {{ CNS_BLOCK_STORAGECLASS }}.storageclass.storage.k8s.io/persistentvolumeclaims: 0 <8>
 ----
 
 <1> While only one quota can be defined in a *Project*, it still needs a unique
@@ -117,7 +117,7 @@ when we get to the *LimitRange* object.
 <5> Across all persistent volume claims in a project, the sum of storage requested cannot exceed this value.
 <6> The total number of persistent volume claims in a project.
 <7> This settings limits the amount of storage that can be provisioned using the `glusterfs-storage` *StorageClass*.
-<8> Setting the amount of **PersistentVolumeClaims** to `0` the use of the **StorageClass** `glusterfs-storage-block` is not allowed in this project.
+<8> Setting the amount of **PersistentVolumeClaims** to `0` the use of a **StorageClass** called `{{ CNS_BLOCK_STORAGECLASS }}` is not allowed in this project.
 
 For more details on the available quota options, refer back to the
 link:https://docs.openshift.com/container-platform/3.9/admin_guide/quota.html[quota

@@ -9,6 +9,7 @@
     - set_fact:
         cns_storageclass: "{{ CNS_STORAGECLASS }}"
         cns_block_storageclass: "{{ CNS_BLOCK_STORAGECLASS }}"
+        cns_infra_storageclass: "{{ CNS_INFRA_STORAGECLASS }}"
       tags: always
 
     - name: Login as system:admin
@@ -44,6 +45,50 @@
       tags:
         - scaleup
         - scaleup_test
+
+    - name: Uncomment cnsinfra lines
+      replace:
+        regexp: '#cnsinfra_'
+        replace: ''
+        path: /etc/ansible/hosts
+      tags:
+        - cns_infra
+
+    - name: check for existing cns infra block storage classes
+      shell: oc get storageclass {{ cns_block_storageclass }}
+      ignore_errors: true
+      register: cns_infra_block_check
+      tags:
+        - cns_infra
+
+
+    - name: check for existing cns infra file storage classes
+      shell: oc get storageclass {{ cns_infra_storageclass }}
+      ignore_errors: true
+      register: cns_infra_check
+      tags:
+        - cns_infra
+
+    - name: install the second cns cluster
+      shell: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-glusterfs/config.yml
+      when:
+        - cns_infra_check is failed
+        - cns_infra_block_check is failed
+      tags:
+        - cns_infra
+
+    - name: check for cns infra block storage classes
+      shell: oc get storageclass {{ cns_block_storageclass }}
+      tags:
+        - cns_infra
+        - cns_infra_test
+
+
+    - name: check for cns infra file storage classes
+      shell: oc get storageclass {{ cns_infra_storageclass }}
+      tags:
+        - cns_infra
+        - cns_infra_test
 
     - name: Uncomment metrics lines
       replace:

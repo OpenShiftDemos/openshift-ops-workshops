@@ -39,7 +39,7 @@ oc get nodes -l region=apps
 
 [TIP]
 ====
-The `-l` switch works for many subcommands of the `oc` utility and filters the output matching objects that carry the supplied key-value-pair as a `label`. 
+The `-l` switch works for many subcommands of the `oc` utility and filters the output matching objects that carry the supplied key-value-pair as a `label`.
 ====
 
 You should see:
@@ -151,8 +151,96 @@ NAME                                          STATUS    ROLES     AGE
 ====
 When deploying a highly-available multi-master OpenShift environment, it is
 also possible to add new master nodes. There is a similar playbook to run. For
-more information on multi-master and HA setups, please refer to the
+more information on multi-master and HA setups, please refer to the link:https://docs.openshift.com/container-platform/3.9/architecture/infrastructure_components/kubernetes_infrastructure.html#high-availability-masters[documentation^].
 ====
+
+
+### Container-native Storage for infrastructure
+
+OpenShift infrastructure, like the Registry, Logging and Metrics (introduced in the following paragraphs in this module) have a requirement for reliable storage. +
+Container-native Storage can be configured directly in the installer, to provide a separate storage pool just for those workloads. This is a good practice in order to separate failure domains.
+
+By definition you need a separate set of hosts for this - which you have just made available in the previous paragraph.
+
+#### Configure the Installer
+Several directives for a second, infrastructure-centric CNS cluster in the `/etc/ansible/hosts` files have been prepared but commented using the `#cnsinfra_` prefix.
+
+Using your favourite editor, open the `/etc/ansible/hosts` file with `sudo` privileges, e.g.
+
+----
+sudo vim /etc/ansible/hosts
+----
+
+... and comment out all lines starting with `#cnsinfra_`... alternatively use the below `sed` command:
+
+----
+sudo sed -i 's/#cnsinfra_//g' /etc/ansible/hosts
+----
+
+The result `/etc/ansible/hosts` looks like this:
+
+[source,ini]
+./etc/ansible/hosts
+----
+[OSEv3:children]
+masters
+nodes
+etcd
+glusterfs
+new_nodes
+glusterfs_registry
+
+...
+
+[OSEv3:vars]
+...
+openshift_storage_glusterfs_registry_namespace=infra-storage <1>
+openshift_storage_glusterfs_registry_storageclass=true <2>
+openshift_storage_glusterfs_registry_block_deploy=true <3>
+openshift_storage_glusterfs_registry_block_storageclass=true <4>
+openshift_storage_glusterfs_registry_block_host_vol_create=true <5>
+openshift_storage_glusterfs_registry_block_host_vol_size=30 <6>
+
+...
+
+[glusterfs_registry] <7>
+{{ NODE4_INTERNAL_FQDN }} glusterfs_ip={{ NODE4_INTERNAL_IP }} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]' <8>
+{{ NODE5_INTERNAL_FQDN }} glusterfs_ip={{ NODE5_INTERNAL_IP }} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
+{{ NODE6_INTERNAL_FQDN }} glusterfs_ip={{ NODE5_INTERNAL_IP }} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
+
+...
+----
+<1> Deploys a the resource of the CNS cluster for infrastructure in a separate namespace
+<2> Creates a StorageClass for the CNS infra cluster
+<3> Enables support for block storage
+<4> Creates a StorageClass for the block storage service in the CNS infra cluster
+<5> Automatically create block-hosting volumes (see CNS module for further explanations)
+<6> Allocate a total 30GiB for block storage based volumes from the CNS infra cluster
+<7> An additional group of hosts which form the CNS infra cluster
+<8> Each line is a node with a device list, consumed by CNS
+
+#### Install the CNS cluster for OpenShift infrastructure
+
+With all required lines uncommented you can start the deployment of the second CNS cluster, dedicated to OpenShift infrastructure workloads:
+
+----
+ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-glusterfs/config.yml
+----
+
+This playbooks takes about 4 minutes to execute and will install an entirely independent CNS cluster, including a separate `heketi` management stack. Additional `StorageClasses` will be set up to make this storage usable.
+
+Verify using the `oc get sc` command that two new `StorageClasses` are available:
+
+----
+NAME                          PROVISIONER                AGE
+glusterfs-registry            kubernetes.io/glusterfs    42s <1>
+glusterfs-registry-block      gluster.org/glusterblock   24s <2>
+glusterfs-storage (default)   kubernetes.io/glusterfs    15m
+----
+<1> The `StorageClass` representing shared file storage from the CNS infra cluster
+<2> The `StorageClass` representing block storage from the CNS infra cluster
+
+The target use case for these additional storage services is to provide robust, persistent storage for the Registry, Logging and Metrics service - the latter 2 we will set up now.
 
 ### OpenShift Metrics
 _Metrics_ in OpenShift refers to the continuous collection of performance and
@@ -205,7 +293,7 @@ openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }} <4>
 
 As you can see above openshift-ansible currently has no way of telling which `StorageClass` it should use as part of requesting persistent storage using a `PersistentVolumeClaim`.
 
-Hence we need to temporarily make the block-storage service offered by Red Hat Container-native Storage the system-wide default. First disable the file-based service in CNS as the default:
+Since we have just deployed an extra CNS cluster for this, we need to temporarily make it's block-storage service offered by Container-native Storage the system-wide default. First disable the file-based service in the first CNS cluster as the default:
 
 ----
 oc patch storageclass {{ CNS_STORAGECLASS }} \
@@ -223,8 +311,9 @@ This is how the `StorageClass` definitions are now set up when querying via `oc 
 
 ----
 NAME                                PROVISIONER                AGE
-{{ CNS_STORAGECLASS }}                   kubernetes.io/glusterfs    2h
-{{ CNS_BLOCK_STORAGECLASS }} (default)   gluster.org/glusterblock   2h
+glusterfs-registry                  kubernetes.io/glusterfs    15m
+{{ CNS_BLOCK_STORAGECLASS }} (default)   gluster.org/glusterblock   30m
+{{ CNS_STORAGECLASS }}                   kubernetes.io/glusterfs    15m
 ----
 
 #### Install Metrics

@@ -279,7 +279,7 @@ Since you have made a configuration change to the master, you will need to
 restart its service. You can do so with the following command with `sudo` privileges:
 
 ----
-sudo systemctl restart atomic-openshift-master-api
+sudo systemctl restart atomic-openshift-master-api atomic-openshift-master-controllers
 ----
 
 ### Test the Project Request Template

@@ -932,6 +932,7 @@ Resources:
                     HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
                     HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
                     CNS_STORAGECLASS: "glusterfs-storage"
+                    CNS_STORAGECLASS2: "glusterfs-storage-second"
                     CNS_BLOCK_STORAGECLASS: "glusterfs-storage-block"
                     NODE4_EXTERNAL_FQDN: "node04.${AWS::AccountId}.${PublicHostedZone}"
                     NODE5_EXTERNAL_FQDN: "node05.${AWS::AccountId}.${PublicHostedZone}"

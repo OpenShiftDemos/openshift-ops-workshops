@@ -292,7 +292,7 @@
         - mapit-verify
 
     - name: Wait for app instances
-      command: oc get dc mapit -o jsonpath='{.status.readyReplicas}' -n app-management
+      command: oc get dc mapit -o jsonpath='{.status.updatedReplicas}' -n app-management
       register: result
       until: '"1" in result.stdout'
       retries: 10

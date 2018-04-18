@@ -306,7 +306,7 @@ somehow die/exit are not automatically restarted. *ReplicationControllers* are
 how OpenShift "self heals".
 
 A *DeploymentConfiguration* (DC) defines how something in OpenShift should be
-deployed. From the https://docs.openshift.com/container-platform/3.5/architecture/core_concepts/deployments.html[deployments documentation]:
+deployed. From the https://docs.openshift.com/container-platform/3.9/architecture/core_concepts/deployments.html[deployments documentation^]:
 
 ----
 Building on replication controllers, OpenShift adds expanded support for the
@@ -723,7 +723,7 @@ mapit-4-d872b    0/1       ContainerCreating   0          5s
 mapit-4-deploy   1/1       Running             0          10s
 ----
 
-We will look at how this storage was provisioned automatically in the background using *Red Hat Container-native Storage* later. You will also learn how to request storage as part of a template.
+We will look at how this storage was provisioned automatically in the background using _Red Hat Container-native Storage_ later. You will also learn how to request storage as part of a template.
 
 Suffice to say, a 1GiB GlusterFS volume has been created and made available to the pod.
 
@@ -734,7 +734,7 @@ Log on to the new pod (**your pod names will be different**) using the remote-sh
 oc rsh mapit-4-d872b
 ----
 
-Next, list the content of the root directory from the perspective of the container's namespace:
+*Being in the container's shell session*, list the content of the root directory from the perspective of the container's namespace:
 
 ----
 ls -ahl /

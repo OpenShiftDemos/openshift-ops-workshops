@@ -474,8 +474,8 @@ vSwitch.
 
 The multitenant network plugin was introduced in OpenShift 3.1, and more
 information about it and its configuration can be found in the
-link:https://docs.openshift.com/container-platform/3.5/architecture/additional_concepts/sdn.html[networking
-documentation]. Additionally, other vendors are working with the upstream
+link:https://docs.openshift.com/container-platform/3.9/architecture/networking/sdn.html[networking
+documentation^]. Additionally, other vendors are working with the upstream
 Kubernetes community to implement their own SDN plugins, and several of these
 are supported by the vendors for use with OpenShift. These plugin
 implementations make use of appc/CNI, which is outside the scope of this lab.

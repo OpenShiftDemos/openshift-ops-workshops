@@ -16,7 +16,7 @@ oc login -u system:admin -n {{CNS_NAMESPACE}}
 Container-Native Storage is GlusterFS running in containers, specifically in pods managed by OpenShift. We have looked at the pods making up the storage cluster already in the introduction chapter:
 
 ----
-oc get pods -o wide
+oc get pods -o wide -n {{ CNS_NAMESPACE }}
 ----
 
 Which yields:
@@ -33,8 +33,8 @@ heketi-1-cd032    1/1       Running   0          1m       {{INFRA_INTERNAL_IP}} 
 
 [NOTE]
 ====
-The exact *Pod* names will be different in your environment, since they are
-auto-generated. Also the heketi *Pod* might run on any node.
+The exact *pod* names will be different in your environment, since they are
+auto-generated. Also the heketi *pod* might run on any node.
 ====
 
 The CNS *Pods* use the host's network and block devices to run the
@@ -113,20 +113,124 @@ the following command to look at the template for a sample Ruby on Rails
 application with a PostgreSQL database:
 
 ----
-oc get template/rails-pgsql-persistent -n openshift -o yaml
+oc get template/rails-pgsql-persistent -n openshift
 ----
 
 This template creates a Rails Application instance which mimics a very basic
 weblog. The articles and comments are saved in a PostgreSQL database which runs
-in another pod. As part of the resource template a PVC is issued (line 194) to
-supply the PostgreSQL pod with persistent storage with the mount point
-`/var/lib/pgsql/data` (line 275). This will request a *PersistentVolume* in
-`RWO` mode. Storage provided in this mode can only be mounted by a single pod at
-a time.
+in another pod.
+
+As part of the resource template a PVC is issued in YAML. Run the following command to `grep` the relavant part:
+
+
+----
+oc get template/rails-pgsql-persistent -n openshift -o yaml | grep PersistentVolumeClaim -A8
+----
+
+This show's the basic structure of a `PersistentVolumeClaim`:
+
+[source,yaml]
+----
+kind: PersistentVolumeClaim
+metadata:
+  name: ${DATABASE_SERVICE_NAME}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: ${VOLUME_CAPACITY}
+----
+
+This will request a *PersistentVolume* in `RWO` mode. Storage provided in this mode can only be mounted by a single pod at a time. The requested capacity under `resources.requests.storage` is coming in via a parameter when the template is parsed. This is how storage is _requested_.
+
+Using persistent storage is done via a `PersistentVolume` provided in response to this `PersistentVolumeClaim`. It will supply the PostgreSQL pod with persistent storage with the mount point `/var/lib/pgsql/data`.
+
+You can see this when inspecting how the pod described as part of the `DeploymentConfig`:
+
+----
+oc get template/rails-pgsql-persistent -n openshift -o yaml | grep mountPath -B60 -A5
+----
+
+Will show:
+
+
+[source,yaml]
+----
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      description: Defines how to deploy the database
+      template.alpha.openshift.io/wait-for-ready: "true"
+    name: ${DATABASE_SERVICE_NAME}
+  spec:
+    replicas: 1
+    selector:
+      name: ${DATABASE_SERVICE_NAME}
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          name: ${DATABASE_SERVICE_NAME}
+        name: ${DATABASE_SERVICE_NAME}
+      spec:
+        containers:
+        - env:
+          - name: POSTGRESQL_USER
+            valueFrom:
+              secretKeyRef:
+                key: database-user
+                name: ${NAME}
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: database-password
+                name: ${NAME}
+          - name: POSTGRESQL_DATABASE
+            value: ${DATABASE_NAME}
+          - name: POSTGRESQL_MAX_CONNECTIONS
+            value: ${POSTGRESQL_MAX_CONNECTIONS}
+          - name: POSTGRESQL_SHARED_BUFFERS
+            value: ${POSTGRESQL_SHARED_BUFFERS}
+          image: ' '
+          livenessProbe:
+            initialDelaySeconds: 30
+            tcpSocket:
+              port: 5432
+            timeoutSeconds: 1
+          name: postgresql
+          ports:
+          - containerPort: 5432
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -i
+              - -c
+              - psql -h 127.0.0.1 -U ${POSTGRESQL_USER} -q -d ${POSTGRESQL_DATABASE}
+                -c 'SELECT 1'
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: ${MEMORY_POSTGRESQL_LIMIT}
+          volumeMounts:
+          - mountPath: /var/lib/pgsql/data <1>
+            name: ${DATABASE_SERVICE_NAME}-data <2>
+        volumes:
+        - name: ${DATABASE_SERVICE_NAME}-data <2>
+          persistentVolumeClaim:
+            claimName: ${DATABASE_SERVICE_NAME} <3>
+----
+<1> The mount path where the persistent storage should appear inside the container
+<2> The name of the volume known by the container
+<3> The `PersistentVolumeClaim` from which this volume should come from
 
 [TIP]
 ====
-If you want to see more about the parameters or other details of this template,
+In the above snipped you see there are even more parameters in this template. If you want to see more about the parameters or other details of this template,
 you can execute the following:
 
 ----
@@ -135,7 +239,7 @@ oc describe template rails-pgsql-persistent -n openshift
 ====
 
 The storage size parameter in the template is called `VOLUME_CAPACITY`. The
-`new-app` command will actually handle processing and interpreting a *Template*
+`new-app` command will again handle processing and interpreting a *Template*
 into the appropriate OpenShift objects. We will specify that we want _5Gi_ of
 storage as part of deploying a new app from the template as follows:
 
@@ -208,62 +312,11 @@ Go back to the OpenShift web console:
 *{{WEB_CONSOLE_URL}}*
 
 Make sure you are logged in as _fancyuser1_ and find your newly created project
-`my-database-app`. You can now follow the deployment process. Alternatively, watch the
-containers deploy from the command line like this:
-
-[source]
-----
-oc get pods -w
-----
-
-You will see something like:
-
-----
-NAME                             READY     STATUS              RESTARTS   AGE
-postgresql-1-deploy              0/1       ContainerCreating   0          11s
-rails-pgsql-persistent-1-build   0/1       ContainerCreating   0          11s
-NAME                  READY     STATUS    RESTARTS   AGE
-postgresql-1-deploy   1/1       Running   0          14s
-postgresql-1-81gnm   0/1       Pending   0         0s
-postgresql-1-81gnm   0/1       Pending   0         0s
-rails-pgsql-persistent-1-build   1/1       Running   0         19s
-postgresql-1-81gnm   0/1       Pending   0         15s
-postgresql-1-81gnm   0/1       ContainerCreating   0         16s
-postgresql-1-81gnm   0/1       Running   0         47s
-postgresql-1-81gnm   1/1       Running   0         4m
-postgresql-1-deploy   0/1       Completed   0         4m
-postgresql-1-deploy   0/1       Terminating   0         4m
-postgresql-1-deploy   0/1       Terminating   0         4m
-rails-pgsql-persistent-1-deploy   0/1       Pending   0         0s
-rails-pgsql-persistent-1-deploy   0/1       Pending   0         0s
-rails-pgsql-persistent-1-deploy   0/1       ContainerCreating   0         0s
-rails-pgsql-persistent-1-build   0/1       Completed   0         11m
-rails-pgsql-persistent-1-deploy   1/1       Running   0         6s
-rails-pgsql-persistent-1-hook-pre   0/1       Pending   0         0s
-rails-pgsql-persistent-1-hook-pre   0/1       Pending   0         0s
-rails-pgsql-persistent-1-hook-pre   0/1       ContainerCreating   0         0s
-rails-pgsql-persistent-1-hook-pre   1/1       Running   0         6s
-rails-pgsql-persistent-1-hook-pre   0/1       Completed   0         15s
-rails-pgsql-persistent-1-dkj7w   0/1       Pending   0         0s
-rails-pgsql-persistent-1-dkj7w   0/1       Pending   0         0s
-rails-pgsql-persistent-1-dkj7w   0/1       ContainerCreating   0         0s
-rails-pgsql-persistent-1-dkj7w   0/1       Running   0         1m
-rails-pgsql-persistent-1-dkj7w   1/1       Running   0         1m
-rails-pgsql-persistent-1-deploy   0/1       Completed   0         1m
-rails-pgsql-persistent-1-deploy   0/1       Terminating   0         1m
-rails-pgsql-persistent-1-deploy   0/1       Terminating   0         1m
-rails-pgsql-persistent-1-hook-pre   0/1       Terminating   0         1m
-rails-pgsql-persistent-1-hook-pre   0/1       Terminating   0         1m
-----
-
-Exit out of the watch mode with kbd:[Ctrl + c] when you see the *-deploy and
-*-hook-pre pods terminating.
+`my-database-app`. You can now follow the deployment process here.
 
 [NOTE]
 ====
-It may take up to 5 minutes for the deployment to complete, and you might not
-see _exactly_ the same output, depending on when you first start watching (`-w`)
-the *Pod* list.
+It may take up to 5 minutes for the deployment to complete.
 ====
 
 You should now also see a PVC that has been issued and now being in the _Bound_
@@ -276,16 +329,20 @@ oc get pvc
 You will see something like:
 
 ----
-NAME         STATUS    VOLUME                                     CAPACITY   ACCESSMODES   AGE
-postgresql   Bound     pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8   5Gi        RWO           4m
+NAME         STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS        AGE
+postgresql   Bound     pvc-6de8449e-3f34-11e8-87ea-0298f449cc4c   5Gi        RWO            {{ CNS_STORAGECLASS }}   4m
 ----
 
 [TIP]
 ====
-This PVC has been automatically fulfilled by CNS because the `cns-gold` *StorageClass*
-was set up as the system-wide default in lab module link:cns-deploy["Deploying
-Container-native Storage"]
+This PVC has been automatically fulfilled by CNS because the `{{ CNS_NAMESPACE }}` *StorageClass* was set up as the system-wide default as part of the installation. The responsible parameter in the inventory file was: `openshift_storage_glusterfs_storageclass_default=true`
 ====
+
+The following diagram sums up how storage get's provisioned in OpenShift and depicts the relationship of `PersistentVolumes`, `PersistentVolumeClaims` and `StorageClasses`:
+
+.OpenShift Storage Framework.
+[caption="OpenShift Persistent Volume Framework", link=cns_diagram_pvc.png]
+image::cns_diagram_pvc.png[]
 
 #### Try the Application
 Now go ahead and try out the application. The overview page in the OpenShift UI
@@ -308,7 +365,7 @@ Following this output, point your browser to:
 *http://rails-pgsql-persistent-my-database-app.{{OCP_ROUTING_SUFFIX}}/articles*
 
 The username/password to create articles and comments is by default
-'openshift'/'secret'.
+'_openshift_'/'_secret_'.
 
 You should be able to successfully create articles and comments. When they are
 saved they are actually saved in the PostgreSQL database which stores it's table
@@ -320,7 +377,7 @@ This application's template included a *Route* object definition, which is why
 the *Service* was automatically exposed. This is a good practice.
 ====
 
-#### Explore the Underlying CNS Artifacts
+#### Explore the underlying CNS artifacts
 Now let's take a look at how this was deployed on the GlusterFS side. First you
 need to acquire necessary permissions:
 
@@ -343,8 +400,8 @@ oc get pvc
 You will see something like:
 
 ----
-NAME         STATUS    VOLUME                                     CAPACITY   ACCESSMODES   AGE
-postgresql   Bound     pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8   5Gi        RWO           17m
+NAME         STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS        AGE
+postgresql   Bound     pvc-6de8449e-3f34-11e8-87ea-0298f449cc4c   5Gi        RWO            glusterfs-storage   144m
 ----
 
 [NOTE]
@@ -353,18 +410,19 @@ Your PV name will be different as it's dynamically generated.
 ====
 
 Look at the details of the PV bound to the PVC, in this case
-`pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8`:
+`pvc-6de8449e-3f34-11e8-87ea-0298f449cc4c` (your's will be different):
 
+[source,bash,role=copypaste]
 ----
-oc describe pv/pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8
+oc describe pv/pvc-6de8449e-3f34-11e8-87ea-0298f449cc4c
 ----
 
 You will see something like:
 
 ----
-Name:		pvc-9bb84d88-4ac6-11e7-b56f-2cc2602a6dc8 <1>
+Name:		pvc-6de8449e-3f34-11e8-87ea-0298f449cc4c <1>
 Labels:		<none>
-StorageClass:	cns-gold
+StorageClass:	{{ CNS_STORAGECLASS }}
 Status:		Bound
 Claim:		my-database-app/postgresql
 Reclaim Policy:	Delete
@@ -386,7 +444,7 @@ Note the GlusterFS volume name, in this case *vol_e8fe7f46fedf7af7628feda0dcbf2f
 Now let's switch to the namespace we used for CNS deployment:
 
 ----
-oc project container-native-storage
+oc project {{ CNS_NAMESPACE }}
 ----
 
 Look at the GlusterFS pods running and pick one (which one is not important):
@@ -408,6 +466,7 @@ heketi-1-cd032    1/1       Running   0          1m       {{NODE3_INTERNAL_IP}} 
 Remember the IP address of the pod you select, for example: *{{NODE1_INTERNAL_IP}}* of pod *glusterfs-37vn8*. +
 Log on to the selected GlusterFS pod with a remote terminal session like so:
 
+[source,bash,role=copypaste]
 ----
 oc rsh glusterfs-37vn8
 ----
@@ -432,6 +491,7 @@ vol_f2e8fda1d42a41efabbb4d4a3b4a5659
 
 Query GlusterFS about the topology of this volume:
 
+[source,bash,role=copypaste]
 ----
 sh-4.2# gluster volume info vol_e8fe7f46fedf7af7628feda0dcbf2f60
 ----
@@ -475,6 +535,7 @@ You can even look at this yourself, by listing the files in the brick directory.
 Select the brick's directory (the path starting with `/var/lib/heketi/...`)
 marked in the output above:
 
+[source,bash,role=copypaste]
 ----
 sh-4.2# ls -ahl /var/lib/heketi/mounts/vg_0246fd563709384a3cbc3f3bbeeb87a9/brick_684a01f8993f241a92db02b117e0b912/brick
 ----
@@ -490,8 +551,9 @@ drwxr-sr-x.   3 root       2001   25 Jun  6 14:44 .trashcan
 drwx------.  20 1000080000 2001 8.0K Jun  6 14:46 userdata
 ----
 
-Then, try looking at the data folder:
+Then, try looking at the `userdata` folder:
 
+[source,bash,role=copypaste]
 ----
 sh-4.2# ls -ahl /var/lib/heketi/mounts/vg_0246fd563709384a3cbc3f3bbeeb87a9/brick_684a01f8993f241a92db02b117e0b912/brick/userdata
 ----
@@ -540,11 +602,8 @@ perspective of the GlusterFS server side. It's a normal local filesystem here.
 
 Clients, like the OpenShift nodes and their application pods talk to this
 storage with the GlusterFS protocol. Which abstracts the 3-way replication
-behind a single FUSE mount point. + When a pod starts that mounts storage from a
-PV backed by GlusterFS, OpenShift will mount the GlusterFS volume on the right
-app node and then _bind-mount_ this directory to the right pod. + This is
-happening transparently to the application inside the pod and looks like a
-normal local filesystem.
+behind a single FUSE mount point.
+When a pod starts that mounts storage from a PV backed by GlusterFS, OpenShift will mount the GlusterFS volume on the right app node and then _bind-mount_ this directory to the right pod. This is happening transparently to the application inside the pod and looks like a normal local filesystem.
 
 You may now exit your remote session to the GlusterFS pod.
 
@@ -724,9 +783,7 @@ locally.
 
 [CAUTION]
 ====
-Never attempt to store persistent data in a *Pod*. *Pods* and their containers are
-ephemeral by definition, and any stored data will be lost as soon as the *Pod*
-terminates.
+Never attempt to store persistent data in a *Pod*. *Pods* and their containers are ephemeral by definition, and any stored data will be lost as soon as the *Pod* ExpandPersistentVolumes=truePersistentVolumeClaimResize:terminates.
 ====
 
 Let's see when this become a problem. Exit out of the container shell:
@@ -800,7 +857,7 @@ the `oc volume` command. Execute the following
 [source]
 ----
 oc volume dc/file-uploader --add --name=my-shared-storage \
--t pvc --claim-mode=ReadWriteMany --claim-size=5Gi \
+-t pvc --claim-mode=ReadWriteMany --claim-size=1Gi \
 --claim-name=my-shared-storage --mount-path=/opt/app-root/src/uploaded
 ----
 
@@ -964,7 +1021,7 @@ admin and change to the CNS namespace:
 
 ----
 oc login -u system:admin
-oc project container-native-storage
+oc project {{ CNS_NAMESPACE }}
 ----
 
 First, identify the newly added nodes - the easiest way is to look at their uptime:
@@ -1496,8 +1553,8 @@ The registry will now redeploy.
 The registry is preconfigured with a volume called `registry-storage` that is
 using the `emptyDir` storage type. The above command `--overwrite` the existing
 volume with our new PVC. More information can be found in the
-link:https://docs.openshift.com/container-platform/3.5/dev_guide/volumes.html[volumes
-documentation].
+link:https://docs.openshift.com/container-platform/3.9/dev_guide/volumes.html[volumes
+documentation^].
 ====
 
 [TIP]

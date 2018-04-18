@@ -54,8 +54,8 @@ sets of OpenShift objects with powerful parameterization. They can be used to
 quickly deploy more complicated and related components into OpenShift, and can be a
 useful part of your organization's software development lifecycle (SDLC). More
 information can be found in the
-link:https://docs.openshift.com/container-platform/3.5/dev_guide/templates.html[template
-documentation]. We will not go into more detail on *Templates* in these
+link:https://docs.openshift.com/container-platform/3.9/dev_guide/templates.html[template
+documentation^]. We will not go into more detail on *Templates* in these
 exercises.
 
 #### Modify the Project Request Template
@@ -72,8 +72,8 @@ Take note that there are two new sections added: *ResourceQuota* and
 
 ### Background: ResourceQuota
 The
-link:https://docs.openshift.com/container-platform/3.5/admin_guide/quota.html[quota
-documentation] provides a great description of what *ResourceQuota* is about:
+link:https://docs.openshift.com/container-platform/3.9/admin_guide/quota.html[quota
+documentation^] provides a great description of what *ResourceQuota* is about:
 
 ----
 A resource quota, defined by a ResourceQuota object, provides constraints that
@@ -111,7 +111,7 @@ name/id.
 <3> CPUs are measured in "milicores", and more information on how
 Kubernetes/OpenShift calculates cores can be found in the
 link:https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/[upstream
-documentation].
+documentation^].
 <4> There is a system of both `limits` and `requests` that we will discuss more
 when we get to the *LimitRange* object.
 <5> Across all persistent volume claims in a project, the sum of storage requested cannot exceed this value.
@@ -120,13 +120,13 @@ when we get to the *LimitRange* object.
 <8> Setting the amount of **PersistentVolumeClaims** to `0` the use of the **StorageClass** `glusterfs-storage-block` is not allowed in this project.
 
 For more details on the available quota options, refer back to the
-link:https://docs.openshift.com/container-platform/3.5/admin_guide/quota.html[quota
-documentation].
+link:https://docs.openshift.com/container-platform/3.9/admin_guide/quota.html[quota
+documentation^].
 
 ### Background: LimitRange
 The
-link:https://docs.openshift.com/container-platform/3.5/admin_guide/limits.html[limit
-range documentation] provides some good background:
+link:https://docs.openshift.com/container-platform/3.9/admin_guide/limits.html[limit
+range documentation^] provides some good background:
 
 ----
 A limit range, defined by a LimitRange object, enumerates compute resource
@@ -168,8 +168,8 @@ Take a look at the sample `LimitRange` definition that we have provided in the
 ----
 
 The difference between requests and default limits is important, and is covered
-in the link:https://docs.openshift.com/container-platform/3.5/admin_guide/limits.html[limit
-range documentation]. But, generally speaking:
+in the link:https://docs.openshift.com/container-platform/3.9/admin_guide/limits.html[limit
+range documentation^]. But, generally speaking:
 
 <1> `max` is the highest value that may be specified for limits and requests
 <2> `min` is the lowest value that may be specified for limits and requests
@@ -181,8 +181,8 @@ nothing is specified
 In addition to these topics, there are things like *Quality of Service Tiers* as
 well as a *Limit* : *Request* ratio. There is additionally more information in
 the
-link:https://docs.openshift.com/container-platform/3.5/dev_guide/compute_resources.html[compute
-resources] section of the documentation.
+link:https://docs.openshift.com/container-platform/3.9/dev_guide/compute_resources.html[compute
+resources^] section of the documentation.
 
 For the sake of brevity, suffice it to say that there is a complex and powerful
 system of Quality of Service and resource management in OpenShift. Understanding
@@ -215,8 +215,8 @@ NOTE: Remember that quotas and limits are applied at the *Project* level. *Users
 may have access to multiple *Projects*, but quotas and limits do not apply
 directly to *Users*. If you want to apply one quota across multiple *Projects*,
 then you should look at the
-link:https://docs.openshift.com/container-platform/3.5/admin_guide/multiproject_quota.html[multi-project
-quota] documentation. We will not cover multi-project quota in these exercises.
+link:https://docs.openshift.com/container-platform/3.9/admin_guide/multiproject_quota.html[multi-project
+quota^] documentation. We will not cover multi-project quota in these exercises.
 
 ### Installing the Project Request Template
 OK, with this background in place, let's go ahead and actually tell OpenShift to

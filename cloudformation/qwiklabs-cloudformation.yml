@@ -1003,6 +1003,10 @@ Resources:
                     openshift_storage_glusterfs_storageclass=true
                     openshift_storage_glusterfs_storageclass_default=true
                     openshift_storage_glusterfs_block_deploy=false
+                    #cnsinfra_openshift_storage_glusterfs_registry_version=v3.9
+                    #cnsinfra_openshift_storage_glusterfs_registry_heketi_version=v3.9
+                    #cnsinfra_openshift_storage_glusterfs_registry_block_version=v3.9
+                    #cnsinfra_openshift_storage_glusterfs_registry_s3_version=v3.9
                     #cnsinfra_openshift_storage_glusterfs_registry_namespace=infra-storage
                     #cnsinfra_openshift_storage_glusterfs_registry_storageclass=true
                     #cnsinfra_openshift_storage_glusterfs_registry_storageclass_default=false

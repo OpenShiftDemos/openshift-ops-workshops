@@ -376,7 +376,7 @@
         cns_clusterid_2: "{{heketi_cluster_second.clusters|difference([cns_clusterid_1])|first}}"
 
     - name: create storage class file from template
-      shell: "oc get storageclass {{ cns_storageclass }} -o json | jq \".parameters=(.parameters + {\\"clusterid\\": \\"{{ cns_clusterid_2 }}\\"})\" | jq '.metadata.name = \"{{ cns_storageclass2 }}\"' | jq '.metadata.annotations.\"storageclass.kubernetes.io/is-default-class\" = \"false\"' > /tmp/glusterfs-storage-second.json"
+      shell: "oc get storageclass {{ cns_storageclass }} -o json | jq \".parameters=(.parameters + {\\\"clusterid\\\": \\\"{{ cns_clusterid_2 }}\\\"})\" | jq '.metadata.name = \"{{ cns_storageclass2 }}\"' | jq '.metadata.annotations.\"storageclass.kubernetes.io/is-default-class\" = \"false\"' > /tmp/glusterfs-storage-second.json"
       args:
         creates: /tmp/glusterfs-storage-second.json
 

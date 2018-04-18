@@ -970,24 +970,6 @@ Resources:
                   owner: cloud-user:cloud-user
 
                 - content: |
-                    apiVersion: storage.k8s.io/v1beta1
-                    kind: StorageClass
-                    metadata:
-                      name: cns-silver
-                      annotations:
-                    provisioner: kubernetes.io/glusterfs
-                    parameters:
-                      resturl: "http://heketi-container-native-storage.apps.${AWS::AccountId}.${PublicHostedZone}"
-                      restauthenabled: "true"
-                      restuser: "admin"
-                      volumetype: "replicate:3"
-                      clusterid: "INSERT-CLUSTER-ID-HERE"
-                      secretNamespace: "default"
-                      secretName: "cns-secret"
-                  path: /opt/lab/support/second-cns-storageclass.yaml
-                  owner: cloud-user:cloud-user
-
-                - content: |
                     [OSEv3:children]
                     masters
                     nodes

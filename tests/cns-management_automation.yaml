@@ -466,7 +466,7 @@
       changed_when: false
 
     - name: check daemonset health
-      shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.numberReady}'
+      shell: oc get daemonset -l glusterfs=storage-daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs-storage")].status.numberReady}'
       register: check_daemonset_ready
       failed_when:
         - check_daemonset_ready.stdout == ""

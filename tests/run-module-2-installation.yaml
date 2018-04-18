@@ -1,6 +1,6 @@
 ---
 
-- name: Tests for verifying the OpenShift installation (Lab-Module 1)
+- name: Tests for verifying the OpenShift installation
   hosts: masters
   tags:
     - deployment_verify

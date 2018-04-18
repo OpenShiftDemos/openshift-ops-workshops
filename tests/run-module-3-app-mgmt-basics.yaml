@@ -152,7 +152,7 @@
       tags:
         - mapit-deploy
 
-    - name: Wait for app instances
+    - name: Wait for app instance
       command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
       register: result
       until: '"1" in result.stdout'
@@ -291,7 +291,7 @@
         - mapit-deploy
         - mapit-verify
 
-    - name: Wait for app instances
+    - name: Wait for app instance
       command: oc get dc mapit -o jsonpath='{.status.updatedReplicas}' -n app-management
       register: result
       until: '"1" in result.stdout'

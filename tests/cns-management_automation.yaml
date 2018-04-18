@@ -293,7 +293,7 @@
     - cns_extend
   tasks:
 
-    - import_taks: ../support/configure-for-cns-tasks.yaml
+    - import_tasks: ../support/configure-for-cns-tasks.yaml
 
 
 - name: Extend CNS

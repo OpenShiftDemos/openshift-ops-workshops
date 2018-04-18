@@ -452,7 +452,7 @@
     # ensure other tasks in the configure-for-cns-tasks.yaml have been successful
 
     - name: ensure additional storage nodes have correct label
-      shell: oc get nodes -l storagenode=glusterfs -o jsonpath='{$.items[?(@.metadata.name=="{{ item }}")].metadata.name}'
+      shell: oc get nodes -l glusterfs=storage-host -o jsonpath='{$.items[?(@.metadata.name=="{{ item }}")].metadata.name}'
       register: node_label_check
       failed_when: node_label_check.stdout != item
       with_items: "{{ new_cns_nodes_internal_fqdn }}"

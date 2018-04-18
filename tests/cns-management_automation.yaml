@@ -87,7 +87,7 @@
       assert:
         that:
           - postgresql_pvc.metadata.annotations['volume.beta.kubernetes.io/storage-provisioner'] == 'kubernetes.io/glusterfs'
-          - postgresql_pv.spec.storageClassName == cns_storageclass
+          - postgresql_pvc.spec.storageClassName == cns_storageclass
         msg: pvc is not served from StorageClass {{ cns_storageclass }}
 
     - name: check pv is exists

@@ -1247,9 +1247,9 @@ You can look at the `StorageClass` for the first cluster like so:
 oc get storageclass {{ CNS_STORAGECLASS }} -o yaml
 ----
 
-We could now copy this by saving the output of this command in a file, modify the name, add `clusterid` parameter and set the `is-default-class` value to `false` and then use `oc create -f <file.yaml>` to create the new `StorageClass` object.
+We could now copy this by saving the output of this command in a file and then modify the file: change the name, add `clusterid` parameter and set the `is-default-class` value to `false`. Then use `oc create -f <file.yaml>` to create the new `StorageClass` object.
 
-Here is a shortcut using the nifty `jq` utility (a JSON manipulator) to do this in a single command line.
+Here is a shortcut using the nifty `jq` utility (a command-line JSON manipulator) to do this in a single command line.
 
 [source,bash]
 ----
@@ -1293,11 +1293,13 @@ You can look at the file now, it should look similar to this:
 <2> The heketi internal ID of the new cluster is used to specifically direct
 requests to it. This should contain *your ID* of the second cluster.
 
+Create the `StorageClass` by parsing the JSON using the `oc create` command:
+
 ----
 oc create -f glusterfs-storage-second.json
 ----
 
-The command should go through without erros.
+The command should go through without errors.
 
 ----
 storageclass "glusterfs-storage-second" created

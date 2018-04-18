@@ -381,18 +381,21 @@
         creates: /tmp/glusterfs-storage-second.json
 
     - name: create second storage class
-      shell: oc create -f/tmp/glusterfs-storage-second.json
+      shell: oc create -f /tmp/glusterfs-storage-second.json
 
-    - name: query nodes of second cns cluster
-      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster info {{ cns_clusterid_2 }} --json
-      register: heketi_cluster_node_list
+    - name: create sample PV
+      shell: oc create -f /opt/lab/support/cns-second-pvc.yaml
 
-    - set_fact:
-        cns_cluster_info: "{{ heketi_cluster_node_list.stdout|from_json }}"
-
-    - assert:
-        that:
-          - cns_cluster_info.nodes | length == 3
+    # - name: query nodes of second cns cluster
+    #   shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster info {{ cns_clusterid_2 }} --json
+    #   register: heketi_cluster_node_list
+    #
+    # - set_fact:
+    #     cns_cluster_info: "{{ heketi_cluster_node_list.stdout|from_json }}"
+    #
+    # - assert:
+    #     that:
+    #       - cns_cluster_info.nodes | length == 3
 
     # - name: add additional devices to second CNS cluster
     #   shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device add --name={{ node_brick_device2 }} --node={{ item }}
@@ -479,22 +482,22 @@
       register: heketi_cluster_list
 
     - name: get storage class
-      shell: oc get storageclass/{{ cns_storageclass }} -o json
-      register: get_storageclass1
+      shell: oc get storageclass/{{ cns_storageclass2 }} -o json
+      register: get_storageclass2
       changed_when: false
 
     - set_fact:
-        storageclass1: "{{ get_storageclass1.stdout|from_json }}"
+        storageclass2: "{{ get_storageclass2.stdout|from_json }}"
 
-    - name: get CNS cluster id of storageclass
+    - name: get second CNS cluster id of storageclass
       set_fact:
-        clusterid1: "{{storageclass1.parameters.clusterid}}"
+        clusterid12: "{{storageclass2.parameters.clusterid}}"
 
     - set_fact:
         heketi_clusters: "{{heketi_cluster_list.stdout|from_json}}"
 
     - set_fact:
-        clusterid2: "{{heketi_clusters.clusters|difference([clusterid1])|first}}"
+        clusterid1: "{{heketi_clusters.clusters|difference([clusterid2])|first}}"
 
     - name: get nodes from heketi using CNS cluster id 2
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster info {{ clusterid2 }} --json
@@ -511,31 +514,53 @@
       changed_when: false
 
     - name: check second set of cns nodes are pods in second cns cluster
-      shell: oc get pods -o wide -n container-native-storage -o jsonpath='{$.items[?(@.status.hostIP=="{{ (item.stdout|from_json).hostnames.storage|first }}")].metadata.name}'
+      shell: oc get pods -o wide -n {{ cns_namespace }} -l glusterfs=storage-pod -o jsonpath='{$.items[?(@.status.hostIP=="{{ (item.stdout|from_json).hostnames.storage|first }}")].metadata.name}'
       register: get_cluster2_node
       with_items: "{{ get_cluster2_node_infos.results }}"
       failed_when: get_cluster2_node.stdout == ""
       changed_when: false
 
-    - name: get second storage class
-      shell: oc get storageclass/{{ cns_storageclass2 }} -o json
-      register: get_storageclass2
+    - name: ensure sample pvc exists
+      shell: oc get pvc/my-container-storage-second -o json
+      register: get_sample_pvc
       changed_when: false
 
     - set_fact:
-        storageclass2: "{{ get_storageclass2.stdout|from_json }}"
+        sample_pvc: "{{ get_sample_pvc.stdout|from_json }}"
 
-    - name: check second storage class carries second clusters id
+    - name: ensure pvc is bound
       fail:
-        msg: "cluster id {{ clusterid2 }} is not set in storageclass {{ cns_storageclass2 }}"
-      when: storageclass2.parameters.clusterid != clusterid2
+        msg: pvc is not bound
+      when: sample_pvc.status.phase != "Bound"
 
-    - name: check presence of additional devices in nodes
-      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ item }}
-      with_items: "{{ cluster2_nodes }}"
-      register: cluster2_node
-      failed_when: node_brick_device2 not in cluster2_node.stdout
+    - name: ensure pvc is issued against CNS and the right storageclass
+      assert:
+        that:
+          - sample_pvc.metadata.annotations['volume.beta.kubernetes.io/storage-provisioner'] == 'kubernetes.io/glusterfs'
+          - sample_pvc.spec.storageClassName == cns_storageclass2
+        msg: pvc is not served from StorageClass {{ cns_storageclass2 }}
+
+    - name: check pv is exists
+      shell: oc get pv/{{ sample_pvc.spec.volumeName }} -o json
+      register: get_sample_pv
       changed_when: false
+
+    - set_fact:
+        sample_pv: "{{ get_sample_pv.stdout|from_json }}"
+
+    - name: check pv is provided by CNS and by the right storageclass
+      assert:
+        that:
+          - sample_pv.metadata.annotations['pv.kubernetes.io/provisioned-by'] == 'kubernetes.io/glusterfs'
+          - sample_pv.spec.storageClassName == cns_storageclass2
+        msg: pv is not provided by {{ cns_storageclass2 }}
+
+    # - name: check presence of additional devices in nodes
+    #   shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ item }}
+    #   with_items: "{{ cluster2_nodes }}"
+    #   register: cluster2_node
+    #   failed_when: node_brick_device2 not in cluster2_node.stdout
+    #   changed_when: false
 
 - name: Perform CNS Maintenance
   hosts: localhost

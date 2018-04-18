@@ -17,6 +17,39 @@ At this point you should be logged in as `cloud-user` on the OpenShift Master
 node via SSH.
 ====
 
+### Master Components
+
+.OpenShift Master's 4 main responsibilities.
+image::openshift_master_4_responsibilities.png[]
+
+
+#### API/Authentication
+The Kubernetes API server validates and configures the data for pods, services, and replication controllers. It also assigns pods to nodes and synchronizes pod information with service configuration. Can be run as a standalone process.
+
+Common things that interact with the Kubernetes API server are:
+
+* OpenShift Web Console
+* OpenShift `oc` command line tool
+* OpenShift Node
+* Kubernetes Controllers
+
+#### Data Store
+The OpenShift Data Store (etcd) stores the persistent master state while other components watch etcd for changes to bring themselves into the desired state. etcd can be optionally configured for high availability, typically deployed with 2n+1 peer services.
+
+#### Scheduler
+The pod scheduler is responsible for determining placement of new pods onto nodes within the cluster.
+
+#### Health / Scaling
+The master uses the information from node objects to validate nodes with health checks. A node is ignored until it passes the health checks, and the master continues checking nodes until they are valid.
+
+
+
+For more information on the OpenShift Master's areas of responsibility, please refer to
+the
+link:https://docs.openshift.com/container-platform/3.5/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
+
+
+
 ### Examining the provided Ansible inventory file
 First, let's examine the provided installer configuration file.
 

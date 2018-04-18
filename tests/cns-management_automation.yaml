@@ -487,7 +487,7 @@
 
     - name: get second CNS cluster id of storageclass
       set_fact:
-        clusterid12: "{{storageclass2.parameters.clusterid}}"
+        clusterid2: "{{storageclass2.parameters.clusterid}}"
 
     - set_fact:
         heketi_clusters: "{{heketi_cluster_list.stdout|from_json}}"

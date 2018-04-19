@@ -291,7 +291,7 @@
           - "{{NODE4_INTERNAL_FQDN}}"
           - "{{NODE5_INTERNAL_FQDN}}"
           - "{{NODE6_INTERNAL_FQDN}}"
-        heketi_resturl: "http://heketi-registry-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+        heketi_resturl: "http://heketi-registry-{{CNS_INFRA_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
 
     - name: get id of cns infra cluster

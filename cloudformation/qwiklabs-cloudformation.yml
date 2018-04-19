@@ -933,7 +933,6 @@ Resources:
                     HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
                     HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
                     CNS_STORAGECLASS: "glusterfs-storage"
-                    CNS_STORAGECLASS2: "glusterfs-storage-second"
                     CNS_BLOCK_STORAGECLASS: "glusterfs-registry-block"
                     CNS_INFRA_STORAGECLASS: "glusterfs-registry"
                     NODE4_EXTERNAL_FQDN: "node04.${AWS::AccountId}.${PublicHostedZone}"
@@ -1332,11 +1331,11 @@ Resources:
                   NODE_BRICK_DEVICE="/dev/xvdd"
                   NODE_BRICK_DEVICE2="/dev/xvde"
                   CNS_NAMESPACE="storage"
-                  CNS_STORAGECLASS="cns-gold"
-                  CNS_STORAGECLASS2="cns-silver"
+                  CNS_INFRA_NAMESPACE: "infra-storage"
                   HEKETI_ADMIN_PW="myS3cr3tpassw0rd"
-                  HEKETI_ADMIN_PW_BASE64="bXlTM2NyM3RwYXNzdzByZA=="
-                  HEKETI_USER_PW="mys3rs3cr3tpassw0rd"
+                  CNS_STORAGECLASS: "glusterfs-storage"
+                  CNS_BLOCK_STORAGECLASS: "glusterfs-registry-block"
+                  CNS_INFRA_STORAGECLASS: "glusterfs-registry"
                 path: /etc/sysconfig/workshopper
                 owner: root:root
 

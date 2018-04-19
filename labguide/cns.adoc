@@ -976,6 +976,19 @@ Filesystem                                      Size  Used Avail Use% Mounted on
 10.0.1.36:vol_6320cd6974d8573f49f85a5d7255a7f2  5.0G  1.1G  4.0G  21% /opt/app-root/src/uploaded
 ----
 
+### Providing block storage with CNS
+
+Container-native Storage also contains a block storage persona. Add the very end of every *Pod* accessing a `PersistentVolume` there is a filesystem directory bind-mounted to the container's filesystem namespace. In the case of GlusterFS it's the GlusterFS filesystem, a POSIX compatible, replicated shared network filesystem.
+As of today there is no support to provision a block device directly to *Pod*. All block storage supported by OpenShift eventually gets formatted with a filesystem like XFS, and then this is bind-mounted to the container.
+
+When we speak of block storage in CNS, we are talking about an iSCSI LUN getting provisioned as part of a `PersistentVolumeClaim` against the block-based `StorageClass` of CNS. This iSCSI LUN is generated from the LIO stack running in the CNS pods. It is backed by a sparse file which is hosted on an internal GlusterFS volume. This subsystem is called `gluster-block`.
+See below graphic for a representation:
+
+.gluster-block IO flow in CNS
+image::cns_diagram_gluster_block.png[]
+
+
+
 ### CNS Operations
 
 #### Options to increase Storage Capacity in CNS

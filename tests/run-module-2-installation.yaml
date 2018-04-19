@@ -43,7 +43,7 @@
         method: GET
       changed_when: false
 
-- name: Actions to automate user actions after OpenShift installation (Lab-Module 1)
+- name: Actions to automate user actions after OpenShift installation
   hosts: masters
   tags:
     - deployment_simulate
@@ -59,7 +59,7 @@
     - assert:
         that:
           - "'Logged into \"https://master.internal.aws.testdrive.openshift.com:443\" as \"system:admin\" using existing credentials.' in login.stdout"
-          - "'Using project \"default\".' in login.stdout"
+          - "'project \"default\".' in login.stdout"
 
     - name: list all nodes
       shell: oc get nodes

@@ -596,7 +596,7 @@
 - name: Verify Registry Persistent Storage
   hosts: localhost
   tags:
-    - registry_storage_example
+    - registry_storage
     - registry_storage_verify
   tasks:
     - include_vars: /opt/lab/environment.yml

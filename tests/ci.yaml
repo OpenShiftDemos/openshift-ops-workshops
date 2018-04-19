@@ -1,9 +1,9 @@
 
 ---
-- include: run-module-2-installation.yaml
-- include: run-module-3-app-mgmt-basics.yaml
-- include: run-module-4-template-quota-limits.yaml
-- include: run-module-5-ldap-groupsync.yaml
-- include: run-module-6-infra-mgmt.yaml
-- include: cns-management_automation.yaml
-- include: cns-management_verify.yaml
+- import_playbook: run-module-2-installation.yaml
+- import_playbook: run-module-3-app-mgmt-basics.yaml
+- import_playbook: run-module-4-template-quota-limits.yaml
+- import_playbook: run-module-5-ldap-groupsync.yaml
+- import_playbook: run-module-6-infra-mgmt.yaml
+- import_playbook: cns-management_automation.yaml
+- import_playbook: cns-management_verify.yaml

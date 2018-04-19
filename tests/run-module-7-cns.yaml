@@ -371,7 +371,7 @@
         cns_infra_cluster_id: "{{ get_cns_infra_cluster_id.stdout }}"
 
     - name: get node 4 id
-      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} heketi-cli topology info --json | jq -r ".clusters[] | select(.id==\"{{ cns_infra_cluster_id }}\") | .nodes[] | select(.hostnames.manage[0] == \"{{ node4_internal_fqdn }}\") | .id"
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info --json | jq -r ".clusters[] | select(.id==\"{{ cns_infra_cluster_id }}\") | .nodes[] | select(.hostnames.manage[0] == \"{{ node4_internal_fqdn }}\") | .id"
       register: get_node4_id
 
     - set_fact:

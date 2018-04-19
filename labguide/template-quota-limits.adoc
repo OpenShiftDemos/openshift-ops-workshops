@@ -54,8 +54,8 @@ sets of OpenShift objects with powerful parameterization. They can be used to
 quickly deploy more complicated and related components into OpenShift, and can be a
 useful part of your organization's software development lifecycle (SDLC). More
 information can be found in the
-link:https://docs.openshift.com/container-platform/3.5/dev_guide/templates.html[template
-documentation]. We will not go into more detail on *Templates* in these
+link:https://docs.openshift.com/container-platform/3.9/dev_guide/templates.html[template
+documentation^]. We will not go into more detail on *Templates* in these
 exercises.
 
 #### Modify the Project Request Template
@@ -72,8 +72,8 @@ Take note that there are two new sections added: *ResourceQuota* and
 
 ### Background: ResourceQuota
 The
-link:https://docs.openshift.com/container-platform/3.5/admin_guide/quota.html[quota
-documentation] provides a great description of what *ResourceQuota* is about:
+link:https://docs.openshift.com/container-platform/3.9/admin_guide/quota.html[quota
+documentation^] provides a great description of what *ResourceQuota* is about:
 
 ----
 A resource quota, defined by a ResourceQuota object, provides constraints that
@@ -99,8 +99,10 @@ volume claims, and *Pods*. Take a look at the `ResourceQuota` section from the
       requests.cpu: 4000m <3>
       requests.memory: 8Gi <4>
       resourcequotas: 1
-      requests.storage: 25Gi <5>
+      requests.storage: 50Gi <5>
       persistentvolumeclaims: 5 <6>
+      {{ CNS_STORAGECLASS }}.storageclass.storage.k8s.io/requests.storage: 25Gi <7>
+      {{ CNS_BLOCK_STORAGECLASS }}.storageclass.storage.k8s.io/persistentvolumeclaims: 0 <8>
 ----
 
 <1> While only one quota can be defined in a *Project*, it still needs a unique
@@ -109,20 +111,22 @@ name/id.
 <3> CPUs are measured in "milicores", and more information on how
 Kubernetes/OpenShift calculates cores can be found in the
 link:https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/[upstream
-documentation].
+documentation^].
 <4> There is a system of both `limits` and `requests` that we will discuss more
 when we get to the *LimitRange* object.
 <5> Across all persistent volume claims in a project, the sum of storage requested cannot exceed this value.
 <6> The total number of persistent volume claims in a project.
+<7> This settings limits the amount of storage that can be provisioned using the `glusterfs-storage` *StorageClass*.
+<8> Setting the amount of **PersistentVolumeClaims** to `0` the use of a **StorageClass** called `{{ CNS_BLOCK_STORAGECLASS }}` is not allowed in this project.
 
 For more details on the available quota options, refer back to the
-link:https://docs.openshift.com/container-platform/3.5/admin_guide/quota.html[quota
-documentation].
+link:https://docs.openshift.com/container-platform/3.9/admin_guide/quota.html[quota
+documentation^].
 
 ### Background: LimitRange
 The
-link:https://docs.openshift.com/container-platform/3.5/admin_guide/limits.html[limit
-range documentation] provides some good background:
+link:https://docs.openshift.com/container-platform/3.9/admin_guide/limits.html[limit
+range documentation^] provides some good background:
 
 ----
 A limit range, defined by a LimitRange object, enumerates compute resource
@@ -164,8 +168,8 @@ Take a look at the sample `LimitRange` definition that we have provided in the
 ----
 
 The difference between requests and default limits is important, and is covered
-in the link:https://docs.openshift.com/container-platform/3.5/admin_guide/limits.html[limit
-range documentation]. But, generally speaking:
+in the link:https://docs.openshift.com/container-platform/3.9/admin_guide/limits.html[limit
+range documentation^]. But, generally speaking:
 
 <1> `max` is the highest value that may be specified for limits and requests
 <2> `min` is the lowest value that may be specified for limits and requests
@@ -177,8 +181,8 @@ nothing is specified
 In addition to these topics, there are things like *Quality of Service Tiers* as
 well as a *Limit* : *Request* ratio. There is additionally more information in
 the
-link:https://docs.openshift.com/container-platform/3.5/dev_guide/compute_resources.html[compute
-resources] section of the documentation.
+link:https://docs.openshift.com/container-platform/3.9/dev_guide/compute_resources.html[compute
+resources^] section of the documentation.
 
 For the sake of brevity, suffice it to say that there is a complex and powerful
 system of Quality of Service and resource management in OpenShift. Understanding
@@ -211,8 +215,8 @@ NOTE: Remember that quotas and limits are applied at the *Project* level. *Users
 may have access to multiple *Projects*, but quotas and limits do not apply
 directly to *Users*. If you want to apply one quota across multiple *Projects*,
 then you should look at the
-link:https://docs.openshift.com/container-platform/3.5/admin_guide/multiproject_quota.html[multi-project
-quota] documentation. We will not cover multi-project quota in these exercises.
+link:https://docs.openshift.com/container-platform/3.9/admin_guide/multiproject_quota.html[multi-project
+quota^] documentation. We will not cover multi-project quota in these exercises.
 
 ### Installing the Project Request Template
 OK, with this background in place, let's go ahead and actually tell OpenShift to
@@ -275,7 +279,7 @@ Since you have made a configuration change to the master, you will need to
 restart its service. You can do so with the following command with `sudo` privileges:
 
 ----
-sudo systemctl restart atomic-openshift-master
+sudo systemctl restart atomic-openshift-master-api atomic-openshift-master-controllers
 ----
 
 ### Test the Project Request Template
@@ -316,15 +320,16 @@ Description:    <none>
 Status:         Active
 Node Selector:  <none>
 Quota:
-        Name:                   template-test-quota
-        Resource                Used    Hard
-        --------                ----    ----
-        persistentvolumeclaims  0       5
-        pods                    0       10
-        requests.cpu            0       4
-        requests.memory         0       4Gi
-        requests.storage        0       25Gi
-        resourcequotas          1       1
+Resource								Used	Hard
+--------								----	----
+glusterfs-block.storageclass.storage.k8s.io/persistentvolumeclaims	0	0
+glusterfs.storageclass.storage.k8s.io/requests.storage			0	25Gi
+persistentvolumeclaims							0	5
+pods									0	10
+requests.cpu								0	4
+requests.memory								0	8Gi
+requests.storage							0	50Gi
+resourcequotas								1	1
 Resource limits:
         Name:           template-test-limits
         Type            Resource        Min     Max     Default

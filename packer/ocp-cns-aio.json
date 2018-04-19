@@ -32,13 +32,13 @@
     }],
     "ami_name": "ocp-cns-aio-{{timestamp}}",
     "ami_regions": ["eu-west-1", "eu-central-1", "us-east-1", "us-west-2", "ap-southeast-1"],
-    "ami_users": ["XXXX"],
+    "ami_users": ["XXX"],
     "ami_description": "OCP 3.9 / CNS 3.9 with all core container images available locally for use by Qwiklabs",
     "tags": {
       "Name": "ocp-cns-qwiklabs",
       "Platform": "Red Hat Enterprise Linux",
-      "Release": "3.9.0",
-      "OS_Version": "Red Hat Enterprise Linux 7.4",
+      "Release": "3.9.1",
+      "OS_Version": "Red Hat Enterprise Linux 7.5",
       "OCP_Version": "OpenShift Enterprise 3.9",
       "CNS_Version": "Container-Native Storage 3.9"
     }

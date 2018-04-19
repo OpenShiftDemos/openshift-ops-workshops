@@ -17,6 +17,39 @@ At this point you should be logged in as `cloud-user` on the OpenShift Master
 node via SSH.
 ====
 
+### Master Components
+
+.OpenShift Master's 4 main responsibilities.
+image::openshift_master_4_responsibilities.png[]
+
+
+#### API/Authentication
+The Kubernetes API server validates and configures the data for pods, services, and replication controllers. It also assigns pods to nodes and synchronizes pod information with service configuration. Can be run as a standalone process.
+
+Common things that interact with the Kubernetes API server are:
+
+* OpenShift Web Console
+* OpenShift `oc` command line tool
+* OpenShift Node
+* Kubernetes Controllers
+
+#### Data Store
+The OpenShift Data Store (etcd) stores the persistent master state while other components watch etcd for changes to bring themselves into the desired state. etcd can be optionally configured for high availability, typically deployed with 2n+1 peer services.
+
+#### Scheduler
+The pod scheduler is responsible for determining placement of new pods onto nodes within the cluster.
+
+#### Health / Scaling
+The master uses the information from node objects to validate nodes with health checks. A node is ignored until it passes the health checks, and the master continues checking nodes until they are valid.
+
+
+
+For more information on the OpenShift Master's areas of responsibility, please refer to
+the
+link:https://docs.openshift.com/container-platform/3.5/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
+
+
+
 ### Examining the provided Ansible inventory file
 First, let's examine the provided installer configuration file.
 
@@ -37,7 +70,7 @@ link:https://docs.openshift.com/container-platform/3.9/install_config/install/ad
 installer's documentation].
 
 The top-level playbook in `/usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml` triggers the installation of the cluster and all of it's components. It's idempotent, which means you can execute this playbook multiple times without harm. This also allows to deploy additional components after the initial install by simply modifying the configuration in `/etc/ansible/hosts` and re-run the installer.
-In addition to this there are playbooks that only deploy a specific component or service which makes them faster to execute.
+In addition to this, there are playbooks that only deploy a specific components or services which makes them faster to execute.
 
 [TIP]
 ====
@@ -54,7 +87,7 @@ this preconfigured config. Otherwise, anyone who can `sudo` on the master has
 super user privileges on the entire cluster.
 
 #### Login on the master
-Additionally, your account,`cloud-user`, is preconfigured for cluster administrator access as well.
+Additionally, your Linux system account on the master, `cloud-user`, is preconfigured to access this OpenShift "super administrator" without password.
 Type the following command to login as the internal super-user on OpenShift:
 
 ----
@@ -93,12 +126,12 @@ oc get nodes
 The output should look something like the following:
 
 ----
-NAME                          STATUS                     AGE      VERSION
-{{INFRA_INTERNAL_FQDN}}     Ready                      1m         v1.9.1+a0ce1bc657
-{{MASTER_INTERNAL_FQDN}}    Ready,SchedulingDisabled   1m         v1.9.1+a0ce1bc657
-{{NODE1_INTERNAL_FQDN}}    Ready                      1m          v1.9.1+a0ce1bc657
-{{NODE2_INTERNAL_FQDN}}    Ready                      1m          v1.9.1+a0ce1bc657
-{{NODE3_INTERNAL_FQDN}}    Ready                      1m           v1.9.1+a0ce1bc657
+NAME                                          STATUS    ROLES     AGE
+{{ INFRA_INTERNAL_FQDN }}    Ready     <none>    1m
+{{ MASTER_INTERNAL_FQDN }}   Ready     master    1m
+{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1m
+{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1m
+{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1m
 ----
 
 All of the systems listed in the `[nodes]` group in the `/etc/ansible/hosts`
@@ -134,7 +167,7 @@ In your environment Red Hat Container-native Storage was installed as part of Op
 We will now use a command line client on the *master* to talk via this server to container storage cluster. It's password protected, so let's export a couple of environment variables first to configure the client:
 
 ----
-export HEKETI_CLI_SERVER=http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+export HEKETI_CLI_SERVER=http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
 export HEKETI_CLI_USER=admin
 export HEKETI_CLI_KEY={{HEKETI_ADMIN_PW}}
 ----

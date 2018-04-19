@@ -24,5 +24,6 @@ storage_packages:
   - glusterfs-fuse
   - ceph-common
   - iscsi-initiator-utils
+  - device-mapper-multipath
 
 ...

@@ -1,0 +1,86 @@
+---
+- name: Automation of project request template, quota, limits module
+  hosts: masters
+  tasks:
+    - name: Login as system:admin to create projects
+      command: oc login -u system:admin
+      tags:
+        - quota-deploy
+        - quota-verify
+
+    - name: Check for the project request template
+      command: oc get template project-request -n default
+      register: template_output
+      ignore_errors: true
+      tags:
+        - quota-deploy
+
+    - name: Create the project-request template in the namespace 'default'
+      command: oc create -f /opt/lab/support/project_request_template.yaml -n default
+      when: template_output | failed
+      tags:
+        - quota-deploy
+
+    - name: read master config from file
+      slurp:
+        src: /etc/origin/master/master-config.yaml
+      register: master_config_file
+
+    - set_fact:
+        master_config: "{{ master_config_file['content'] | b64decode | from_yaml }}"
+
+    - name: output new master config
+      template:
+        src: templates/master-config.yaml.j2
+        dest: /etc/origin/master/master-config.yaml
+        owner: root
+        group: root
+        mode: 0600
+      vars:
+        newProjectRequestTemplate: "default/project-request"
+      tags:
+        - quota-deploy
+
+    - name: Restart the master services for changes to apply
+      command: systemctl restart {{ item }}
+      with_items:
+        - atomic-openshift-master-api
+        - atomic-openshift-master-controllers
+      tags:
+        - quota-deploy
+
+    - name: Check for template-test project
+      command: oc get project template-test
+      register: template_out
+      ignore_errors: true
+      tags:
+        - quota-deploy
+        - quota-verify
+
+    - name: Creating the creation of a new project
+      command: oc new-project template-test
+      when: template_out | failed
+      tags:
+        - quota-deploy
+        - quota-verify
+
+    - name: Check again for template-test project
+      command: oc get project template-test
+      tags:
+        - quota-verify
+
+    - name: Checking if quota is present for this project
+      command: oc get quota template-test-quota -n template-test
+      tags:
+        - quota-verify
+
+    - name: Checking if limitrange is present for the created project
+      command: oc get limits template-test-limits -n template-test
+      tags:
+        - quota-verify
+
+    - name: Delete template-test project
+      command: oc delete project template-test
+      tags:
+        - quota-deploy
+        - quota-verify

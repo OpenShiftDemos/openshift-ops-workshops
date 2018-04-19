@@ -10,7 +10,7 @@
     copy:
       src: systemd-docker
       dest: /usr/local/sbin/
-      mode: u+x,g=r,o=r
+      mode: u=rx,g=r,o=r
       owner: root
       group: root
 

@@ -21,12 +21,12 @@ oc get nodes
 You should see:
 
 ----
-NAME                                          STATUS                     AGE
-{{ INFRA_INTERNAL_FQDN }}    Ready                      1h
-{{ MASTER_INTERNAL_FQDN }}   Ready,SchedulingDisabled   1h
-{{ NODE1_INTERNAL_FQDN }}   Ready                      1h
-{{ NODE2_INTERNAL_FQDN }}   Ready                      1h
-{{ NODE3_INTERNAL_FQDN }}   Ready                      1h
+NAME                                          STATUS    ROLES     AGE
+{{ INFRA_INTERNAL_FQDN }}    Ready     <none>    1h
+{{ MASTER_INTERNAL_FQDN }}   Ready     master    1h
+{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1h
+{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1h
+{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1h
 ----
 
 Use the label specified as the default node selector for pods in the inventory
@@ -37,13 +37,18 @@ application nodes:
 oc get nodes -l region=apps
 ----
 
+[TIP]
+====
+The `-l` switch works for many subcommands of the `oc` utility and filters the output matching objects that carry the supplied key-value-pair as a `label`.
+====
+
 You should see:
 
 ----
-NAME                                          STATUS                     AGE
-{{ NODE1_INTERNAL_FQDN }}   Ready                      1h
-{{ NODE2_INTERNAL_FQDN }}   Ready                      1h
-{{ NODE3_INTERNAL_FQDN }}   Ready                      1h
+NAME                                          STATUS    ROLES     AGE
+{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1h
+{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1h
+{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1h
 ----
 
 Extending the cluster is easy. Simply add a new set of hosts to an Ansible group
@@ -74,6 +79,7 @@ When finished, your inventory file should look like the following:
 masters
 nodes
 etcd
+glusterfs
 new_nodes
 
 ...
@@ -119,7 +125,7 @@ already taken care of.
 To extend your cluster run the following playbook:
 
 ----
-ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml
+ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-node/scaleup.yml
 ----
 
 The playbook takes 1-2 minutes to complete. When done verify the amount of
@@ -132,21 +138,109 @@ oc get nodes -l region=apps
 You will see:
 
 ----
-NAME                                          STATUS                     AGE
-{{ NODE1_INTERNAL_FQDN }}   Ready                      1h
-{{ NODE2_INTERNAL_FQDN }}   Ready                      1h
-{{ NODE3_INTERNAL_FQDN }}   Ready                      1h
-{{ NODE4_INTERNAL_FQDN }}   Ready                      1m
-{{ NODE5_INTERNAL_FQDN }}   Ready                      1m
-{{ NODE6_INTERNAL_FQDN }}   Ready                      1m
+NAME                                          STATUS    ROLES     AGE
+{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1h
+{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1h
+{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1h
+{{ NODE4_INTERNAL_FQDN }}   Ready     compute   2m
+{{ NODE5_INTERNAL_FQDN }}   Ready     compute   2m
+{{ NODE6_INTERNAL_FQDN }}   Ready     compute   2m
 ----
 
 [TIP]
 ====
 When deploying a highly-available multi-master OpenShift environment, it is
 also possible to add new master nodes. There is a similar playbook to run. For
-more information on multi-master and HA setups, please refer to the
+more information on multi-master and HA setups, please refer to the link:https://docs.openshift.com/container-platform/3.9/architecture/infrastructure_components/kubernetes_infrastructure.html#high-availability-masters[documentation^].
 ====
+
+
+### Container-native Storage for infrastructure
+
+OpenShift infrastructure, like the Registry, Logging and Metrics (introduced in the following paragraphs in this module) have a requirement for reliable storage. +
+Container-native Storage can be configured directly in the installer, to provide a separate storage pool just for those workloads. This is a good practice in order to separate failure domains.
+
+By definition you need a separate set of hosts for this - which you have just made available in the previous paragraph.
+
+#### Configure the Installer
+Several directives for a second, infrastructure-centric CNS cluster in the `/etc/ansible/hosts` files have been prepared but commented using the `#cnsinfra_` prefix.
+
+Using your favourite editor, open the `/etc/ansible/hosts` file with `sudo` privileges, e.g.
+
+----
+sudo vim /etc/ansible/hosts
+----
+
+... and comment out all lines starting with `#cnsinfra_`... alternatively use the below `sed` command:
+
+----
+sudo sed -i 's/#cnsinfra_//g' /etc/ansible/hosts
+----
+
+The result `/etc/ansible/hosts` looks like this:
+
+[source,ini]
+./etc/ansible/hosts
+----
+[OSEv3:children]
+masters
+nodes
+etcd
+glusterfs
+new_nodes
+glusterfs_registry
+
+...
+
+[OSEv3:vars]
+...
+openshift_storage_glusterfs_registry_namespace=infra-storage <1>
+openshift_storage_glusterfs_registry_storageclass=true <2>
+openshift_storage_glusterfs_registry_block_deploy=true <3>
+openshift_storage_glusterfs_registry_block_storageclass=true <4>
+openshift_storage_glusterfs_registry_block_host_vol_create=true <5>
+openshift_storage_glusterfs_registry_block_host_vol_size=30 <6>
+
+...
+
+[glusterfs_registry] <7>
+{{ NODE4_INTERNAL_FQDN }} glusterfs_ip={{ NODE4_INTERNAL_IP }} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]' <8>
+{{ NODE5_INTERNAL_FQDN }} glusterfs_ip={{ NODE5_INTERNAL_IP }} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
+{{ NODE6_INTERNAL_FQDN }} glusterfs_ip={{ NODE5_INTERNAL_IP }} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
+
+...
+----
+<1> Deploys a the resource of the CNS cluster for infrastructure in a separate namespace
+<2> Creates a StorageClass for the CNS infra cluster
+<3> Enables support for block storage
+<4> Creates a StorageClass for the block storage service in the CNS infra cluster
+<5> Automatically create block-hosting volumes (see CNS module for further explanations)
+<6> Allocate a total 30GiB for block storage based volumes from the CNS infra cluster
+<7> An additional group of hosts which form the CNS infra cluster
+<8> Each line is a node with a device list, consumed by CNS
+
+#### Install the CNS cluster for OpenShift infrastructure
+
+With all required lines uncommented you can start the deployment of the second CNS cluster, dedicated to OpenShift infrastructure workloads:
+
+----
+ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-glusterfs/config.yml
+----
+
+This playbooks takes about 4 minutes to execute and will install an entirely independent CNS cluster, including a separate `heketi` management stack. Additional `StorageClasses` will be set up to make this storage usable.
+
+Verify using the `oc get sc` command that two new `StorageClasses` are available:
+
+----
+NAME                          PROVISIONER                AGE
+glusterfs-registry            kubernetes.io/glusterfs    42s <1>
+glusterfs-registry-block      gluster.org/glusterblock   24s <2>
+glusterfs-storage (default)   kubernetes.io/glusterfs    15m
+----
+<1> The `StorageClass` representing shared file storage from the CNS infra cluster
+<2> The `StorageClass` representing block storage from the CNS infra cluster
+
+The target use case for these additional storage services is to provide robust, persistent storage for the Registry, Logging and Metrics service - the latter 2 we will set up now.
 
 ### OpenShift Metrics
 _Metrics_ in OpenShift refers to the continuous collection of performance and
@@ -184,33 +278,55 @@ following:
 ...
 [OSEv3:vars]
 ...
-openshift_metrics_install_metrics=true
-openshift_metrics_cassandra_storage_type=pv
-openshift_metrics_cassandra_pvc_size=10Gi
-openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }}
+openshift_metrics_install_metrics=true <1>
+openshift_metrics_cassandra_storage_type=dynamic <2>
+openshift_metrics_cassandra_pvc_size=10Gi <3>
+openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }} <4>
 ...
+----
+<1> Instruct the installer to actually deploy the Metrics service
+<2> Cassandra, part of the Metrics service, will get dynamically provisioned storage
+<3> The resulting PersistentVolumeClaim will be of `10Gi`in size
+<4> The Metrics frontend (`hawkular`) will be reachable under this domain.
+
+#### Make CNS block storage the default
+
+As you can see above openshift-ansible currently has no way of telling which `StorageClass` it should use as part of requesting persistent storage using a `PersistentVolumeClaim`.
+
+Since we have just deployed an extra CNS cluster for this, we need to temporarily make it's block-storage service offered by Container-native Storage the system-wide default. First disable the file-based service in the first CNS cluster as the default:
+
+----
+oc patch storageclass {{ CNS_STORAGECLASS }} \
+-p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+----
+
+Then make the CNS block-storage `StorageClass` the default:
+
+----
+oc patch storageclass {{ CNS_BLOCK_STORAGECLASS }} \
+-p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+----
+
+This is how the `StorageClass` definitions are now set up when querying via `oc get sc`:
+
+----
+NAME                                PROVISIONER                AGE
+glusterfs-registry                  kubernetes.io/glusterfs    15m
+{{ CNS_BLOCK_STORAGECLASS }} (default)   gluster.org/glusterblock   30m
+{{ CNS_STORAGECLASS }}                   kubernetes.io/glusterfs    15m
 ----
 
 #### Install Metrics
-There is a specific playbook included with the installer that will handle metrics. It can
-be run like so:
+There is a specific playbook included with the installer that will handle metrics. It can be run like so:
 
 ----
-ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
+ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-metrics/config.yml
 ----
 
 This will deploy the metric collection and visualization stack on OpenShift. All
 resources will be stood up in the `openshift-infra` *Project*. As part of the
 deployment, persistent storage will automatically used for storing the metrics
-information.
-
-[WARNING]
-====
-In this environment you will end up using CNS as the persistent storage for the
-Cassandra database. While functional, at this time CNS is not a fully supported
-back-end storage solution for Cassandra. Full support for the metrics solution
-on CNS should come in a future release.
-====
+information. It will take roughly 2 minutes to complete.
 
 Once the installation playbook has completed, you can then verify that the
 metrics components are running in the `openshift-infra` *Project*:
@@ -220,19 +336,19 @@ oc login -u system:admin -n openshift-infra
 oc get pods -o wide
 ----
 
-You will see something like:
+It might take a while but after some time you will see something like:
 
 ----
 NAME                         READY     STATUS    RESTARTS   AGE       IP           NODE
-hawkular-cassandra-1-6gv0d   1/1       Running   0          3m        10.129.0.7   node02.internal.aws.testdrive.openshift.com
-hawkular-metrics-zkp0h       1/1       Running   0          3m        10.130.0.8   node03.internal.aws.testdrive.openshift.com
-heapster-r2l2v               1/1       Running   0          3m        10.131.2.2   node05.internal.aws.testdrive.openshift.com
+hawkular-cassandra-1-6gv0d   1/1       Running   0          3m        10.129.0.7   {{ NODE3_INTERNAL_FQDN }}
+hawkular-metrics-zkp0h       1/1       Running   0          3m        10.130.0.8  {{ NODE3_INTERNAL_FQDN }}
+heapster-r2l2v               1/1       Running   0          3m        10.131.2.2   {{ NODE5_INTERNAL_FQDN }}
 ----
 
 [NOTE]
 ====
 In this lab environment it can take up to 2-3 minutes after the metrics playbook
-finishes for the metrics stack to finish intialization and for all pods to reach
+finishes for the metrics stack to finish initialization and for all pods to reach
 the _Ready_ state.
 ====
 
@@ -315,23 +431,32 @@ Your resulting file should look like the following:
 
 [OSEv3:vars]
 ...
-openshift_logging_install_logging=true
-openshift_logging_namespace=logging
-openshift_logging_es_pvc_size=10Gi
-openshift_logging_kibana_hostname=kibana.{{ OCP_ROUTING_SUFFIX }}
-openshift_logging_public_master_url=https://kibana.{{ OCP_ROUTING_SUFFIX }}
+openshift_logging_install_logging=true <1>
+openshift_logging_namespace=logging <2>
+openshift_logging_es_pvc_dynamic=true <3>
+openshift_logging_es_pvc_size=10Gi <4>
+openshift_logging_es_memory_limit=2G <5>
+openshift_logging_kibana_hostname=kibana.{{ OCP_ROUTING_SUFFIX }} <6>
+openshift_logging_public_master_url=https://kibana.{{ OCP_ROUTING_SUFFIX }} <7>
 ...
 ----
+<1> Trigger the installation of the Logging service
+<2> Deploy the resources of the Logging service in a project called `logging`
+<3> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`
+<4> The resulting PersistentVolumeClaim will be of `10Gi`in size
+<5> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.9/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
+<6> The FQDN under which the Logging frontend UI (Kibana) will be available
+<7> The URL under which the Logging frontend UI (Kibana) will be available
 
 #### Install Logging
 With these settings in place executing the `openshift-logging` Ansible playbook
 that ships as part of the `openshift-ansible` installer:
 
 ----
-ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml
+ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-logging/config.yml
 ----
 
-Once the installation finishes, log in as the cluster administrator, using the
+Once the installation finishes (roughly 4 minutes), log in as the cluster administrator, using the
 `logging` *Project*:
 
 ----
@@ -348,17 +473,17 @@ You will see something like:
 
 ----
 NAME                          READY     STATUS    RESTARTS   AGE       IP            NODE
-logging-curator-1-cnpt8       1/1       Running   0          5m        10.131.2.8    node04.internal.aws.testdrive.openshift.com
-logging-es-yeqpfrm5-1-l9k0t   1/1       Running   0          5m        10.129.0.16   node02.internal.aws.testdrive.openshift.com
-logging-fluentd-2ptb2         1/1       Running   0          4m        10.129.2.8    node05.internal.aws.testdrive.openshift.com
-logging-fluentd-38lvg         1/1       Running   0          4m        10.131.0.10   node01.internal.aws.testdrive.openshift.com
-logging-fluentd-9m6rs         1/1       Running   0          4m        10.130.2.8    node06.internal.aws.testdrive.openshift.com
-logging-fluentd-gstc4         1/1       Running   0          4m        10.128.0.5    master.internal.aws.testdrive.openshift.com
-logging-fluentd-h5zjz         1/1       Running   0          4m        10.130.0.11   node03.internal.aws.testdrive.openshift.com
-logging-fluentd-kkmrb         1/1       Running   0          4m        10.128.2.10   infra.internal.aws.testdrive.openshift.com
-logging-fluentd-twsjg         1/1       Running   0          4m        10.131.2.9    node04.internal.aws.testdrive.openshift.com
-logging-fluentd-xghl1         1/1       Running   0          5m        10.129.0.15   node02.internal.aws.testdrive.openshift.com
-logging-kibana-1-dfl8p        2/2       Running   0          5m        10.129.0.17   node02.internal.aws.testdrive.openshift.com
+logging-curator-1-cnpt8       1/1       Running   0          5m        10.131.2.8    {{ NODE4_INTERNAL_FQDN }}
+logging-es-yeqpfrm5-1-l9k0t   1/1       Running   0          5m        10.129.0.16   {{ NODE2_INTERNAL_FQDN }}
+logging-fluentd-2ptb2         1/1       Running   0          4m        10.129.2.8    {{ NODE5_INTERNAL_FQDN }}
+logging-fluentd-38lvg         1/1       Running   0          4m        10.131.0.10  {{ NODE1_INTERNAL_FQDN }}
+logging-fluentd-9m6rs         1/1       Running   0          4m        10.130.2.8    {{ NODE6_INTERNAL_FQDN }}
+logging-fluentd-gstc4         1/1       Running   0          4m        10.128.0.5    {{ MASTER_INTERNAL_FQDN }}
+logging-fluentd-h5zjz         1/1       Running   0          4m        10.130.0.11   {{ NODE3_INTERNAL_FQDN }}
+logging-fluentd-kkmrb         1/1       Running   0          4m        10.128.2.10   {{ INFRA_INTERNAL_FQDN }}
+logging-fluentd-twsjg         1/1       Running   0          4m        10.131.2.9    {{ NODE4_INTERNAL_FQDN }}
+logging-fluentd-xghl1         1/1       Running   0          5m        10.129.0.15   {{ NODE2_INTERNAL_FQDN }}
+logging-kibana-1-dfl8p        2/2       Running   0          5m        10.129.0.17   {{ NODE2_INTERNAL_FQDN }}
 ----
 
 The _Fluentd_ *Pods* are deployed as part of a *DaemonSet*, which is a mechanism
@@ -398,7 +523,26 @@ be able to see all of the cluster's logs. Kibana utilizes the same RBAC
 underpinning OpenShift to ensure that users can only see the logs they should
 have access to.
 
-image::openshift-logging-kibana-ui.png[]
+#### Restore default StorageClass
+
+As we previously changed the default StorageClass to point to the block-storage service of CNS we will now revert to have it be set to the file-storage service.
+
+----
+oc patch storageclass {{ CNS_BLOCK_STORAGECLASS }} \
+-p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+----
+
+Then make the CNS file-storage `StorageClass` the default again:
+
+----
+oc patch storageclass {{ CNS_STORAGECLASS }} \
+-p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+----
+
+[IMPORTANT]
+====
+The block-storage service of CNS (also referred to as gluster-block) is **only** supported for Logging and Metrics as of this release. This will likely change in the future as we qualify more workloads.
+====
 
 ### OpenShift Multitenant Networking
 OpenShift has a software defined network (SDN) inside the platform that is based
@@ -424,8 +568,8 @@ vSwitch.
 
 The multitenant network plugin was introduced in OpenShift 3.1, and more
 information about it and its configuration can be found in the
-link:https://docs.openshift.com/container-platform/3.5/architecture/additional_concepts/sdn.html[networking
-documentation]. Additionally, other vendors are working with the upstream
+link:https://docs.openshift.com/container-platform/3.9/architecture/networking/sdn.html[networking
+documentation^]. Additionally, other vendors are working with the upstream
 Kubernetes community to implement their own SDN plugins, and several of these
 are supported by the vendors for use with OpenShift. These plugin
 implementations make use of appc/CNI, which is outside the scope of this lab.
@@ -717,4 +861,111 @@ Now the node will be able to have workload scheduled on it again:
 ----
 NAME                                          STATUS    AGE
 {{ NODE2_INTERNAL_FQDN }}   Ready     4h
+----
+
+### Running the OpenShift Registry with CNS
+
+The Registry in OpenShift is a critical component. As it is the default
+destination for all container builds in the cluster, and is the source for
+deploying applications built inside the cluster, being unavailable is a big
+problem.
+
+The internal registry runs as one or more *Pods* inside the OpenShift
+environment. By default the registry uses local ephemeral storage in its *Pod*.
+This means that any restarts or re-deployments or outages would cause all of the
+built/pushed container images to be lost. Also, only having one registry
+instance and/or one infrastructure node could cause temporary outages. So,
+adding storage and scaling up the registry is a good idea.
+
+[IMPORTANT]
+====
+Your cluster only has one infrastructure node. In practice, you would want a
+minimum of two to achieve high-availability for all infrastructure services.
+====
+
+#### Adding CNS to the Registry
+Adding storage to the registry is as easy as it was for our file-uploader
+application. Simply make the registry *Pods* use a PVC in access mode *RWX*
+based on CNS. This way, a highly-available scale-out registry can be provided
+without external dependencies on NFS or Cloud Provider storage.
+
+[IMPORTANT]
+====
+The following method will be disruptive. All data stored in the registry so far
+will be lost (the Rails and PHP app images). Migration scenarios exist but are
+beyond the scope of this lab, but normally you would configure persistent
+storage for the registry before starting to really use your cluster.
+====
+
+Make sure you are logged in as `system:admin` in the `default` namespace:
+
+----
+oc login -u system:admin -n default
+----
+
+Just like with the file uploader example, you can simply add a volume (and have
+its *PersistentVolumeClaim* created automatically) with the `oc volume` command.
+Execute the following:
+
+----
+oc volume dc/docker-registry --add --name=registry-storage -t pvc \
+--claim-mode=ReadWriteMany --claim-size=5Gi \
+--claim-name=registry-storage --claim-class={{ CNS_INFRA_STORAGECLASS }} --overwrite
+----
+
+The registry will now redeploy.
+
+[NOTE]
+====
+The registry is preconfigured with a volume called `registry-storage` that is
+using the `emptyDir` storage type. The above command `--overwrite` the existing
+volume with our new PVC. More information can be found in the
+link:https://docs.openshift.com/container-platform/3.9/dev_guide/volumes.html[volumes
+documentation^].
+====
+
+[TIP]
+====
+It is also possible to use `openshift-ansible` to deploy the registry
+====
+
+After a couple of seconds a new deployment of the registry should be available.
+Verify a new version of the registry's *DeploymentConfig* is running:
+
+----
+oc get dc/docker-registry
+----
+
+Wait until you see the following state:
+
+----
+NAME              REVISION   DESIRED   CURRENT   TRIGGERED BY
+docker-registry   2          1         1         config
+----
+
+Now your OpenShift Registry is using persistent storage provided by CNS.  Since
+this is shared storage this also allows you to scale out the registry pods.
+
+You can scale the registry like this:
+
+----
+oc scale dc/docker-registry --replicas=3
+----
+
+After a short while you should see 3 healthy registry pods in the default
+*Project*:
+
+----
+oc get pods
+----
+
+And you should see something like:
+
+----
+NAME                       READY     STATUS    RESTARTS   AGE
+docker-registry-2-5rszg    1/1       Running   0          1m
+docker-registry-2-7s3tm    1/1       Running   0          14s
+docker-registry-2-g3l70    1/1       Running   0          14s
+registry-console-1-b47jt   1/1       Running   0          6h
+router-1-hs9wp             1/1       Running   0          6h
 ----

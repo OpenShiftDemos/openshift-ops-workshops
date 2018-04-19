@@ -7,21 +7,3 @@
     owner: root
     group: root
     mode: "u=rwx,g=rx,o=rx"
-
-- name: enable EPEL
-  yum: name=https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm state=present
-
-- name: install aws-cfn-bootstrap dependencies
-  yum: name={{ item }} state=present
-  with_items:
-    - python-pip
-    - python-setuptools
-    - haveged
-
-- name: copy cfn-signal script
-  copy:
-    src: cfn-signal.sh
-    dest: /usr/local/bin/
-    owner: root
-    group: root
-    mode: "u=rwx,g=rx,o=rx"

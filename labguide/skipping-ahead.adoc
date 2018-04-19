@@ -16,13 +16,12 @@ the `{{ CODE_CLONE_LOCATION }}/tests` folder.
 [options="header"]
 |==============================================
 | Module     | Playbook
-|2. Installation and Verification| installation_automation.yaml
-|3. Deploying Container-Native Storage| cns-deploy_automation.yaml
-|4. Application Management Basics| app-mgmt-basics_automation.yaml
-|5. Project Request Template, Quotas, Limits|template-quota-limits_automation.yaml
-|6. Using External Authentication Providers (LDAP)|ldap-groupsync_automation.yaml
-|7. Infrastructure Management Basics|infra-mgmt_automation.yaml
-|8. Container-native Storage Management|cns-management_automation.yaml
+|2. Installation and Verification| run-module-2-installation.yaml
+|3. Application Management Basics| run-module-3-app-mgmt-basics.yaml
+|4. Project Request Template, Quotas, Limits|run-module-4-template-quota-limits.yaml
+|5. Using External Authentication Providers (LDAP)|run-module-5-ldap-groupsync.yaml
+|6. Infrastructure Management Basics|run-module-6-infra-mgmt.yaml
+|7. Container-native Storage|run-module-7-cns.yaml
 |==============================================
 
 Executing the skip module playbooks is trivial. They are self-contained
@@ -36,9 +35,9 @@ following:
 
 ----
 cd {{ CODE_CLONE_LOCATION }}/tests/
-ansible-playbook installation_automation.yaml
-ansible-playbook cns-deploy_automation.yaml
-ansible-playbook app-mgmt-basics_automation.yaml
+ansible-playbook run-module-2-installation.yaml
+ansible-playbook run-module-3-app-mgmt-basics.yaml
+ansible-playbook run-module-4-template-quota-limits.yaml
 ----
 
 [WARNING]
@@ -48,15 +47,5 @@ Do not run playbooks without following above constraint of running them in order
 
 [IMPORTANT]
 ====
-Do not run the `installation_automation.yaml` or `cns-deploy_automation.yaml` twice. It's not quite idempotent yet.
-====
-
-
-[TIP]
-====
-You will also notice some playbooks called `*_verify.yaml`. These
-verification playbooks are used as a part of our test-driven development
-methodology for the Test Drive. You will not need to use it, although
-examining it may provide some insight into how we evaluate whether or not
-things are still working after updates and upgrades.
+Do not run the playbooks twice. They are not quite idempotent yet.
 ====

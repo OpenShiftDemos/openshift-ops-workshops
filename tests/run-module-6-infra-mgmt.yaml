@@ -53,6 +53,7 @@
         path: /etc/ansible/hosts
       tags:
         - cns_infra
+        - cns_infra_deploy
 
     - name: check for existing cns infra block storage classes
       shell: oc get storageclass {{ cns_block_storageclass }}
@@ -60,7 +61,7 @@
       register: cns_infra_block_check
       tags:
         - cns_infra
-
+        - cns_infra_deploy
 
     - name: check for existing cns infra file storage classes
       shell: oc get storageclass {{ cns_infra_storageclass }}
@@ -68,6 +69,7 @@
       register: cns_infra_check
       tags:
         - cns_infra
+        - cns_infra_deploy
 
     - name: install the second cns cluster
       shell: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-glusterfs/config.yml
@@ -76,6 +78,7 @@
         - cns_infra_block_check is failed
       tags:
         - cns_infra
+        - cns_infra_deploy
 
     - name: check for cns infra block storage classes
       shell: oc get storageclass {{ cns_block_storageclass }}
@@ -83,9 +86,100 @@
         - cns_infra
         - cns_infra_test
 
-
     - name: check for cns infra file storage classes
       shell: oc get storageclass {{ cns_infra_storageclass }}
+      tags:
+        - cns_infra
+        - cns_infra_test
+
+    - name: issue test rwo pvc against cns infra block storage
+      shell: oc process -p PVC_NAME=cns_infra_block_test -p STORAGE_CLASS={{ cns_block_storageclass }} -f templates/cns-rwo-pvc-template.yml
+      tags:
+        - cns_infra
+        - cns_infra_test
+
+    - name: wait for pvc to be bound
+      shell: oc get pvc/cns_infra_block_test -o jsonpath='{$.status.phase}'
+      register: check_cns_infra_block_pvc
+      until: check_cns_infra_block_pvc.stdout == "Bound"
+      retries: 60
+      delay: 10
+      tags:
+        - cns_infra
+        - cns_infra_test
+
+    - name: check pvc exists
+      shell: oc get pvc/cns_infra_block_test -o json
+      register: get_cns_infra_block_pvc
+      changed_when: false
+      tags:
+        - cns_infra
+        - cns_infra_test
+
+    - set_fact:
+        cns_infra_block_pvc: "{{ get_cns_infra_block_pvc.stdout|from_json }}"
+      tags:
+        - cns_infra
+        - cns_infra_test
+
+    - name: ensure pvc is issued against CNS
+      assert:
+        that:
+          - cns_infra_block_pvc.metadata.annotations['volume.beta.kubernetes.io/storage-provisioner'] == 'gluster.org/glusterblock'
+          - cns_infra_block_pvc.spec.storageClassName == cns_block_storageclass
+        msg: pvc is not served from StorageClass {{ cns_block_storageclass }}
+      tags:
+        - cns_infra
+        - cns_infra_test
+
+    - name: delete pvc
+      shell: oc delete pvc cns_infra_block_test
+      tags:
+        - cns_infra
+        - cns_infra_test
+
+    - name: issue test rwx pvc against cns infra storage
+      shell: oc process -p PVC_NAME=cns_infra_test -p STORAGE_CLASS={{ cns_infra_storageclass }} -f templates/cns-rwx-pvc-template.yml
+      tags:
+        - cns_infra
+        - cns_infra_test
+
+    - name: wait for pvc to be bound
+      shell: oc get pvc/cns_infra_test -o jsonpath='{$.status.phase}'
+      register: check_cns_infra_pvc
+      until: check_cns_infra_pvc.stdout == "Bound"
+      retries: 60
+      delay: 10
+      tags:
+        - cns_infra
+        - cns_infra_test
+
+    - name: check pvc exists
+      shell: oc get pvc/cns_infra_test -o json
+      register: get_cns_infra_pvc
+      changed_when: false
+      tags:
+        - cns_infra
+        - cns_infra_test
+
+    - set_fact:
+        cns_infra_pvc: "{{ get_cns_infra_pvc.stdout|from_json }}"
+      tags:
+        - cns_infra
+        - cns_infra_test
+
+    - name: ensure pvc is issued against CNS
+      assert:
+        that:
+          - cns_infra_pvc.metadata.annotations['volume.beta.kubernetes.io/storage-provisioner'] == 'kubernetes.io/glusterfs'
+          - cns_infra_pvc.spec.storageClassName == cns_infra_storageclass
+        msg: pvc is not served from StorageClass {{ cns_infra_storageclass }}
+      tags:
+        - cns_infra
+        - cns_infra_test
+
+    - name: delete pvc
+      shell: oc delete pvc cns_infra_test
       tags:
         - cns_infra
         - cns_infra_test

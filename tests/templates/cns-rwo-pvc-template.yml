@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: rwo-pvc-template
+labels:
+  template: rwo-test-pvc
+objects:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: ${PVC_NAME}
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: ${STORAGE_CLASS}
+parameters:
+  - description: The StorageClass to use for this PVC
+    name: STORAGE_CLASS
+  - description: The name for this PVC
+    name: PVC_NAME

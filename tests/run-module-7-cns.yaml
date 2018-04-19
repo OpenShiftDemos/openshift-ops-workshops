@@ -293,18 +293,20 @@
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
 
     - name: get id of cns infra cluster
-      shell: heketi-cli cluster list --json | jq '.clusters[0]'
+      shell: heketi-cli cluster list --json | jq -r '.clusters[0]'
       register: get_cns_infra_cluster_id
 
     - set_fact:
         cns_infra_cluster_id: "{{ get_cns_infra_cluster_id.stdout }}"
 
     - name: get ids of cns infra cluster nodes
-      shell: heketi-cli cluster info $CNS_INFRA_CLUSTER --json | jq '.nodes[]'
+      shell: heketi-cli cluster info $CNS_INFRA_CLUSTER --json | jq '.nodes'
       register: get_cns_infra_cluster_nodes
 
     - set_fact:
         cns_infra_cluster_nodes: "{{ get_cns_infra_cluster_nodes.stdout | from_json }}"
+
+    - debug: var=cns_infra_cluster_nodes
 
     # - name: add disks to infra cluster
 

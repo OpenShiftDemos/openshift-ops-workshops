@@ -285,6 +285,8 @@
     - set_fact:
         cns_namespace: "{{ CNS_NAMESPACE }}"
         cns_storageclass: "{{ CNS_STORAGECLASS }}"
+        node_brick_device: "{{ NODE_BRICK_DEVICE }}"
+        node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
         new_cns_nodes_internal_fqdn:
           - "{{NODE4_INTERNAL_FQDN}}"
           - "{{NODE5_INTERNAL_FQDN}}"
@@ -309,9 +311,9 @@
     - set_fact:
         cns_infra_cluster_nodes: "{{ cns_infra_cluster_info.nodes  }}"
 
-    - debug: var=cns_infra_cluster_nodes
-
-    # - name: add disks to infra cluster
+    - name: add disks to infra cluster
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device add --name={{ node_brick_device2 }} --node={{ item }}
+      with_items: "{{ cns_infra_cluster_nodes }}"
 
 - name: Perform CNS Maintenance
   hosts: localhost

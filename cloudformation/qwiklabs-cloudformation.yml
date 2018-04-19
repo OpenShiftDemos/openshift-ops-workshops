@@ -997,10 +997,10 @@ Resources:
                     openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift_Packages', 'baseurl': 'http://master.internal.aws.testdrive.openshift.com/repo', 'enabled': 1, 'gpgcheck': 0}]
                     openshift_docker_insecure_registries=support.internal.aws.testdrive.openshift.com:5000
                     openshift_docker_additional_registries=support.internal.aws.testdrive.openshift.com:5000
-                    oreg_url=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-${!component}:${!version}
-                    osm_etcd_image=support.internal.aws.testdrive.openshift.com:5000/rhel7/etcd
-                    openshift_cli_image=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose
-                    osm_image=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose
+                    #oreg_url=mirror.lab:5555/openshift3/ose-${!component}:${!version}
+                    #osm_etcd_image=mirror.lab:5555/rhel7/etcd
+                    #openshift_cli_image=mirror.lab:5555/openshift3/ose
+                    #osm_image=mirror.lab:5555/openshift3/ose
                     openshift_storage_glusterfs_version=v3.9
                     openshift_storage_glusterfs_heketi_version=v3.9
                     openshift_storage_glusterfs_block_version=v3.9

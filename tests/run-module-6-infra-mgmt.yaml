@@ -610,6 +610,6 @@
         registry_pvc: "{{ get_registry_pvc.stdout|from_json }}"
 
     - name: ensure registry pv comes from registry pvc
-      shell: oc get dc/docker-registry -o jsonpath='{$.spec.template.spec.volumes[0].persistentVolumeClaim.claimName}'
+      shell: oc get dc/docker-registry -o jsonpath='{$.spec.template.spec.volumes[?(@.name=="registry-storage")].persistentVolumeClaim.claimName}'
       register: get_registry_pvc_name
       failed_when: get_registry_pvc_name.stdout != registry_pvc.metadata.name

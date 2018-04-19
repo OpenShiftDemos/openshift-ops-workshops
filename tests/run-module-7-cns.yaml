@@ -283,14 +283,7 @@
     - include_vars: /opt/lab/environment.yml
 
     - set_fact:
-        cns_namespace: "{{ CNS_NAMESPACE }}"
-        cns_storageclass: "{{ CNS_STORAGECLASS }}"
-        node_brick_device: "{{ NODE_BRICK_DEVICE }}"
         node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
-        new_cns_nodes_internal_fqdn:
-          - "{{NODE4_INTERNAL_FQDN}}"
-          - "{{NODE5_INTERNAL_FQDN}}"
-          - "{{NODE6_INTERNAL_FQDN}}"
         heketi_resturl: "http://heketi-registry-{{CNS_INFRA_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
 
@@ -314,6 +307,47 @@
     - name: add disks to infra cluster
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device add --name={{ node_brick_device2 }} --node={{ item }}
       with_items: "{{ cns_infra_cluster_nodes }}"
+
+- name: Verify disks added to second CNS cluster
+  hosts: localhost
+  tags:
+    - cns_ops
+    - cns_verify_disks
+  tasks:
+    - include_vars: /opt/lab/environment.yml
+
+    - set_fact:
+          node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
+          heketi_resturl: "http://heketi-registry-{{CNS_INFRA_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+          heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
+
+    - name: get id of cns infra cluster
+      shell: heketi-cli cluster --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} list --json | jq -r '.clusters[0]'
+      register: get_cns_infra_cluster_id
+
+    - set_fact:
+        cns_infra_cluster_id: "{{ get_cns_infra_cluster_id.stdout }}"
+
+    - name: get ids of cns infra cluster nodes
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster info {{ cns_infra_cluster_id }} --json
+      register: get_cns_infra_cluster_info
+
+    - set_fact:
+        cns_infra_cluster_info: "{{ get_cns_infra_cluster_info.stdout | from_json }}"
+
+    - set_fact:
+        cns_infra_cluster_nodes: "{{ cns_infra_cluster_info.nodes  }}"
+
+    - name: get additional disks from nodes
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ item }} --json | jq -r '.devices[] | select (.name=="{{ node_brick_device2 }}") | .id'
+      register: additional_disk
+      with_items: "{{ cns_infra_cluster_nodes }}"
+
+    - name: verify additional disks from nodes
+      assert:
+        that:
+          - item.stdout != ""
+      with_items: "{{ additional_disk.results }}"
 
 - name: Perform CNS Maintenance
   hosts: localhost

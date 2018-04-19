@@ -14,7 +14,7 @@ objects:
       - ReadWriteMany
       resources:
         requests:
-          storage: 10Gi
+          storage: 5Gi
       storageClassName: ${STORAGE_CLASS}
 parameters:
   - description: The StorageClass to use for this PVC

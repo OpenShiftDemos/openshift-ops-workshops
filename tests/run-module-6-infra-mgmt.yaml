@@ -15,6 +15,9 @@
     - name: Login as system:admin
       command: oc login -u system:admin
 
+    - name: Login to default namespace
+      command: oc project default
+
     - name: uncomment scaleup lines
       replace:
         regexp: '#scaleup_'

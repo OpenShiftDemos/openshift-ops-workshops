@@ -52,7 +52,7 @@
     - include_vars: /opt/lab/environment.yml
 
     - name: login to OCP using system:admin
-      shell: oc login -u system:admin
+      shell: oc login -u system:admin -n default
       register: login
       changed_when: false
 

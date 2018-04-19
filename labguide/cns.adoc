@@ -888,7 +888,7 @@ oc rsh file-uploader-2-jd22b dd if=/dev/zero of=uploaded/bigfile bs=1M count=100
 
 The result after some 30 seconds is:
 ----
-d: error writing 'uploaded/bigfile': Input/output error
+dd: error writing 'uploaded/bigfile': Input/output error
 dd: closing output file 'uploaded/bigfile': Input/output error
 ----
 
@@ -1056,35 +1056,11 @@ Check `heketi-cli topology info` again to verify the presence of the new device.
 
 That's it - the devices are now available to `heketi` and will be considered the next time CNS serves a volume request. Adding devices and nodes are online operation, meaning they do are non-disruptive and can be run in production without downtime.
 
-[NOTE]
-====
-The node UUIDs will be different for you since they are automatically generated.
-====
-
-You can now verify the presence of these new devices by running:
-
-----
-heketi-cli topology info
-----
-
-You should see a `/dev/xvde` device present for each of the nodes in the
-`cns-silver` cluster.
-
-### Other CNS Maintenance Activities
-In addition to extending your CNS cluster with additional storage nodes, you may
-also want to perform other maintenance activities. For example, if you have
-added more block devices to one of your CNS nodes, you may simply wish to add
-additional devices to the cluster. Or, if you have degraded physical devices
-that need to be replaced, maintained, or eliminated, you may wish to remove
-devices from a cluster.
-
-
 
 ### Replacing Failed Disks and Nodes
 
-Despite CNS' capability to continue operating transparently to the client in the
-face of failing disks and nodes, you soon might want to replace such components
-to move out of a degraded state.
+When a device fails CNS  transparently continues operations with the remaining replicas.
+You soon might want to replace such components to move out of a degraded state and get to 3 replicas again, either using other devices free capacity in the same node or in different nodes.
 
 For this exercise, let's assume the device `{{NODE_BRICK_DEVICE}}` of your node
 {{NODE4_INTERNAL_FQDN}} failed and you need to replace it. You can do that as
@@ -1092,14 +1068,19 @@ long as there is enough spare capacity somewhere else in the cluster,
 preferrable but not necessarily in the same failure domain (as specifed in the
 topology).
 
-The first step is to, again, determine the CNS node's internal UUID in heketi's
-database:
+[TIP]
+====
+CNS is aware of failure domains in your infrastructure. These could be racks in a data center or availability zones in public cloud environments. The zones are identified by distinct values in the `zone` parameter of each node. Nodes with the same value for `zone` are considered part of the same failure domain.
+CNS will try to do it's best (but not enforce it) to replicate and rebalance data across 3 different failure domains at all times.
+====
 
+The first step is to determine the CNS node's internal UUID in heketi's
+database. You can do that manually:
 ----
 heketi-cli topology info | grep -B4 {{NODE4_INTERNAL_FQDN}}
 ----
 
-You will see something like:
+...and see something like:
 
 ----
 	Node Id: 33e0045354db4be29b18728cbe817605
@@ -1109,83 +1090,87 @@ You will see something like:
 	Management Hostname: {{NODE4_INTERNAL_FQDN}}
 ----
 
+Or you can do it programmatically, for easy copy&paste, by asking `heketi` and parsing it's JSON output using `jq`:
+
+----
+NODE_4_ID=$(heketi-cli topology info --json | jq -r ".clusters[] | select(.id==\"$CNS_INFRA_CLUSTER\") | .nodes[] | select(.hostnames.manage[0] == \"{{NODE4_INTERNAL_FQDN}}\") | .id")
+echo ${NODE_4_ID}
+----
+
+This should yield, like above `33e0045354db4be29b18728cbe817605`
+
 Second, determine the device's UUID by querying the node (indicated above by
 `Node Id`):
 
-[source,bash,role=copypaste]
+Again, you could do this manually by looking at `heketi` information about the node:
+
 ----
 heketi-cli node info 33e0045354db4be29b18728cbe817605
-----
-
-You will see something like:
-
-----
 Node Id: 33e0045354db4be29b18728cbe817605
 State: online
-Cluster Id: ca777ae0285ef6d8cd7237c862bd591c
+Cluster Id: 119ea7f96ce132f15a04c28de9978018
 Zone: 1
-Management Hostname: {{NODE4_INTERNAL_FQDN}}
-Storage Hostname: {{NODE4_INTERNAL_IP}}
+Management Hostname: {{ NODE4_INTERNAL_FQDN }}
+Storage Hostname: {{ NODE4_INTERNAL_IP }}
 Devices:
-Id:01c94798bf6b1af87974573b420c4dff   Name:{{NODE_BRICK_DEVICE}}           State:online    Size (GiB):9       Used (GiB):1       Free (GiB):8
-Id:da91a2f1c9f62d9916831de18cc09952   Name:{{NODE_BRICK_DEVICE2}}           State:online    Size (GiB):9       Used (GiB):1       Free (GiB):8
+Id:0b32d5e57f2047485e42e6288405ad7f   Name:{{ NODE_BRICK_DEVICE2 }}           State:online    Size (GiB):49      Used (GiB):0       Free (GiB):49
+Id:4fb2ae473d5ee451906d5489abfc653e   Name:{{ NODE_BRICK_DEVICE }}           State:online    Size (GiB):49      Used (GiB):42      Free (GiB):7
 ----
 
-Notice the UUID of the device `{{NODE_BRICK_DEVICE}}` as shown.
+Or again, for easy copy&paste, you can do it the smart way and retrieve the device ID of `{{NODE_BRICK_DEVICE}}` programmatically from the JSON output using `jq`:
 
-[NOTE]
-====
-The device ID, as well as all other UUIDs in heketi commands are
-automatically generated and different in your environment. Please be aware when
-copy & pasting.
-====
-
-Third, mark the device as offline to stop heketi from further attempts to
-allocate space from it:
-
-[source,bash,role=copypaste]
 ----
-heketi-cli device disable 01c94798bf6b1af87974573b420c4dff
+export FAILED_DEVICE_ID=$(heketi-cli node info $NODE_4_ID  --json | jq -r '.devices[] | select(.name=="{{ NODE_BRICK_DEVICE }}") | .id')
+echo $FAILED_DEVICE_ID
+----
+
+You should get the UUID of `{{ NODE_BRICK_DEVICE }}` from this command, in this example `4fb2ae473d5ee451906d5489abfc653e`.
+
+With the UUID we can first mark the device as offline to stop heketi from further attempts to allocate space from it:
+
+[source,bash]
+----
+heketi-cli device disable $FAILED_DEVICE_ID
 ----
 
 You will see something like:
 
 ----
-Device 01c94798bf6b1af87974573b420c4dff is now offline
+Device 4fb2ae473d5ee451906d5489abfc653e is now offline
 ----
 
 The device is now offline but it's still part of replicated volumes. To remove
 it and trigger a self-healing operation in the background issue:
 
-[source,bash,role=copypaste]
+[source,bash]
 ----
-heketi-cli device remove 01c94798bf6b1af87974573b420c4dff
+heketi-cli device remove $FAILED_DEVICE_ID
 ----
 
 You will see something like:
 
 ----
-Device 01c94798bf6b1af87974573b420c4dff is now removed
+Device 4fb2ae473d5ee451906d5489abfc653e is now removed
 ----
 
 This command can take a bit longer as it will go through the topology and search
-for the next available device on the same node, in the same failure domain and
-in the rest of the cluster (in that order) and trigger a brick-replacement
-operation. This way data is re-replicated to another health storage device and
-the 3-way replicated storage volume moves out of degraded state.
+for the next available device on the same node, in the same failure domain or
+in the rest of the cluster (in that order) and trigger a *brick-replacement
+operation*. That is, the data from the failed brick is re-replicated to another health storage device and the 3-way replicated storage volume moves out of degraded state. +
+This is also an online operation and can be run in production.
 
-The device is still lurking around in _failed_ state. To finally get rid of it
+Our failed device is still lurking around in _failed_ state. To finally get rid of it
 issue:
 
-[source,bash,role=copypaste]
+[source,bash]
 ----
-heketi-cli device delete 01c94798bf6b1af87974573b420c4dff
+heketi-cli device delete $FAILED_DEVICE_ID
 ----
 
 You will see something like:
 
 ----
-Device 01c94798bf6b1af87974573b420c4dff deleted
+Device 4fb2ae473d5ee451906d5489abfc653e deleted
 ----
 
 [NOTE]
@@ -1201,7 +1186,7 @@ You can now check that the device is gone from the topology by running:
 heketi-cli topology info
 ----
 
-Node deletion is also possible and is basically comprised of:
+*Node deletion* is also possible and is basically comprised of:
 
 1. successful execution of the `remove` operation on all devices of the node
 2. running `heketi-cli node delete <node_id>` on the node in question

@@ -293,7 +293,7 @@
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
 
     - name: get id of cns infra cluster
-      shell: heketi-cli cluster list --json | jq -r '.clusters[0]'
+      shell: heketi-cli cluster list --json | jq '.clusters[0]'
       register: get_cns_infra_cluster_id
 
     - set_fact:

@@ -994,7 +994,6 @@ Resources:
                     openshift_router_selector='region=infra'
                     openshift_registry_selector='region=infra'
                     openshift_examples_modify_imagestreams=false
-                    
                     openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift_Packages', 'baseurl': 'http://master.internal.aws.testdrive.openshift.com/repo', 'enabled': 1, 'gpgcheck': 0}]
                     openshift_docker_insecure_registries=support.internal.aws.testdrive.openshift.com:5000
                     openshift_docker_additional_registries=support.internal.aws.testdrive.openshift.com:5000

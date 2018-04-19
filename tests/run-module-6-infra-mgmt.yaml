@@ -93,13 +93,13 @@
         - cns_infra_test
 
     - name: issue test rwo pvc against cns infra block storage
-      shell: oc process -p PVC_NAME=cns_infra_block_test -p STORAGE_CLASS={{ cns_block_storageclass }} -f templates/cns-rwo-pvc-template.yml
+      shell: oc process -p PVC_NAME=cns_infra_block_test -p STORAGE_CLASS={{ cns_block_storageclass }} -f templates/cns-rwo-pvc-template.yml -n default | oc create -f -
       tags:
         - cns_infra
         - cns_infra_test
 
     - name: wait for pvc to be bound
-      shell: oc get pvc/cns_infra_block_test -o jsonpath='{$.status.phase}'
+      shell: oc get pvc/cns_infra_block_test -o jsonpath='{$.status.phase}' -n default
       register: check_cns_infra_block_pvc
       until: check_cns_infra_block_pvc.stdout == "Bound"
       retries: 60
@@ -109,7 +109,7 @@
         - cns_infra_test
 
     - name: check pvc exists
-      shell: oc get pvc/cns_infra_block_test -o json
+      shell: oc get pvc/cns_infra_block_test -o json -n default
       register: get_cns_infra_block_pvc
       changed_when: false
       tags:
@@ -133,19 +133,19 @@
         - cns_infra_test
 
     - name: delete pvc
-      shell: oc delete pvc cns_infra_block_test
+      shell: oc delete pvc cns_infra_block_test -n default
       tags:
         - cns_infra
         - cns_infra_test
 
     - name: issue test rwx pvc against cns infra storage
-      shell: oc process -p PVC_NAME=cns_infra_test -p STORAGE_CLASS={{ cns_infra_storageclass }} -f templates/cns-rwx-pvc-template.yml
+      shell: oc process -p PVC_NAME=cns_infra_test -p STORAGE_CLASS={{ cns_infra_storageclass }} -f templates/cns-rwx-pvc-template.yml -n default | oc create -f -
       tags:
         - cns_infra
         - cns_infra_test
 
     - name: wait for pvc to be bound
-      shell: oc get pvc/cns_infra_test -o jsonpath='{$.status.phase}'
+      shell: oc get pvc/cns_infra_test -o jsonpath='{$.status.phase}' -n default
       register: check_cns_infra_pvc
       until: check_cns_infra_pvc.stdout == "Bound"
       retries: 60
@@ -155,7 +155,7 @@
         - cns_infra_test
 
     - name: check pvc exists
-      shell: oc get pvc/cns_infra_test -o json
+      shell: oc get pvc/cns_infra_test -o json -n default
       register: get_cns_infra_pvc
       changed_when: false
       tags:
@@ -179,7 +179,7 @@
         - cns_infra_test
 
     - name: delete pvc
-      shell: oc delete pvc cns_infra_test
+      shell: oc delete pvc cns_infra_test -n default
       tags:
         - cns_infra
         - cns_infra_test

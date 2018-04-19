@@ -274,6 +274,39 @@
 
     # verify new capacity of 5Gi of "uploaded" directory in the pods
 
+- name: Add disks to second CNS cluster
+  hosts: localhost
+  tags:
+    - cns_ops
+    - cns_add_disks
+  tasks:
+    - include_vars: /opt/lab/environment.yml
+
+    - set_fact:
+        cns_namespace: "{{ CNS_NAMESPACE }}"
+        cns_storageclass: "{{ CNS_STORAGECLASS }}"
+        new_cns_nodes_internal_fqdn:
+          - "{{NODE4_INTERNAL_FQDN}}"
+          - "{{NODE5_INTERNAL_FQDN}}"
+          - "{{NODE6_INTERNAL_FQDN}}"
+        heketi_resturl: "http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+        heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
+
+    - name: get id of cns infra cluster
+      shell: heketi-cli cluster list --json | jq -r '.clusters[0]'
+      register: get_cns_infra_cluster_id
+
+    - set_fact:
+        cns_infra_cluster_id: "{{ get_cns_infra_cluster_id.stdout }}"
+
+    - name: get ids of cns infra cluster nodes
+      shell: heketi-cli cluster info $CNS_INFRA_CLUSTER --json | jq '.nodes[]'
+      register: get_cns_infra_cluster_nodes
+
+    - set_fact:
+        cns_infra_cluster_nodes: "{{ get_cns_infra_cluster_nodes.stdout | from_json }}"
+
+    - name: add disks to infra cluster
 
 - name: Perform CNS Maintenance
   hosts: localhost

@@ -72,23 +72,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-913494ee
+      ami: ami-2b9f3354
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-21264a59
+      ami: ami-a7711edf
     eu-west-1:
-      ami: ami-72c9ef0b
+      ami: ami-6652721f
     eu-central-1:
-      ami: ami-b5a4fe5e
+      ami: ami-aef3d645
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-1c98b860
+      ami: ami-70092b0c
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -997,10 +997,10 @@ Resources:
                     openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift_Packages', 'baseurl': 'http://master.internal.aws.testdrive.openshift.com/repo', 'enabled': 1, 'gpgcheck': 0}]
                     openshift_docker_insecure_registries=support.internal.aws.testdrive.openshift.com:5000
                     openshift_docker_additional_registries=support.internal.aws.testdrive.openshift.com:5000
-                    #oreg_url=mirror.lab:5555/openshift3/ose-${!component}:${!version}
-                    #osm_etcd_image=mirror.lab:5555/rhel7/etcd
-                    #openshift_cli_image=mirror.lab:5555/openshift3/ose
-                    #osm_image=mirror.lab:5555/openshift3/ose
+                    oreg_url=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-${!component}:${!version}
+                    osm_etcd_image=support.internal.aws.testdrive.openshift.com:5000/rhel7/etcd
+                    openshift_cli_image=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose
+                    osm_image=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose
                     openshift_storage_glusterfs_version=v3.9
                     openshift_storage_glusterfs_heketi_version=v3.9
                     openshift_storage_glusterfs_block_version=v3.9
@@ -1366,10 +1366,7 @@ Resources:
               - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
               - ansible master.internal.aws.testdrive.openshift.com, -m wait_for -a "path=/etc/origin/master/ipa-ca.crt timeout=600"
               - ansible localhost -m wait_for -a "port=80 host=localhost"
-              - ansible localhost -m docker_image -a "name=localhost:5000/openshift3/ose-deployer:v3.9.14-1 repository=localhost:5000/openshift3/ose-deployer:v3.9.14 push=yes"
-              - ansible localhost -m docker_image -a "name=localhost:5000/openshift3/ose-haproxy-router:v3.9.14-1 repository=localhost:5000/openshift3/ose-haproxy-router:v3.9.14 push=yes"
-              - ansible localhost -m docker_image -a "name=localhost:5000/openshift3/ose-docker-registry:v3.9.14-1 repository=localhost:5000/openshift3/ose-docker-registry:v3.9.14 push=yes"
-              - ansible localhost -m docker_image -a "name=localhost:5000/openshift3/openshift3/ose-sti-builder:v3.9.14-1 repository=localhost:5000/openshift3/openshift3/ose-sti-builder:v3.9.14 push=yes"
+              - ansible localhost -m wait_for -a "port=5000 host=localhost"
               - ansible all -i master.internal.aws.testdrive.openshift.com, -m fetch -a "src=/etc/ansible/hosts dest=/etc/ansible/hosts flat=yes"
               - "ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml ; /usr/local/bin/cfn-signal.sh $? '${OpenShiftWaitHandle}'"
               - "ansible-playbook /opt/lab/support/pv-resize-post-deploy-config.yml ; /usr/local/bin/cfn-signal.sh $? '${PostDeployWaitHandle}'"

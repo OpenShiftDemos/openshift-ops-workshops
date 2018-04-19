@@ -300,7 +300,7 @@
         cns_infra_cluster_id: "{{ get_cns_infra_cluster_id.stdout }}"
 
     - name: get ids of cns infra cluster nodes
-      shell: heketi-cli cluster info $CNS_INFRA_CLUSTER --json
+      shell: heketi-cli cluster info {{ cns_infra_cluster_id }} --json
       register: get_cns_infra_cluster_info
 
     - set_fact:

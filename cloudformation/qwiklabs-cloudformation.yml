@@ -928,6 +928,7 @@ Resources:
                     NODE_BRICK_DEVICE: "/dev/xvdd"
                     NODE_BRICK_DEVICE2: "/dev/xvde"
                     CNS_NAMESPACE: "storage"
+                    CNS_INFRA_NAMESPACE: "infra-storage"
                     HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
                     HEKETI_ADMIN_PW_BASE64: "bXlTM2NyM3RwYXNzdzByZA=="
                     HEKETI_USER_PW: "mys3rs3cr3tpassw0rd"
@@ -1696,7 +1697,7 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvde
           Ebs:
-            VolumeSize: '10'
+            VolumeSize: '50'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
       Tags:
@@ -1793,7 +1794,7 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvde
           Ebs:
-            VolumeSize: '10'
+            VolumeSize: '50'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
       Tags:
@@ -1890,7 +1891,7 @@ Resources:
             DeleteOnTermination: 'true'
         - DeviceName: /dev/xvde
           Ebs:
-            VolumeSize: '10'
+            VolumeSize: '50'
             VolumeType: 'gp2'
             DeleteOnTermination: 'true'
       Tags:

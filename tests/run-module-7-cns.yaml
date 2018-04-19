@@ -306,7 +306,7 @@
     - set_fact:
         cns_infra_cluster_nodes: "{{ get_cns_infra_cluster_nodes.stdout | from_json }}"
 
-    - name: add disks to infra cluster
+    # - name: add disks to infra cluster
 
 - name: Perform CNS Maintenance
   hosts: localhost

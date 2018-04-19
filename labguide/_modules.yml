@@ -107,6 +107,7 @@ modules:
     vars:
       CNS_STORAGECLASS: "glusterfs-storage"
       CNS_BLOCK_STORAGECLASS: "glusterfs-registry-block"
+      CNS_INFRA_STORAGECLASS: "glusterfs-registry"
   cns:
     name: Container-native Storage
     requires:
@@ -116,7 +117,6 @@ modules:
       HEKETI_ADMIN_PW: "myS3cr3tpassw0rd"
       CNS_STORAGECLASS: "glusterfs-storage"
       CNS_BLOCK_STORAGECLASS: "glusterfs-registry-block"
-      CNS_STORAGECLASS2: "glusterfs-storage-second"
       CNS_NAMESPACE: "storage"
       CNS_INFRA_NAMESPACE: "infra-storage"
       NODE_BRICK_DEVICE: "/dev/xvdd"

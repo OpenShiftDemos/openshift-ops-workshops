@@ -862,3 +862,110 @@ Now the node will be able to have workload scheduled on it again:
 NAME                                          STATUS    AGE
 {{ NODE2_INTERNAL_FQDN }}   Ready     4h
 ----
+
+### Running the OpenShift Registry with CNS
+
+The Registry in OpenShift is a critical component. As it is the default
+destination for all container builds in the cluster, and is the source for
+deploying applications built inside the cluster, being unavailable is a big
+problem.
+
+The internal registry runs as one or more *Pods* inside the OpenShift
+environment. By default the registry uses local ephemeral storage in its *Pod*.
+This means that any restarts or re-deployments or outages would cause all of the
+built/pushed container images to be lost. Also, only having one registry
+instance and/or one infrastructure node could cause temporary outages. So,
+adding storage and scaling up the registry is a good idea.
+
+[IMPORTANT]
+====
+Your cluster only has one infrastructure node. In practice, you would want a
+minimum of two to achieve high-availability for all infrastructure services.
+====
+
+#### Adding CNS to the Registry
+Adding storage to the registry is as easy as it was for our file-uploader
+application. Simply make the registry *Pods* use a PVC in access mode *RWX*
+based on CNS. This way, a highly-available scale-out registry can be provided
+without external dependencies on NFS or Cloud Provider storage.
+
+[IMPORTANT]
+====
+The following method will be disruptive. All data stored in the registry so far
+will be lost (the Rails and PHP app images). Migration scenarios exist but are
+beyond the scope of this lab, but normally you would configure persistent
+storage for the registry before starting to really use your cluster.
+====
+
+Make sure you are logged in as `system:admin` in the `default` namespace:
+
+----
+oc login -u system:admin -n default
+----
+
+Just like with the file uploader example, you can simply add a volume (and have
+its *PersistentVolumeClaim* created automatically) with the `oc volume` command.
+Execute the following:
+
+----
+oc volume dc/docker-registry --add --name=registry-storage -t pvc \
+--claim-mode=ReadWriteMany --claim-size=5Gi \
+--claim-name=registry-storage --claim-class={{ CNS_INFRA_STORAGECLASS }} --overwrite
+----
+
+The registry will now redeploy.
+
+[NOTE]
+====
+The registry is preconfigured with a volume called `registry-storage` that is
+using the `emptyDir` storage type. The above command `--overwrite` the existing
+volume with our new PVC. More information can be found in the
+link:https://docs.openshift.com/container-platform/3.9/dev_guide/volumes.html[volumes
+documentation^].
+====
+
+[TIP]
+====
+It is also possible to use `openshift-ansible` to deploy the registry
+====
+
+After a couple of seconds a new deployment of the registry should be available.
+Verify a new version of the registry's *DeploymentConfig* is running:
+
+----
+oc get dc/docker-registry
+----
+
+Wait until you see the following state:
+
+----
+NAME              REVISION   DESIRED   CURRENT   TRIGGERED BY
+docker-registry   2          1         1         config
+----
+
+Now your OpenShift Registry is using persistent storage provided by CNS.  Since
+this is shared storage this also allows you to scale out the registry pods.
+
+You can scale the registry like this:
+
+----
+oc scale dc/docker-registry --replicas=3
+----
+
+After a short while you should see 3 healthy registry pods in the default
+*Project*:
+
+----
+oc get pods
+----
+
+And you should see something like:
+
+----
+NAME                       READY     STATUS    RESTARTS   AGE
+docker-registry-2-5rszg    1/1       Running   0          1m
+docker-registry-2-7s3tm    1/1       Running   0          14s
+docker-registry-2-g3l70    1/1       Running   0          14s
+registry-console-1-b47jt   1/1       Running   0          6h
+router-1-hs9wp             1/1       Running   0          6h
+----

@@ -987,7 +987,114 @@ See below graphic for a representation:
 .gluster-block IO flow in CNS
 image::cns_diagram_gluster_block.png[]
 
+Why is this beneficial? Some applications, like OpenShift Logging and Metrics services facilitate operations which are cheap on a local filesystem like XFS but expensive on distributed filesystem like GlusterFS.
 
+With `gluster-block` you get advantage of a resilient, scalable storage without the overhead on filesystem operations like locking and byte-range locking.
+
+OpenShift Metrics and Logging issue a lot of these operations, and hence *`gluster-block` is currently the only supported backend in CNS for those services*.
+
+`gluster-block` was deployed in the previous chapter (_Infrastructure Management Basics_) and used to supply storage to Cassandra as part of the Metrics service and to ElasticSearch as part of the Logging service.
+
+If you look on the host running any of those service, you will see that there are iSCSI sessions open.
+
+For example, pick the host running the ElasticSearch pod:
+
+----
+oc get pod -l component=es -n logging -o wide
+----
+
+You will see the IP and the hostname of the host the pod is running on.
+In this example the pod is running on {{ NODE5_INTERNAL_FQDN }}.
+
+----
+NAME                                      READY     STATUS    RESTARTS   AGE       IP           NODE
+logging-es-data-master-nsgqvac6-1-jsfnb   2/2       Running   0          3m        10.131.2.4   {{ NODE5_INTERNAL_FQDN }}
+----
+
+[TIP]
+====
+Above you see one of the exampls where a *Pod* actually contains two containers. The ElasticSearch contains an additional proxy service, living in it's own container but running with the actual ElasticSearch service on the same host.
+====
+
+Sign on to this host (use the host shown in the last command) from the master using SSH and run the `iscsiadm` utility to display running iSCSI sessions:
+
+[source,bash,role=copypaste]
+----
+ssh {{ NODE5_INTERNAL_FQDN }} sudo iscsiadm -m session
+----
+
+Answer "*yes*" to the SSH security prompt. You should see output similar to the below:
+
+----
+tcp: [1] 10.0.3.234:3260,1 iqn.2016-12.org.gluster-block:1241c07c-68ec-40cf-ba75-c10661806a16 (non-flash)
+tcp: [2] 10.0.4.75:3260,2 iqn.2016-12.org.gluster-block:1241c07c-68ec-40cf-ba75-c10661806a16 (non-flash)
+tcp: [3] 10.0.1.145:3260,3 iqn.2016-12.org.gluster-block:1241c07c-68ec-40cf-ba75-c10661806a16 (non-flash)
+----
+
+The IPs and LUN IDs are going to be different for you, but essentially you see 3 iSCSI sessions open to the same LUN (identified by the UUID after `iqn.2016-12.org.gluster-block`).
+There are 3 sessions because every CNS pod of the second CNS cluster for Infrastructure runs the Linux iSCSI target stack (TCMU) and each session represents an independent IO path to the same LUN, thus achieving high availability and path-based failover.
+
+Like every block storage supplied to OpenShift, it get's formatted with XFS which you can see if you look at mounts on the host running ElasticSearch:
+
+----
+ssh {{ NODE5_INTERNAL_FQDN }} mount | grep iscsi
+----
+
+You will see something similar to this:
+
+----
+/dev/sda on /var/lib/origin/openshift.local.volumes/plugins/kubernetes.io/iscsi/iface-default/10.0.3.234:3260-iqn.2016-12.org.gluster-block:1241c07c-68ec-40cf-ba75-c10661806a16-lun-0 type xfs (rw,relatime,seclabel,attr2,inode64,noquota)
+----
+
+As you can see the device `/dev/sda` is how the iSCSI LUN ended up (in this case) on {{ NODE5_INTERNAL_FQDN}}.
+
+To serve a block device from CNS a special external provisioner is shipping with it. You can see it's pod in the namespace that the second CNS cluster was deployed to:
+
+----
+oc get pod -n {{ CNS_INFRA_NAMESPACE }} -l glusterfs=block-registry-provisioner-pod
+----
+
+You should see something like:
+
+----
+NAME                                           READY     STATUS    RESTARTS   AGE
+glusterblock-registry-provisioner-dc-1-vsgpg   1/1       Running   0          21m
+----
+
+This component is containing the additional logic to carve out block devices from CNS.
+
+You also find evidence of the different provisioning mechanism if you look at the `StorageClass`:
+
+----
+oc get sc
+----
+
+Shows the 3, currently defined `StorageClasses` in the system:
+
+----
+NAME                          PROVISIONER                AGE
+glusterfs-registry            kubernetes.io/glusterfs    58m
+glusterfs-registry-block      gluster.org/glusterblock   58m <1>
+glusterfs-storage (default)   kubernetes.io/glusterfs    1h
+----
+<1> The provisioner does not start with `kubernetes.io` which indicates it's an external provisioner (shipping as an additional component, not as part of OpenShift or Kubernetes)
+
+Finally the block device is reflected as a specific type of volume, a `blockvolume` in `heketi`.
+
+Run the following command, to ask `heketi` about all block volumes currently present using the `heketi-cli` tool:
+
+----
+heketi-cli --server http://heketi-registry-{{CNS_INFRA_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}} --user=admin --secret {{ HEKETI_ADMIN_PW }} blockvolume list
+----
+
+There should be two, one for Logging and one for Metrics:
+
+----
+Id:a2ceeabc91d453a30e197da764fca8c9    Cluster:f68d7554542bab9d0fdeb683d66d951a    Name:blockvol_a2ceeabc91d453a30e197da764fca8c9
+Id:a67906a197ad0c750a90c793452f83c7    Cluster:f68d7554542bab9d0fdeb683d66d951a    Name:blockvol_a67906a197ad0c750a90c793452f83c7
+----
+
+Using `heketi-cli` you could also provision new block volumes or even create new internal GlusterFS volumes to host block volumes. However this is rarely necessary, since this, at time of writing (2018), is only meant to be in place for Logging and Metrics and provisioning is handled automatically.
 
 ### CNS Operations
 
@@ -1203,120 +1310,3 @@ heketi-cli topology info
 
 1. successful execution of the `remove` operation on all devices of the node
 2. running `heketi-cli node delete <node_id>` on the node in question
-
-### Running the OpenShift Registry with CNS
-
-The Registry in OpenShift is a critical component. As it is the default
-destination for all container builds in the cluster, and is the source for
-deploying applications built inside the cluster, being unavailable is a big
-problem.
-
-The internal registry runs as one or more *Pods* inside the OpenShift
-environment. By default the registry uses local ephemeral storage in its *Pod*.
-This means that any restarts or re-deployments or outages would cause all of the
-built/pushed container images to be lost. Also, only having one registry
-instance and/or one infrastructure node could cause temporary outages. So,
-adding storage and scaling up the registry is a good idea.
-
-[IMPORTANT]
-====
-Your cluster only has one infrastructure node. In practice, you would want a
-minimum of two to achieve high-availability for all infrastructure services.
-====
-
-#### Adding CNS to the Registry
-Adding storage to the registry is as easy as it was for our file-uploader
-application. Simply make the registry *Pods* use a PVC in access mode *RWX*
-based on CNS. This way, a highly-available scale-out registry can be provided
-without external dependencies on NFS or Cloud Provider storage.
-
-[IMPORTANT]
-====
-The following method will be disruptive. All data stored in the registry so far
-will be lost (the Rails and PHP app images). Migration scenarios exist but are
-beyond the scope of this lab, but normally you would configure persistent
-storage for the registry before starting to really use your cluster.
-====
-
-Make sure you are logged in as `system:admin` in the `default` namespace:
-
-----
-oc login -u system:admin -n default
-----
-
-Just like with the file uploader example, you can simply add a volume (and have
-its *PersistentVolumeClaim* created automatically) with the `oc volume` command.
-Execute the following:
-
-----
-oc volume dc/docker-registry --add --name=registry-storage -t pvc \
---claim-mode=ReadWriteMany --claim-size=5Gi \
---claim-name=registry-storage --overwrite
-----
-
-The registry will now redeploy.
-
-[NOTE]
-====
-The registry is preconfigured with a volume called `registry-storage` that is
-using the `emptyDir` storage type. The above command `--overwrite` the existing
-volume with our new PVC. More information can be found in the
-link:https://docs.openshift.com/container-platform/3.9/dev_guide/volumes.html[volumes
-documentation^].
-====
-
-[TIP]
-====
-In a future release of OpenShift, you will be able to configure Container Native
-Storage as part of the OpenShift installation directly, including automatically
-using CNS for the storage for the registry, fully supported.
-====
-
-Observe the registry deployment get updated:
-
-----
-oc get pod -w
-----
-
-Remember to kbd:[Ctrl + c] when you are done watching the *Pods* redeploy.
-
-After a couple of seconds a new deployment of the registry should be available.
-Verify a new version of the registry's *DeploymentConfig* is running:
-
-----
-oc get dc/docker-registry
-----
-
-You will see something like:
-
-----
-NAME              REVISION   DESIRED   CURRENT   TRIGGERED BY
-docker-registry   2          1         1         config
-----
-
-Now your OpenShift Registry is using persistent storage provided by CNS.  Since
-this is shared storage this also allows you to scale out the registry pods.
-
-You can scale the registry like this:
-
-----
-oc scale dc/docker-registry --replicas=3
-----
-
-After a short while you should see 3 healthy registry pods in the default
-*Project*:
-
-----
-oc get pods
-----
-
-And you should see something like:
-
-----
-NAME                       READY     STATUS    RESTARTS   AGE
-docker-registry-2-5rszg    1/1       Running   0          1m
-docker-registry-2-7s3tm    1/1       Running   0          14s
-docker-registry-2-g3l70    1/1       Running   0          14s
-registry-console-1-b47jt   1/1       Running   0          6h
-router-1-hs9wp             1/1       Running   0          6h
-----

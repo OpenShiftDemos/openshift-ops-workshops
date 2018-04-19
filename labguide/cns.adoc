@@ -898,7 +898,7 @@ Oops. The file system seems to have a problem. Let's check it:
 oc rsh file-uploader-2-jd22b df -h /opt/app-root/src/uploaded
 ----
 
-Houston, we have a problem - clearly the file system is full:
+Clearly the file system is full:
 
 ----
 Filesystem                                      Size  Used Avail Use% Mounted on
@@ -976,61 +976,85 @@ Filesystem                                      Size  Used Avail Use% Mounted on
 10.0.1.36:vol_6320cd6974d8573f49f85a5d7255a7f2  5.0G  1.1G  4.0G  21% /opt/app-root/src/uploaded
 ----
 
-### Increasing Storage Capacity in CNS
+### CNS Operations
 
-At some point the overall CNS cluster capacity may need to be expanded. There are two ways of how to to increase the storage capacity offered by CNS. Either by adding additional nodes with storage ton existing CNS cluster or by adding additional storage devices to the existing nodes of a running CNS cluster.
+#### Options to increase Storage Capacity in CNS
 
-You also have the option to deploy a second CNS cluster, which is what we are doing next:
+At some point the overall CNS cluster capacity may need to be expanded. There are a couple of ways of how to increase the storage capacity offered by CNS.
 
+1. add a second, independent CNS cluster with it's own management stack (`heketi`) (like you did in the _Infrastructure Management_ module )
+2. add a second, independent CNS cluster to the existing management stack (as described in the link:https://access.redhat.com/documentation/en-us/container-native_storage/3.9/html-single/container-native_storage_for_openshift_container_platform/#idm140292314514720[documentation^])
+3. add additional nodes to an existing CNS cluster (as described in the link:https://access.redhat.com/documentation/en-us/container-native_storage/3.9/html-single/container-native_storage_for_openshift_container_platform/#idm140292314767904[documentation^])
+4. add additional devices to existing nodes
 
-
-### Other CNS Maintenance Activities
-In addition to extending your CNS cluster with additional storage nodes, you may
-also want to perform other maintenance activities. For example, if you have
-added more block devices to one of your CNS nodes, you may simply wish to add
-additional devices to the cluster. Or, if you have degraded physical devices
-that need to be replaced, maintained, or eliminated, you may wish to remove
-devices from a cluster.
+Option 1) is automated using `openshift-ansible`, Option 2) is an option you likely want to take when you have nodes with different media types (SSD vs. HDD) and you want to offer quality of service. +
+Option 3) allows you to easily expand the cluster capacity in-place. In this lab we however have no node left to add, so we will illustrate Option 4).
 
 #### Adding Additional Devices to a CNS Cluster
-Instead of adding a net-new cluster you can also add additional devices to an
-existing cluster. The process is very similar to adding new nodes - loading a
-modified topology JSON file via the heketi client.
 
-To illustrate an alternative we are going to use `heketi-cli` tool directly.
+To perform management operations you also use the `heketi-cli` tool. It manages several entities that make up CNS, that is: clusters, nodes, volumes and devices.
 
-The nodes of the second cluster, have an additional, unused storage device
-`{{NODE_BRICK_DEVICE2}}`. To add them we need to know their node IDs. + With the
-environment variables for `heketi-cli` still set run:
+For each entity there are several create/add, update, delete commands available. For initial cluster setup `heketi-cli` also offers batch processing via JSON file.
+
+In the following we will manually add devices, that node04, node05 and node06, which form the CNS cluster for OpenShift infrastructure.
+
+Like in _Installation_ module, we first set up some Bash environment variables to configure our `heketi-cli` client to talk to the second CNS cluster. This time we take a shortcut by programmatically determining the URL to heketi and the password by querying the `heketi` pod:
 
 ----
-heketi-cli node list | grep ca777ae0285ef6d8cd7237c862bd591c
+export HEKETI_POD=$(oc get pods -l glusterfs=heketi-registry-pod -o jsonpath='{.items[0].metadata.name}' -n {{ CNS_INFRA_NAMESPACE }})
+export HEKETI_CLI_SERVER=http://$(oc get route -l glusterfs=heketi-registry-route -o jsonpath='{.items[0].spec.host}' -n {{ CNS_INFRA_NAMESPACE }})
+export HEKETI_CLI_USER=admin
+export HEKETI_CLI_KEY=$(oc get pod/$HEKETI_POD -o jsonpath='{.spec.containers[0].env[?(@.name=="HEKETI_ADMIN_KEY")].value}' -n {{ CNS_INFRA_NAMESPACE }})
+----
+
+Run the following command to store the `heketi`-internal ID of the CNS cluster (there is only a single one known to this `heketi` instance) in a bash variable:
+
+----
+export CNS_INFRA_CLUSTER=$(heketi-cli cluster list --json | jq -r '.clusters[0]')
+echo $CNS_INFRA_CLUSTER
+----
+
+Now we can query `heketi` about the nodes in this cluster:
+
+----
+heketi-cli cluster info $CNS_INFRA_CLUSTER
 Id:33e0045354db4be29b18728cbe817605	Cluster:ca777ae0285ef6d8cd7237c862bd591c
 Id:d8443e7ee8314c0c9fb4d8274a370bbd	Cluster:ca777ae0285ef6d8cd7237c862bd591c
 Id:caaed3927e424b22b1a89d261f7617ad	Cluster:ca777ae0285ef6d8cd7237c862bd591c
 ----
 
-[IMPORTANT]
-====
-You will need to replace the `grep` with your unique cluster ID. This is the
-cluster ID of the second / new CNS cluster that you just created previously, and
-used when creating the new `cns-silver` *StorageClass*.
-====
-
-For each node in the output (eg: `33e0045354db4be29b18728cbe817605`,
-`d8443e7ee8314c0c9fb4d8274a370bbd`, and `caaed3927e424b22b1a89d261f7617ad`), go
-ahhead and `device add` the additional block device:
+The UUIDs of the nodes will be different for you. We however need them to tell `heketi` from which nodes to add a device. To avoid repetitive copy&paste here is another Bash short cut to parse above output in a Bash variable:
 
 ----
-heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=33e0045354db4be29b18728cbe817605
-Device added successfully
-
-heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=d8443e7ee8314c0c9fb4d8274a370bbd
-Device added successfully
-
-heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=caaed3927e424b22b1a89d261f7617ad
-Device added successfully
+export NODES=$(heketi-cli cluster info $CNS_INFRA_CLUSTER --json | jq -r '.nodes[]')
+export NODE_LIST=($NODES)
+echo $NODES
 ----
+
+To illustrate the before and after effect, first inspect the output of:
+
+----
+heketi-cli topology info
+----
+
+You should see that every node currently has a single device: `{{NODE_BRICK_DEVICE}}`.
+
+These nodes of the second CBS cluster, have an additional, unused storage device
+`{{NODE_BRICK_DEVICE2}}`. For each node now go ahead and make `heketi` aware of this device using the `device add` directive
+
+----
+heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=${NODE_LIST[0]}
+
+heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=${NODE_LIST[1]}
+
+heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=${NODE_LIST[2]}
+----
+
+Each command should return with the message `Device added successfully`.
+
+Check `heketi-cli topology info` again to verify the presence of the new device.
+
+That's it - the devices are now available to `heketi` and will be considered the next time CNS serves a volume request. Adding devices and nodes are online operation, meaning they do are non-disruptive and can be run in production without downtime.
 
 [NOTE]
 ====
@@ -1045,6 +1069,16 @@ heketi-cli topology info
 
 You should see a `/dev/xvde` device present for each of the nodes in the
 `cns-silver` cluster.
+
+### Other CNS Maintenance Activities
+In addition to extending your CNS cluster with additional storage nodes, you may
+also want to perform other maintenance activities. For example, if you have
+added more block devices to one of your CNS nodes, you may simply wish to add
+additional devices to the cluster. Or, if you have degraded physical devices
+that need to be replaced, maintained, or eliminated, you may wish to remove
+devices from a cluster.
+
+
 
 ### Replacing Failed Disks and Nodes
 

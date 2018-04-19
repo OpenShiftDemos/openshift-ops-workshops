@@ -118,6 +118,7 @@ modules:
       CNS_BLOCK_STORAGECLASS: "glusterfs-registry-block"
       CNS_STORAGECLASS2: "glusterfs-storage-second"
       CNS_NAMESPACE: "storage"
+      CNS_INFRA_NAMESPACE: "infra-storage"
       NODE_BRICK_DEVICE: "/dev/xvdd"
       NODE_BRICK_DEVICE2: "/dev/xvde"
   skipping-ahead:

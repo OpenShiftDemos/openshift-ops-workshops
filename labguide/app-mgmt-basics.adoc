@@ -16,7 +16,7 @@ blocks will help you better see the big picture of application management on the
 platform.
 
 #### Projects
-A *Project* is a "bucket", of sorts. It's a meta construct where all of a user's
+A *Project* is a "bucket" of sorts. It's a meta construct where all of a user's
 resources live. From an administrative perspective, each *Project* can be
 thought of like a tenant. *Projects* may have multiple users who can access
 them, and users may be able to access multiple *Projects*.
@@ -55,6 +55,8 @@ The output will look like:
     deploymentconfig "mapit" created
     service "mapit" created
 --> Success
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose svc/mapit'
     Run 'oc status' to view your app.
 ----
 
@@ -513,13 +515,13 @@ OpenShift routing layer. And the data object behind that is a *Route*.
 
 The default OpenShift router (HAProxy) uses the HTTP header of the incoming
 request to determine where to proxy the connection. You can optionally define
-security, such as TLS, for the *Route*. If you want your *Services*, and, by
-extension, your *Pods*,  to be accessible to the outside world, you need to
+security, such as TLS, for the *Route*. If you want your *Services* (and by
+extension, your *Pods*) to be accessible to the outside world, then you need to
 create a *Route*.
 
 Do you remember setting up the router? You probably don't. That's because the
 installer settings created a router for you! The router lives in the `default`
-*Project*, and you can see something about it with the following command:
+*Project*, and you can see information about it with the following command:
 
 ----
 oc describe dc router -n default
@@ -558,7 +560,7 @@ If you take a look at the `HOST/PORT` column, you'll see a familiar looking
 FQDN. The default behavior of OpenShift is to expose services on a formulaic
 hostname:
 
-`{SERVICENAME}.{PROJECTNAME}.{ROUTINGSUBDOMAIN}`
+`{SERVICENAME}-{PROJECTNAME}.{ROUTINGSUBDOMAIN}`
 
 How does this work? Firstly, the `ROUTINGSUBDOMAIN` can be configured at install
 time. We did this for you. In the `/etc/ansible/hosts` file you will find the
@@ -569,7 +571,7 @@ following line:
 openshift_master_default_subdomain={{OCP_ROUTING_SUFFIX}}
 ----
 
-There is also a wildcard DNS entry that points `*.apps...` to the host where the
+There is also a wildcard DNS entry that points `+*.apps...+` to the host where the
 router lives. OpenShift concatenates the *Service* name, *Project* name, and the
 routing subdomain to create this FQDN/URL.
 
@@ -578,7 +580,7 @@ It should be accessible from anywhere on the internet.
 
 The *Route* is associated with the *Service*, and the router automatically
 proxies connections directly to the *Pod*. The router itself runs as a *Pod*. It
-bridges the real "internet" to the SDN.
+bridges the "real" internet to the SDN.
 
 If you take a step back to examine everything you've done so far, in three
 commands you deployed an application, scaled it, and made it accessible to the
@@ -616,9 +618,9 @@ subjected to its restart policy.
 *Readiness Probe*
 
 A readiness probe determines if a container is ready to service requests. If the
-readiness probe fails, the endpoints controller ensures the container has its IP
+readiness probe fails, the endpoint's controller ensures the container has its IP
 address removed from the endpoints of all services that should match it. A
-readiness probe can be used to signal to the endpoints controller that even
+readiness probe can be used to signal to the endpoint's controller that even
 though a container is running, it should not receive any traffic.
 
 More information on probing applications is available in the
@@ -682,11 +684,11 @@ The `mapit` application currently doesn't leverage any persistent storage. If th
 
 [NOTE]
 ====
-The directories that make up the containers internal filesystem come are a blend of the read-only layers of the container image and the top-most writable layer that is added as soon as a container instance is started from the image.
-The writable layer is disposed once the container is deleted which happens regularly in a container orchestration environment.
+The directories that make up the containers internal filesystem are a blend of the read-only layers of the container image and the top-most writable layer that is added as soon as a container instance is started from the image.
+The writable layer is disposed of once the container is deleted which happens regularly in a container orchestration environment.
 ====
 
-If a pod in OpenShift would need reliable storage, for example to host a database, we would need to supply **persistent** volume to the pod. This type of storage outlives the container, i.e. it persists when the pod dies. It typically comes from an external storage system.
+If a pod in OpenShift needs reliable storage, for example to host a database, we would need to supply **persistent** volume to the pod. This type of storage outlives the container, i.e. it persists when the pod dies. It typically comes from an external storage system.
 
 We will talk about this concept in more detail later. But let's imagine for a moment, the `mapit` application needs persistent storage available under the `/app-storage` directory inside the container.
 
@@ -734,7 +736,7 @@ mapit-4-deploy   1/1       Running             0          10s
 
 We will look at how this storage was provisioned automatically in the background using _Red Hat Container-native Storage_ later. You will also learn how to request storage as part of a template.
 
-Suffice to say, a 1GiB GlusterFS volume has been created and made available to the pod.
+Suffice it to say, a 1GiB GlusterFS volume has been created and made available to the pod.
 
 Log on to the new pod (**your pod names will be different**) using the remote-shell capability of the `oc` client:
 

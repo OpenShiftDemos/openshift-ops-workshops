@@ -1,6 +1,6 @@
 ## Infrastructure Management, Metrics and Logging
 In this lab you will explore various aspects of managing cluster infrastructure.
-This includes the extending the OpenShift cluster and installation of the
+This includes extending the OpenShift cluster and installation of the
 Logging and Metrics components, all automated by the installer. It also includes
 some maintenance of nodes, as well as manipulating the multitenant network.
 
@@ -12,7 +12,7 @@ Log in as cluster administrator:
 oc login -u system:admin
 ----
 
-Verify your cluster currently consists of 5 nodes, of which one is marked as _Not Schedulable_ (the Master).
+Verify your cluster currently consists of 5 nodes.
 
 ----
 oc get nodes
@@ -57,18 +57,18 @@ the `scaleup` playbook.
 
 #### Configure the Installer
 Your environment already has 3 additional nodes, but you have not used
-them so far. They are already configured in the inventory file but commented out. +
-Edit the file `/etc/ansible/hosts/` in an editor of your choice with `sudo` privileges, e.g.
+them so far. They are already configured in the inventory file but commented out with a `#scaleup_` prefix.
+
+To see the lines run:
+----
+sudo grep '#scaleup_' /etc/ansible/hosts
+----
+
+Remove the `#scaleup_` comment prefix by running the below `sed` command:
 
 ----
-sudo vim /etc/ansible/hosts
+sudo sed -i 's/#scaleup_//g' /etc/ansible/hosts
 ----
-
-There two places where `#scaleup_` appears:
-
-. in front of the `new_nodes` in the `OSEv3:children` group
-.. removing the comment tells the installer to include that subgroup.
-. in the actual `new_nodes` group, for each node's definition
 
 When finished, your inventory file should look like the following:
 
@@ -163,21 +163,20 @@ Container-native Storage can be configured directly in the installer, to provide
 By definition you need a separate set of hosts for this - which you have just made available in the previous paragraph.
 
 #### Configure the Installer
-Several directives for a second, infrastructure-centric CNS cluster in the `/etc/ansible/hosts` files have been prepared but commented using the `#cnsinfra_` prefix.
+Several directives for a second, infrastructure-centric CNS cluster are in the `/etc/ansible/hosts` file. They have been prepared but commented out using the `#cnsinfra_` prefix.
 
-Using your favourite editor, open the `/etc/ansible/hosts` file with `sudo` privileges, e.g.
-
+To see the lines run:
 ----
-sudo vim /etc/ansible/hosts
+sudo grep '#cnsinfra_' /etc/ansible/hosts
 ----
 
-... and comment out all lines starting with `#cnsinfra_`... alternatively use the below `sed` command:
+Remove the `#cnsinfra_` comment prefix by running the below `sed` command:
 
 ----
 sudo sed -i 's/#cnsinfra_//g' /etc/ansible/hosts
 ----
 
-The result `/etc/ansible/hosts` looks like this:
+When finished, your inventory file should look like the following:
 
 [source,ini]
 ./etc/ansible/hosts
@@ -210,12 +209,12 @@ openshift_storage_glusterfs_registry_block_host_vol_size=30 <6>
 
 ...
 ----
-<1> Deploys a the resource of the CNS cluster for infrastructure in a separate namespace
+<1> Deploys a resource of the CNS cluster for infrastructure in a separate namespace
 <2> Creates a StorageClass for the CNS infra cluster
 <3> Enables support for block storage
 <4> Creates a StorageClass for the block storage service in the CNS infra cluster
 <5> Automatically create block-hosting volumes (see CNS module for further explanations)
-<6> Allocate a total 30GiB for block storage based volumes from the CNS infra cluster
+<6> Allocate a total of 30GiB for block storage based volumes from the CNS infra cluster
 <7> An additional group of hosts which form the CNS infra cluster
 <8> Each line is a node with a device list, consumed by CNS
 
@@ -229,7 +228,7 @@ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-gluste
 
 This playbooks takes about 4 minutes to execute and will install an entirely independent CNS cluster, including a separate `heketi` management stack. Additional `StorageClasses` will be set up to make this storage usable.
 
-Verify using the `oc get sc` command that two new `StorageClasses` are available:
+Verify by using the `oc get sc` command that two new `StorageClasses` are available:
 
 ----
 NAME                          PROVISIONER                AGE
@@ -258,19 +257,28 @@ facilitated by running a specific playbook that is part of the
 solution when the cluster was initially installed.
 
 #### Configure the Installer
-Using your favourite editor, open the `/etc/ansible/hosts` file with `sudo` privileges, e.g.
+The lines to configure OpenShift Metrics are already configured in the inventory file but commented out with a `#metrics_` prefix.
+
+To see the lines run:
+----
+sudo grep '#metrics_' /etc/ansible/hosts
+----
+
+Remove the `#metrics_` comment prefix by running the below `sed` command:
 
 ----
-sudo vim /etc/ansible/hosts
+sudo sed -i 's/#metrics_//g' /etc/ansible/hosts
 ----
 
-In the `[OSEv3:vars]` section, you will find some directives that begin with
-`openshift_metrics`. Several are commented out, with the prefix `#metrics_` (similar to the comments used for extending the cluster).
+The OpenShift installer variable `openshift_metrics_install_metrics=false` tells the
+installer to *not* install the metrics solution when it runs. Remove that line by
+running the below `sed` command:
 
-`openshift_metrics_install_metrics=false` tells the installer *not* to install
-the metrics solution when it runs. Make sure that you delete that line. Then,
-remove all of the comments, so that the section in your file looks like the
-following:
+----
+sudo sed -i '/openshift_metrics_install_metrics=false/d' /etc/ansible/hosts
+----
+
+When finished, your inventory file should look like the following:
 
 [source,ini]
 ./etc/ansible/hosts
@@ -286,14 +294,14 @@ openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }} <4>
 ----
 <1> Instruct the installer to actually deploy the Metrics service
 <2> Cassandra, part of the Metrics service, will get dynamically provisioned storage
-<3> The resulting PersistentVolumeClaim will be of `10Gi`in size
+<3> The resulting PersistentVolumeClaim will be of `10Gi` in size
 <4> The Metrics frontend (`hawkular`) will be reachable under this domain.
 
 #### Make CNS block storage the default
 
 As you can see above openshift-ansible currently has no way of telling which `StorageClass` it should use as part of requesting persistent storage using a `PersistentVolumeClaim`.
 
-Since we have just deployed an extra CNS cluster for this, we need to temporarily make it's block-storage service offered by Container-native Storage the system-wide default. First disable the file-based service in the first CNS cluster as the default:
+Since we have just deployed an extra CNS cluster for this, we need to temporarily make its block-storage service offered by Container-native Storage the system-wide default. First disable the file-based service in the first CNS cluster as the default:
 
 ----
 oc patch storageclass {{ CNS_STORAGECLASS }} \
@@ -325,7 +333,7 @@ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-metric
 
 This will deploy the metric collection and visualization stack on OpenShift. All
 resources will be stood up in the `openshift-infra` *Project*. As part of the
-deployment, persistent storage will automatically used for storing the metrics
+deployment, persistent storage will automatically be used for storing the metrics
 information. It will take roughly 2 minutes to complete.
 
 Once the installation playbook has completed, you can then verify that the
@@ -374,6 +382,8 @@ If you don't have it open, return to the OpenShift web console:
 You will want to be sure you are logged in as `fancyuser1` with the password `openshift`, who is a
 `cluster-reader` and can see interesting *Projects*.
 
+Click on the `default` project.
+
 [IMPORTANT]
 ====
 At this point the OpenShift UI will display an error message, stating
@@ -387,7 +397,7 @@ to access Hawkular and accept the untrusted certificate. Then, return to the
 OpenShift web console and refresh the page, and the metrics should begin to
 display.
 
-When working properly, it looks like this:
+When working properly and the resource view is expanded, it looks like this:
 
 .The OpenShift UI will show history metrics for applications
 image::openshift-metrics-overview.png[]
@@ -406,22 +416,37 @@ itself, `openshift-infra`.
 ### OpenShift Logging
 Equally important to performance metrics is collecting and aggregating logs from
 the environments and the application pods it is running. OpenShift ships with an
-elastic log aggregation solution: *EFK*. + **E**lasticSearch, **F**luentd and
-**K**ibana forms a configuration where logs from all nodes and applications are
+elastic log aggregation solution: *EFK*. **E**lasticSearch, **F**luentd and
+**K**ibana form a configuration where logs from all nodes and applications are
 consolidated (Fluentd) in a central place (ElasticSearch) on top of which rich
 queries can be made from a single UI (Kibana). Administrators can see and search
-through all logs, application owners and developers can allow access logs that
-belong to their projects. + Like metrics the EFK stack runs on top of OpenShift.
+through all logs. Application owners and developers can allow access logs that
+belong to their projects. Like metrics the EFK stack runs on top of OpenShift.
 
 #### Configuring the Inventory
-To configure the installation of EFK edit (update or insert) the Ansible
-inventory file just like you did for metrics. In the `/etc/ansible/hosts` file,
-make the following changes:
+The lines to configure OpenShift Logging are already configured in the inventory file but commented out with a `#logging_` prefix.
 
-* remove the line `openshift_logging_install_logging=false`
-* remove the comments beginning with `#logging_`
+To see the lines run:
+----
+sudo grep '#logging_' /etc/ansible/hosts
+----
 
-Your resulting file should look like the following:
+Remove the `#logging_` comment prefix by running the below `sed` command:
+
+----
+sudo sed -i 's/#logging_//g' /etc/ansible/hosts
+----
+
+The OpenShift installer variable `openshift_logging_install_logging=false` tells the
+installer to *not* install the logging solution when it runs. Remove that line by
+running the below `sed` command:
+
+----
+sudo sed -i '/openshift_logging_install_logging=false/d' /etc/ansible/hosts
+----
+
+When finished, your inventory file should look like the following:
+
 
 [source,ini]
 ./etc/ansible/hosts
@@ -443,13 +468,13 @@ openshift_logging_public_master_url=https://kibana.{{ OCP_ROUTING_SUFFIX }} <7>
 <1> Trigger the installation of the Logging service
 <2> Deploy the resources of the Logging service in a project called `logging`
 <3> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`
-<4> The resulting PersistentVolumeClaim will be of `10Gi`in size
+<4> The resulting PersistentVolumeClaim will be of `10Gi` in size
 <5> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.9/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
 <6> The FQDN under which the Logging frontend UI (Kibana) will be available
 <7> The URL under which the Logging frontend UI (Kibana) will be available
 
 #### Install Logging
-With these settings in place executing the `openshift-logging` Ansible playbook
+With these settings in place execute the `openshift-logging` Ansible playbook
 that ships as part of the `openshift-ansible` installer:
 
 ----
@@ -497,8 +522,8 @@ oc get daemonset
 You will see something like:
 
 ----
-NAME              DESIRED   CURRENT   READY     NODE-SELECTOR                AGE
-logging-fluentd   5         5         5         logging-infra-fluentd=true   9m
+NAME              DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE SELECTOR                AGE
+logging-fluentd   8         8         8         8            8           logging-infra-fluentd=true   3m
 ----
 
 To reach the _Kibana_ user interface, first determine its public access URL by
@@ -518,8 +543,8 @@ logging-kibana   kibana.apps.{{ OCP_ROUTING_SUFFIX }}             logging-kibana
 You can click the link ( https://kibana.{{ OCP_ROUTING_SUFFIX }} ) to open the
 Kibana interface. There is a special authentication proxy that is configured as
 part of the EFK installation that results in Kibana requiring OpenShift
-credentials for access. You should login to Kibana as the `fancyuser1` user to
-be able to see all of the cluster's logs. Kibana utilizes the same RBAC
+credentials for access. You should login to Kibana as the `fancyuser1` user with password
+`openshift` to be able to see all of the cluster's logs. Kibana utilizes the same RBAC
 underpinning OpenShift to ensure that users can only see the logs they should
 have access to.
 
@@ -769,7 +794,7 @@ documentation].
 ### Node Maintenance
 
 It is possible to put any node of the OpenShift environment into maintenance by
-marking it as non-schedulable following by _evacuation_ of all pods on the node.
+marking it as non-schedulable followed by a _drain_ of all pods on the node.
 
 These operations require elevated privileges. Ensure you are logged in as
 cluster admin:
@@ -802,7 +827,7 @@ NAME                                          STATUS                     AGE
 {{ NODE2_INTERNAL_FQDN }}   Ready,SchedulingDisabled   4h
 ----
 
-Marking the node out like this did not impact the pods it is running. List those
+Marking the node as non-schedulable did not impact the pods it is running. List those
 pods:
 
 ----
@@ -812,28 +837,28 @@ oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
 Other than a *Pod* for Container Native Storage and a Fluentd instance (there is
 one on every node), there may or may not be other *Pods* running on this node.
 
-The next step is to evacuate the *Pods* to other nodes in the cluster. You can
-first simulate what actions the system would perform during evacuation with the
+The next step is to drain the *Pods* to other nodes in the cluster. You can
+first simulate what actions the system would perform during the drain with the
 following command:
 
 ----
-oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --evacuate --dry-run
+oc adm drain {{ NODE2_INTERNAL_FQDN }} --ignore-daemonsets --dry-run
 ----
 
 [IMPORTANT]
 ====
 *Pods* running on the node as part of a `DaemonSet` like those associated to
-Logging or CNS will *not* be evacuated. They will not be accessible anymore
+Logging or CNS will *not* be drained. They will not be accessible anymore
 through OpenShift, but will continue to run as containers on the nodes until the
 local OpenShift services are stopped and/or the node is shutdown. This is not a
 problem since software like CNS or the OpenShift Metrics stack is designed to
 handle such situations transparently.
 ====
 
-Start the evacuation process like this:
+Start the drain process like this:
 
 ----
-oadm manage-node {{ NODE2_INTERNAL_FQDN }} --evacuate
+oc adm drain {{ NODE2_INTERNAL_FQDN }} --ignore-daemonsets
 ----
 
 After a few moments, all of the *Pods*, except those for Fluentd and Container
@@ -880,7 +905,7 @@ adding storage and scaling up the registry is a good idea.
 [IMPORTANT]
 ====
 Your cluster only has one infrastructure node. In practice, you would want a
-minimum of two to achieve high-availability for all infrastructure services.
+minimum of three to achieve high-availability for all infrastructure services.
 ====
 
 #### Adding CNS to the Registry
@@ -918,7 +943,7 @@ The registry will now redeploy.
 [NOTE]
 ====
 The registry is preconfigured with a volume called `registry-storage` that is
-using the `emptyDir` storage type. The above command `--overwrite` the existing
+using the `emptyDir` storage type. The above command will `--overwrite` the existing
 volume with our new PVC. More information can be found in the
 link:https://docs.openshift.com/container-platform/3.9/dev_guide/volumes.html[volumes
 documentation^].

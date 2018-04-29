@@ -1,8 +1,8 @@
 ## Installation and Verification
 
-The primary method of installing for OpenShift Container Platform is based on Ansible playbooks. These playbooks ship as part of the product in the `openshift-ansible` package.
+The primary method of installing OpenShift Container Platform is based on Ansible playbooks. These playbooks ship as part of the product in the `openshift-ansible` package.
 
-This method has in the past been referred to as `advanced` installation method and it involves Ansible directly to run the installation playbooks. The advanced installer supports many configuration and customization options. It also covers installation of supporting infrastructure like container-native storage, logging and metrics components.
+This method has, in the past, been referred to as the `advanced installation method` and it involves Ansible directly running the installation playbooks. The advanced installer supports many configuration and customization options. It also covers installation of supporting infrastructure like container-native storage, logging and metrics components.
 
 Your environment comes with a preinstalled cluster that has been deployed using the installer's configuration file (`/etc/ansible/hosts`) when you started the lab.
 
@@ -33,7 +33,7 @@ Common things that interact with the Kubernetes API server are:
 * OpenShift Node
 * Kubernetes Controllers
 
-All interactions with the API server are secured using TLS and all API calls must be authenticated (the user is who they say they are) and the user must be authorized to make the requested operation against the cluster.
+All interactions with the API server are secured using TLS. In addition, all API calls must be authenticated (the user is who they say they are) and authorized (the user has rights to make the requested API calls).
 
 
 #### Data Store
@@ -82,8 +82,8 @@ refer to the
 link:https://docs.openshift.com/container-platform/3.9/install_config/install/advanced_install.html#configuring-ansible[advanced
 installer's documentation].
 
-The top-level playbook in `/usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml` triggers the installation of the cluster and all of it's components. It's idempotent, which means you can execute this playbook multiple times without harm. This also allows to deploy additional components after the initial install by simply modifying the configuration in `/etc/ansible/hosts` and re-run the installer.
-In addition to this, there are playbooks that only deploy a specific components or services which makes them faster to execute.
+The top-level playbook in `/usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml` triggers the installation of the cluster and all of it's components. It's idempotent, which means you can execute this playbook multiple times without harm. This also allows you to deploy additional components after the initial install by simply modifying the configuration in `/etc/ansible/hosts` and re-run the installer.
+In addition to this, there are playbooks that only deploy a specific component or service, which makes them faster to execute.
 
 [TIP]
 ====
@@ -93,14 +93,14 @@ A typical multi-host installation like this might normally take around an hour d
 ### Verifying the Installation
 Let's to some basic tests with your installation. As an administrator, most of your interaction with OpenShift will be from the command line. The `oc` program is a command line interface that talks to the OpenShift API.
 
-On the `master` host, after the installation, the `root` system account is
-preconfigured to use a special "super administrator" account. It is vitally
-important that you protect access to the `root` system account, or to remove
+During the OpenShift installation, the `root` system account on the `master` host is
+configured to use a special OpenShift "super administrator" account. Because of this, it is vitally
+important that you protect access to the `root` system account, or remove
 this preconfigured config. Otherwise, anyone who can `sudo` on the master has
 super user privileges on the entire cluster.
 
 #### Login on the master
-Additionally, your Linux system account on the master, `cloud-user`, is preconfigured to access this OpenShift "super administrator" without password.
+Additionally, your Linux system account on the master, `cloud-user`, is preconfigured to access this OpenShift "super administrator" without a password.
 Type the following command to login as the internal super-user on OpenShift:
 
 ----
@@ -151,15 +151,15 @@ All of the systems listed in the `[nodes]` group in the `/etc/ansible/hosts`
 file should be listed here. 1 Infrastructure Node, 1 Master and 3 Worker nodes.
 
 The OpenShift *Master* is also a *Node* because it needs to participate in the
-software defined network (SDN). By default, however, scheduling is disabled --
-no workload will be run on masters. The *Infra* node will only run workloads related to supporting OpenShift infrastructure.
+software defined network (SDN).
+The *Infra* node will only run workloads related to supporting OpenShift infrastructure.
 
 #### Check the Web Console
 OpenShift provides a web console for users, developers and application operators
-to interact with the environment. There are not many cluster administrative
+to interact with the environment. There aren't many cluster administrative
 functions to perform through the web console. Some OpenShift components (like
-the internal image registry) run as workload inside the OpenShift environment,
-and you could see these things. However, we have not yet explored authentication
+the internal image registry) run on top of the OpenShift environment,
+and you can see these things. However, we have not yet explored authentication
 topics, so you have no cluster administrator "human" accounts yet.
 
 Point your browser to {{WEB_CONSOLE_URL}} to verify that the web console is
@@ -175,9 +175,9 @@ link:https://docs.openshift.com/container-platform/3.9/install_config/install/ad
 certificates] section of the installation documentation.
 
 #### Verify the Storage cluster
-In your environment Red Hat Container-native Storage was installed as part of OpenShift. It will serve robust and persistent storage to both business applications as well as OpenShift infrastructure. It is based on Red Hat Gluster Storage, running on containers on OpenShift nodes and an additional API server called `heketi` that enables the API integration with OpenShift.
+In your environment Red Hat Container-native Storage was installed as part of OpenShift. It will serve robust and persistent storage to both business applications as well as OpenShift infrastructure. It is based on Red Hat Gluster Storage, running in containers on OpenShift nodes and an additional API server called `heketi` that enables the API integration with OpenShift.
 
-We will now use a command line client on the *master* to talk via this server to container storage cluster. It's password protected, so let's export a couple of environment variables first to configure the client:
+We will now use a command line client on the *master* to talk via this server to the container storage cluster. It's password protected, so let's export a couple of environment variables first to configure the client:
 
 ----
 export HEKETI_CLI_SERVER=http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
@@ -270,4 +270,4 @@ Cluster Id: ec7a9c8be8327a54839236791bf7ba24
 <1> An internal GlusterFS volume that is automatically generated by the setup routine to hold the heketi database.
 
 
-This output tells you that Red Hat Container-native Storage currently consists a single cluster, which consists of 3 nodes, each with a single block device `/dev/xvdd` of 50GiB in size. The GlusterFS layer will turn these 3 devices/hosts into a single, flat storage pool from which OpenShift will be able to carve out either distinct filesystem volumes or block devices that serve as persistent storage for containers.
+This output tells you that Red Hat Container-native Storage currently consists of a single cluster, which consists of 3 nodes, each with a single block device `/dev/xvdd` of 50GiB in size. The GlusterFS layer will turn these 3 devices/hosts into a single, flat storage pool from which OpenShift will be able to carve out either distinct filesystem volumes or block devices that serve as persistent storage for containers.

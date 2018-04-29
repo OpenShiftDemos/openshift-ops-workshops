@@ -9,13 +9,11 @@ constraints, or in a POC-type environment, that would be fine. But reality calls
 for a little restraint.
 
 [WARNING]
-====
-Before continuing, make sure you are using logged with the built-in system administrator account in OpenShift.
+=====
+Before continuing, make sure you are logged in with the built-in system administrator account in OpenShift.
 
-----
-oc login -u system:admin
-----
-====
+ oc login -u system:admin
+=====
 
 ### Background: Project Request Template
 When users use the `new-project` command, what is actually happening behind the
@@ -41,7 +39,7 @@ oc new-project -h
 Do you see how there is a `--display-name` directive on `new-project` and how
 there is a `PROJECT_DISPLAYNAME` parameter?
 
-The `new-app` workflow involves the user providing information to fulfill the
+The `new-project` workflow involves the user providing information to fulfill the
 project request. OpenShift decides if this request should be allowed (for
 example, are users allowed to create *Projects*? Does this user have too many
 *Projects*?) and, if so, processes the *Template*.
@@ -108,7 +106,7 @@ volume claims, and *Pods*. Take a look at the `ResourceQuota` section from the
 <1> While only one quota can be defined in a *Project*, it still needs a unique
 name/id.
 <2> The total number of pods in a non-terminal state that can exist in the project.
-<3> CPUs are measured in "milicores", and more information on how
+<3> CPUs are measured in "milicores". More information on how
 Kubernetes/OpenShift calculates cores can be found in the
 link:https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/[upstream
 documentation^].
@@ -116,8 +114,8 @@ documentation^].
 when we get to the *LimitRange* object.
 <5> Across all persistent volume claims in a project, the sum of storage requested cannot exceed this value.
 <6> The total number of persistent volume claims in a project.
-<7> This settings limits the amount of storage that can be provisioned using the `glusterfs-storage` *StorageClass*.
-<8> Setting the amount of **PersistentVolumeClaims** to `0` the use of a **StorageClass** called `{{ CNS_BLOCK_STORAGECLASS }}` is not allowed in this project.
+<7> This setting limits the amount of storage that can be provisioned using the `glusterfs-storage` *StorageClass*.
+<8> This setting limits the number of **PersistentVolumeClaims** for a **StorageClass** called `{{ CNS_BLOCK_STORAGECLASS }}`. A value of 0 means that creating **PersistentVolumeClaims** from this storage class is not allowed in this project.
 
 For more details on the available quota options, refer back to the
 link:https://docs.openshift.com/container-platform/3.9/admin_guide/quota.html[quota

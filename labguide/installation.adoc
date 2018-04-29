@@ -59,7 +59,7 @@ Readiness probes tell the system when the pod is ready to take traffic. This, fo
 
 For more information on the OpenShift Master's areas of responsibility, please refer to
 the
-link:https://docs.openshift.com/container-platform/3.5/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
+link:https://docs.openshift.com/container-platform/3.9/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
 
 
 
@@ -171,7 +171,7 @@ OpenShift is installed, by default, a CA and SSL certificates are generated for
 all inter-component communication within OpenShift, including the web console.
 It is possible to provide your own SSL certificates during the installation, and
 more information can be found in the
-link:https://docs.openshift.com/container-platform/3.5/install_config/install/advanced_install.html#advanced-install-custom-certificates[custom
+link:https://docs.openshift.com/container-platform/3.9/install_config/install/advanced_install.html#advanced-install-custom-certificates[custom
 certificates] section of the installation documentation.
 
 #### Verify the Storage cluster

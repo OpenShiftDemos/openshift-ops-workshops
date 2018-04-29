@@ -168,7 +168,7 @@ The way that a *Service* maps to a set of *Pods* is via a system of *Labels* and
 protocols can be mapped.
 
 There is a lot more information about
-https://docs.openshift.com/container-platform/3.5/architecture/core_concepts/pods_and_services.html#services[Services],
+https://docs.openshift.com/container-platform/3.9/architecture/core_concepts/pods_and_services.html#services[Services],
 including the YAML format to make one by hand, in the official documentation.
 
 The `new-app` command used earlier caused a service to be created. You can see

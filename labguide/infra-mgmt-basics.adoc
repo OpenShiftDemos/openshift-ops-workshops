@@ -118,7 +118,7 @@ You will see:
 
 Much like when you installed OpenShift originally, these new hosts have all of
 the
-link:https://docs.openshift.com/container-platform/3.5/install_config/install/prerequisites.html[prerequisites]
+link:https://docs.openshift.com/container-platform/3.9/install_config/install/prerequisites.html[prerequisites]
 already taken care of.
 
 #### Run the Playbook to Extend the Cluster
@@ -763,7 +763,7 @@ between two projects, or completely restrict access. Don't fret, though. If you
 need finer-grained control of inter-*Pod* and *Service* communication, there is
 a Tech Preview network implementation called `NetworkPolicy`. You can learn more
 about it in the
-link:https://docs.openshift.com/container-platform/3.5/admin_guide/managing_networking.html#admin-guide-networking-networkpolicy[product
+link:https://docs.openshift.com/container-platform/3.9/admin_guide/managing_networking.html#admin-guide-networking-networkpolicy[product
 documentation].
 
 ### Node Maintenance

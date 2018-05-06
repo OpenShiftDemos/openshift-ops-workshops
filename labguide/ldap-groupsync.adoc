@@ -388,18 +388,8 @@ oc new-app docker.io/siamaksade/mapit
 You will see that it will not work:
 
 ----
---> Found Docker image 338a303 (3 weeks old) from docker.io for "docker.io/siamaksade/mapit"
-
-    * An image stream will be created as "mapit:latest" that will track this image
-    * This image will be deployed in deployment config "mapit"
-    * Ports 8080/tcp, 8778/tcp, 9779/tcp will be load balanced by service "mapit"
-      * Other containers can access this service through the hostname "mapit"
-
---> Creating resources ...
-    error: User "teamuser1" cannot create imagestreams in project "app-prod"
-    error: User "teamuser1" cannot create deploymentconfigs in project "app-prod"
-    error: User "teamuser1" cannot create services in project "app-prod"
---> Failed
+error: can't lookup images: imagestreamimports.image.openshift.io is forbidden: User "teamuser1" cannot create imagestreamimports.image.openshift.io in the namespace "app-prod": User "teamuser1" cannot create imagestreamimports.image.openshift.io in project "app-prod"
+[...]
 ----
 
 This failure is exactly what we wanted to see.

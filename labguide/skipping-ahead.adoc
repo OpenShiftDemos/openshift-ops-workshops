@@ -30,7 +30,7 @@ directory.
 
 There is a constraint that if you want to skip across multiple modules, **you
 need to skip all preceding modules in order**. For example, if you wanted to
-skip to Module 5 (that is skipping module 2-4), you would need to run the
+skip to Module 5 (that is, skipping modules 2-4 as well), you would need to run the
 following:
 
 ----

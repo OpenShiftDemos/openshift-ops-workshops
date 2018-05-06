@@ -985,3 +985,80 @@ docker-registry-2-g3l70    1/1       Running   0          14s
 registry-console-1-b47jt   1/1       Running   0          6h
 router-1-hs9wp             1/1       Running   0          6h
 ----
+
+Check the registry's `DeploymentConfig` to verify it indeeds mounts a `PersistentVolume` to the `/registry` directory which is where the registry stores all container images:
+
+----
+oc describe dc docker-registry
+----
+
+This should show:
+
+----
+Name:		docker-registry
+Namespace:	default
+Created:	2 hours ago
+Labels:		docker-registry=default
+Annotations:	<none>
+Latest Version:	2
+Selector:	docker-registry=default
+Replicas:	3
+Triggers:	Config
+Strategy:	Rolling
+Template:
+Pod Template:
+  Labels:		docker-registry=default
+  Service Account:	registry
+  Containers:
+   registry:
+    Image:	support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-docker-registry:v3.9.14
+    Port:	5000/TCP
+    Requests:
+      cpu:	100m
+      memory:	256Mi
+    Liveness:	http-get https://:5000/healthz delay=10s timeout=5s period=10s #success=1 #failure=3
+    Readiness:	http-get https://:5000/healthz delay=0s timeout=5s period=10s #success=1 #failure=3
+    Environment:
+      REGISTRY_HTTP_ADDR:					:5000
+      REGISTRY_HTTP_NET:					tcp
+      REGISTRY_HTTP_SECRET:					g4fMc23QUZLFhRmtu7m7mCah5bhefi3h2sBPbjgJvdw=
+      REGISTRY_MIDDLEWARE_REPOSITORY_OPENSHIFT_ENFORCEQUOTA:	false
+      REGISTRY_OPENSHIFT_SERVER_ADDR:				docker-registry.default.svc:5000
+      REGISTRY_HTTP_TLS_KEY:					/etc/secrets/registry.key
+      REGISTRY_HTTP_TLS_CERTIFICATE:				/etc/secrets/registry.crt
+    Mounts:
+      /etc/secrets from registry-certificates (rw)
+      /registry from registry-storage (rw) <1>
+  Volumes:
+   registry-certificates:
+    Type:	Secret (a volume populated by a Secret)
+    SecretName:	registry-certificates
+    Optional:	false
+   registry-storage: <2>
+    Type:	PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace) <3>
+    ClaimName:	registry-storage <4>
+    ReadOnly:	false
+
+Deployment #2 (latest):
+	Name:		docker-registry-2
+	Created:	48 seconds ago
+	Status:		Complete
+	Replicas:	3 current / 3 desired
+	Selector:	deployment=docker-registry-2,deploymentconfig=docker-registry,docker-registry=default
+	Labels:		docker-registry=default,openshift.io/deployment-config.name=docker-registry
+	Pods Status:	3 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Deployment #1:
+	Created:	2 hours ago
+	Status:		Complete
+	Replicas:	0 current / 0 desired
+
+Events:
+  Type		Reason				Age	From				Message
+  ----		------				----	----				-------
+  Normal	DeploymentCreated		48s	deploymentconfig-controller	Created new replication controller "docker-registry-2" for version 2
+  Normal	ReplicationControllerScaled	29s	deploymentconfig-controller	Scaled replication controller "docker-registry-2" from 1 to 3
+----
+<1> The `/registry` directory in the pod namespace will be a mountpoint for a `PersistentVolume` called `registry-storage`
+<2> The definition for the volume `registry-storage`
+<3> The volume will be of the type `PersistentVolume` which is referenced to a `PersistentVolumeClaim`
+<4> The name of the `PersistentVolumeClaim` which this volume references

@@ -75,7 +75,7 @@ You may verify external availability of this API and heketi being alive with a t
 curl -w "\n" http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}/hello
 ----
 
-This should return (likely without a line break)
+This should return:
 
 ----
 Hello from Heketi
@@ -1036,6 +1036,7 @@ There are 3 sessions because every CNS pod of the second CNS cluster for Infrast
 
 Like every block storage supplied to OpenShift, it get's formatted with XFS which you can see if you look at mounts on the host running ElasticSearch:
 
+[source,bash,role=copypaste]
 ----
 ssh {{ NODE5_INTERNAL_FQDN }} mount | grep iscsi
 ----
@@ -1137,7 +1138,7 @@ echo $CNS_INFRA_CLUSTER
 Now we can query `heketi` about the nodes in this cluster:
 
 ----
-heketi-cli cluster info $CNS_INFRA_CLUSTER
+heketi-cli node info $CNS_INFRA_CLUSTER
 Id:33e0045354db4be29b18728cbe817605	Cluster:ca777ae0285ef6d8cd7237c862bd591c
 Id:d8443e7ee8314c0c9fb4d8274a370bbd	Cluster:ca777ae0285ef6d8cd7237c862bd591c
 Id:caaed3927e424b22b1a89d261f7617ad	Cluster:ca777ae0285ef6d8cd7237c862bd591c
@@ -1214,7 +1215,7 @@ Or you can do it programmatically, for easy copy&paste, by asking `heketi` and p
 
 ----
 NODE_4_ID=$(heketi-cli topology info --json | jq -r ".clusters[] | select(.id==\"$CNS_INFRA_CLUSTER\") | .nodes[] | select(.hostnames.manage[0] == \"{{NODE4_INTERNAL_FQDN}}\") | .id")
-echo ${NODE_4_ID}
+echo $NODE_4_ID
 ----
 
 This should yield, like above `33e0045354db4be29b18728cbe817605`
@@ -1225,7 +1226,7 @@ Second, determine the device's UUID by querying the node (indicated above by
 Again, you could do this manually by looking at `heketi` information about the node:
 
 ----
-heketi-cli node info 33e0045354db4be29b18728cbe817605
+heketi-cli node info $NODE_4_ID
 Node Id: 33e0045354db4be29b18728cbe817605
 State: online
 Cluster Id: 119ea7f96ce132f15a04c28de9978018

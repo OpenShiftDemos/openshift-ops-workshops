@@ -221,6 +221,22 @@ openshift_storage_glusterfs_registry_block_host_vol_size=30 <6>
 
 #### Install the CNS cluster for OpenShift infrastructure
 
+To illustrate what becomes available with this step, first issue look at the `StorageClass` definitions in the system as of now:
+
+----
+oc get sc
+----
+
+There is only a single `StorageClass` defined, the default CNS cluster that shipped with this installation:
+
+----
+NAME                          PROVISIONER                AGE
+glusterfs-storage (default)   kubernetes.io/glusterfs    10m
+----
+
+Don't worry about the concept of the `StorageClass` - we will explain it in more detail later.
+
+
 With all required lines uncommented you can start the deployment of the second CNS cluster, dedicated to OpenShift infrastructure workloads:
 
 ----

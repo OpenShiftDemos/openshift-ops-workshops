@@ -155,7 +155,7 @@ more information on multi-master and HA setups, please refer to the link:https:/
 ====
 
 
-### Container-native Storage for infrastructure
+### Container-native Storage for OpenShift Infrastructure
 
 OpenShift infrastructure, like the Registry, Logging and Metrics (introduced in the following paragraphs in this module) have a requirement for reliable storage. +
 Container-native Storage can be configured directly in the installer, to provide a separate storage pool just for those workloads. This is a good practice in order to separate failure domains.

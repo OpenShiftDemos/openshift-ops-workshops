@@ -1,24 +1,14 @@
 ## Installation and Verification
 
-There are two primary methods of installation for OpenShift Container Platform.
+The primary method of installing OpenShift Container Platform is based on Ansible playbooks. These playbooks ship as part of the product in the `openshift-ansible` package.
 
-* Quick Installation
-The quick installation provides a simplified experience through an interactive
-CLI. It does not support as much customization or configuration of the OpenShift
-environment. For quick and simple POC-type scenarios, it can be a useful tool.
+This method has, in the past, been referred to as the `advanced installation method` and it involves Ansible directly running the installation playbooks. The advanced installer supports many configuration and customization options. It also covers installation of supporting infrastructure like container-native storage, logging and metrics components.
 
-* Advanced Installation
-You will use the advanced installation method in this exercise. The advanced
-installation method involves configuring an Ansible hosts file and then invoking
-Ansible directly to run the installation playbooks. The advanced installer
-supports many, many configuration and customization options.
-
-We have pre-configured the installer's configuration file (`/etc/ansible/hosts`)
-for you.
+Your environment comes with a preinstalled cluster that has been deployed using the installer's configuration file (`/etc/ansible/hosts`) when you started the lab.
 
 For more information on installing OpenShift Container Platform, please refer to
 the
-link:https://docs.openshift.com/container-platform/3.5/install_config/install/quick_install.html[installation
+link:https://docs.openshift.com/container-platform/3.9/install_config/install/quick_install.html[installation
 section] of the product documentation.
 
 [NOTE]
@@ -34,7 +24,7 @@ image::openshift_master_4_responsibilities.png[]
 
 
 #### API/Authentication
-The Kubernetes API server validates and configures the data for pods, services, and replication controllers. It also assigns pods to nodes and synchronizes pod information with service configuration. Can be run as a standalone process.
+The Kubernetes API server validates and configures the resources that make up a Kubernetes cluster.
 
 Common things that interact with the Kubernetes API server are:
 
@@ -43,20 +33,33 @@ Common things that interact with the Kubernetes API server are:
 * OpenShift Node
 * Kubernetes Controllers
 
+All interactions with the API server are secured using TLS. In addition, all API calls must be authenticated (the user is who they say they are) and authorized (the user has rights to make the requested API calls).
+
+
 #### Data Store
 The OpenShift Data Store (etcd) stores the persistent master state while other components watch etcd for changes to bring themselves into the desired state. etcd can be optionally configured for high availability, typically deployed with 2n+1 peer services.
+
+[NOTE]
+====
+etcd stores the cluster's state. It is not used to store user application data.
+====
 
 #### Scheduler
 The pod scheduler is responsible for determining placement of new pods onto nodes within the cluster.
 
-#### Health / Scaling
-The master uses the information from node objects to validate nodes with health checks. A node is ignored until it passes the health checks, and the master continues checking nodes until they are valid.
+The scheduler is very flexible and can take the physical topology of the cluster into account (racks, datacenters, etc).
 
+#### Health / Scaling
+Each pod can register both liveness and readiness probes.
+
+Liveness probes tell the system if the pod is healthy or not. If the pod is not healthy, it can be restarted automatically.
+
+Readiness probes tell the system when the pod is ready to take traffic. This, for example, can be used by the cluster to know when to put a pod into the load balancer.
 
 
 For more information on the OpenShift Master's areas of responsibility, please refer to
 the
-link:https://docs.openshift.com/container-platform/3.5/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
+link:https://docs.openshift.com/container-platform/3.9/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
 
 
 
@@ -76,76 +79,56 @@ like *Masters* and *Nodes*.
 
 For more details on how OpenShift uses Ansible for its installation, please
 refer to the
-link:https://docs.openshift.com/container-platform/3.5/install_config/install/advanced_install.html#configuring-ansible[advanced
+link:https://docs.openshift.com/container-platform/3.9/install_config/install/advanced_install.html#configuring-ansible[advanced
 installer's documentation].
 
-### Installing OpenShift
-Since we have pre-configured the installer for you, you can simply run it.
-
-#### Run the Installer
-Launching the advanced installation is as simple as executing the following
-command:
-
-----
-ansible-playbook -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
-----
-
-This will take some time. You might want to go get a beverage or check your
-email. Come back in about 7-10 minutes. We have pre-cached as much of the
-content as possible to make the installation go quickly.
+The top-level playbook in `/usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml` triggers the installation of the cluster and all of it's components. It's idempotent, which means you can execute this playbook multiple times without harm. This also allows you to deploy additional components after the initial install by simply modifying the configuration in `/etc/ansible/hosts` and re-run the installer.
+In addition to this, there are playbooks that only deploy a specific component or service, which makes them faster to execute.
 
 [TIP]
 ====
-The additional command-line switch `-i /etc/ansible/hosts` in the command
-above is actually redundant. It directs Ansible to use an inventory file at
-the supplied path. When omitted, Ansible will look at a number of default
-paths, among which is `/etc/ansible/hosts`.
+A typical multi-host installation like this might normally take around an hour depending on the speed of your internet connection. Disconnected installation options are also available. Prerequisites and other information is all covered in the documentation.
 ====
 
-A typical multi-host installation like this might take around an hour depending
-on the speed of your internet connection. Disconnected installation options are
-also available. Prerequisites and other information is all covered in the
-documentation.
-
 ### Verifying the Installation
-Once the installation process is complete, there are some basic tests you can
-perform to ensure that it went successfully.
+Let's to some basic tests with your installation. As an administrator, most of your interaction with OpenShift will be from the command line. The `oc` program is a command line interface that talks to the OpenShift API.
 
-#### Check the Logs
-The installer is quite verbose, and can be made even more verbose. If you know
-anything about Ansible, the output should be familiar to you. In any case, so
-long as there are no fatal-type errors and all hosts exit "OK", the odds are
-good that the installation was successful.
-
-If you look in your terminal at the output of the installer, it should finish
-with something that looks like the following:
-
-----
-PLAY RECAP ***********************************************************************************
-infra.internal.aws.testdrive.openshift.com  : ok=241  changed=53   unreachable=0    failed=0
-localhost                                   : ok=11   changed=0    unreachable=0    failed=0
-master.internal.aws.testdrive.openshift.com : ok=703  changed=157  unreachable=0    failed=0
-node01.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0
-node02.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0
-node03.internal.aws.testdrive.openshift.com : ok=238  changed=51   unreachable=0    failed=0
-----
-
-You will notice zero failed tasks.
-
-#### Look at the Nodes
-As an administrator, most of your interaction with OpenShift will be from the
-command line. The `oc` program is a command line interface that talks to the
-OpenShift API.
-
-On the `master` host, after the installation, the `root` system account is
-preconfigured to use a special "super administrator" account. It is vitally
-important that you protect access to the `root` system account, or to remove
+During the OpenShift installation, the `root` system account on the `master` host is
+configured to use a special OpenShift "super administrator" account. Because of this, it is vitally
+important that you protect access to the `root` system account, or remove
 this preconfigured config. Otherwise, anyone who can `sudo` on the master has
 super user privileges on the entire cluster.
 
-Additionally, since we ran the installation as `cloud-user`, this account, too,
-is preconfigured for cluster administrator access.
+#### Login on the master
+Additionally, your Linux system account on the master, `cloud-user`, is preconfigured to access this OpenShift "super administrator" without a password.
+Type the following command to login as the internal super-user on OpenShift:
 
+----
+oc login -u system:admin
+----
+
+You will see that you got logged in to a project called 'default'. More on projects later.
+
+----
+Logged into "https://master.internal.aws.testdrive.openshift.com:443" as "system:admin" using existing credentials.
+
+You have access to the following projects and can switch between them with 'oc project <projectname>':
+
+  * default
+    kube-public
+    kube-system
+    logging
+    management-infra
+    openshift
+    openshift-infra
+    openshift-node
+    openshift-web-console
+    storage
+
+Using project "default".
+----
+
+#### Look at the Nodes
 Execute the following command to see a list of the *Nodes* that OpenShift knows
 about:
 
@@ -156,27 +139,27 @@ oc get nodes
 The output should look something like the following:
 
 ----
-NAME                          STATUS                     AGE
-{{INFRA_INTERNAL_FQDN}}     Ready                      1m
-{{MASTER_INTERNAL_FQDN}}    Ready,SchedulingDisabled   1m
-{{NODE1_INTERNAL_FQDN}}    Ready                      1m
-{{NODE2_INTERNAL_FQDN}}    Ready                      1m
-{{NODE3_INTERNAL_FQDN}}    Ready                      1m
+NAME                                          STATUS    ROLES     AGE
+{{ INFRA_INTERNAL_FQDN }}    Ready     <none>    1m
+{{ MASTER_INTERNAL_FQDN }}   Ready     master    1m
+{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1m
+{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1m
+{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1m
 ----
 
 All of the systems listed in the `[nodes]` group in the `/etc/ansible/hosts`
-file should be listed here.
+file should be listed here. 1 Infrastructure Node, 1 Master and 3 Worker nodes.
 
 The OpenShift *Master* is also a *Node* because it needs to participate in the
-software defined network (SDN). By default, however, scheduling is disabled --
-no workload will be run on masters.
+software defined network (SDN).
+The *Infra* node will only run workloads related to supporting OpenShift infrastructure.
 
 #### Check the Web Console
 OpenShift provides a web console for users, developers and application operators
-to interact with the environment. There are not many cluster administrative
+to interact with the environment. There aren't many cluster administrative
 functions to perform through the web console. Some OpenShift components (like
-the internal image registry) run as workload inside the OpenShift environment,
-and you could see these things. However, we have not yet explored authentication
+the internal image registry) run on top of the OpenShift environment,
+and you can see these things. However, we have not yet explored authentication
 topics, so you have no cluster administrator "human" accounts yet.
 
 Point your browser to {{WEB_CONSOLE_URL}} to verify that the web console is
@@ -188,5 +171,103 @@ OpenShift is installed, by default, a CA and SSL certificates are generated for
 all inter-component communication within OpenShift, including the web console.
 It is possible to provide your own SSL certificates during the installation, and
 more information can be found in the
-link:https://docs.openshift.com/container-platform/3.5/install_config/install/advanced_install.html#advanced-install-custom-certificates[custom
+link:https://docs.openshift.com/container-platform/3.9/install_config/install/advanced_install.html#advanced-install-custom-certificates[custom
 certificates] section of the installation documentation.
+
+#### Verify the Storage cluster
+In your environment Red Hat Container-native Storage was installed as part of OpenShift. It will serve robust and persistent storage to both business applications as well as OpenShift infrastructure. It is based on Red Hat Gluster Storage, running in containers on OpenShift nodes and an additional API server called `heketi` that enables the API integration with OpenShift.
+
+We will now use a command line client on the *master* to talk via this server to the container storage cluster. It's password protected, so let's export a couple of environment variables first to configure the client:
+
+----
+export HEKETI_CLI_SERVER=http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+export HEKETI_CLI_USER=admin
+export HEKETI_CLI_KEY={{HEKETI_ADMIN_PW}}
+----
+
+Then use the CLI tool `heketi-cli` to query `heketi` about all the storage clusters it knows about:
+
+----
+heketi-cli cluster list
+----
+
+`heketi` will list all known clusters with internal UUIDs:
+
+----
+Clusters:
+ec7a9c8be8327a54839236791bf7ba24 [file][block]<1>
+----
+<1> This is the internal UUID of the CNS cluster
+
+[NOTE]
+====
+The cluster UUID will be different for you since it's automatically generated.
+====
+
+To get more detailed information about the topology of your CNS cluster (i.e.
+nodes, devices and volumes heketi has discovered) run the following command
+(output abbreviated):
+
+----
+heketi-cli topology info
+----
+
+You will get a lengthy output that describes the GlusterFS cluster topology as it is known by `heketi`:
+
+----
+Cluster Id: ec7a9c8be8327a54839236791bf7ba24
+
+    File:  true
+    Block: true
+
+    Volumes
+
+        Name: heketidbstorage <1>
+        Size: 2
+        Id: 272c8d37828c62c4002a19027abd2feb
+        Cluster Id: ec7a9c8be8327a54839236791bf7ba24
+        Mount: {{NODE1_INTERNAL_IP}}:heketidbstorage
+        Mount Options: backup-volfile-servers={{NODE2_INTERNAL_IP}},{{NODE2_INTERNAL_IP}}
+        Durability Type: replicate
+        Replica: 3
+        Snapshot: Disabled
+
+    Nodes:
+
+	Node Id: 099b016da11a623bef37de9b85aaa2d7
+	State: online
+	Cluster Id: ec7a9c8be8327a54839236791bf7ba24
+	Zone: 3
+	Management Hostname: {{NODE3_INTERNAL_FQDN}}
+	Storage Hostname: {{NODE3_INTERNAL_FQDN}}
+	Devices:
+		Id:e64fac664861c14bd75e3116f805b8fc   Name:/dev/xvdd           State:online    Size (GiB):49      Used (GiB):0       Free (GiB):49
+			Bricks:
+                            [...]
+
+	Node Id: 43336d05323e6003be6740dbb7477bd6
+	State: online
+	Cluster Id: ec7a9c8be8327a54839236791bf7ba24
+	Zone: 1
+	Management Hostname: {{NODE1_INTERNAL_FQDN}}
+	Storage Hostname: {{NODE1_INTERNAL_IP}}
+	Devices:
+		Id:11a148d8065f6a6220f89c2912d00d13   Name:/dev/xvdd           State:online    Size (GiB):49      Used (GiB):0       Free (GiB):49
+			Bricks:
+                            [...]
+
+	Node Id: 6c738028f642e37b2368eca88f8c626c
+	State: online
+	Cluster Id: ec7a9c8be8327a54839236791bf7ba24
+	Zone: 2
+	Management Hostname: {{NODE2_INTERNAL_FQDN}}
+	Storage Hostname: {{NODE2_INTERNAL_IP}}
+	Devices:
+		Id:cf7c0dfb258f07be25ac9cd4c4d2e6ae   Name:/dev/xvdd           State:online    Size (GiB):49      Used (GiB):0       Free (GiB):49
+			Bricks:
+                            [...]
+----
+<1> An internal GlusterFS volume that is automatically generated by the setup routine to hold the heketi database.
+
+
+This output tells you that Red Hat Container-native Storage currently consists of a single cluster, which consists of 3 nodes, each with a single block device `/dev/xvdd` of 50GiB in size. The GlusterFS layer will turn these 3 devices/hosts into a single, flat storage pool from which OpenShift will be able to carve out either distinct filesystem volumes or block devices that serve as persistent storage for containers.

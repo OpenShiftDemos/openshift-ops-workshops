@@ -1,0 +1,370 @@
+---
+- name: Automating Application Management Basics module
+  hosts: masters
+  become_user: root
+  tasks:
+    - name: Login as system:admin
+      command: oc login -u system:admin
+      tags: always
+
+    - name: Check for app-management project
+      command: oc get project app-management
+      register: app_project_check
+      ignore_errors: true
+      tags:
+        - mapit-deploy
+
+    - name: Create app-management project
+      command: oc new-project app-management
+      when: app_project_check is failed
+      tags:
+        - mapit-deploy
+
+    - name: Check for the sample application
+      command: oc get dc mapit -n app-management
+      register: app_dc_check
+      ignore_errors: true
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: Deploy the sample application
+      command: oc new-app docker.io/siamaksade/mapit -n app-management
+      when: app_dc_check is failed
+      tags:
+        - mapit-deploy
+
+    - name: Wait for app to be running
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+      register: mapit_dc
+      until: 'mapit_dc.stdout | int >= 1'
+      retries: 10
+      delay: 15
+      tags:
+        - mapit-deploy
+
+    - name: Check for the dc to be available
+      command: oc get dc mapit -n app-management
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: Check for service to be available
+      command: oc get service mapit -n app-management
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: Check for endpoints
+      command: oc get endpoints mapit -o json -n app-management
+      register: mapit_endpoints_json
+      tags:
+        - mapit-deploy
+
+    - set_fact:
+        mapit_endpoints: "{{ mapit_endpoints_json.stdout | from_json }}"
+      tags:
+        - mapit-deploy
+
+    - assert:
+        that:
+          - mapit_endpoints.subsets | length == 1
+          - mapit_endpoints.subsets[0].addresses | length == 1
+          - mapit_endpoints.subsets[0].ports | length == 3
+          - mapit_endpoints.subsets[0].ports[0].port == 8080
+          - mapit_endpoints.subsets[0].ports[1].port == 9779
+          - mapit_endpoints.subsets[0].ports[2].port == 8778
+      when: app_dc_check is failed
+      tags:
+        - mapit-deploy
+
+    - name: Check for deploymentconfig
+      command: oc get deploymentconfig mapit -n app-management
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: Check for replicationcontroller
+      command: oc get replicationcontroller -l app=mapit
+      register: rc_check
+      failed_when: rc_check.stdout == "No resources found."
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: Scale to two instances
+      command: oc scale dc/mapit --replicas=2 -n app-management
+      tags:
+        - mapit-deploy
+
+    - name: Wait for both app instances
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+      register: result
+      until: '"2" in result.stdout'
+      retries: 10
+      delay: 15
+      tags:
+        - mapit-deploy
+
+    - name: Check for endpoints
+      command: oc get endpoints mapit -o json -n app-management
+      register: mapit_endpoints_json_v2
+      tags:
+        - mapit-deploy
+
+    - set_fact:
+        mapit_endpoints_v2: "{{ mapit_endpoints_json_v2.stdout | from_json }}"
+      tags:
+        - mapit-deploy
+
+    - assert:
+        that:
+          - mapit_endpoints_v2.subsets | length == 1
+          - mapit_endpoints_v2.subsets[0].addresses | length == 2
+          - mapit_endpoints_v2.subsets[0].ports | length == 3
+          - mapit_endpoints_v2.subsets[0].ports[0].port == 8080
+          - mapit_endpoints_v2.subsets[0].ports[1].port == 9779
+          - mapit_endpoints_v2.subsets[0].ports[2].port == 8778
+      tags:
+        - mapit-deploy
+
+    - name: Check for mapit route
+      command: oc get route mapit
+      register: mapit_route_check
+      ignore_errors: true
+      tags:
+        - mapit-deploy
+
+    - name: Create mapit route
+      command: oc expose service mapit -n app-management
+      when: mapit_route_check is failed
+      tags:
+        - mapit-deploy
+
+    - name: Check again for mapit route
+      command: oc get route mapit -n app-management
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: Scale down to 1 instance
+      command: oc scale dc/mapit --replicas=1 -n app-management
+      tags:
+        - mapit-deploy
+
+    - name: Wait for app instance
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+      register: result
+      until: '"1" in result.stdout'
+      retries: 10
+      delay: 15
+      tags:
+        - mapit-deploy
+
+    - name: Set mapit liveness probe
+      command: oc set probe dc/mapit --liveness --get-url=http://:8080/health --initial-delay-seconds=30 -n app-management
+      tags:
+        - mapit-deploy
+
+    - name: Set mapit readiness probe
+      command: oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30 -n app-management
+      tags:
+        - mapit-deploy
+
+    - name: Wait for app instances
+      command: oc get dc mapit -o jsonpath='{.status.readyReplicas}' -n app-management
+      register: result
+      until: '"1" in result.stdout'
+      retries: 10
+      delay: 15
+      tags:
+        - mapit-deploy
+
+    - name: Check for endpoints
+      command: oc get endpoints mapit -o json -n app-management
+      register: mapit_endpoints_json_v3
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - set_fact:
+        mapit_endpoints_v3: "{{ mapit_endpoints_json_v3.stdout | from_json }}"
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - assert:
+        that:
+          - mapit_endpoints_v3.subsets | length == 1
+          - mapit_endpoints_v3.subsets[0].addresses | length >= 1
+          - mapit_endpoints_v3.subsets[0].ports | length == 3
+          - mapit_endpoints_v3.subsets[0].ports[0].port == 8080
+          - mapit_endpoints_v3.subsets[0].ports[1].port == 9779
+          - mapit_endpoints_v3.subsets[0].ports[2].port == 8778
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: Check for a PVC called 'mapit-storage'
+      shell: oc get pvc/mapit-storage -o json -n app-management
+      register: check_mapit_pvc
+      ignore_errors: true
+      tags:
+        - mapit-deploy
+
+    - set_fact:
+        existing_mapit_pvc: "{{ check_mapit_pvc.stdout|from_json }}"
+      when: check_mapit_pvc is success
+      tags:
+        - mapit-deploy
+
+    - name: ensure pvc is bound
+      assert:
+        that:
+          - existing_mapit_pvc.status.phase == "Bound"
+      when: check_mapit_pvc is success
+      tags:
+        - mapit-deploy
+
+    - name: Check for existing mapit storage configuration
+      command: oc get dc mapit -o json -n app-management
+      register: mapit_dc_cmd
+      tags:
+        - mapit-deploy
+
+    - set_fact:
+        mapit_dc: "{{ mapit_dc_cmd.stdout | from_json }}"
+      tags:
+        - mapit-deploy
+
+    - name: Add storage to mapit app
+      command: oc volume dc/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi --claim-name=mapit-storage --mount-path=/app-storage -n app-management
+      when:
+        - mapit_dc.spec.template.spec.volumes is not defined
+        - check_mapit_pvc is failed
+      tags:
+        - mapit-deploy
+
+    - name: Check for deployed mapit storage configuration
+      command: oc get dc mapit -o json
+      register: mapit_dc_cmd2
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - set_fact:
+        mapit_dc2: "{{ mapit_dc_cmd2.stdout | from_json }}"
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - assert:
+        that:
+          - mapit_dc2.spec.template.spec.volumes is defined
+          - mapit_dc2.spec.template.spec.volumes|length == 1
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: Check for a PVC called 'mapit-storage'
+      shell: oc get pvc/mapit-storage -o json -n app-management
+      register: check_mapit_pvc
+      ignore_errors: true
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - set_fact:
+        mapit_pvc: "{{ check_mapit_pvc.stdout|from_json }}"
+      when: check_mapit_pvc.rc == 0
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: wait for pvc to be bound
+      command: oc get pvc/mapit-storage -o jsonpath='{$.status.phase}' -n app-management
+      register: mapit_pvc
+      until: mapit_pvc.stdout == "Bound"
+      retries: 10
+      delay: 15
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: Wait for app instance
+      command: oc get dc mapit -o jsonpath='{.status.updatedReplicas}' -n app-management
+      register: result
+      until: '"1" in result.stdout'
+      retries: 10
+      delay: 15
+      tags:
+        - mapit-deploy
+
+    - name: Check for DeploymentConfig revision
+      command: oc get dc mapit -o jsonpath='{.status.latestVersion}' -n app-management
+      register: mapit_revision
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: get pod name for latest deployment config
+      command: oc get pod -o jsonpath='{.items[0].metadata.name}' -l deployment=mapit-{{ mapit_revision.stdout | int }} -n app-management
+      register: mapit_pod_1
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: check for directory mount
+      command: oc rsh {{ mapit_pod_1.stdout }} ls -ahl /app-storage
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: create test file in directory mount
+      command: oc rsh {{ mapit_pod_1.stdout }} touch /app-storage/hello.txt
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: Scale to two instances
+      command: oc scale dc/mapit --replicas=2 -n app-management
+      tags:
+        - mapit-deploy
+
+    - name: Wait for both app instances
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+      register: result
+      until: '"2" in result.stdout'
+      retries: 10
+      delay: 15
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: Check for DeploymentConfig revision
+      command: oc get dc mapit -o jsonpath='{.status.latestVersion}' -n app-management
+      register: mapit_revision
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: get pod names for latest deployment config
+      command: oc get pod -o json -l deployment=mapit-{{ mapit_revision.stdout | int }} -n app-management
+      register: mapit_pods_json
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - set_fact:
+        mapit_pods: "{{ mapit_pods_json.stdout | from_json }}"
+      tags:
+        - mapit-deploy
+        - mapit-verify
+
+    - name: check for directory mount
+      command: oc rsh {{ item.metadata.name }} ls -ahl /app-storage/hello.txt
+      register: result
+      with_items: "{{ mapit_pods['items'] }}"
+      tags:
+        - mapit-deploy
+        - mapit-verify

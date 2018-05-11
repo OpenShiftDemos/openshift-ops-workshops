@@ -10,7 +10,7 @@
     copy:
       src: systemd-docker
       dest: /usr/local/sbin/
-      mode: u+x,g=r,o=r
+      mode: u=rx,g=r,o=r
       owner: root
       group: root
 
@@ -23,12 +23,5 @@
     copy:
       src: workshopper
       dest: /etc/sysconfig/
-
-  - name: start workshopper systemd service
-    systemd:
-      daemon_reload: yes
-      name: workshopper
-      enabled: no
-      state: started
 
 ...

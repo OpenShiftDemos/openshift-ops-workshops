@@ -16,7 +16,7 @@ blocks will help you better see the big picture of application management on the
 platform.
 
 #### Projects
-A *Project* is a "bucket", of sorts. It's a meta construct where all of a user's
+A *Project* is a "bucket" of sorts. It's a meta construct where all of a user's
 resources live. From an administrative perspective, each *Project* can be
 thought of like a tenant. *Projects* may have multiple users who can access
 them, and users may be able to access multiple *Projects*.
@@ -55,6 +55,8 @@ The output will look like:
     deploymentconfig "mapit" created
     service "mapit" created
 --> Success
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose svc/mapit'
     Run 'oc status' to view your app.
 ----
 
@@ -168,7 +170,7 @@ The way that a *Service* maps to a set of *Pods* is via a system of *Labels* and
 protocols can be mapped.
 
 There is a lot more information about
-https://docs.openshift.com/container-platform/3.5/architecture/core_concepts/pods_and_services.html#services[Services],
+https://docs.openshift.com/container-platform/3.9/architecture/core_concepts/pods_and_services.html#services[Services],
 including the YAML format to make one by hand, in the official documentation.
 
 The `new-app` command used earlier caused a service to be created. You can see
@@ -313,7 +315,7 @@ somehow die/exit are not automatically restarted. *ReplicationControllers* are
 how OpenShift "self heals".
 
 A *DeploymentConfiguration* (DC) defines how something in OpenShift should be
-deployed. From the https://docs.openshift.com/container-platform/3.5/architecture/core_concepts/deployments.html[deployments documentation]:
+deployed. From the https://docs.openshift.com/container-platform/3.9/architecture/core_concepts/deployments.html[deployments documentation^]:
 
 ----
 Building on replication controllers, OpenShift adds expanded support for the
@@ -389,7 +391,7 @@ You will see something like the following:
 
 ----
 NAME         DESIRED   CURRENT   READY     AGE
-mapit-1      2         2         0         4h
+mapit-1      2         2         1         4h
 ----
 
 You can see that we now have 2 replicas. Let's verify the number of pods with
@@ -513,13 +515,13 @@ OpenShift routing layer. And the data object behind that is a *Route*.
 
 The default OpenShift router (HAProxy) uses the HTTP header of the incoming
 request to determine where to proxy the connection. You can optionally define
-security, such as TLS, for the *Route*. If you want your *Services*, and, by
-extension, your *Pods*,  to be accessible to the outside world, you need to
+security, such as TLS, for the *Route*. If you want your *Services* (and by
+extension, your *Pods*) to be accessible to the outside world, then you need to
 create a *Route*.
 
 Do you remember setting up the router? You probably don't. That's because the
 installer settings created a router for you! The router lives in the `default`
-*Project*, and you can see something about it with the following command:
+*Project*, and you can see information about it with the following command:
 
 ----
 oc describe dc router -n default
@@ -558,7 +560,7 @@ If you take a look at the `HOST/PORT` column, you'll see a familiar looking
 FQDN. The default behavior of OpenShift is to expose services on a formulaic
 hostname:
 
-`{SERVICENAME}.{PROJECTNAME}.{ROUTINGSUBDOMAIN}`
+`{SERVICENAME}-{PROJECTNAME}.{ROUTINGSUBDOMAIN}`
 
 How does this work? Firstly, the `ROUTINGSUBDOMAIN` can be configured at install
 time. We did this for you. In the `/etc/ansible/hosts` file you will find the
@@ -569,7 +571,7 @@ following line:
 openshift_master_default_subdomain={{OCP_ROUTING_SUFFIX}}
 ----
 
-There is also a wildcard DNS entry that points `*.apps...` to the host where the
+There is also a wildcard DNS entry that points `+*.apps...+` to the host where the
 router lives. OpenShift concatenates the *Service* name, *Project* name, and the
 routing subdomain to create this FQDN/URL.
 
@@ -578,7 +580,7 @@ It should be accessible from anywhere on the internet.
 
 The *Route* is associated with the *Service*, and the router automatically
 proxies connections directly to the *Pod*. The router itself runs as a *Pod*. It
-bridges the real "internet" to the SDN.
+bridges the "real" internet to the SDN.
 
 If you take a step back to examine everything you've done so far, in three
 commands you deployed an application, scaled it, and made it accessible to the
@@ -616,9 +618,9 @@ subjected to its restart policy.
 *Readiness Probe*
 
 A readiness probe determines if a container is ready to service requests. If the
-readiness probe fails, the endpoints controller ensures the container has its IP
+readiness probe fails, the endpoint's controller ensures the container has its IP
 address removed from the endpoints of all services that should match it. A
-readiness probe can be used to signal to the endpoints controller that even
+readiness probe can be used to signal to the endpoint's controller that even
 though a container is running, it should not receive any traffic.
 
 More information on probing applications is available in the
@@ -675,3 +677,150 @@ Similarly, you can set a readiness probe in the same manner:
 ----
 oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30
 ----
+
+### Add Storage to the Application
+
+The `mapit` application currently doesn't leverage any persistent storage. If the pod dies, so does all the content inside the container.
+
+[NOTE]
+====
+The directories that make up the containers internal filesystem are a blend of the read-only layers of the container image and the top-most writable layer that is added as soon as a container instance is started from the image.
+The writable layer is disposed of once the container is deleted which happens regularly in a container orchestration environment.
+====
+
+If a pod in OpenShift needs reliable storage, for example to host a database, we would need to supply **persistent** volume to the pod. This type of storage outlives the container, i.e. it persists when the pod dies. It typically comes from an external storage system.
+
+We will talk about this concept in more detail later. But let's imagine for a moment, the `mapit` application needs persistent storage available under the `/app-storage` directory inside the container.
+
+Here's how you would instruct OpenShift to create a *PersistentVolume* object, which represents external, persistent storage, and have it *mounted* inside the container's filesystem:
+
+----
+oc volume dc/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi --claim-name=mapit-storage --mount-path=/app-storage
+----
+
+The output looks like this:
+
+----
+persistentvolumeclaims/mapit-storage
+deploymentconfig "mapit" updated
+----
+
+In the first step a *PersistentVolumeClaim* was created. This object represents a request for storage of a certain kind, with a certain capacity from the user to OpenShift.
+Next the `DeploymentConfig` of `mapit` is updated to reference this storage and make it available under the `/app-storage` directory inside the pod.
+
+You can see the new `DeploymentConfig` like this:
+
+----
+oc get dc mapit
+----
+
+The output will show that a new revision was created as part of the update with storage.
+
+----
+NAME      REVISION   DESIRED   CURRENT   TRIGGERED BY
+mapit     4          1         1         config,image(mapit:latest)
+----
+
+Likely, depending when you ran the command you may or may not see that the new pod is still being spawned:
+
+----
+oc get pod
+----
+
+----
+NAME             READY     STATUS              RESTARTS   AGE
+mapit-3-ntd9w    1/1       Running             0          9m
+mapit-4-d872b    0/1       ContainerCreating   0          5s
+mapit-4-deploy   1/1       Running             0          10s
+----
+
+We will look at how this storage was provisioned automatically in the background using _Red Hat Container-native Storage_ later. You will also learn how to request storage as part of a template.
+
+Suffice it to say, a 1GiB GlusterFS volume has been created and made available to the pod.
+
+Log on to the new pod (**your pod names will be different**) using the remote-shell capability of the `oc` client:
+
+[source,none,role=copypaste]
+----
+oc rsh mapit-4-d872b
+----
+
+*Being in the container's shell session*, list the content of the root directory from the perspective of the container's namespace:
+
+----
+ls -ahl /
+----
+
+You will see an additional directory there under `/app-storage`
+
+----
+total 36K
+drwxr-xr-x.  19 root  root 4.0K Apr  9 11:00 .
+drwxr-xr-x.  19 root  root 4.0K Apr  9 11:00 ..
+-rwxr-xr-x.   1 root  root    0 Apr  9 11:00 .dockerenv
+-rw-r--r--.   1 root  root  16K Dec 14  2016 anaconda-post.log
+drwxrwsr-x.   4 root  2000 4.0K Apr  9 11:05 app-storage <1>
+lrwxrwxrwx.   1 root  root    7 Dec 14  2016 bin -> usr/bin
+drwxrwxrwx.   2 jboss root  137 Aug  4  2017 deployments
+drwxr-xr-x.   5 root  root  360 Apr  9 11:00 dev
+drwxr-xr-x.  52 root  root 4.0K Apr  9 11:00 etc
+drwxr-xr-x.   2 root  root    6 Nov  5  2016 home
+lrwxrwxrwx.   1 root  root    7 Dec 14  2016 lib -> usr/lib
+lrwxrwxrwx.   1 root  root    9 Dec 14  2016 lib64 -> usr/lib64
+drwx------.   2 root  root    6 Dec 14  2016 lost+found
+drwxr-xr-x.   2 root  root    6 Nov  5  2016 media
+drwxr-xr-x.   2 root  root    6 Nov  5  2016 mnt
+drwxr-xr-x.   4 root  root   61 Jan 18  2017 opt
+dr-xr-xr-x. 299 root  root    0 Apr  9 11:00 proc
+dr-xr-x---.   2 root  root  114 Dec 14  2016 root
+drwxr-xr-x.  11 root  root  145 Apr  9 11:00 run
+lrwxrwxrwx.   1 root  root    8 Dec 14  2016 sbin -> usr/sbin
+drwxr-xr-x.   2 root  root    6 Nov  5  2016 srv
+dr-xr-xr-x.  13 root  root    0 Apr  9 09:14 sys
+drwxrwxrwt.  10 root  root  241 Apr  9 11:00 tmp
+drwxr-xr-x.  13 root  root  155 Dec 16  2016 usr
+drwxr-xr-x.  18 root  root  238 Dec 14  2016 var
+----
+<1> This is where the persistent storage appears inside the container
+
+One of the interesting aspects of persistent storage from GlusterFS is that it is actually "shared" as indicated by the claim mode **ReadWriteMany**. This means that multiple containers can read and write to the same storage location concurrently.
+
+Let's try this. First write a file to the persistent, shared storage and then exit the remote shell session.
+
+----
+echo "Hello World from OpenShift" > /app-storage/hello.txt
+exit
+----
+
+Now, let's scale your deployment to two pods:
+
+----
+oc scale --replicas=2 dc/mapit
+----
+
+After some time, ensure both are in the `Running` state:
+
+----
+oc get pods
+----
+
+----
+NAME            READY     STATUS    RESTARTS   AGE
+mapit-4-ljjmf   1/1       Running   0          24m
+mapit-4-d872b   1/1       Running   0          25m
+----
+
+Read the text file from the other pod using the `cat` command appended directly to the `oc rsh` call:
+
+[source,none,role=copypaste]
+----
+oc rsh mapit-4-ljjmf cat /app-storage/hello.txt
+----
+
+You should see the content of the file from **the other pod**:
+
+----
+Hello World from OpenShift
+----
+
+This illustrates how to provide persistent storage, that is independent from the pod lifecycle and can optionally be shared by multiple pods at the same time.

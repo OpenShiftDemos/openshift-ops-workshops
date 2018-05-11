@@ -1,0 +1,427 @@
+---
+- name: Deploy RWO Persistent Storage Application
+  hosts: localhost
+  tags:
+    - rwo_example
+    - rwo_deploy
+  tasks:
+    - include_vars: /opt/lab/environment.yml
+
+    - set_fact:
+        cns_namespace: "{{ CNS_NAMESPACE }}"
+        cns_storageclass: "{{ CNS_STORAGECLASS }}"
+        new_cns_nodes_internal_fqdn:
+          - "{{NODE4_INTERNAL_FQDN}}"
+          - "{{NODE5_INTERNAL_FQDN}}"
+          - "{{NODE6_INTERNAL_FQDN}}"
+        heketi_resturl: "http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+        heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
+        ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
+        node_brick_device: "{{ NODE_BRICK_DEVICE }}"
+        node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
+        node4_internal_fqdn: " {{ NODE4_INTERNAL_FQDN }}"
+
+    - name: login as fancyuser1
+      shell: oc login -u 'fancyuser1' -p 'openshift'
+
+    - name: create new project called 'my-database-app'
+      shell: oc new-project my-database-app
+
+    - name: Deploy the rails-postgres-persistent template via new-app
+      shell: oc new-app rails-pgsql-persistent -p VOLUME_CAPACITY=5Gi
+
+    - name: wait for postgres app to be ready
+      shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.name=="rails-pgsql-persistent")].status.readyReplicas}'
+      register: pgsql_app_rc_check
+      until: pgsql_app_rc_check.stdout == "1"
+      retries: 60
+      delay: 10
+
+- name: Verify RWO Persistent Storage Application
+  hosts: localhost
+  tags:
+    - rwo_example
+    - rwo_verify
+  tasks:
+    - include_vars: /opt/lab/environment.yml
+
+    - set_fact:
+        cns_namespace: "{{ CNS_NAMESPACE }}"
+        cns_storageclass: "{{ CNS_STORAGECLASS }}"
+        new_cns_nodes_internal_fqdn:
+          - "{{NODE4_INTERNAL_FQDN}}"
+          - "{{NODE5_INTERNAL_FQDN}}"
+          - "{{NODE6_INTERNAL_FQDN}}"
+        heketi_resturl: "http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+        heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
+        ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
+        node_brick_device: "{{ NODE_BRICK_DEVICE }}"
+        node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
+        node4_internal_fqdn: " {{ NODE4_INTERNAL_FQDN }}"
+
+    - name: re-login as system:admin
+      shell: oc login -u system:admin
+
+    - name: change to project of fancyuser1
+      shell:  oc project my-database-app
+
+    - name: check route
+      shell: oc get route/rails-pgsql-persistent
+
+    - name: check pvc called 'postgres' exists
+      shell: oc get pvc/postgresql -o json
+      register: get_postgresql_pvc
+      changed_when: false
+
+    - set_fact:
+        postgresql_pvc: "{{ get_postgresql_pvc.stdout|from_json }}"
+
+    - name: ensure pvc is bound
+      fail:
+        msg: pvc is not bound
+      when: postgresql_pvc.status.phase != "Bound"
+
+    - name: ensure pvc is issued against CNS
+      assert:
+        that:
+          - postgresql_pvc.metadata.annotations['volume.beta.kubernetes.io/storage-provisioner'] == 'kubernetes.io/glusterfs'
+          - postgresql_pvc.spec.storageClassName == cns_storageclass
+        msg: pvc is not served from StorageClass {{ cns_storageclass }}
+
+    - name: check pv is exists
+      shell: oc get pv/{{ postgresql_pvc.spec.volumeName }} -o json
+      register: get_postgresql_pv
+      changed_when: false
+
+    - set_fact:
+        postgresql_pv: "{{ get_postgresql_pv.stdout|from_json }}"
+
+    - name: check pv is provided by CNS
+      assert:
+        that:
+          - postgresql_pv.metadata.annotations['pv.kubernetes.io/provisioned-by'] == 'kubernetes.io/glusterfs'
+          - postgresql_pv.spec.storageClassName == cns_storageclass
+        msg: pv is not provided by {{ cns_storageclass }}
+
+    - name: get volume path of pv for app
+      shell: oc get pv $(oc get pvc -n my-database-app postgresql -o jsonpath='{.spec.volumeName}') -o jsonpath='{.spec.glusterfs.path}'
+      register: pv_volume_path
+
+    - name: check gluster volume of pv
+      shell: oc exec -n {{ cns_namespace }} $(oc get pods -n {{ cns_namespace }} -o jsonpath='{.items[0].metadata.name}' -l glusterfs=storage-pod) -- gluster vol info {{ pv_volume_path.stdout }}
+      changed_when: false
+
+    - name: check health of postgres-db deployment
+      shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.name=="postgresql")].status.readyReplicas}'
+      register: pgsql_db_rc_check
+      failed_when: pgsql_db_rc_check.stdout != "1"
+      changed_when: false
+
+    - name: check health of rails-app deployment
+      shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.name=="rails-pgsql-persistent")].status.readyReplicas}'
+      register: rails_app_rc_check
+      failed_when: rails_app_rc_check.stdout != "1"
+      changed_when: false
+
+- name: Deploy RWX Persistent Storage Application
+  hosts: localhost
+  tags:
+    - rwx_example
+    - rwx_deploy
+  tasks:
+    - include_vars: /opt/lab/environment.yml
+
+    - set_fact:
+        cns_namespace: "{{ CNS_NAMESPACE }}"
+        cns_storageclass: "{{ CNS_STORAGECLASS }}"
+        new_cns_nodes_internal_fqdn:
+          - "{{NODE4_INTERNAL_FQDN}}"
+          - "{{NODE5_INTERNAL_FQDN}}"
+          - "{{NODE6_INTERNAL_FQDN}}"
+        heketi_resturl: "http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+        heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
+        ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
+        node_brick_device: "{{ NODE_BRICK_DEVICE }}"
+        node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
+        node4_internal_fqdn: " {{ NODE4_INTERNAL_FQDN }}"
+
+    - name: log back in as fancyuser1
+      shell: oc login -u 'fancyuser1' -p 'openshift'
+
+    - name: create new project called 'my-shared-storage'
+      shell: oc new-project my-shared-storage
+
+    - name: deploy file-uploader app
+      shell: oc new-app openshift/php:7.0~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
+
+    - name: wait for php app to be ready
+      shell: oc get dc file-uploader -o jsonpath='{.status.availableReplicas}'
+      register: php_app_check
+      until: php_app_check.stdout == "1"
+      retries: 30
+      delay: 10
+
+    - name: expose php app service
+      shell: oc expose svc/file-uploader
+
+    - name: scale php app
+      shell: oc scale dc/file-uploader --replicas=3
+
+    - name: wait for php app to be scaled to 3 pods
+      shell: oc get dc file-uploader -o jsonpath='{.status.availableReplicas}'
+      register: php_app_scale_check
+      until: php_app_scale_check.stdout == "3"
+      retries: 30
+      delay: 10
+
+    - name: add pvc to app deploymentconfig
+      shell: oc volume dc/file-uploader --add --name=my-shared-storage -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi --claim-name=my-shared-storage --mount-path=/opt/app-root/src/uploaded
+
+    - name: wait for php app replication controller to be updated
+      shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="file-uploader")].spec.template.spec.volumes[?(@.persistentVolumeClaim.claimName=="my-shared-storage")].name}'
+      register: php_app_update_rc_check
+      until: '"shared-storage" in php_app_update_rc_check.stdout'
+      retries: 30
+      delay: 10
+
+    - name: wait for php app to be fully redeployed
+      shell: oc get rc file-uploader-$(oc get dc file-uploader -o jsonpath='{.status.latestVersion}') -o jsonpath='{.status.availableReplicas}'
+      register: php_app_update_check
+      until: php_app_update_check.stdout == "3"
+      retries: 30
+      delay: 10
+
+    # check current capacity of 1Gi of "uploaded" directory in the pods
+
+    # extend PVC to 5Gi
+
+- name: Verify RWX Persistent Storage Application
+  hosts: localhost
+  tags:
+    - rwx_example
+    - rwx_verify
+  tasks:
+    - include_vars: /opt/lab/environment.yml
+
+    - set_fact:
+        cns_namespace: "{{ CNS_NAMESPACE }}"
+        cns_storageclass: "{{ CNS_STORAGECLASS }}"
+        new_cns_nodes_internal_fqdn:
+          - "{{NODE4_INTERNAL_FQDN}}"
+          - "{{NODE5_INTERNAL_FQDN}}"
+          - "{{NODE6_INTERNAL_FQDN}}"
+        heketi_resturl: "http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+        heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
+        ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
+        node_brick_device: "{{ NODE_BRICK_DEVICE }}"
+        node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
+        node4_internal_fqdn: " {{ NODE4_INTERNAL_FQDN }}"
+
+    - name: login as system:admin
+      command: oc login -u system:admin
+
+    - name: change to my-shared-storage project
+      command: oc project my-shared-storage
+
+    - name: check route of file-uploader sevice
+      shell: oc get route/file-uploader
+      changed_when: false
+
+    - name: ensure rwx pvc exists
+      shell: oc get pvc/my-shared-storage -o json
+      register: get_file_uploader_pvc
+      changed_when: false
+
+    - set_fact:
+        file_uploader_pvc: "{{ get_file_uploader_pvc.stdout|from_json }}"
+
+    - name: ensure pvc is bound
+      fail:
+        msg: pvc is not bound
+      when: file_uploader_pvc.status.phase != "Bound"
+
+    - name: ensure pvc is issued against CNS
+      assert:
+        that:
+          - file_uploader_pvc.metadata.annotations['volume.beta.kubernetes.io/storage-provisioner'] == 'kubernetes.io/glusterfs'
+          - file_uploader_pvc.spec.storageClassName == cns_storageclass
+        msg: pvc is not served from StorageClass {{ cns_storageclass }}
+
+    - name: check pv is exists
+      shell: oc get pv/{{ file_uploader_pvc.spec.volumeName }} -o json
+      register: get_file_uploader_pv
+      changed_when: false
+
+    - set_fact:
+        file_uploader_pv: "{{ get_file_uploader_pv.stdout|from_json }}"
+
+    - name: check pv is provided by CNS
+      assert:
+        that:
+          - file_uploader_pv.metadata.annotations['pv.kubernetes.io/provisioned-by'] == 'kubernetes.io/glusterfs'
+          - file_uploader_pv.spec.storageClassName == cns_storageclass
+        msg: pv is not provided by {{ cns_storageclass }}
+
+    - name: ensure pv is file-uploader deployment config contains pvc
+      shell: oc get dc/file-uploader -o jsonpath='{$.spec.template.spec.volumes[0].persistentVolumeClaim.claimName}'
+      register: get_file_uploader_pvc_name
+      failed_when: get_file_uploader_pvc_name.stdout != file_uploader_pvc.metadata.name
+      changed_when: false
+
+    # verify new capacity of 5Gi of "uploaded" directory in the pods
+
+- name: Add disks to second CNS cluster
+  hosts: localhost
+  tags:
+    - cns_ops
+    - cns_add_disks
+  tasks:
+    - include_vars: /opt/lab/environment.yml
+
+    - set_fact:
+        node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
+        heketi_resturl: "http://heketi-registry-{{CNS_INFRA_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+        heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
+
+    - name: get id of cns infra cluster
+      shell: heketi-cli cluster --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} list --json | jq -r '.clusters[0]'
+      register: get_cns_infra_cluster_id
+
+    - set_fact:
+        cns_infra_cluster_id: "{{ get_cns_infra_cluster_id.stdout }}"
+
+    - name: get ids of cns infra cluster nodes
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster info {{ cns_infra_cluster_id }} --json
+      register: get_cns_infra_cluster_info
+
+    - set_fact:
+        cns_infra_cluster_info: "{{ get_cns_infra_cluster_info.stdout | from_json }}"
+
+    - set_fact:
+        cns_infra_cluster_nodes: "{{ cns_infra_cluster_info.nodes  }}"
+
+    - name: add disks to infra cluster
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device add --name={{ node_brick_device2 }} --node={{ item }}
+      with_items: "{{ cns_infra_cluster_nodes }}"
+
+- name: Verify disks added to second CNS cluster
+  hosts: localhost
+  tags:
+    - cns_ops
+    - cns_verify_disks
+  tasks:
+    - include_vars: /opt/lab/environment.yml
+
+    - set_fact:
+          node_brick_device2: "{{ NODE_BRICK_DEVICE2 }}"
+          heketi_resturl: "http://heketi-registry-{{CNS_INFRA_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+          heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
+
+    - name: get id of cns infra cluster
+      shell: heketi-cli cluster --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} list --json | jq -r '.clusters[0]'
+      register: get_cns_infra_cluster_id
+
+    - set_fact:
+        cns_infra_cluster_id: "{{ get_cns_infra_cluster_id.stdout }}"
+
+    - name: get ids of cns infra cluster nodes
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} cluster info {{ cns_infra_cluster_id }} --json
+      register: get_cns_infra_cluster_info
+
+    - set_fact:
+        cns_infra_cluster_info: "{{ get_cns_infra_cluster_info.stdout | from_json }}"
+
+    - set_fact:
+        cns_infra_cluster_nodes: "{{ cns_infra_cluster_info.nodes  }}"
+
+    - name: get additional disks from nodes
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ item }} --json | jq -r '.devices[] | select (.name=="{{ node_brick_device2 }}") | .id'
+      register: additional_disk
+      with_items: "{{ cns_infra_cluster_nodes }}"
+
+    - name: verify additional disks from nodes
+      assert:
+        that:
+          - item.stdout != ""
+      with_items: "{{ additional_disk.results }}"
+
+- name: Delete disk from second CNS cluster
+  hosts: localhost
+  tags:
+    - cns_ops
+    - cns_delete_disk
+  tasks:
+    - include_vars: /opt/lab/environment.yml
+
+    - set_fact:
+        node_brick_device: "{{ NODE_BRICK_DEVICE }}"
+        node4_internal_fqdn: "{{ NODE4_INTERNAL_FQDN }}"
+        heketi_resturl: "http://heketi-registry-{{CNS_INFRA_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+        heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
+
+    - name: get id of cns infra cluster
+      shell: heketi-cli cluster --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} list --json | jq -r '.clusters[0]'
+      register: get_cns_infra_cluster_id
+
+    - set_fact:
+        cns_infra_cluster_id: "{{ get_cns_infra_cluster_id.stdout }}"
+
+    - name: get node 4 id
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info --json | jq -r ".clusters[] | select(.id==\"{{ cns_infra_cluster_id }}\") | .nodes[] | select(.hostnames.manage[0] == \"{{ node4_internal_fqdn }}\") | .id"
+      register: get_node4_id
+
+    - set_fact:
+        node4_id: "{{ get_node4_id.stdout }}"
+
+    - name: get failed disks from node 4
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ node4_id }} --json | jq -r '.devices[] | select (.name=="{{ node_brick_device }}") | .id'
+      register: get_failed_disk
+
+    - set_fact:
+        failed_disk: "{{ get_failed_disk.stdout }}"
+
+    - name: disable the device
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device disable {{ failed_disk }}
+
+    - name: remove the device
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device remove {{ failed_disk }}
+
+    - name: need to sleep here to have LVM2 gather it's wits
+      pause:
+        seconds: 60
+
+    - name: delete the device
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device delete {{ failed_disk }}
+
+- name: Verify disk is deleted from second CNS cluster
+  hosts: localhost
+  tags:
+    - cns_ops
+    - cns_verify_delete
+  tasks:
+    - include_vars: /opt/lab/environment.yml
+
+    - set_fact:
+        node_brick_device: "{{ NODE_BRICK_DEVICE }}"
+        node4_internal_fqdn: "{{ NODE4_INTERNAL_FQDN }}"
+        heketi_resturl: "http://heketi-registry-{{CNS_INFRA_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
+        heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
+
+    - name: get id of cns infra cluster
+      shell: heketi-cli cluster --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} list --json | jq -r '.clusters[0]'
+      register: get_cns_infra_cluster_id
+
+    - set_fact:
+        cns_infra_cluster_id: "{{ get_cns_infra_cluster_id.stdout }}"
+
+    - name: get node 4 id
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info --json | jq -r ".clusters[] | select(.id==\"{{ cns_infra_cluster_id }}\") | .nodes[] | select(.hostnames.manage[0] == \"{{ node4_internal_fqdn }}\") | .id"
+      register: get_node4_id
+
+    - set_fact:
+        node4_id: "{{ get_node4_id.stdout }}"
+
+    - name: verify failed disks from node 4 is gone
+      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ node4_id }} --json | jq -r '.devices[] | select (.name=="{{ node_brick_device }}") | .id'
+      register: get_failed_disk
+      failed_when: get_failed_disk.stdout != ""

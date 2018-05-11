@@ -1,0 +1,18 @@
+---
+
+- name: temporarily enable epel
+  yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    state: present
+
+- name: install jq utility
+  yum:
+    name: jq
+    state: present
+
+- name: remove epel
+  yum:
+    name: epel-release
+    state: absent
+
+...

@@ -12,6 +12,7 @@
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 389 -j ACCEPT
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 636 -j ACCEPT
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 7389 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 5000 -j ACCEPT
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 88 -j ACCEPT

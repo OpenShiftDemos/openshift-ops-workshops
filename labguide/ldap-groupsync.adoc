@@ -2,7 +2,7 @@
 
 OpenShift supports a number of different authentication providers, and you can
 find the complete list in the
-link:https://docs.openshift.com/container-platform/3.5/install_config/configuring_authentication.html[authentication
+link:https://docs.openshift.com/container-platform/3.9/install_config/configuring_authentication.html[authentication
 documentation]. One of the most commonly used authentication providers is LDAP,
 whether provided by Microsoft Active Directory or by other sources.
 
@@ -36,7 +36,7 @@ the inventory file. As the `root` user on the master host, examine the master
 config with `cat`, `less`, or your favorite editor:
 
 ----
-cat /etc/origin/master/master-config.yaml
+sudo cat /etc/origin/master/master-config.yaml
 ----
 
 Look for one of the `oauthConfig` sections that looks like the following:
@@ -68,21 +68,22 @@ oauthConfig:
       ca: /etc/origin/master/ipa-ca.crt <6>
       insecure: false
       kind: LDAPPasswordIdentityProvider
-      url: <7>ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com)
+      url: ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com) <7>
   ...
 ----
 
 Some notable fields under `identityProviders:`:
 
-<1> `name`: The unique ID of the identity provider. It is possible to have
+<1> `mappingMethod: claim`: This section has to do with how usernames are
+assigned within an OpenShift cluster when multiple providers are configured. See
+the
+link:https://docs.openshift.com/container-platform/3.9/install_config/configuring_authentication.html#mapping-identities-to-users[mapping
+identities to users] section for more information.
+
+<2> `name`: The unique ID of the identity provider. It is possible to have
 multiple authentication providers in an OpenShift environment, and OpenShift is
 able to distinguish between them.
 
-<2> `mappingMethod: claim`: This section has to do with how usernames are
-assigned within an OpenShift cluster when multiple providers are configured. See
-the
-link:https://docs.openshift.com/container-platform/3.5/install_config/configuring_authentication.html#mapping-identities-to-users[mapping
-identities to users] section for more information.
 
 <3> `attributes`: This section defines the LDAP fields to iterate over and
 assign to the fields in the OpenShift user's "account". If any attributes are
@@ -102,8 +103,8 @@ LDAP server.
 
 For more information on the specific details of LDAP authentication in OpenShift
 you can refer to the
-link:https://docs.openshift.com/container-platform/3.5/install_config/configuring_authentication.html#LDAPPasswordIdentityProvider[LDAP
-provider documentation].
+link:https://docs.openshift.com/container-platform/3.9/install_config/configuring_authentication.html#LDAPPasswordIdentityProvider[LDAP
+provider documentation^].
 
 [NOTE]
 ====
@@ -115,8 +116,8 @@ by looking in `/etc/ansible/hosts` at the line that begins with
 #### Syncing LDAP Groups to OpenShift Groups
 In OpenShift, groups can be used to manage users and control permissions for
 multiple users at once. There is a section in the documentation on how to
-link:https://docs.openshift.com/container-platform/3.5/install_config/syncing_groups_with_ldap.html[sync
-groups with LDAP]. Syncing groups involves running a program called `groupsync`
+link:https://docs.openshift.com/container-platform/3.9/install_config/syncing_groups_with_ldap.html[sync
+groups with LDAP^]. Syncing groups involves running a program called `groupsync`
 when logged into OpenShift as a user with `cluster-admin` privileges, and using
 a configuration file that tells OpenShift what to do with the users it finds in
 the various groups.
@@ -144,13 +145,13 @@ are logged in as the `root` user. Then, make sure you are logged in as a cluster
 administrator:
 
 ----
-oc login -u system:admin
+sudo oc login -u system:admin
 ----
 
 And then execute the `groupsync`:
 
 ----
-oc adm groups sync --sync-config=/opt/lab/support/groupsync.yaml --confirm
+sudo oc adm groups sync --sync-config=/opt/lab/support/groupsync.yaml --confirm
 ----
 
 You will see output like the following:
@@ -169,7 +170,7 @@ output of the help with `oc adm groups sync -h`.
 If you want to see the *Groups* that were created, execute the following:
 
 ----
-oc get groups
+sudo oc get groups
 ----
 
 You will see output like the following:
@@ -185,7 +186,7 @@ ose-user         normaluser1, fancyuser1, fancyuser2, teamuser1, teamuser2
 Take a look at a specific group in YAML:
 
 ----
-oc get group ose-fancy-dev -o yaml
+sudo oc get group ose-fancy-dev -o yaml
 ----
 
 The YAML looks like:
@@ -217,14 +218,14 @@ has listed the users who are in the group.
 What happens if you list the *Users*?
 
 ----
-oc get user
+sudo oc get user
 ----
 
-If you logged into the web console as `fancyuser1` previously, you will see:
+If you logged into the web console as `teamuser1` previously, you will see:
 
 ----
-NAME         UID                                    FULL NAME        IDENTITIES
-fancyuser1   d0f11476-a9c3-11e7-a5b2-029466ad0702   OpenShift User   idm:uid=fancyuser1,cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
+NAME        UID                                    FULL NAME        IDENTITIES
+teamuser1   ace42f02-4bcf-11e8-98be-0a8fee356162   OpenShift User   idm:uid=teamuser1,cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
 ----
 
 Or, if you did not login with the UI before, you will get:
@@ -242,7 +243,7 @@ OpenShift that, if it encounters a *User* with that specific ID, that it should
 be associated with the *Group*.
 
 #### Change Group Policy
-In your environment, there are a special group of super developers called
+In your environment, there is a special group of super developers called
 _ose-fancy-dev_ who should have special `cluster-reader` privileges. This is a role
 that allows a user to view administrative-level information about the cluster.
 For example, they can see the list of all *Projects* in the cluster.
@@ -250,15 +251,14 @@ For example, they can see the list of all *Projects* in the cluster.
 Change the policy for the `ose-fancy-dev` *Group*:
 
 ----
-oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
+sudo oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
 ----
 
 [NOTE]
 ====
 If you are interested in the different roles that come with OpenShift, you can
 learn more about them in the
-link:https://docs.openshift.com/container-platform/3.5/admin_guide/manage_authorization_policy.html[authorization
-policies] documentation.
+link:https://docs.openshift.com/container-platform/3.9/admin_guide/manage_rbac.html#admin-guide-manage-rbac[role-based access control (RBAC)^] documentation.
 ====
 
 #### Examine `cluster-reader` policy
@@ -371,11 +371,27 @@ oc login -u normaluser1 -p openshift
 oc get projects
 ----
 
+You should get:
+
+----
+No resources found.
+----
+
+
 Then, try `teamuser1` from the `ose-teamed-app` group:
 
 ----
 oc login -u teamuser1 -p openshift
 oc get projects
+----
+
+You should get:
+
+----
+NAME       DISPLAY NAME              STATUS
+app-dev    Application Development   Active
+app-prod   Application Production    Active
+app-test   Application Testing       Active
 ----
 
 You did not grant the team users edit access to the production project. Go ahead
@@ -389,18 +405,23 @@ oc new-app docker.io/siamaksade/mapit
 You will see that it will not work:
 
 ----
---> Found Docker image 338a303 (3 weeks old) from docker.io for "docker.io/siamaksade/mapit"
+error: can't lookup images: imagestreamimports.image.openshift.io is forbidden: User "teamuser1" cannot create imagestreamimports.image.openshift.io in the namespace "app-prod": User "teamuser1" cannot create imagestreamimports.image.openshift.io in project "app-prod"
+error:  local file access failed with: stat docker.io/siamaksade/mapit: no such file or directory
+error: unable to locate any images in image streams, templates loaded in accessible projects, template files, local docker images with name "docker.io/siamaksade/mapit"
 
-    * An image stream will be created as "mapit:latest" that will track this image
-    * This image will be deployed in deployment config "mapit"
-    * Ports 8080/tcp, 8778/tcp, 9779/tcp will be load balanced by service "mapit"
-      * Other containers can access this service through the hostname "mapit"
+Argument 'docker.io/siamaksade/mapit' was classified as an image, image~source, or loaded template reference.
 
---> Creating resources ...
-    error: User "teamuser1" cannot create imagestreams in project "app-prod"
-    error: User "teamuser1" cannot create deploymentconfigs in project "app-prod"
-    error: User "teamuser1" cannot create services in project "app-prod"
---> Failed
+The 'oc new-app' command will match arguments to the following types:
+
+  1. Images tagged into image streams in the current project or the 'openshift' project
+     - if you don't specify a tag, we'll add ':latest'
+  2. Images in the Docker Hub, on remote registries, or on the local Docker engine
+  3. Templates in the current project or the 'openshift' project
+  4. Git repository URLs or local paths that point to Git repositories
+
+--allow-missing-images can be used to point to an image that does not exist yet.
+
+See 'oc new-app -h' for examples.
 ----
 
 This failure is exactly what we wanted to see.

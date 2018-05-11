@@ -3,19 +3,22 @@
 - hosts: default
 
   roles:
+    - { role: tools, tags: ['tools']}
     - { role: authorized-key, tags: ['authorized-key']}
     - { role: instructor-user, tags: ['instructor-user']}
     - { role: registered-host, tags: ['registered-host']}
-    - { role: aws-host, tags: ['aws-host']}
     - { role: ocp-installer, tags: ['ocp-installer']}
+    - { role: aws-host, tags: ['aws-host']}
     - { role: docker-host, tags: ['docker-host']}
     - { role: registry-mirror, tags: ['registry-mirror']}
     - { role: ansible-host, tags: ['ansible-host']}
     - { role: master-cert, tags: ['master-cert']}
     - { role: inventory-fixup-script, tags: ['inventory-fixup-script']}
     - { role: idm-install, tags: ['idm-install']}
-    - { role: cns-deploy, tags: ['cns-deploy']}
+    - { role: container-native-storage, tags: ['container-native-storage']}
     - { role: workshopper, tags: ['workshopper']}
+    - { role: local-repo, tags: ['local-repo']}
+    - { role: hardcoded-user, tags: ['hardcoded-user']}
 
   tasks:
 

@@ -1,0 +1,134 @@
+---
+
+- name: Automation of LDAP and user manipulation module
+  hosts: masters
+  become_user: root
+
+  tasks:
+
+    - block:
+      - name: Login as system:admin
+        command: oc login -u system:admin
+
+      - name: Sync all of the LDAP groups
+        command: oc adm groups sync --sync-config=/opt/lab/support/groupsync.yaml --confirm
+
+      - name: Check for app-dev project
+        command: oc get project app-dev
+        register: project_out
+        ignore_errors: true
+
+      - name: Create app-dev project
+        command: oc adm new-project app-dev --display-name="Application Development"
+        when: project_out | failed
+
+      - name: Check for app-test project
+        command: oc get project app-test
+        register: project_out
+        ignore_errors: true
+
+      - name: Create app-dev project
+        command: oc adm new-project app-test --display-name="Application Test"
+        when: project_out | failed
+
+      - name: Check for app-prod project
+        command: oc get project app-prod
+        register: project_out
+        ignore_errors: true
+
+      - name: Create app-prod project
+        command: oc adm new-project app-prod --display-name="Application Production"
+        when: project_out | failed
+
+      - name: Give cluster-reader to fancy-dev
+        command: oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
+
+      - name: Manipulate group roles
+        command: oc adm policy add-role-to-group {{ item.role }} {{ item.group }} -n {{ item.namespace }}
+        with_items:
+          - { role: "edit", group: "ose-teamed-app", namespace: "app-dev" }
+          - { role: "edit", group: "ose-teamed-app", namespace: "app-test" }
+          - { role: "view", group: "ose-teamed-app", namespace: "app-prod" }
+          - { role: "edit", group: "ose-fancy-dev", namespace: "app-prod" }
+      tags:
+        - ldap-deploy
+
+    - block:
+      - name: Login as system:admin so as to list all groups and projects
+        command: oc login -u system:admin
+
+      - name: Look for all of the synced groups
+        command: oc get group {{ item }}
+        with_items: [ 'ose-user', 'ose-normal-dev', 'ose-fancy-dev', 'ose-teamed-app' ]
+
+      - name: Check for ose-user group users
+        command: oc get -o jsonpath='{.users}' group ose-user
+        register: ose_user_users
+        failed_when: >
+          'normaluser1' not in ose_user_users.stdout or
+          'teamuser1' not in ose_user_users.stdout or
+          'teamuser2' not in ose_user_users.stdout or
+          'fancyuser1' not in ose_user_users.stdout or
+          'fancyuser2' not in ose_user_users.stdout
+
+      - name: check for ose-normal-dev group users
+        command: oc get -o jsonpath='{.users}' group 'ose-normal-dev'
+        register: normaldev_users
+        failed_when: >
+          'normaluser1' not in normaldev_users.stdout or
+          'teamuser1' not in normaldev_users.stdout or
+          'teamuser2' not in normaldev_users.stdout
+
+      - name: Check for ose-fancy-dev group users
+        command: oc get -o jsonpath='{.users}' group ose-fancy-dev
+        register: fancydev_users
+        failed_when: >
+          'fancyuser1' not in fancydev_users.stdout or
+          'fancyuser2' not in fancydev_users.stdout
+
+      - name: Check for ose-teamed-app group users
+        command: oc get -o jsonpath='{.users}' group ose-teamed-app
+        register: teamedapp_users
+        failed_when: >
+          'teamuser1'  not in teamedapp_users.stdout or
+          'teamuser2'  not in teamedapp_users.stdout
+
+      - name: Login as normaluser1
+        command: oc login -u normaluser1 -p openshift
+
+      - name: Check that normaluser1 cannot see projects
+        command: oc get project app-dev
+        register: project_out
+        failed_when: project_out | success
+
+      - name: Login as fancyuser1
+        command: oc login -u fancyuser1 -p openshift
+
+      - name: cluster-reader (fancyuser1) should be able to see default project
+        command: oc get project default
+
+      - name: Login as teamuser1
+        command: oc login -u teamuser1 -p openshift
+
+      - name: teamuser1 should see prod project
+        command: oc get project app-prod
+
+      - name: Switch to prod project
+        command: oc project app-prod
+
+      - name: teamuser1 cannot create in app-prod
+        command: oc new-app docker.io/siamaksade/mapit
+        register: result
+        failed_when: result | success
+
+      - name: Login as cluster administrator
+        command: oc login -u system:admin
+
+      - name: Delete projects
+        command: oc delete project {{ item }}
+        with_items:
+          - "app-dev"
+          - "app-test"
+          - "app-prod"
+      tags:
+        - ldap-verify

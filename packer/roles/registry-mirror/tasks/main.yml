@@ -1,15 +1,15 @@
 ---
-
-- name: install dependencies
-  yum: name=docker-python state=present
-
-
 - name: download ose container images
   docker_image:
-    name: "{{ src_registry }}/{{ item }}"
+    name: "{{ image_source }}/{{ item }}"
   with_items:
     - "{{ ose_core_images }}"
     - "{{ ose_infra_images }}"
+
+- name: download cns container images
+  docker_image:
+    name: "{{ item }}"
+  with_items:
     - "{{ cns_core_images }}"
 
 - name: download other images
@@ -18,4 +18,30 @@
   with_items:
     - "{{ other_images }}"
 
+- name: retag images
+  docker_image:
+    name: "{{ image_source }}/{{ item }}"
+    repository: "localhost:5000/{{ item }}"
+    push: yes
+  with_items:
+    - "{{ ose_core_images }}"
+    - "{{ ose_infra_images }}"
+    - "{{ cns_core_images }}"
+    - "{{ other_images }}"
+
+- name: retag images
+  docker_image:
+    name: "docker.io/{{ item }}"
+    repository: "localhost:5000/{{ item }}"
+    push: yes
+  with_items:
+    - "{{ non_rh_images }}"
+
+- name: retag cns images
+  docker_image:
+    name: "{{ image_source }}/{{ item }}"
+    repository: "localhost:5000/{{ item | replace(cns_release_tag, 'latest')}}"
+    push: yes
+  with_items:
+    - "{{ cns_core_images }}"
 ...

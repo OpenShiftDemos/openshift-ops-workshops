@@ -1,8 +1,8 @@
 ## Environment Overview
 
-You will be interacting with an OpenShift 3.5 cluster that is running on {{
+You will be interacting with an OpenShift 3.9 cluster that is running on {{
 ENVIRONMENT }}. During the lab you will also install Container-Native Storage
-3.5. The complete environment consists of the following systems:
+3.9. The complete environment consists of the following systems:
 
 * 1 master node
 * 1 infrastructure node
@@ -36,13 +36,17 @@ publicly access via SSH and the browser is the OpenShift Master node:
 | Master Node       | {{MASTER_EXTERNAL_FQDN}}
 |==============================================
 
-You will be installing OpenShift Container Platform v3.5 using the advanced
+You will be installing OpenShift Container Platform v3.9 using the advanced
 installation method, which involves executing various Ansible playbooks. You
-will also install Container Native Storage v3.5.
+will also install Container Native Storage v3.9.
 
 Note that references to product documentation will be specifically pointing
-to the 3.5 versions, but newer software and documentation versions may be
+to the 3.9 versions, but newer software and documentation versions may be
 available.
+
+## How to get support
+
+In case of technical or functional problems please reach out to mailto:openshift-ops-testdrive@redhat.com[openshift-ops-testdrive@redhat.com]. This is a ticket based system where you will be able to reach the authors and supporters of this Test Drive Experience.
 
 ## Conventions
 You will see various code and command blocks throughout these exercises. Some of

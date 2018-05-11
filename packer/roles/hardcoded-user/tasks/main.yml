@@ -1,0 +1,16 @@
+---
+- name: add password based user
+  user:
+    name: student
+    state: present
+    password: $6$bhFt7ggi$SMQ8rYcB7vAm9hghHbMaLyfDq721tBC5JlIyoeHBDeMrcKeL7U9KOQybbXBC.v4EHk0QwXxTwEKc4FbytwA5K
+    group: wheel
+    append: yes
+
+- name: allow password auth via ssh
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    line: "PasswordAuthentication yes"
+    regexp: "^(#?)(\\s?)PasswordAuthentication (yes|no)$"
+
+...

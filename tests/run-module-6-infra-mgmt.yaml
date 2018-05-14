@@ -471,7 +471,7 @@
     - name: Test connectivity from netproj-b to netproj-a
       shell: oc exec -n netproj-b $(oc get pod -n netproj-b | awk '/ose-*/{ print $1 }') -- ping -c1 -W1 {{ pod_a.stdout }}
       register: ping_a
-      failed_when: ping_b | success
+      failed_when: ping_a | success
       tags:
         - networking
         - networking_test

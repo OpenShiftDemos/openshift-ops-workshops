@@ -1135,6 +1135,17 @@ export HEKETI_CLI_USER=admin
 export HEKETI_CLI_KEY=$(oc get pod/$HEKETI_POD -o jsonpath='{.spec.containers[0].env[?(@.name=="HEKETI_ADMIN_KEY")].value}' -n {{ CNS_INFRA_NAMESPACE }})
 ----
 
+We can now query `heketi` about the nodes in this cluster:
+
+----
+heketi-cli node list
+Id:33e0045354db4be29b18728cbe817605	Cluster:ca777ae0285ef6d8cd7237c862bd591c
+Id:d8443e7ee8314c0c9fb4d8274a370bbd	Cluster:ca777ae0285ef6d8cd7237c862bd591c
+Id:caaed3927e424b22b1a89d261f7617ad	Cluster:ca777ae0285ef6d8cd7237c862bd591c
+----
+
+The UUIDs of the nodes will be different for you. We however need them to tell `heketi` from which nodes to add a device. To avoid repetitive copying and pasting here is another Bash short cut to parse above output in a Bash variable:
+
 Run the following command to store the `heketi`-internal ID of the CNS cluster (there is only one for this `heketi` instance) in a bash variable:
 
 ----
@@ -1142,16 +1153,7 @@ export CNS_INFRA_CLUSTER=$(heketi-cli cluster list --json | jq -r '.clusters[0]'
 echo $CNS_INFRA_CLUSTER
 ----
 
-Now we can query `heketi` about the nodes in this cluster:
-
-----
-heketi-cli node info $CNS_INFRA_CLUSTER
-Id:33e0045354db4be29b18728cbe817605	Cluster:ca777ae0285ef6d8cd7237c862bd591c
-Id:d8443e7ee8314c0c9fb4d8274a370bbd	Cluster:ca777ae0285ef6d8cd7237c862bd591c
-Id:caaed3927e424b22b1a89d261f7617ad	Cluster:ca777ae0285ef6d8cd7237c862bd591c
-----
-
-The UUIDs of the nodes will be different for you. We however need them to tell `heketi` from which nodes to add a device. To avoid repetitive copying and pasting here is another Bash short cut to parse above output in a Bash variable:
+Then get a list of the nodes of this cluster into a Bash variable:
 
 ----
 export NODES=$(heketi-cli cluster info $CNS_INFRA_CLUSTER --json | jq -r '.nodes[]')

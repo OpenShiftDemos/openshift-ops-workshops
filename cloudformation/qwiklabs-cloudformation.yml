@@ -828,7 +828,7 @@ Resources:
 
               chpasswd:
                 list: |
-                  cloud-user:redhat
+                  ec2-user:redhat
                 expire: False
 
               ssh_pwauth: True

@@ -825,9 +825,8 @@ Resources:
               system_info:
                 default_user:
                   name: cloud-user
-                  lock_passwd: true
 
-              password: ${KeyName}
+              password: redhat
               chpasswd: { expire: False }
               ssh_pwauth: True
 
@@ -1926,6 +1925,10 @@ Outputs:
    LabGuide:
      Description: "Student Lab Guide"
      Value: !Sub "http://support.${AWS::AccountId}.${PublicHostedZone}/"
+
+   HostName:
+     Description: The public host name of the master
+     Value: !Sub "master.${AWS::AccountId}.${PublicHostedZone}"
 
    UserName:
      Description: "Name of the SSH user to login on the master"

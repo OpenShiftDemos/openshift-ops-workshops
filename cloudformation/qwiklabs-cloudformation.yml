@@ -825,6 +825,11 @@ Resources:
               system_info:
                 default_user:
                   name: cloud-user
+                  lock_passwd: true
+
+              password: ${KeyName}
+              chpasswd: { expire: False }
+              ssh_pwauth: True
 
               runcmd:
               - ansible localhost -m wait_for -a "port=22 host=${IdmNode1.PrivateIp}"
@@ -1921,3 +1926,11 @@ Outputs:
    LabGuide:
      Description: "Student Lab Guide"
      Value: !Sub "http://support.${AWS::AccountId}.${PublicHostedZone}/"
+
+   UserName:
+     Description: "Name of the SSH user to login on the master"
+     Value: "cloud-user"
+
+   Password:
+     Description: "SSH Password of the user to login on the master"
+     Value: !Ref 'KeyName'

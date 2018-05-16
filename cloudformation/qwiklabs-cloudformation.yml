@@ -800,6 +800,7 @@ Resources:
               - disk_setup
               - mounts
               - runcmd
+              - password
 
               fs_setup:
               - label: etcd_storage

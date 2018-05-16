@@ -816,7 +816,7 @@ Resources:
                 list: |
                   cloud-user:${KeyName}
                 expire: False
-                
+
               ssh_pwauth: True
 
               runcmd:
@@ -1319,8 +1319,8 @@ Resources:
               - ansible localhost -m wait_for -a "port=80 host=localhost"
               - ansible localhost -m wait_for -a "port=5000 host=localhost"
               - ansible all -i master.internal.aws.testdrive.openshift.com, -m fetch -a "src=/etc/ansible/hosts dest=/etc/ansible/hosts flat=yes"
-              - "/usr/local/bin/cfn-signal.sh 0 '${OpenShiftWaitHandle}'"
-              - "/usr/local/bin/cfn-signal.sh 0 '${PostDeployWaitHandle}'"
+              "ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml ; /usr/local/bin/cfn-signal.sh $? '${OpenShiftWaitHandle}'"
+              - "ansible-playbook /opt/lab/support/pv-resize-post-deploy-config.yml ; /usr/local/bin/cfn-signal.sh $? '${PostDeployWaitHandle}'"
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
 
   WorkerNode1NetworkInterface:

@@ -61,13 +61,7 @@ some command to modify
 
 ### Logging in
 You will only need to SSH into the master node to perform all of these
-exercises. If you are on Linux or Mac, use the the private key (*PEM* file)
-you downloaded earlier. Make sure it has the correct permissions:
-
-[source,bash,role=copypaste]
-----
-chmod 0400 ~/Downloads/<pem-file-name>
-----
+exercises. If you are on Linux or Mac, use the on-board SSH client.
 
 [NOTE]
 ====
@@ -75,16 +69,19 @@ Windows users are encouraged to use the
 link:https://www.chiark.greenend.org.uk/~sgtatham/putty/[PuTTY] client.
 Instructions for how to use SSH keys with PuTTY can be found in their
 link:https://the.earth.li/~sgtatham/putty/0.70/htmldoc/Chapter8.html#pubkey[documentation].
-
-If you are on Windows and using PuTTY, you should have downloaded the appropriate
-private key file (*PPK* file) earlier.
 ====
 
-Log on to the master node as `cloud-user`:
+Log on to the master node as `cloud-user` and the password `{{ KEYNAME }}`
 
-[source,bash,role=copypaste]
+[source,bash]
 ----
-ssh -i ~/Downloads/<pem-file-name> -l cloud-user {{MASTER_EXTERNAL_FQDN}}
+ssh -l cloud-user {{MASTER_EXTERNAL_FQDN}}
+----
+
+Once you are logged in you end up on the OpenShift Master Node:
+
+----
+[cloud-user@master ~]$
 ----
 
 The `cloud-user` account has password-less sudo privileges and SSH login on

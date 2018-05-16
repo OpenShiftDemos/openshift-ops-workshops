@@ -826,11 +826,8 @@ Resources:
                 default_user:
                   name: cloud-user
 
-              chpasswd:
-                list: |
-                  cloud-user:redhat
-                expire: False
-
+              password: redhat
+              chpasswd: { expire: False }
               ssh_pwauth: True
 
               runcmd:

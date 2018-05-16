@@ -796,12 +796,6 @@ Resources:
           !Sub
             - |
               #cloud-config
-              cloud_config_modules:
-              - disk_setup
-              - set-passwords
-              - mounts
-              - runcmd
-
               fs_setup:
               - label: etcd_storage
                 filesystem: xfs
@@ -809,16 +803,6 @@ Resources:
                 partition: auto
 
               fqdn: master.internal.${PublicHostedZone}
-
-
-              write_files:
-              - content: |
-                  DEVS='/dev/xvdb'
-                  VG=docker_vol
-                  DATA_SIZE=95%VG
-                  EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-                path: /etc/sysconfig/docker-storage-setup
-                owner: root:root
 
               users:
               - default
@@ -828,9 +812,9 @@ Resources:
                   name: cloud-user
 
               chpasswd:
-                list:
-                  - cloud-user:redhat
-                  - student:R
+                list: |
+                  cloud-user:redhat
+                  student:R
                 expire: False
               ssh_pwauth: True
 

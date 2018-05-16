@@ -1,5 +1,11 @@
 ---
 
+- name: replace ec2-user with cloud-user
+  replace:
+    path: /etc/cloud/cloud.cfg
+    regexp: 'ec2-user'
+    replace: 'cloud-user'
+
 - name: copy cfn-signal script
   copy:
     src: cfn-signal.sh

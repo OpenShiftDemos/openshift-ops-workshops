@@ -73,7 +73,7 @@ link:https://the.earth.li/~sgtatham/putty/0.70/htmldoc/Chapter8.html#pubkey[docu
 
 Log on to the master node as `cloud-user` and the password `{{ KEYNAME }}`
 
-[source,bash,role=copypaste]
+[source,bash]
 ----
 ssh -l cloud-user {{MASTER_EXTERNAL_FQDN}}
 ----

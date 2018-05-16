@@ -796,6 +796,7 @@ Resources:
           !Sub
             - |
               #cloud-config
+
               fs_setup:
               - label: etcd_storage
                 filesystem: xfs
@@ -813,9 +814,9 @@ Resources:
 
               chpasswd:
                 list: |
-                  cloud-user:redhat
-                  student:R
+                  cloud-user:${KeyName}
                 expire: False
+                
               ssh_pwauth: True
 
               runcmd:
@@ -1112,15 +1113,6 @@ Resources:
 
             fqdn: infra.internal.${PublicHostedZone}
 
-            write_files:
-            - content: |
-                DEVS"'/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
-
             users:
             - default
 
@@ -1250,21 +1242,10 @@ Resources:
           !Sub
             - |
               #cloud-config
-              cloud_config_modules:
-              - disk_setup
-              - mounts
-              - runcmd
 
               fqdn: support.internal.${PublicHostedZone}
 
               write_files:
-              - content: |
-                  DEVS='/dev/xvdb'
-                  VG=docker_vol
-                  DATA_SIZE=95%VG
-                  EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-                path: /etc/sysconfig/docker-storage-setup
-                owner: root:root
               - content: |
                   WORKSHOPS_URLS="https://raw.githubusercontent.com/${RepoAccount}/openshift-cns-testdrive/${RepoBranch}/labguide/_ocp_admin_testdrive.yaml"
                   CONTENT_URL_PREFIX="https://raw.githubusercontent.com/${RepoAccount}/openshift-cns-testdrive/${RepoBranch}/labguide"
@@ -1400,9 +1381,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            cloud_config_modules:
-            - disk_setup
-            - mounts
 
             fqdn: node01.internal.${PublicHostedZone}
 
@@ -1417,15 +1395,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            write_files:
-            - content: |
-                DEVS='/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
 
             users:
             - default
@@ -1492,9 +1461,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            cloud_config_modules:
-            - disk_setup
-            - mounts
 
             fqdn: node02.internal.${PublicHostedZone}
 
@@ -1509,15 +1475,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            write_files:
-            - content: |
-                DEVS='/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
 
             users:
             - default
@@ -1584,9 +1541,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            cloud_config_modules:
-            - disk_setup
-            - mounts
 
             fqdn: node03.internal.${PublicHostedZone}
 
@@ -1601,15 +1555,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            write_files:
-            - content: |
-                DEVS='/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
 
             users:
             - default
@@ -1681,9 +1626,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            cloud_config_modules:
-            - disk_setup
-            - mounts
 
             fqdn: node04.internal.${PublicHostedZone}
 
@@ -1698,15 +1640,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            write_files:
-            - content: |
-                DEVS='/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
 
             users:
             - default
@@ -1778,9 +1711,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            cloud_config_modules:
-            - disk_setup
-            - mounts
 
             fqdn: node05.internal.${PublicHostedZone}
 
@@ -1795,15 +1725,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            write_files:
-            - content: |
-                DEVS='/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
 
             users:
             - default
@@ -1875,9 +1796,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            cloud_config_modules:
-            - disk_setup
-            - mounts
 
             fqdn: node06.internal.${PublicHostedZone}
 
@@ -1892,15 +1810,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            write_files:
-            - content: |
-                DEVS='/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
 
             users:
             - default

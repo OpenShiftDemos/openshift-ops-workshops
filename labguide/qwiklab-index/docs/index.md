@@ -31,7 +31,8 @@ For this lab you need to fulfill the following pre-requisites:
 To start the Test Drive press ![START button](img/qwiklab-start-button.png) button in the top bar.
 
 If you have not signed up for this Test Drive as part of an event you will be asked if you want to spend 10 credits on this lab. Answer with **Launch with 10 credits**. It might take 2-3 seconds to proceed.
-You should have received 40 credits as part of registering for this lab online - if this is not the case please reach out to [testdrivetokens@redhat.com](mailto:testdrivetokens@redhat.com).
+If you do not see that option you have run out of credits.
+You should have initially received 40 credits as part of registering for this lab online. If you ran out please contact [testdrivetokens@redhat.com](mailto:testdrivetokens@redhat.com).
 
 ![Pay lab with credits](img/qwiklab-credits.png)
 

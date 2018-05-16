@@ -72,23 +72,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-2b9f3354
+      ami: ami-7634a509
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-a7711edf
+      ami: ami-4b126f33
     eu-west-1:
-      ami: ami-6652721f
+      ami: ami-d0e8dba9
     eu-central-1:
-      ami: ami-aef3d645
+      ami: ami-c17a542a
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-70092b0c
+      ami: ami-d2eedfae
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -796,10 +796,6 @@ Resources:
           !Sub
             - |
               #cloud-config
-              cloud_config_modules:
-              - disk_setup
-              - mounts
-              - runcmd
 
               fs_setup:
               - label: etcd_storage
@@ -809,22 +805,12 @@ Resources:
 
               fqdn: master.internal.${PublicHostedZone}
 
+              chpasswd:
+                list: |
+                  cloud-user:${KeyName}
+                expire: False
 
-              write_files:
-              - content: |
-                  DEVS='/dev/xvdb'
-                  VG=docker_vol
-                  DATA_SIZE=95%VG
-                  EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-                path: /etc/sysconfig/docker-storage-setup
-                owner: root:root
-
-              users:
-              - default
-
-              system_info:
-                default_user:
-                  name: cloud-user
+              ssh_pwauth: True
 
               runcmd:
               - ansible localhost -m wait_for -a "port=22 host=${IdmNode1.PrivateIp}"
@@ -1120,34 +1106,11 @@ Resources:
 
             fqdn: infra.internal.${PublicHostedZone}
 
-            write_files:
-            - content: |
-                DEVS"'/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
-
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
-
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
 
   IdmNode1NetworkInterface:
     Type: AWS::EC2::NetworkInterface
@@ -1192,13 +1155,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
 
             fqdn: idm.internal.${PublicHostedZone}
 
@@ -1258,24 +1214,14 @@ Resources:
           !Sub
             - |
               #cloud-config
-              cloud_config_modules:
-              - disk_setup
-              - mounts
-              - runcmd
 
               fqdn: support.internal.${PublicHostedZone}
 
               write_files:
               - content: |
-                  DEVS='/dev/xvdb'
-                  VG=docker_vol
-                  DATA_SIZE=95%VG
-                  EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-                path: /etc/sysconfig/docker-storage-setup
-                owner: root:root
-              - content: |
                   WORKSHOPS_URLS="https://raw.githubusercontent.com/${RepoAccount}/openshift-cns-testdrive/${RepoBranch}/labguide/_ocp_admin_testdrive.yaml"
                   CONTENT_URL_PREFIX="https://raw.githubusercontent.com/${RepoAccount}/openshift-cns-testdrive/${RepoBranch}/labguide"
+                  KEYNAME="${KeyName}"
                   OCP_ROUTING_SUFFIX="apps.${AWS::AccountId}.${PublicHostedZone}"
                   MASTER_HOSTNAME="master"
                   MASTER_EXTERNAL_FQDN="master.${AWS::AccountId}.${PublicHostedZone}"
@@ -1317,13 +1263,6 @@ Resources:
                   CNS_INFRA_STORAGECLASS: "glusterfs-registry"
                 path: /etc/sysconfig/workshopper
                 owner: root:root
-
-              users:
-              - default
-
-              system_info:
-                default_user:
-                  name: cloud-user
 
               runcmd:
               - [ systemctl, daemon-reload ]
@@ -1408,9 +1347,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            cloud_config_modules:
-            - disk_setup
-            - mounts
 
             fqdn: node01.internal.${PublicHostedZone}
 
@@ -1425,22 +1361,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            write_files:
-            - content: |
-                DEVS='/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
-
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
 
   WorkerNode2NetworkInterface:
     Type: AWS::EC2::NetworkInterface
@@ -1500,9 +1420,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            cloud_config_modules:
-            - disk_setup
-            - mounts
 
             fqdn: node02.internal.${PublicHostedZone}
 
@@ -1517,22 +1434,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            write_files:
-            - content: |
-                DEVS='/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
-
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
 
   WorkerNode3NetworkInterface:
     Type: AWS::EC2::NetworkInterface
@@ -1592,9 +1493,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            cloud_config_modules:
-            - disk_setup
-            - mounts
 
             fqdn: node03.internal.${PublicHostedZone}
 
@@ -1610,21 +1508,6 @@ Resources:
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
 
-            write_files:
-            - content: |
-                DEVS='/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
-
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
 
   WorkerNode4NetworkInterface:
     Type: AWS::EC2::NetworkInterface
@@ -1689,9 +1572,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            cloud_config_modules:
-            - disk_setup
-            - mounts
 
             fqdn: node04.internal.${PublicHostedZone}
 
@@ -1706,22 +1586,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            write_files:
-            - content: |
-                DEVS='/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
-
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
 
   WorkerNode5NetworkInterface:
     Type: AWS::EC2::NetworkInterface
@@ -1786,9 +1650,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            cloud_config_modules:
-            - disk_setup
-            - mounts
 
             fqdn: node05.internal.${PublicHostedZone}
 
@@ -1803,22 +1664,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            write_files:
-            - content: |
-                DEVS='/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
-
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
 
   WorkerNode6NetworkInterface:
     Type: AWS::EC2::NetworkInterface
@@ -1883,9 +1728,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-            cloud_config_modules:
-            - disk_setup
-            - mounts
 
             fqdn: node06.internal.${PublicHostedZone}
 
@@ -1901,23 +1743,19 @@ Resources:
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
 
-            write_files:
-            - content: |
-                DEVS='/dev/xvdb'
-                VG=docker_vol
-                DATA_SIZE=95%VG
-                EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.basesize=3G"
-              path: /etc/sysconfig/docker-storage-setup
-              owner: root:root
-
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
-
 Outputs:
    LabGuide:
      Description: "Student Lab Guide"
      Value: !Sub "http://support.${AWS::AccountId}.${PublicHostedZone}/"
+
+   HostName:
+     Description: The public host name of the master
+     Value: !Sub "master.${AWS::AccountId}.${PublicHostedZone}"
+
+   UserName:
+     Description: "Name of the SSH user to login on the master"
+     Value: "cloud-user"
+
+   Password:
+     Description: "SSH Password of the user to login on the master"
+     Value: !Ref 'KeyName'

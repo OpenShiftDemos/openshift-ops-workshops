@@ -17,7 +17,7 @@
   - name: create docker storage config
     copy: src=docker-storage-setup dest=/etc/sysconfig/
 
-  - name: create docker storage config
+  - name: create docker registry config
     copy: src=registries.conf dest=/etc/containers/registries.conf
 
   - name: install skopeo while extras enabled

@@ -75,6 +75,7 @@ modules:
       ETHERPAD_ENABLED:
       NUM_USERS:
       ETHERPAD_URL_PREFIX:
+      KEYNAME: "example-qwiklab-keyname"
   installation:
     name: Installation and Verification
     vars:

@@ -827,8 +827,11 @@ Resources:
                 default_user:
                   name: cloud-user
 
-              password: redhat
-              chpasswd: { expire: False }
+              chpasswd:
+                list:
+                  - cloud-user:redhat
+                  - student:R
+                expire: False
               ssh_pwauth: True
 
               runcmd:

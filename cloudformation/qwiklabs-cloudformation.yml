@@ -805,13 +805,6 @@ Resources:
 
               fqdn: master.internal.${PublicHostedZone}
 
-              users:
-              - default
-
-              system_info:
-                default_user:
-                  name: cloud-user
-
               chpasswd:
                 list: |
                   cloud-user:${KeyName}
@@ -1113,25 +1106,11 @@ Resources:
 
             fqdn: infra.internal.${PublicHostedZone}
 
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
-
             runcmd:
             - mkdir -p /var/lib/origin/openshift.local.volumes
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
 
   IdmNode1NetworkInterface:
     Type: AWS::EC2::NetworkInterface
@@ -1176,13 +1155,6 @@ Resources:
         Fn::Base64:
           !Sub |
             #cloud-config
-
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
 
             fqdn: idm.internal.${PublicHostedZone}
 
@@ -1291,13 +1263,6 @@ Resources:
                 path: /etc/sysconfig/workshopper
                 owner: root:root
 
-              users:
-              - default
-
-              system_info:
-                default_user:
-                  name: cloud-user
-
               runcmd:
               - [ systemctl, daemon-reload ]
               - [ systemctl, enable, workshopper ]
@@ -1396,13 +1361,6 @@ Resources:
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
 
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
-
   WorkerNode2NetworkInterface:
     Type: AWS::EC2::NetworkInterface
     Properties:
@@ -1475,13 +1433,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
 
   WorkerNode3NetworkInterface:
     Type: AWS::EC2::NetworkInterface
@@ -1556,12 +1507,6 @@ Resources:
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
 
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
 
   WorkerNode4NetworkInterface:
     Type: AWS::EC2::NetworkInterface
@@ -1641,13 +1586,6 @@ Resources:
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
 
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
-
   WorkerNode5NetworkInterface:
     Type: AWS::EC2::NetworkInterface
     Properties:
@@ -1726,13 +1664,6 @@ Resources:
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
 
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
-
   WorkerNode6NetworkInterface:
     Type: AWS::EC2::NetworkInterface
     Properties:
@@ -1810,13 +1741,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
-            users:
-            - default
-
-            system_info:
-              default_user:
-                name: cloud-user
 
 Outputs:
    LabGuide:

@@ -798,9 +798,9 @@ Resources:
               #cloud-config
               cloud_config_modules:
               - disk_setup
+              - set-passwords
               - mounts
               - runcmd
-              - password
 
               fs_setup:
               - label: etcd_storage

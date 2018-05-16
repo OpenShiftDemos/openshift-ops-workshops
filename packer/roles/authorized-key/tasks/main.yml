@@ -2,7 +2,6 @@
 - name: create cloud-user account
   user:
     name: cloud-user
-    password: $6$vflpEFJa6AoKkqY3$LynSFEZFY/vKWbnZVV8aGToiBlsate96LALMWSB2X1IH6diHioito09FoFj9KNl0aNDZueHjhDy76Sy322bE8/
 
 - name: create ssh directory
   file:

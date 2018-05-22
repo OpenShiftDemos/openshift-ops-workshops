@@ -72,23 +72,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-7634a509
+      ami: ami-f074ef8f
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-4b126f33
+      ami: ami-b40977cc
     eu-west-1:
-      ami: ami-d0e8dba9
+      ami: ami-2217285b
     eu-central-1:
-      ami: ami-c17a542a
+      ami: ami-ab1b3340
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-d2eedfae
+      ami: ami-99ead8e5
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -399,6 +399,27 @@ Resources:
         ToPort: 65535
         CidrIp: 0.0.0.0/0
 
+  SupportSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Ref: VPC
+      GroupDescription: Firewall definition for OpenShift Node
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 8080
+        ToPort: 8080
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: icmp
+        FromPort: -1
+        ToPort: -1
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      SecurityGroupEgress:
+      - IpProtocol: -1
+        FromPort: 0
+        ToPort: 65535
+        CidrIp: 0.0.0.0/0
+
   IdmSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -540,6 +561,7 @@ Resources:
       - Master1NetworkInterface
       - InfraNode1NetworkInterface
       - IdmNode1NetworkInterface
+      - SupportNodeNetworkInterface
       - WorkerNode1NetworkInterface
       - WorkerNode2NetworkInterface
       - WorkerNode3NetworkInterface
@@ -562,6 +584,7 @@ Resources:
       - Master1NetworkInterface
       - InfraNode1NetworkInterface
       - IdmNode1NetworkInterface
+      - SupportNodeNetworkInterface
       - WorkerNode1NetworkInterface
       - WorkerNode2NetworkInterface
       - WorkerNode3NetworkInterface
@@ -679,6 +702,12 @@ Resources:
           - !GetAtt IdmNode1.PublicIp
 
         - Name: !Join ['', [support., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt SupportNode.PublicIp
+
+        - Name: !Join ['', [ssh., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
@@ -1168,6 +1197,7 @@ Resources:
       SubnetId: !Ref PublicSubnet1
       GroupSet:
         - !Ref NodeSecurityGroup
+        - !Ref SupportSecurityGroup
       SourceDestCheck: 'false'
       Tags:
       - Key: Application
@@ -1268,6 +1298,8 @@ Resources:
               - [ systemctl, daemon-reload ]
               - [ systemctl, enable, workshopper ]
               - [ systemctl, start, workshopper ]
+              - [ systemctl, enable, webssh2 ]
+              - [ systemctl, start, webssh2 ]
               - [ systemctl, start, docker-distribution ]
               - ansible --become localhost -m file -a "path=/tmp/ansible.log state=touch mode=0777"
               - ansible --become localhost -m lineinfile -a "path=/etc/ansible/ansible.cfg regexp='^log_path' line='log_path = /tmp/ansible.log' state=present"
@@ -1283,6 +1315,7 @@ Resources:
               - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
               - ansible master.internal.aws.testdrive.openshift.com, -m wait_for -a "path=/etc/origin/master/ipa-ca.crt timeout=600"
               - ansible localhost -m wait_for -a "port=80 host=localhost"
+              - ansible localhost -m wait_for -a "port=8080 host=localhost"
               - ansible localhost -m wait_for -a "port=5000 host=localhost"
               - ansible all -i master.internal.aws.testdrive.openshift.com, -m fetch -a "src=/etc/ansible/hosts dest=/etc/ansible/hosts flat=yes"
               - "ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml ; /usr/local/bin/cfn-signal.sh $? '${OpenShiftWaitHandle}'"
@@ -1507,7 +1540,6 @@ Resources:
 
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
 
   WorkerNode4NetworkInterface:
     Type: AWS::EC2::NetworkInterface

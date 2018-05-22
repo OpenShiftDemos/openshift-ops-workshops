@@ -1,0 +1,16 @@
+[Unit]
+Description=WebSSH2
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStart=/usr/local/sbin/systemd-docker --env --cgroups name=systemd run --rm --name %n -p 8080:2222 webssh2:latest
+Restart=always
+RestartSec=10s
+Type=notify
+NotifyAccess=all
+TimeoutStartSec=120
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

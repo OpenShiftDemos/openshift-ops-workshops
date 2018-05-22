@@ -1298,8 +1298,6 @@ Resources:
               - [ systemctl, daemon-reload ]
               - [ systemctl, enable, workshopper ]
               - [ systemctl, start, workshopper ]
-              - [ systemctl, enable, webssh2 ]
-              - [ systemctl, start, webssh2 ]
               - [ systemctl, start, docker-distribution ]
               - ansible --become localhost -m file -a "path=/tmp/ansible.log state=touch mode=0777"
               - ansible --become localhost -m lineinfile -a "path=/etc/ansible/ansible.cfg regexp='^log_path' line='log_path = /tmp/ansible.log' state=present"
@@ -1315,7 +1313,6 @@ Resources:
               - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
               - ansible master.internal.aws.testdrive.openshift.com, -m wait_for -a "path=/etc/origin/master/ipa-ca.crt timeout=600"
               - ansible localhost -m wait_for -a "port=80 host=localhost"
-              - ansible localhost -m wait_for -a "port=8080 host=localhost"
               - ansible localhost -m wait_for -a "port=5000 host=localhost"
               - ansible all -i master.internal.aws.testdrive.openshift.com, -m fetch -a "src=/etc/ansible/hosts dest=/etc/ansible/hosts flat=yes"
               - "ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml ; /usr/local/bin/cfn-signal.sh $? '${OpenShiftWaitHandle}'"

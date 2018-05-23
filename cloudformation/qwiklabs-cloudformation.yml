@@ -389,27 +389,10 @@ Resources:
         FromPort: 443
         ToPort: 443
         CidrIp: 0.0.0.0/0
-      - IpProtocol: icmp
-        FromPort: -1
-        ToPort: -1
-        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
-      SecurityGroupEgress:
-      - IpProtocol: -1
-        FromPort: 0
-        ToPort: 65535
-        CidrIp: 0.0.0.0/0
-
-  SupportSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      VpcId:
-        Ref: VPC
-      GroupDescription: Firewall definition for OpenShift Node
-      SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 8080
         ToPort: 8080
-        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+        CidrIp: 0.0.0.0/0
       - IpProtocol: icmp
         FromPort: -1
         ToPort: -1
@@ -1197,7 +1180,6 @@ Resources:
       SubnetId: !Ref PublicSubnet1
       GroupSet:
         - !Ref NodeSecurityGroup
-        - !Ref SupportSecurityGroup
       SourceDestCheck: 'false'
       Tags:
       - Key: Application

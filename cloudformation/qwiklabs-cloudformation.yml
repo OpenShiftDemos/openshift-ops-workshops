@@ -72,23 +72,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-caa2c7b5
+      ami: ami-eb95f094
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-c283fdba
+      ami: ami-a1fd83d9
     eu-west-1:
-      ami: ami-864c72ff
+      ami: ami-603e0019
     eu-central-1:
-      ami: ami-66b39b8d
+      ami: ami-bf89a154
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-0c6a5770
+      ami: ami-e15c619d
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -946,6 +946,7 @@ Resources:
                     NODE6_INTERNAL_FQDN: "node06.internal.${PublicHostedZone}"
                     IDM_INTERNAL_FQDN: "idm.internal.${PublicHostedZone}"
                     WEB_CONSOLE_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
+                    SSH_CONSOLE_URL: "http://ssh.${AWS::AccountId}${PublicHostedZone}:8080/ssh/host/master.internal.${PublicHostedZone}"
                     API_HEALTH_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                   path: /opt/lab/environment.yml
 
@@ -1264,6 +1265,7 @@ Resources:
                   NODE6_INTERNAL_IP="${WorkerNode6.PrivateIp}"
                   IDM_INTERNAL_FQDN="idm.internal.${PublicHostedZone}"
                   WEB_CONSOLE_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
+                  SSH_CONSOLE_URL="http://ssh.${AWS::AccountId}${PublicHostedZone}:8080/ssh/host/master.internal.${PublicHostedZone}"
                   API_HEALTH_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                   NODE_BRICK_DEVICE="/dev/xvdd"
                   NODE_BRICK_DEVICE2="/dev/xvde"

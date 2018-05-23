@@ -25,3 +25,11 @@
   copy:
     src: webssh2.service
     dest: /etc/systemd/system/
+
+- name: create webssh2 config
+  template:
+    src: webssh2.j2
+    dest: /etc/sysconfig/webssh2
+    owner: root
+    group: root
+    mode: 0644

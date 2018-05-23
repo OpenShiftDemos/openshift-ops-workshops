@@ -72,23 +72,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-863fa4f9
+      ami: ami-caa2c7b5
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-e57d039d
+      ami: ami-c283fdba
     eu-west-1:
-      ami: ami-bc1728c5
+      ami: ami-864c72ff
     eu-central-1:
-      ami: ami-39123ad2
+      ami: ami-66b39b8d
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-c8d5e7b4
+      ami: ami-0c6a5770
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -1280,6 +1280,8 @@ Resources:
               - [ systemctl, daemon-reload ]
               - [ systemctl, enable, workshopper ]
               - [ systemctl, start, workshopper ]
+              - [ systemctl, enable, webssh2 ]
+              - [ systemctl, start, webssh2 ]
               - [ systemctl, start, docker-distribution ]
               - ansible --become localhost -m file -a "path=/tmp/ansible.log state=touch mode=0777"
               - ansible --become localhost -m lineinfile -a "path=/etc/ansible/ansible.cfg regexp='^log_path' line='log_path = /tmp/ansible.log' state=present"
@@ -1759,14 +1761,14 @@ Outputs:
      Description: "Student Lab Guide"
      Value: !Sub "http://support.${AWS::AccountId}.${PublicHostedZone}/"
 
-   HostName:
-     Description: The public host name of the master
-     Value: !Sub "master.${AWS::AccountId}.${PublicHostedZone}"
+   SSHConsole:
+     Description: "SSH Remote Console to OpenShift Master"
+     Value: !Sub "http://ssh.${AWS::AccountId}${PublicHostedZone}:8080/ssh/host/master.internal.${PublicHostedZone}"
 
-   UserName:
+   SSHUserName:
      Description: "Name of the SSH user to login on the master"
      Value: "cloud-user"
 
-   Password:
+   SSHPassword:
      Description: "SSH Password of the user to login on the master"
      Value: !Ref 'KeyName'

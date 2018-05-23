@@ -60,18 +60,14 @@ some command to modify
 ----
 
 ### Logging in
-You will only need to SSH into the master node to perform all of these
-exercises. If you are on Linux or Mac, use the on-board SSH client.
+Most of the exercises in this lab will be facilitated using the OpenShift command line client on the master node. For convenient access to the master's command line we provide a web-based SSH console: {{ SSH_CONSOLE_URL }}
 
-[NOTE]
-====
-Windows users are encouraged to use the
-link:https://www.chiark.greenend.org.uk/~sgtatham/putty/[PuTTY] client.
-Instructions for how to use SSH keys with PuTTY can be found in their
-link:https://the.earth.li/~sgtatham/putty/0.70/htmldoc/Chapter8.html#pubkey[documentation].
-====
+Use the user name `cloud-user` and the password `{{ KEYNAME }}` when prompted.
 
-Log on to the master node as `cloud-user` and the password `{{ KEYNAME }}`
+.SSH Console Login
+image::webssh_login.png[]
+
+If you prefer to use an SSH client on your system you can do that too, using the same credentials:
 
 [source,bash]
 ----

@@ -1765,7 +1765,7 @@ Outputs:
 
    SSHConsole:
      Description: "SSH Remote Console to OpenShift Master"
-     Value: !Sub "http://ssh.${AWS::AccountId}${PublicHostedZone}:8080/ssh/host/master.internal.${PublicHostedZone}"
+     Value: !Sub "http://ssh.${AWS::AccountId}.${PublicHostedZone}:8080/ssh/host/master.internal.${PublicHostedZone}"
 
    SSHUserName:
      Description: "Name of the SSH user to login on the master"

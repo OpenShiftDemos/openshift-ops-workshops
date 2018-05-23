@@ -49,19 +49,30 @@ When your lab infrastructure is ready this progress bar disappears. Upon launch 
 
 ![Lab timer](img/qwiklab-end-button.png)
 
-## 5. Access the lab environment via SSH
+## 5. Access the lab environment via (web-based) SSH
 
 Once the lab is provisioned on the left side of the screen credential information will appear below **CONNECTION DETAILS**:
 
 ![Lab Credentials](img/qwiklab-lab-credentials.png)
 
-You use the provided **host name**, **user name** and **password** to log in via SSH, like so:
+Note the **SSHUserName** and **SSHPassword**. Navigate to the provided URL in the field **SSHConsole** to launch the web-based SSH console. This is a browser-based SSH client that is hosted in your lab environment for convenient access to the lab.
+Enter the previously collected user name and password when prompted in your browser.
+
+![Lab Credentials](img/webssh-login.png)
+
+If you mistype your password the screen will stay black and you don't get a prompt.
+
+![Lab Credentials](img/webssh-login-fail.png)
+
+In this case restart your browser to get another prompt again. When done correctly it should look like this:
+
+![Lab Credentials](img/webssh-login-success.png)
+
+Alternatively, if you prefer your own SSH client you can do that too. Any SSH client is ok (OpenSSH, PuTTY, etc). Please note that your network / VPN must permit outbound traffic to TCP port 22 - this might be blocked on corporate machines.
 
 ~~~
 ssh -l <UserName> <HostName>
 ~~~
-
-Any SSH client is ok (OpenSSH, PuTTY, etc). Please note that your network / VPN must permit outbound traffic to TCP port 22 - this might be blocked on corporate machines.
 
 When logged in with the password provided, you end up on the OpenShift Master node from where the lab guide will run you through the exercises.
 

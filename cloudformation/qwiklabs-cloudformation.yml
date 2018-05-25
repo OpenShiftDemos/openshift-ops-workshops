@@ -72,23 +72,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-7634a509
+      ami: ami-eb95f094
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-4b126f33
+      ami: ami-a1fd83d9
     eu-west-1:
-      ami: ami-d0e8dba9
+      ami: ami-603e0019
     eu-central-1:
-      ami: ami-c17a542a
+      ami: ami-bf89a154
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-d2eedfae
+      ami: ami-e15c619d
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -389,6 +389,10 @@ Resources:
         FromPort: 443
         ToPort: 443
         CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8080
+        ToPort: 8080
+        CidrIp: 0.0.0.0/0
       - IpProtocol: icmp
         FromPort: -1
         ToPort: -1
@@ -540,6 +544,7 @@ Resources:
       - Master1NetworkInterface
       - InfraNode1NetworkInterface
       - IdmNode1NetworkInterface
+      - SupportNodeNetworkInterface
       - WorkerNode1NetworkInterface
       - WorkerNode2NetworkInterface
       - WorkerNode3NetworkInterface
@@ -562,6 +567,7 @@ Resources:
       - Master1NetworkInterface
       - InfraNode1NetworkInterface
       - IdmNode1NetworkInterface
+      - SupportNodeNetworkInterface
       - WorkerNode1NetworkInterface
       - WorkerNode2NetworkInterface
       - WorkerNode3NetworkInterface
@@ -679,6 +685,12 @@ Resources:
           - !GetAtt IdmNode1.PublicIp
 
         - Name: !Join ['', [support., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
+          Type: A
+          TTL: '900'
+          ResourceRecords:
+          - !GetAtt SupportNode.PublicIp
+
+        - Name: !Join ['', [ssh., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
@@ -934,6 +946,7 @@ Resources:
                     NODE6_INTERNAL_FQDN: "node06.internal.${PublicHostedZone}"
                     IDM_INTERNAL_FQDN: "idm.internal.${PublicHostedZone}"
                     WEB_CONSOLE_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
+                    SSH_CONSOLE_URL: "http://ssh.${AWS::AccountId}${PublicHostedZone}:8080/ssh/host/master.internal.${PublicHostedZone}"
                     API_HEALTH_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                   path: /opt/lab/environment.yml
 
@@ -1252,6 +1265,7 @@ Resources:
                   NODE6_INTERNAL_IP="${WorkerNode6.PrivateIp}"
                   IDM_INTERNAL_FQDN="idm.internal.${PublicHostedZone}"
                   WEB_CONSOLE_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
+                  SSH_CONSOLE_URL="http://ssh.${AWS::AccountId}${PublicHostedZone}:8080/ssh/host/master.internal.${PublicHostedZone}"
                   API_HEALTH_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                   NODE_BRICK_DEVICE="/dev/xvdd"
                   NODE_BRICK_DEVICE2="/dev/xvde"
@@ -1268,6 +1282,8 @@ Resources:
               - [ systemctl, daemon-reload ]
               - [ systemctl, enable, workshopper ]
               - [ systemctl, start, workshopper ]
+              - [ systemctl, enable, webssh2 ]
+              - [ systemctl, start, webssh2 ]
               - [ systemctl, start, docker-distribution ]
               - ansible --become localhost -m file -a "path=/tmp/ansible.log state=touch mode=0777"
               - ansible --become localhost -m lineinfile -a "path=/etc/ansible/ansible.cfg regexp='^log_path' line='log_path = /tmp/ansible.log' state=present"
@@ -1508,7 +1524,6 @@ Resources:
             mounts:
             - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
 
-
   WorkerNode4NetworkInterface:
     Type: AWS::EC2::NetworkInterface
     Properties:
@@ -1748,14 +1763,14 @@ Outputs:
      Description: "Student Lab Guide"
      Value: !Sub "http://support.${AWS::AccountId}.${PublicHostedZone}/"
 
-   HostName:
-     Description: The public host name of the master
-     Value: !Sub "master.${AWS::AccountId}.${PublicHostedZone}"
+   SSHConsole:
+     Description: "SSH Remote Console to OpenShift Master"
+     Value: !Sub "http://ssh.${AWS::AccountId}.${PublicHostedZone}:8080/ssh/host/master.internal.${PublicHostedZone}"
 
-   UserName:
+   SSHUserName:
      Description: "Name of the SSH user to login on the master"
      Value: "cloud-user"
 
-   Password:
+   SSHPassword:
      Description: "SSH Password of the user to login on the master"
      Value: !Ref 'KeyName'

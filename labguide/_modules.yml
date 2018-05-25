@@ -58,6 +58,8 @@ config:
       value: "idm.internal.aws.testdrive.openshift.com"
     - name: WEB_CONSOLE_URL
       value: "https://master.external.aws.testdrive.openshift.com/console"
+    - name: SSH_CONSOLE_URL
+      value: "http://ssh.external.aws.testdrive.openshift.com:8080/ssh/host/master.internal.aws.testdrive.openshift.com"
     - name: API_HEALTH_URL
       value: "https://openshift.external.aws.testdrive.openshift.com/healthz/ready"
     - name: CODE_CLONE_LOCATION

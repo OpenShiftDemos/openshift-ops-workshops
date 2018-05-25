@@ -376,6 +376,98 @@ But, until a *Template* was created in the `default` *Project* called
 `project-request`, user *Project* creation would have failed due to a lack of
 the template. So, beware.
 
+### Editing Quotas and Limits
+As a cluster administrator you may want to change the quotas or limits for a 
+specific project, overriding the defaults configured in the default project template. 
+For example, let's modify the limit range and change the default CPU limit to a 
+much lower value: 
+
+----
+oc edit limitange template-test-limits -n template-test
+----
+
+You should see an editor view of the limitrange yaml: 
+[source,yaml]
+----
+- apiVersion: v1
+  kind: LimitRange
+  metadata:
+    name: template-test-limits
+    creationTimestamp: null
+  spec:
+    limits:
+      -
+        type: Container
+        max:
+          cpu: 4000m
+          memory: 1024Mi
+        min: 
+          cpu: 10m
+          memory: 5Mi
+        default: 
+          cpu: 4000m
+          memory: 1024Mi
+        defaultRequest: 
+          cpu: 100m
+          memory: 512Mi
+----
+
+Change the default cpu value to 250m: 
+
+[source,yaml]
+----
+- apiVersion: v1
+  kind: LimitRange
+  metadata:
+    name: template-test-limits
+    creationTimestamp: null
+  spec:
+    limits:
+      -
+        type: Container
+        max: 
+          cpu: 4000m
+          memory: 1024Mi
+        min: 
+          cpu: 10m
+          memory: 5Mi
+        default: 
+          cpu: 250m
+          memory: 1024Mi
+        defaultRequest: 
+          cpu: 100m
+          memory: 512Mi
+----
+
+This means that any Pod created within the project, that does not specify its own runtime limits, the maximum CPU that can be used will be 250 millicores; this is approximately equivalent to 25% CPU utilisation. We can test this by now running a example application: 
+
+----
+oc run noisypod --image=docker.io/centos -- dd if=/dev/zero of=/dev/null
+----
+
+The `oc run` command is similar to the `oc new-app` command, except that instead of creating an application with a service, only the resources needed to run the container are created. The parameters after the `--` is the command to run instead of the container's default entrypoint. In this instance we are using the `dd` command to copy zeros to `/dev/null`, which if left unbounded will typically consume 100% CPU. The following commands demonstrate how the limit range has been automatically applied to the container. 
+
+Open a remote shell to this pod: 
+
+----
+POD_NAME=$(oc get pods -o name)
+oc rsh $POD_NAME
+----
+
+Check the processes that are running in the container:
+
+----
+ps -efl 
+----
+
+You should see the `dd` command is running. Now look at its CPU utilisation: 
+
+----
+top
+----
+
+The `top` command samples the CPU utilisation of the process, you should noticed that it averages around 25% - the value we expect as the Pod has a CPU limit of 250 millicores. To exit `top` press `q`, then type `exit` to quit the remote shell. 
+
 ### Clean Up
 If you wish, you can deploy the application from the Application Management
 Basics lab again inside this `template-test` project to observe how the *Quota*

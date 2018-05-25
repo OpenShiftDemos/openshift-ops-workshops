@@ -64,7 +64,7 @@
         
             <li><a class="toctree-l3" href="#4-wait-for-lab-provisioning-to-complete">4. Wait for lab provisioning to complete</a></li>
         
-            <li><a class="toctree-l3" href="#5-access-the-lab-environment-via-ssh">5. Access the lab environment via SSH</a></li>
+            <li><a class="toctree-l3" href="#5-access-the-lab-environment-via-web-based-ssh">5. Access the lab environment via (web-based) SSH</a></li>
         
             <li><a class="toctree-l3" href="#6-how-to-access-your-personalized-lab-guide">6. How to access your personalized lab guide</a></li>
         
@@ -142,14 +142,20 @@ You should have initially received 40 credits as part of registering for this la
 <p>In total provisioning usually takes about 15 minutes and should not exceed 20 minutes.
 When your lab infrastructure is ready this progress bar disappears. Upon launch you will see a button to end your lab session and a countdown until automatic shutdown:</p>
 <p><img alt="Lab timer" src="./img/qwiklab-end-button.png" /></p>
-<h2 id="5-access-the-lab-environment-via-ssh">5. Access the lab environment via SSH</h2>
+<h2 id="5-access-the-lab-environment-via-web-based-ssh">5. Access the lab environment via (web-based) SSH</h2>
 <p>Once the lab is provisioned on the left side of the screen credential information will appear below <strong>CONNECTION DETAILS</strong>:</p>
 <p><img alt="Lab Credentials" src="./img/qwiklab-lab-credentials.png" /></p>
-<p>You use the provided <strong>host name</strong>, <strong>user name</strong> and <strong>password</strong> to log in via SSH, like so:</p>
+<p>Note the <strong>SSHUserName</strong> and <strong>SSHPassword</strong>. Navigate to the provided URL in the field <strong>SSHConsole</strong> to launch the web-based SSH console. This is a browser-based SSH client that is hosted in your lab environment for convenient access to the lab.
+Enter the previously collected user name and password when prompted in your browser.</p>
+<p><img alt="Lab Credentials" src="./img/webssh-login.png" /></p>
+<p>If you mistype your password the screen will stay black and you don't get a prompt.</p>
+<p><img alt="Lab Credentials" src="./img/webssh-login-fail.png" /></p>
+<p>In this case restart your browser to get another prompt again. When done correctly it should look like this:</p>
+<p><img alt="Lab Credentials" src="./img/webssh-login-success.png" /></p>
+<p>Alternatively, if you prefer your own SSH client you can do that too. Any SSH client is ok (OpenSSH, PuTTY, etc). Please note that your network / VPN must permit outbound traffic to TCP port 22 - this might be blocked on corporate machines.</p>
 <pre><code>ssh -l &lt;UserName&gt; &lt;HostName&gt;
 </code></pre>
 
-<p>Any SSH client is ok (OpenSSH, PuTTY, etc). Please note that your network / VPN must permit outbound traffic to TCP port 22 - this might be blocked on corporate machines.</p>
 <p>When logged in with the password provided, you end up on the OpenShift Master node from where the lab guide will run you through the exercises.</p>
 <h2 id="6-how-to-access-your-personalized-lab-guide">6. How to access your personalized lab guide</h2>
 <p>This lab features a personalized lab guide which is ready as soon as the environment is provisioned. A field called "LabGuide" will appear on the left hand side of your screen as soon as that is the case.</p>
@@ -200,5 +206,5 @@ It will walk you through the rest of the lab show you how to access your environ
 
 <!--
 MkDocs version : 0.17.3
-Build Date UTC : 2018-05-16 15:58:10
+Build Date UTC : 2018-05-23 16:22:20
 -->

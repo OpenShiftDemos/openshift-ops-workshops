@@ -7,13 +7,4 @@
       owner: cloud-user
       group: cloud-user
       mode: "u=rwx,g=r,o=r"
-
-  - name: Copy inventory patch playbook
-    copy:
-      src: inventory_ldap_auth.yml
-      dest: /opt/lab/helpers/
-      owner: cloud-user
-      group: cloud-user
-      mode: "u=rw,g=r,o=r"
-
 ...

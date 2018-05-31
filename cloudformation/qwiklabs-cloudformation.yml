@@ -1016,6 +1016,7 @@ Resources:
                     #logging_openshift_logging_public_master_url=https://kibana.apps.${AWS::AccountId}.${PublicHostedZone}
                     openshift_web_console_nodeselector={'region':'infra'}
                     openshift_web_console_prefix='support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-'
+                    openshift_hosted_prometheus_deploy=true
 
                     [etcd]
                     master.internal.${PublicHostedZone}

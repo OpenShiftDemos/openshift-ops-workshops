@@ -1,0 +1,18 @@
+---
+- name: Validate prometheus deployment
+  hosts: localhost
+  become_user: root
+  tasks:
+    - name: Login as system:admin
+      command: oc login -u system:admin
+
+    - name: Move to the openshift-metrics project
+      command: oc project openshift-metrics
+
+    - name: Move to the openshift-metrics project
+      shell: "oc get route prometheus"
+      register: prometheus_route
+
+    - name: Run the prometheus installation again if a failure 
+      command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-prometheus/config.yml
+      when: prometheus_route | failed

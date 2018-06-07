@@ -946,7 +946,7 @@ Resources:
                     NODE6_INTERNAL_FQDN: "node06.internal.${PublicHostedZone}"
                     IDM_INTERNAL_FQDN: "idm.internal.${PublicHostedZone}"
                     WEB_CONSOLE_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
-                    SSH_CONSOLE_URL: "http://ssh.${AWS::AccountId}${PublicHostedZone}:8080/ssh/host/master.internal.${PublicHostedZone}"
+                    SSH_CONSOLE_URL: "http://ssh.${AWS::AccountId}.${PublicHostedZone}:8080/ssh/host/master.internal.${PublicHostedZone}"
                     API_HEALTH_URL: "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                   path: /opt/lab/environment.yml
 

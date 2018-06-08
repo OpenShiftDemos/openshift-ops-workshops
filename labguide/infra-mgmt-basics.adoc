@@ -211,7 +211,7 @@ openshift_storage_glusterfs_registry_block_host_vol_size=30 <6>
 ----
 <1> Deploys a resource of the CNS cluster for infrastructure in a separate namespace
 <2> Creates a StorageClass for the CNS infra cluster
-<3> Enables support for block storage - the supported storage option for Logging and Metrics
+<3> Enables support for block storage
 <4> Creates a StorageClass for the block storage service in the CNS infra cluster
 <5> Automatically create block-hosting volumes (see CNS module for further explanations)
 <6> Allocate a total of 30GiB for block storage based volumes from the CNS infra cluster
@@ -254,9 +254,6 @@ glusterfs-storage (default)   kubernetes.io/glusterfs    15m
 ----
 <1> The `StorageClass` representing shared file storage from the CNS infra cluster
 <2> The `StorageClass` representing block storage from the CNS infra cluster
-
-The block storage service (identified by the `gluster.org/glusterblock` provisioner) provided by this second CNS cluster will be explained in the following module. For now, it's only important to know that for CNS serving storage Logging and Metrics, the CNS block storage service is the *only* supported option. +
-The regular file storage service of CNS (identified by the `kubernetes.io/glusterfs` provisioner) is *not supported* for Logging and Metrics.
 
 The target use case for these additional storage services is to provide robust, persistent storage for the Registry, Logging and Metrics service - the latter 2 we will set up now.
 
@@ -308,15 +305,40 @@ When finished, your inventory file should look like the following:
 openshift_metrics_install_metrics=true <1>
 openshift_metrics_cassandra_storage_type=dynamic <2>
 openshift_metrics_cassandra_pvc_size=10Gi <3>
-openshift_metrics_cassanda_pvc_storage_class_name= {{ CNS_BLOCK_STORAGECLASS }} <4>
-openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }} <5>
+openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }} <4>
 ...
 ----
 <1> Instruct the installer to actually deploy the Metrics service
 <2> Cassandra, part of the Metrics service, will get dynamically provisioned storage
 <3> The resulting PersistentVolumeClaim will be of `10Gi` in size
-<4> The name of the StorageClass to use for the PersistentVolumeClaim, makes it use block storage from CNS
-<5> The Metrics frontend (`hawkular`) will be reachable under this domain.
+<4> The Metrics frontend (`hawkular`) will be reachable under this domain.
+
+#### Make CNS block storage the default
+
+As you can see above openshift-ansible currently has no way of telling which `StorageClass` it should use as part of requesting persistent storage using a `PersistentVolumeClaim`.
+
+Since we have just deployed an extra CNS cluster for this, we need to temporarily make its block-storage service offered by Container-native Storage the system-wide default. First disable the file-based service in the first CNS cluster as the default:
+
+----
+oc patch storageclass {{ CNS_STORAGECLASS }} \
+-p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+----
+
+Then make the CNS block-storage `StorageClass` the default:
+
+----
+oc patch storageclass {{ CNS_BLOCK_STORAGECLASS }} \
+-p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+----
+
+This is how the `StorageClass` definitions are now set up when querying via `oc get sc`:
+
+----
+NAME                                PROVISIONER                AGE
+glusterfs-registry                  kubernetes.io/glusterfs    15m
+{{ CNS_BLOCK_STORAGECLASS }} (default)   gluster.org/glusterblock   30m
+{{ CNS_STORAGECLASS }}                   kubernetes.io/glusterfs    15m
+----
 
 #### Install Metrics
 There is a specific playbook included with the installer that will handle metrics. It can be run like so:
@@ -345,13 +367,6 @@ NAME                         READY     STATUS    RESTARTS   AGE       IP        
 hawkular-cassandra-1-6gv0d   1/1       Running   0          3m        10.129.0.7   {{ NODE3_INTERNAL_FQDN }}
 hawkular-metrics-zkp0h       1/1       Running   0          3m        10.130.0.8  {{ NODE3_INTERNAL_FQDN }}
 heapster-r2l2v               1/1       Running   0          3m        10.131.2.2   {{ NODE5_INTERNAL_FQDN }}
-----
-
-You will also see the storage for Cassandra being automatically provisioned from the CNS block storage service if you query the PersistentVolumeClaim objects in this project using `oc get pvc`:
-
-----
-NAME                  STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS               AGE
-metrics-cassandra-1   Bound     pvc-e289ba7c-6af6-11e8-af61-02cea7838d26   10Gi       RWO            {{ CNS_BLOCK_STORAGECLASS }}   3m
 ----
 
 [NOTE]
@@ -461,20 +476,18 @@ openshift_logging_install_logging=true <1>
 openshift_logging_namespace=logging <2>
 openshift_logging_es_pvc_dynamic=true <3>
 openshift_logging_es_pvc_size=10Gi <4>
-openshift_logging_es_pvc_storage_class_name={{ CNS_BLOCK_STORAGECLASS }} <5>
-openshift_logging_es_memory_limit=2G <6>
-openshift_logging_kibana_hostname=kibana.{{ OCP_ROUTING_SUFFIX }} <7>
-openshift_logging_public_master_url=https://kibana.{{ OCP_ROUTING_SUFFIX }} <>
+openshift_logging_es_memory_limit=2G <5>
+openshift_logging_kibana_hostname=kibana.{{ OCP_ROUTING_SUFFIX }} <6>
+openshift_logging_public_master_url=https://kibana.{{ OCP_ROUTING_SUFFIX }} <7>
 ...
 ----
 <1> Trigger the installation of the Logging service
 <2> Deploy the resources of the Logging service in a project called `logging`
 <3> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`
 <4> The resulting PersistentVolumeClaim will be of `10Gi` in size
-<5> The name of the StorageClass to use for the PersistentVolumeClaim
-<6> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.9/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
-<7> The FQDN under which the Logging frontend UI (Kibana) will be available
-<8> The URL under which the Logging frontend UI (Kibana) will be available
+<5> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.9/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
+<6> The FQDN under which the Logging frontend UI (Kibana) will be available
+<7> The URL under which the Logging frontend UI (Kibana) will be available
 
 #### Install Logging
 With these settings in place execute the `openshift-logging` Ansible playbook
@@ -529,13 +542,6 @@ NAME              DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE SE
 logging-fluentd   8         8         8         8            8           logging-infra-fluentd=true   3m
 ----
 
-You will also see the storage for ElasticSearch being automatically provisioned from the CNS block storage service if you query the PersistentVolumeClaim objects in this project using `oc get pvc`:
-
-----
-NAME           STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS               AGE
-logging-es-0   Bound     pvc-8188d8dd-6af7-11e8-af61-02cea7838d26   10Gi       RWO            {{ CNS_BLOCK_STORAGECLASS }}   3m
-----
-
 To reach the _Kibana_ user interface, first determine its public access URL by
 querying the *Route* that got set up to expose Kibana's *Service*:
 
@@ -558,9 +564,25 @@ credentials for access. You should login to Kibana as the `fancyuser1` user with
 underpinning OpenShift to ensure that users can only see the logs they should
 have access to.
 
+#### Restore default StorageClass
+
+As we previously changed the default StorageClass to point to the block-storage service of CNS we will now revert to have it be set to the file-storage service.
+
+----
+oc patch storageclass {{ CNS_BLOCK_STORAGECLASS }} \
+-p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+----
+
+Then make the CNS file-storage `StorageClass` the default again:
+
+----
+oc patch storageclass {{ CNS_STORAGECLASS }} \
+-p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+----
+
 [IMPORTANT]
 ====
-The block-storage service of CNS (also referred to as `gluster-block`, introduced in the next chapter) is **only** supported for Logging and Metrics as of this release. This is about to change in the near future as we qualify more workloads.
+The block-storage service of CNS (also referred to as gluster-block) is **only** supported for Logging and Metrics as of this release. This will likely change in the future as we qualify more workloads.
 ====
 
 ### OpenShift Multitenant Networking

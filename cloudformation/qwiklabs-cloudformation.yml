@@ -1021,12 +1021,14 @@ Resources:
                     #metrics_openshift_metrics_install_metrics=true
                     #metrics_openshift_metrics_cassandra_storage_type=dynamic
                     #metrics_openshift_metrics_cassandra_pvc_size=10Gi
+                    #metrics_openshift_metrics_cassanda_pvc_storage_class_name=glusterfs-registry-block
                     #metrics_openshift_metrics_hawkular_hostname=metrics.apps.${AWS::AccountId}.${PublicHostedZone}
                     openshift_logging_install_logging=false
                     #logging_openshift_logging_install_logging=true
                     #logging_openshift_logging_namespace=logging
                     #logging_openshift_logging_es_pvc_dynamic=true
                     #logging_openshift_logging_es_pvc_size=10Gi
+                    #logging_openshift_logging_es_pvc_storage_class_name=glusterfs-registry-block
                     #logging_openshift_logging_es_memory_limit=2G
                     #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
                     #logging_openshift_logging_public_master_url=https://kibana.apps.${AWS::AccountId}.${PublicHostedZone}
@@ -1282,7 +1284,7 @@ Resources:
                   NODE6_INTERNAL_IP="${WorkerNode6.PrivateIp}"
                   IDM_INTERNAL_FQDN="idm.internal.${PublicHostedZone}"
                   WEB_CONSOLE_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/console"
-                  SSH_CONSOLE_URL="http://ssh.${AWS::AccountId}${PublicHostedZone}:8080/ssh/host/master.internal.${PublicHostedZone}"
+                  SSH_CONSOLE_URL="http://ssh.${AWS::AccountId}.${PublicHostedZone}:8080/ssh/host/master.internal.${PublicHostedZone}"
                   API_HEALTH_URL= "https://openshift.${AWS::AccountId}.${PublicHostedZone}/healthz/ready"
                   NODE_BRICK_DEVICE="/dev/xvdd"
                   NODE_BRICK_DEVICE2="/dev/xvde"

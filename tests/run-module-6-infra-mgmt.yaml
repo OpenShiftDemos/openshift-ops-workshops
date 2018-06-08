@@ -210,18 +210,6 @@
       tags:
         - metrics
 
-    - name: Remove gluster-file as the system-wide default
-      command: "oc patch storageclass {{ cns_storageclass }} -p '{\"metadata\": {\"annotations\": {\"storageclass.kubernetes.io/is-default-class\": \"false\"}}}'"
-      tags:
-        - metrics
-        - logging
-
-    - name: Set gluster-block as the system-wide default
-      command: "oc patch storageclass {{ cns_block_storageclass }} -p '{\"metadata\": {\"annotations\": {\"storageclass.kubernetes.io/is-default-class\": \"true\"}}}'"
-      tags:
-        - metrics
-        - logging
-
     - name: Run the metrics installation playbook
       command: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-metrics/config.yml
       when: hawkular_cassandra_service | failed
@@ -341,18 +329,6 @@
       tags:
         - logging
         - logging_test
-
-    - name: Remove gluster-block as the system-wide default
-      command: "oc patch storageclass {{ cns_block_storageclass }} -p '{\"metadata\": {\"annotations\": {\"storageclass.kubernetes.io/is-default-class\": \"false\"}}}'"
-      tags:
-        - metrics
-        - logging
-
-    - name: Set gluster-file as the system-wide default
-      command: "oc patch storageclass {{ cns_storageclass }} -p '{\"metadata\": {\"annotations\": {\"storageclass.kubernetes.io/is-default-class\": \"true\"}}}'"
-      tags:
-        - metrics
-        - logging
 
     # failure of this command (nonzero exit) means it isn't
     - name: Check that multitenant SDN is installed by looking for netnamespaces

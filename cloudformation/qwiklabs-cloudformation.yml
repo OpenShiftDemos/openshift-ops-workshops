@@ -72,23 +72,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-eb95f094
+      ami: ami-966f1fe9
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-a1fd83d9
+      ami: ami-21eeaa59
     eu-west-1:
-      ami: ami-603e0019
+      ami: ami-814f49f8
     eu-central-1:
-      ami: ami-bf89a154
+      ami: ami-35eed9de
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-e15c619d
+      ami: ami-32a29a4e
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -380,6 +380,22 @@ Resources:
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 9100
+        ToPort: 9100
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 1936
+        ToPort: 1936
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 8444
+        ToPort: 8444
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 8443
+        ToPort: 8443
         CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
         FromPort: 80
@@ -1018,6 +1034,7 @@ Resources:
                     #logging_openshift_logging_public_master_url=https://kibana.apps.${AWS::AccountId}.${PublicHostedZone}
                     openshift_web_console_nodeselector={'region':'infra'}
                     openshift_web_console_prefix='support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-'
+                    openshift_hosted_prometheus_deploy=true
 
                     [etcd]
                     master.internal.${PublicHostedZone}

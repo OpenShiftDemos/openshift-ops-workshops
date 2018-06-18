@@ -68,6 +68,12 @@ In this case restart your browser to get another prompt again. When done correct
 
 ![Lab Credentials](img/webssh-login-success.png)
 
+It is possible that a spotty connection to the lab environment will cause the browser-based SSH console to timeout. The console will be in status **WEBSOCKET SERVER DISCONNECTED: transport close**.
+
+![Lab Credentials](img/webssh-transport-close.png)
+
+In this case simply reload your browser to restore the connection.
+
 Alternatively, if you prefer your own SSH client you can do that too. Any SSH client is ok (OpenSSH, PuTTY, etc). Please note that your network / VPN must permit outbound traffic to TCP port 22 - this might be blocked on corporate machines.
 
 ~~~

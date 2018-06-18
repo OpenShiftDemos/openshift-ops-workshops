@@ -152,6 +152,9 @@ Enter the previously collected user name and password when prompted in your brow
 <p><img alt="Lab Credentials" src="./img/webssh-login-fail.png" /></p>
 <p>In this case restart your browser to get another prompt again. When done correctly it should look like this:</p>
 <p><img alt="Lab Credentials" src="./img/webssh-login-success.png" /></p>
+<p>It is possible that a spotty connection to the lab environment will cause the browser-based SSH console to timeout. The console will be in status <strong>WEBSOCKET SERVER DISCONNECTED: transport close</strong>.</p>
+<p><img alt="Lab Credentials" src="./img/webssh-transport-close.png" /></p>
+<p>In this case simply reload your browser to restore the connection.</p>
 <p>Alternatively, if you prefer your own SSH client you can do that too. Any SSH client is ok (OpenSSH, PuTTY, etc). Please note that your network / VPN must permit outbound traffic to TCP port 22 - this might be blocked on corporate machines.</p>
 <pre><code>ssh -l &lt;UserName&gt; &lt;HostName&gt;
 </code></pre>
@@ -206,5 +209,5 @@ It will walk you through the rest of the lab show you how to access your environ
 
 <!--
 MkDocs version : 0.17.3
-Build Date UTC : 2018-05-23 16:22:20
+Build Date UTC : 2018-06-18 10:56:38
 -->

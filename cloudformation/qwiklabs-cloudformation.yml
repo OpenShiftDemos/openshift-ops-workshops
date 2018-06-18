@@ -1322,8 +1322,8 @@ Resources:
               - ansible all -i master.internal.aws.testdrive.openshift.com, -m fetch -a "src=/etc/ansible/hosts dest=/etc/ansible/hosts flat=yes"
               - "ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml ; /usr/local/bin/cfn-signal.sh $? '${OpenShiftWaitHandle}'"
               - "ansible-playbook /opt/lab/support/pv-resize-post-deploy-config.yml ; /usr/local/bin/cfn-signal.sh $? '${PostDeployWaitHandle}'"
-              - oc get is ruby -n openshift -o json | jq '(.spec.tags[] | select(.name == "2.3").from.name) = "support.internal.aws.testdrive.openshift.com:5000/rhscl/ruby-23-rhel7:latest"' | jq '(.spec.tags[] | select(.name == "2.3").importPolicy.insecure) = true' | oc replace -f -
-              - oc get is postgresql -n openshift -o json | jq '(.spec.tags[] | select(.name == "9.5").from.name) = "support.internal.aws.testdrive.openshift.com:5000/rhscl/postgresql-95-rhel7:latest"' | jq '(.spec.tags[] | select(.name == "9.5").importPolicy.insecure) = true' | oc replace -f -
+              - ansible master.internal.aws.testdrive.openshift.com, -m raw -a "oc get is ruby -n openshift -o json | jq '(.spec.tags[] | select(.name == \"2.3\").from.name) = \"support.internal.aws.testdrive.openshift.com:5000/rhscl/ruby-23-rhel7:latest\"' | jq '(.spec.tags[] | select(.name == \"2.3\").importPolicy.insecure) = true' | oc replace -f -"
+              - ansible master.internal.aws.testdrive.openshift.com, -m raw -a "oc get is postgresql -n openshift -o json | jq '(.spec.tags[] | select(.name == \"9.5\").from.name) = \"support.internal.aws.testdrive.openshift.com:5000/rhscl/postgresql-95-rhel7:latest\"' | jq '(.spec.tags[] | select(.name == \"9.5\").importPolicy.insecure) = true' | oc replace -f -"
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
 
   WorkerNode1NetworkInterface:

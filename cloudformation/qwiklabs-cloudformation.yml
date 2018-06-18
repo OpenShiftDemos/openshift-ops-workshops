@@ -1793,3 +1793,7 @@ Outputs:
    SSHPassword:
      Description: "SSH Password of the user to login on the master"
      Value: !Ref 'KeyName'
+
+   MasterHost:
+     Description: "Fully-qualified domain name of the OpenShift Master node"
+     Value: !Sub "master.${AWS::AccountId}.${PublicHostedZone}"

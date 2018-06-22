@@ -1035,6 +1035,7 @@ Resources:
                     openshift_web_console_nodeselector={'region':'infra'}
                     openshift_web_console_prefix='support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-'
                     openshift_hosted_prometheus_deploy=true
+                    openshift_image_tag=v3.9.27
 
                     [etcd]
                     master.internal.${PublicHostedZone}

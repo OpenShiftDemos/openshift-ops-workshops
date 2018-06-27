@@ -72,23 +72,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-966f1fe9
+      ami: ami-f0c3958f
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-21eeaa59
+      ami: ami-48c58b30
     eu-west-1:
-      ami: ami-814f49f8
+      ami: ami-6d494687
     eu-central-1:
-      ami: ami-35eed9de
+      ami: ami-71655a9a
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-32a29a4e
+      ami: ami-adebe8d1
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -1322,6 +1322,8 @@ Resources:
               - ansible all -i master.internal.aws.testdrive.openshift.com, -m fetch -a "src=/etc/ansible/hosts dest=/etc/ansible/hosts flat=yes"
               - "ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml ; /usr/local/bin/cfn-signal.sh $? '${OpenShiftWaitHandle}'"
               - "ansible-playbook /opt/lab/support/pv-resize-post-deploy-config.yml ; /usr/local/bin/cfn-signal.sh $? '${PostDeployWaitHandle}'"
+              - ansible master.internal.aws.testdrive.openshift.com, -m raw -a "oc get is ruby -n openshift -o json | jq '(.spec.tags[] | select(.name == \"2.3\").from.name) = \"support.internal.aws.testdrive.openshift.com:5000/rhscl/ruby-23-rhel7:latest\"' | jq '(.spec.tags[] | select(.name == \"2.3\").importPolicy.insecure) = true' | oc replace -f -"
+              - ansible master.internal.aws.testdrive.openshift.com, -m raw -a "oc get is postgresql -n openshift -o json | jq '(.spec.tags[] | select(.name == \"9.5\").from.name) = \"support.internal.aws.testdrive.openshift.com:5000/rhscl/postgresql-95-rhel7:latest\"' | jq '(.spec.tags[] | select(.name == \"9.5\").importPolicy.insecure) = true' | oc replace -f -"
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
 
   WorkerNode1NetworkInterface:
@@ -1793,3 +1795,7 @@ Outputs:
    SSHPassword:
      Description: "SSH Password of the user to login on the master"
      Value: !Ref 'KeyName'
+
+   MasterHost:
+     Description: "Fully-qualified domain name of the OpenShift Master node"
+     Value: !Sub "master.${AWS::AccountId}.${PublicHostedZone}"

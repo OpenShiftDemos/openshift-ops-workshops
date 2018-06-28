@@ -19,7 +19,7 @@
 
     - assert:
         that:
-          - "'v3.9.30' in version.stdout"
+          - "'v3.9.31' in version.stdout"
           - "'v1.9.1+a0ce1bc657' in version.stdout"
 
     - name: Checking status of all the nodes to be 'Ready'

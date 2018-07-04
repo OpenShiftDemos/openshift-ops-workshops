@@ -72,23 +72,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-c2e3c3bd
+      ami: ami-e324069c
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-d196c2a9
+      ami: ami-0705527f
     eu-west-1:
-      ami: ami-224e5ac8
+      ami: ami-6a849080
     eu-central-1:
-      ami: ami-f53a011e
+      ami: ami-9ad2e971
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-c486fb2e
+      ami: ami-8d7d0167
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -1035,6 +1035,8 @@ Resources:
                     openshift_web_console_nodeselector={'region':'infra'}
                     openshift_web_console_prefix='support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-'
                     openshift_hosted_prometheus_deploy=true
+                    openshift_image_tag=v3.9.30
+                    openshift_release_tag=v3.9.30
 
                     [etcd]
                     master.internal.${PublicHostedZone}

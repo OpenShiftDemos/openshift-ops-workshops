@@ -2,8 +2,8 @@
 
 deploy_mirror: false
 image_src: registry.access.redhat.com
-ose_minor_tag: v3.9.31
-ose_major_tag: v3.9.31
+ose_minor_tag: v3.9.30
+ose_major_tag: v3.9.30
 ose_release_tag: v3.9
 cns_release_tag: "{{ ose_release_tag }}"
 ose_deployer_tag: latest

@@ -15,6 +15,7 @@
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 5000 -j ACCEPT
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 9100 -j ACCEPT
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 88 -j ACCEPT
 -A INPUT -p udp -m state --state NEW -m udp --dport 88 -j ACCEPT

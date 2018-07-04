@@ -9,15 +9,15 @@ ose_packages:
   - bridge-utils
   - bash-completion
   - dnsmasq
-  - openshift-ansible-roles
-  - openshift-ansible-docs
-  - openshift-ansible
-  - atomic-openshift-utils
-  - atomic-openshift
-  - atomic-openshift-excluder
-  - atomic-openshift-docker-excluder
-  - openshift-ansible-playbooks
-  - atomic-openshift-clients
+  - openshift-ansible-3.9.30-1.git.7.46f8678.el7.noarch
+  - openshift-ansible-playbooks-3.9.30-1.git.7.46f8678.el7.noarch
+  - openshift-ansible-roles-3.9.30-1.git.7.46f8678.el7.noarch
+  - openshift-ansible-docs-3.9.30-1.git.7.46f8678.el7.noarch
+  - atomic-openshift-utils-3.9.30-1.git.7.46f8678.el7.noarch
+  - atomic-openshift-3.9.30-1.git.0.dec1ba7.el7.x86_64
+  - atomic-openshift-excluder-3.9.30-1.git.0.dec1ba7.el7.noarch
+  - atomic-openshift-docker-excluder-3.9.30-1.git.0.dec1ba7.el7.noarch
+  - atomic-openshift-clients-3.9.30-1.git.0.dec1ba7.el7.x86_64
 
 storage_packages:
   - nfs-utils

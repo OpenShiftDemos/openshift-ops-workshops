@@ -1044,9 +1044,9 @@ Resources:
                     #logging_openshift_logging_es_memory_limit=2G
                     #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
                     #logging_openshift_logging_public_master_url=https://kibana.apps.${AWS::AccountId}.${PublicHostedZone}
+
+                    # prometheus configs (future)
                     openshift_hosted_prometheus_deploy=true
-                    openshift_image_tag=v3.9.30
-                    openshift_release_tag=v3.9.30
 
                     [etcd]
                     master.internal.${PublicHostedZone}

@@ -72,23 +72,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-a3fea0dc
+      ami: ami-e324069c
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-be87ccc6
+      ami: ami-0705527f
     eu-west-1:
-      ami: ami-3a2820d0
+      ami: ami-6a849080
     eu-central-1:
-      ami: ami-fc7e4717
+      ami: ami-9ad2e971
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-56565a2a
+      ami: ami-8d7d0167
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -1045,6 +1045,8 @@ Resources:
                     #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
                     #logging_openshift_logging_public_master_url=https://kibana.apps.${AWS::AccountId}.${PublicHostedZone}
                     openshift_hosted_prometheus_deploy=true
+                    openshift_image_tag=v3.9.30
+                    openshift_release_tag=v3.9.30
 
                     [etcd]
                     master.internal.${PublicHostedZone}

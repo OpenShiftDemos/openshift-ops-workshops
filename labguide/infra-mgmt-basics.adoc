@@ -855,13 +855,19 @@ Start the drain process like this:
 oc adm drain {{ NODE2_INTERNAL_FQDN }} --ignore-daemonsets
 ----
 
-After a few moments, all of the *Pods*, except those for Fluentd and Container
-Native Storage, previously running on `{{ NODE2_INTERNAL_FQDN }}` should have
-terminated and been launched elsewhere.
+After a few moments, all of the *Pods*, except those for Fluentd, Container
+Native Storage, and Prometheus previously running on `{{ NODE2_INTERNAL_FQDN
+}}` should have terminated and been launched elsewhere.
 
 ----
 oc get pods --all-namespaces -o wide
 ----
+
+[NOTE]
+====
+You can also use `oc adm manage-node` to list the pods on `{{
+NODE2_INTERNAL_FQDN }}` explicitly, if you like. 
+====
 
 The node `{{ NODE2_INTERNAL_FQDN }}` is now ready for an administrator to
 start maintenance operations. If those include a reboot of the system or

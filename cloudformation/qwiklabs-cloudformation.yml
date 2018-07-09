@@ -978,16 +978,21 @@ Resources:
                     [OSEv3:vars]
                     ansible_become=true
                     deployment_type=openshift-enterprise
+                    openshift_disable_check=memory_availability,disk_availability,docker_storage,package_version,docker_image_availability,package_availability
                     containerized=true
+                    openshift_enable_service_catalog=false
+
                     openshift_master_api_port=443
                     openshift_master_console_port=443
                     openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com', 'bindPassword': 'bindingpassword', 'ca': '/etc/origin/master/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com)'}]
                     os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
-                    openshift_disable_check=memory_availability,disk_availability,docker_storage,package_version,docker_image_availability,package_availability
                     openshift_master_default_subdomain=apps.${AWS::AccountId}.${PublicHostedZone}
                     openshift_master_cluster_public_hostname=openshift.${AWS::AccountId}.${PublicHostedZone}
                     openshift_router_selector='region=infra'
                     openshift_registry_selector='region=infra'
+                    openshift_web_console_nodeselector={'region':'infra'}
+                    openshift_web_console_prefix='support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-'
+
                     openshift_examples_modify_imagestreams=false
                     openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift_Packages', 'baseurl': 'http://master.internal.aws.testdrive.openshift.com/repo', 'enabled': 1, 'gpgcheck': 0}]
                     openshift_docker_insecure_registries=support.internal.aws.testdrive.openshift.com:5000
@@ -996,6 +1001,10 @@ Resources:
                     osm_etcd_image=support.internal.aws.testdrive.openshift.com:5000/rhel7/etcd
                     openshift_cli_image=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose
                     osm_image=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose
+                    openshift_release=v3.9.30
+                    openshift_image_tag=v3.9.30
+
+                    # special storage configs
                     openshift_storage_glusterfs_version=v3.9
                     openshift_storage_glusterfs_heketi_version=v3.9
                     openshift_storage_glusterfs_block_version=v3.9
@@ -1016,13 +1025,16 @@ Resources:
                     #cnsinfra_openshift_storage_glusterfs_registry_block_storageclass=true
                     #cnsinfra_openshift_storage_glusterfs_registry_block_host_vol_create=true
                     #cnsinfra_openshift_storage_glusterfs_registry_block_host_vol_size=30
+
+                    # metrics configs
                     openshift_metrics_install_metrics=false
-                    openshift_enable_service_catalog=false
                     #metrics_openshift_metrics_install_metrics=true
                     #metrics_openshift_metrics_cassandra_storage_type=dynamic
                     #metrics_openshift_metrics_cassandra_pvc_size=10Gi
                     #metrics_openshift_metrics_cassanda_pvc_storage_class_name=glusterfs-registry-block
                     #metrics_openshift_metrics_hawkular_hostname=metrics.apps.${AWS::AccountId}.${PublicHostedZone}
+
+                    # logging configs
                     openshift_logging_install_logging=false
                     #logging_openshift_logging_install_logging=true
                     #logging_openshift_logging_namespace=logging
@@ -1032,11 +1044,9 @@ Resources:
                     #logging_openshift_logging_es_memory_limit=2G
                     #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
                     #logging_openshift_logging_public_master_url=https://kibana.apps.${AWS::AccountId}.${PublicHostedZone}
-                    openshift_web_console_nodeselector={'region':'infra'}
-                    openshift_web_console_prefix='support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-'
+
+                    # prometheus configs (future)
                     openshift_hosted_prometheus_deploy=true
-                    openshift_image_tag=v3.9.30
-                    openshift_release_tag=v3.9.30
 
                     [etcd]
                     master.internal.${PublicHostedZone}

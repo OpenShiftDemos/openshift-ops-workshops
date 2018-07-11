@@ -783,7 +783,7 @@ need finer-grained control of inter-*Pod* and *Service* communication, there is
 a Tech Preview network implementation called `NetworkPolicy`. You can learn more
 about it in the
 link:https://docs.openshift.com/container-platform/3.9/admin_guide/managing_networking.html#admin-guide-networking-networkpolicy[product
-documentation].
+documentation^].
 
 ### Node Maintenance
 

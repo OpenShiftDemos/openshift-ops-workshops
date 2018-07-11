@@ -91,7 +91,7 @@ A typical multi-host installation like this might normally take around an hour d
 ====
 
 ### Verifying the Installation
-Let's to some basic tests with your installation. As an administrator, most of your interaction with OpenShift will be from the command line. The `oc` program is a command line interface that talks to the OpenShift API.
+Let's do some basic tests with your installation. As an administrator, most of your interaction with OpenShift will be from the command line. The `oc` program is a command line interface that talks to the OpenShift API.
 
 During the OpenShift installation, the `root` system account on the `master` host is
 configured to use a special OpenShift "super administrator" account. Because of this, it is vitally

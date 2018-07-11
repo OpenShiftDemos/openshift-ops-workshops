@@ -220,7 +220,7 @@ openshift_storage_glusterfs_registry_block_host_vol_size=30 <6>
 
 #### Install the CNS cluster for OpenShift infrastructure
 
-To illustrate what becomes available with this step, first issue look at the `StorageClass` definitions in the system as of now:
+To illustrate what becomes available with this step, first look at the `StorageClass` definitions in the system as of now:
 
 ----
 oc get sc

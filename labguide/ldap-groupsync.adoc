@@ -89,7 +89,7 @@ able to distinguish between them.
 assign to the fields in the OpenShift user's "account". If any attributes are
 not found / not populated when searching through the list, the entire
 authentication fails. In this case we are creating an identity that is
-assocuated with the LDAP `dn`, an email address from the LDAP `mail`, a name from
+associated with the LDAP `dn`, an email address from the LDAP `mail`, a name from
 the LDAP `cn`, and a username from the LDAP `uid`.
 
 <4> `bindDN`: When searching LDAP, bind to the server as this user.

@@ -24,6 +24,25 @@
     - name: login as fancyuser1
       shell: oc login -u 'fancyuser1' -p 'openshift'
 
+    - name: check for my-database-app project
+      shell: oc get project my-database-app
+      register: db_project_check
+      ignore_errors: true
+
+    - name: delete my-database-app project if present
+      shell: oc delete project my-database-app
+      when: db_project_check | success
+      register: db_delete_out
+
+    - name: wait for project deletion
+      shell: oc get project my-database-app -o yaml
+      when: db_project_check | success
+      register: db_delete_status
+      until: db_delete_status | failed
+      retries: 10
+      delay: 15
+      ignore_errors: true
+
     - name: create new project called 'my-database-app'
       shell: oc new-project my-database-app
 
@@ -147,6 +166,25 @@
 
     - name: log back in as fancyuser1
       shell: oc login -u 'fancyuser1' -p 'openshift'
+
+    - name: check for my-shared-storage project
+      shell: oc get project my-shared-storage
+      register: storage_project_check
+      ignore_errors: true
+
+    - name: delete my-shared-storage project if present
+      shell: oc delete project my-shared-storage
+      when: storage_project_check | success
+      register: db_delete_out
+
+    - name: wait for project deletion
+      shell: oc get project my-shared-storage -o yaml
+      when: storage_project_check | success
+      register: storage_delete_status
+      until: storage_delete_status | failed
+      retries: 10
+      delay: 15
+      ignore_errors: true
 
     - name: create new project called 'my-shared-storage'
       shell: oc new-project my-shared-storage

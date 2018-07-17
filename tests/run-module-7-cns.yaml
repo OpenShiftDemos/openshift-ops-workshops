@@ -190,7 +190,7 @@
       shell: oc new-project my-shared-storage
 
     - name: deploy file-uploader app
-      shell: oc new-app openshift/php:7.0~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
+      shell: oc new-app openshift/php:7.1~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
 
     - name: wait for php app to be ready
       shell: oc get dc file-uploader -o jsonpath='{.status.availableReplicas}'

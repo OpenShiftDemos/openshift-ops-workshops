@@ -383,6 +383,10 @@
           - item.stdout != ""
       with_items: "{{ additional_disk.results }}"
 
+    - name: Pause for safety on disk operations, just in case
+      pause:
+        seconds: 180
+
 - name: Delete disk from second CNS cluster
   hosts: localhost
   tags:
@@ -421,12 +425,16 @@
     - name: disable the device
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device disable {{ failed_disk }}
 
+    - name: Pause for safety on disk operations, just in case
+      pause:
+        seconds: 180
+
     - name: remove the device
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device remove {{ failed_disk }}
 
-    - name: need to sleep here to have LVM2 gather it's wits
+    - name: Pause for safety on disk operations, just in case
       pause:
-        seconds: 60
+        seconds: 180
 
     - name: delete the device
       shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} device delete {{ failed_disk }}

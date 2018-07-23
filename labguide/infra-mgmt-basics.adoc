@@ -407,7 +407,7 @@ image::openshift-metrics-overview.png[]
 In the context of a specific *Pod*, the _Metrics_ tab in the UI will show CPU,
 memory and network throughput for this particular *Pod* with a configurable
 time-range. Also optionally a _donut_ chart next to a resource appears if the
-pods was given a consumption limit on this resource (e.g. RAM).
+pod was given a consumption limit on this resource (e.g. RAM).
 
 image::openshift-metrics-pods.png[]
 
@@ -421,7 +421,7 @@ elastic log aggregation solution: *EFK*. **E**lasticSearch, **F**luentd and
 **K**ibana form a configuration where logs from all nodes and applications are
 consolidated (Fluentd) in a central place (ElasticSearch) on top of which rich
 queries can be made from a single UI (Kibana). Administrators can see and search
-through all logs. Application owners and developers can allow access logs that
+through all logs. Application owners and developers can allow access to logs that
 belong to their projects. Like metrics the EFK stack runs on top of OpenShift.
 
 #### Configuring the Inventory

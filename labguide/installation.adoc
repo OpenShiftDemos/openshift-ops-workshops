@@ -117,7 +117,7 @@ is all covered in the documentation.
 ====
 
 ### Verifying the Installation
-Let's to some basic tests with your installation. As an administrator, most
+Let's do some basic tests with your installation. As an administrator, most
 of your interaction with OpenShift will be from the command line. The `oc`
 program is a command line interface that talks to the OpenShift API.
 

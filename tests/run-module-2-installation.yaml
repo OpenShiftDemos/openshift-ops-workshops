@@ -1,5 +1,4 @@
 ---
-
 - name: Tests for verifying the OpenShift installation
   hosts: masters
   tags:
@@ -82,6 +81,34 @@
           - "node2_fqdn in nodes.stdout"
           - "node3_fqdn in nodes.stdout"
 
+    - name: check that there is a prometheus statefulset
+      shell: oc get statefulset prometheus -n openshift-metrics
+
+    - name: check that prometheus components are running
+      shell: oc get pod prometheus-0 --template='{.status.containerStatuses[?(@.name=="{{ item|quote }}")].ready}' -o jsonpath -n openshift-metrics
+      register: prometheus_status_out
+      failed_when: "'true' not in prometheus_status_out.stdout"
+      with_items:
+        - "prom-proxy"
+        - "prometheus"
+        - "alerts-proxy"
+        - "alert-buffer"
+        - "alertmanager-proxy"
+        - "alertmanager"
+
+    - name: check for prometheus-related routes
+      shell: oc get route {{ item }} -n openshift-metrics
+      with_items:
+        - "alertmanager"
+        - "alerts"
+        - "prometheus"
+
+    # there should be 5 nodes, including master, at this point, with exporters
+    - name: check for 5 prometheus node exporters
+      shell: oc get daemonset prometheus-node-exporter -o jsonpath --template='{.status.numberReady}' -n openshift-metrics
+      register: prometheus_exporter_out
+      failed_when: "'5' not in prometheus_exporter_out.stdout"
+
     - set_fact:
         cns_namespace: "{{ CNS_NAMESPACE }}"
         ocp_routing_suffix: "{{ OCP_ROUTING_SUFFIX }}"
@@ -108,5 +135,3 @@
         HEKETI_CLI_SERVER: http://heketi-storage-{{ cns_namespace }}.{{ ocp_routing_suffix }}
         HEKETI_CLI_USER: admin
         HEKETI_CLI_KEY: "{{ heketi_admin_pw }}"
-
-...

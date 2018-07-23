@@ -1,10 +1,18 @@
 ## Installation and Verification
 
-The primary method of installing OpenShift Container Platform is based on Ansible playbooks. These playbooks ship as part of the product in the `openshift-ansible` package.
+The primary method of installing OpenShift Container Platform is based on
+Ansible playbooks. These playbooks ship as part of the product in the
+`openshift-ansible` package.
 
-This method has, in the past, been referred to as the `advanced installation method` and it involves Ansible directly running the installation playbooks. The advanced installer supports many configuration and customization options. It also covers installation of supporting infrastructure like container-native storage, logging and metrics components.
+This method has, in the past, been referred to as the `advanced installation
+method` and it involves Ansible directly running the installation playbooks.
+The advanced installer supports many configuration and customization options.
+It also covers installation of supporting infrastructure like
+container-native storage, logging and metrics components.
 
-Your environment comes with a preinstalled cluster that has been deployed using the installer's configuration file (`/etc/ansible/hosts`) when you started the lab.
+Your environment comes with a preinstalled cluster that has been deployed
+using the installer's configuration file (`/etc/ansible/hosts`) when you
+started the lab.
 
 For more information on installing OpenShift Container Platform, please refer to
 the
@@ -33,11 +41,16 @@ Common things that interact with the Kubernetes API server are:
 * OpenShift Node
 * Kubernetes Controllers
 
-All interactions with the API server are secured using TLS. In addition, all API calls must be authenticated (the user is who they say they are) and authorized (the user has rights to make the requested API calls).
+All interactions with the API server are secured using TLS. In addition, all
+API calls must be authenticated (the user is who they say they are) and
+authorized (the user has rights to make the requested API calls).
 
 
 #### Data Store
-The OpenShift Data Store (etcd) stores the persistent master state while other components watch etcd for changes to bring themselves into the desired state. etcd can be optionally configured for high availability, typically deployed with 2n+1 peer services.
+The OpenShift Data Store (etcd) stores the persistent master state while
+other components watch etcd for changes to bring themselves into the desired
+state. etcd can be optionally configured for high availability, typically
+deployed with 2n+1 peer services.
 
 [NOTE]
 ====
@@ -45,23 +58,25 @@ etcd stores the cluster's state. It is not used to store user application data.
 ====
 
 #### Scheduler
-The pod scheduler is responsible for determining placement of new pods onto nodes within the cluster.
+The pod scheduler is responsible for determining placement of new pods onto
+nodes within the cluster.
 
-The scheduler is very flexible and can take the physical topology of the cluster into account (racks, datacenters, etc).
+The scheduler is very flexible and can take the physical topology of the
+cluster into account (racks, datacenters, etc).
 
 #### Health / Scaling
 Each pod can register both liveness and readiness probes.
 
-Liveness probes tell the system if the pod is healthy or not. If the pod is not healthy, it can be restarted automatically.
+Liveness probes tell the system if the pod is healthy or not. If the pod is
+not healthy, it can be restarted automatically.
 
-Readiness probes tell the system when the pod is ready to take traffic. This, for example, can be used by the cluster to know when to put a pod into the load balancer.
-
+Readiness probes tell the system when the pod is ready to take traffic. This,
+for example, can be used by the cluster to know when to put a pod into the
+load balancer.
 
 For more information on the OpenShift Master's areas of responsibility, please refer to
 the
 link:https://docs.openshift.com/container-platform/3.9/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
-
-
 
 ### Examining the provided Ansible inventory file
 First, let's examine the provided installer configuration file.
@@ -82,35 +97,52 @@ refer to the
 link:https://docs.openshift.com/container-platform/3.9/install_config/install/advanced_install.html#configuring-ansible[advanced
 installer's documentation].
 
-The top-level playbook in `/usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml` triggers the installation of the cluster and all of it's components. It's idempotent, which means you can execute this playbook multiple times without harm. This also allows you to deploy additional components after the initial install by simply modifying the configuration in `/etc/ansible/hosts` and re-run the installer.
-In addition to this, there are playbooks that only deploy a specific component or service, which makes them faster to execute.
+The top-level playbook in
+`/usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml` triggers
+the installation of the cluster and all of it's components. It's idempotent,
+which means you can execute this playbook multiple times without harm. This
+also allows you to deploy additional components after the initial install by
+simply modifying the configuration in `/etc/ansible/hosts` and re-run the
+installer.
+
+In addition to this, there are playbooks that only deploy a specific
+component or service, which makes them faster to execute.
 
 [TIP]
 ====
-A typical multi-host installation like this might normally take around an hour depending on the speed of your internet connection. Disconnected installation options are also available. Prerequisites and other information is all covered in the documentation.
+A typical multi-host installation like this might normally take around an
+hour depending on the speed of your internet connection. Disconnected
+installation options are also available. Prerequisites and other information
+is all covered in the documentation.
 ====
 
 ### Verifying the Installation
-Let's to some basic tests with your installation. As an administrator, most of your interaction with OpenShift will be from the command line. The `oc` program is a command line interface that talks to the OpenShift API.
+Let's to some basic tests with your installation. As an administrator, most
+of your interaction with OpenShift will be from the command line. The `oc`
+program is a command line interface that talks to the OpenShift API.
 
-During the OpenShift installation, the `root` system account on the `master` host is
-configured to use a special OpenShift "super administrator" account. Because of this, it is vitally
-important that you protect access to the `root` system account, or remove
-this preconfigured config. Otherwise, anyone who can `sudo` on the master has
-super user privileges on the entire cluster.
+During the OpenShift installation, the `root` system account on the `master`
+host is configured to use a special OpenShift "super administrator" account.
+Because of this, it is vitally important that you protect access to the
+`root` system account, or remove this preconfigured config. Otherwise, anyone
+who can `sudo` on the master has super user privileges on the entire cluster.
 
 #### Login on the master
-Additionally, your Linux system account on the master, `cloud-user`, is preconfigured to access this OpenShift "super administrator" without a password.
-Type the following command to login as the internal super-user on OpenShift:
+Additionally, your Linux system account on the master, `cloud-user`, is
+preconfigured to access this OpenShift "super administrator" without a
+password. Type the following command to login as the internal super-user on
+OpenShift:
 
 ----
 oc login -u system:admin
 ----
 
-You will see that you got logged in to a project called 'default'. More on projects later.
+You will see that you got logged in to a project called 'default'. More on
+projects later.
 
 ----
-Logged into "https://master.internal.aws.testdrive.openshift.com:443" as "system:admin" using existing credentials.
+Logged into "https://master.internal.aws.testdrive.openshift.com:443" as
+"system:admin" using existing credentials.
 
 You have access to the following projects and can switch between them with 'oc project <projectname>':
 
@@ -174,10 +206,148 @@ more information can be found in the
 link:https://docs.openshift.com/container-platform/3.9/install_config/install/advanced_install.html#advanced-install-custom-certificates[custom
 certificates] section of the installation documentation.
 
-#### Verify the Storage cluster
-In your environment Red Hat Container-native Storage was installed as part of OpenShift. It will serve robust and persistent storage to both business applications as well as OpenShift infrastructure. It is based on Red Hat Gluster Storage, running in containers on OpenShift nodes and an additional API server called `heketi` that enables the API integration with OpenShift.
+#### Prometheus
+OpenShift is currently in the process of adopting Prometheus for cluster
+infrastructure monitoring and alerting. At this time Prometheus is still in a Tech
+Preview mode, with a non-production SLA. We encourage customers to explore
+Prometheus and its alerts, and to provide us feedback.
 
-We will now use a command line client on the *master* to talk via this server to the container storage cluster. It's password protected, so let's export a couple of environment variables first to configure the client:
+More information about prometheus can be found in the
+link:https://docs.openshift.com/container-platform/3.9/install_config/cluster_metrics.html#openshift-prometheus[Prometheus
+documentation] for OpenShift.
+
+At this point, Prometheus is installed in your cluster. Until we configure
+administrative users, there is not much to do with it, though. The user
+authentication exercises will have you access Prometheus later, but, outside
+of this there currently are not any exercises for interacting with
+Prometheus. Look for these exercises to be added with the OpenShift 3.11
+release.
+
+Change to the `openshift-metrics` project:
+
+----
+oc project openshift-metrics
+----
+
+Now, `describe` the `StatefulSet` for Prometheus:
+
+----
+oc describe statefulset prometheus
+----
+
+You'll see something like the following:
+
+----
+Name:               prometheus
+Namespace:          openshift-metrics
+CreationTimestamp:  Mon, 09 Jul 2018 12:57:55 +0000
+Selector:           app=prometheus
+Labels:             app=prometheus
+Annotations:        <none>
+Replicas:           1 desired | 1 total
+Pods Status:        1 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:           app=prometheus
+  Service Account:  prometheus
+  Containers:
+   prom-proxy:
+    Image:  registry.access.redhat.com/openshift3/oauth-proxy:v3.9.30
+    Port:   8443/TCP
+    Args:
+      -provider=openshift
+      -https-address=:8443
+...
+----
+
+`StatefulSet` is a special Kubernetes resource that deals with containers
+that have various startup and other dependencies. The key thing to note here
+is that Prometheus is actually made up of several containers, including
+authentication proxies (to secure it) and other components. There are six
+total containers in the core Prometheus stack.
+
+There is also a `node-exporter` container that runs as a `DaemonSet`. You can look at it by executing the following:
+
+----
+oc describe daemonset prometheus-node-exporter
+----
+
+You will see something like the following:
+
+----
+Name:           prometheus-node-exporter
+Selector:       app=prometheus-node-exporter,role=monitoring
+Node-Selector:  <none>
+Labels:         app=prometheus-node-exporter
+                role=monitoring
+Annotations:    kubectl.kubernetes.io/last-applied-configuration={"apiVersion":"extensions/v1beta1","kind":"DaemonSet","metadata":{"annotations":{},"labels":{"app":"prometheus-node-exporter","role":"monitoring"},"nam...
+Desired Number of Nodes Scheduled: 5
+Current Number of Nodes Scheduled: 5
+Number of Nodes Scheduled with Up-to-date Pods: 5
+Number of Nodes Scheduled with Available Pods: 5
+Number of Nodes Misscheduled: 0
+Pods Status:  5 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:           app=prometheus-node-exporter
+                    role=monitoring
+  Service Account:  prometheus-node-exporter
+  Containers:
+   node-exporter:
+    Image:  registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.9.30
+    Port:   9100/TCP
+    Limits:
+      cpu:     200m
+      memory:  50Mi
+    Requests:
+      cpu:        100m
+      memory:     30Mi
+    Environment:  <none>
+    Mounts:
+      /host/proc from proc (ro)
+      /host/sys from sys (ro)
+  Volumes:
+   proc:
+    Type:          HostPath (bare host directory volume)
+    Path:          /proc
+    HostPathType:  
+   sys:
+    Type:          HostPath (bare host directory volume)
+    Path:          /sys
+    HostPathType:  
+Events:            <none>
+----
+
+A `DaemonSet` is another special Kubernetes resource. It makes sure that
+specified containers are running on certain nodes.
+
+There are no labs for these, so feel free to check the documentation for link:https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/[StatefulSet] and for link:https://docs.openshift.com/container-platform/3.9/dev_guide/daemonsets.html[DaemonSet].
+
+Lastly, you can view that the Prometheus components have been exposed for access when outside of OpenShift using `Routes`. You'll learn about `Routes` later:
+
+----
+oc get routes
+----
+
+You will see something like the following:
+
+----
+NAME           HOST/PORT                                                                      PATH      SERVICES       PORT      TERMINATION   WILDCARD
+alertmanager   alertmanager-openshift-metrics.{{OCP_ROUTING_SUFFIX}}             alertmanager   <all>     reencrypt     None
+alerts         alerts-openshift-metrics.{{OCP_ROUTING_SUFFIX}}                   alerts         <all>     reencrypt     None
+prometheus     prometheus-openshift-metrics.{{OCP_ROUTING_SUFFIX}}               prometheus     <all>     reencrypt     None
+----
+
+We will briefly come back to Prometheus once we're able to log in to it.
+
+#### Verify the Storage cluster
+In your environment Red Hat Container-native Storage was installed as part of
+OpenShift. It will serve robust and persistent storage to both business
+applications as well as OpenShift infrastructure. It is based on Red Hat
+Gluster Storage, running in containers on OpenShift nodes and an additional
+API server called `heketi` that enables the API integration with OpenShift.
+
+We will now use a command line client on the *master* to talk via this server
+to the container storage cluster. It's password protected, so let's export a
+couple of environment variables first to configure the client:
 
 ----
 export HEKETI_CLI_SERVER=http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
@@ -269,5 +439,9 @@ Cluster Id: ec7a9c8be8327a54839236791bf7ba24
 ----
 <1> An internal GlusterFS volume that is automatically generated by the setup routine to hold the heketi database.
 
-
-This output tells you that Red Hat Container-native Storage currently consists of a single cluster, which consists of 3 nodes, each with a single block device `/dev/xvdd` of 50GiB in size. The GlusterFS layer will turn these 3 devices/hosts into a single, flat storage pool from which OpenShift will be able to carve out either distinct filesystem volumes or block devices that serve as persistent storage for containers.
+This output tells you that Red Hat Container-native Storage currently
+consists of a single cluster, which consists of 3 nodes, each with a single
+block device `/dev/xvdd` of 50GiB in size. The GlusterFS layer will turn
+these 3 devices/hosts into a single, flat storage pool from which OpenShift
+will be able to carve out either distinct filesystem volumes or block devices
+that serve as persistent storage for containers.

@@ -220,7 +220,7 @@ openshift_storage_glusterfs_registry_block_host_vol_size=30 <6>
 
 #### Install the CNS cluster for OpenShift infrastructure
 
-To illustrate what becomes available with this step, first issue look at the `StorageClass` definitions in the system as of now:
+To illustrate what becomes available with this step, first look at the `StorageClass` definitions in the system as of now:
 
 ----
 oc get sc
@@ -407,7 +407,7 @@ image::openshift-metrics-overview.png[]
 In the context of a specific *Pod*, the _Metrics_ tab in the UI will show CPU,
 memory and network throughput for this particular *Pod* with a configurable
 time-range. Also optionally a _donut_ chart next to a resource appears if the
-pods was given a consumption limit on this resource (e.g. RAM).
+pod was given a consumption limit on this resource (e.g. RAM).
 
 image::openshift-metrics-pods.png[]
 
@@ -421,7 +421,7 @@ elastic log aggregation solution: *EFK*. **E**lasticSearch, **F**luentd and
 **K**ibana form a configuration where logs from all nodes and applications are
 consolidated (Fluentd) in a central place (ElasticSearch) on top of which rich
 queries can be made from a single UI (Kibana). Administrators can see and search
-through all logs. Application owners and developers can allow access logs that
+through all logs. Application owners and developers can allow access to logs that
 belong to their projects. Like metrics the EFK stack runs on top of OpenShift.
 
 #### Configuring the Inventory
@@ -855,13 +855,19 @@ Start the drain process like this:
 oc adm drain {{ NODE2_INTERNAL_FQDN }} --ignore-daemonsets
 ----
 
-After a few moments, all of the *Pods*, except those for Fluentd and Container
-Native Storage, previously running on `{{ NODE2_INTERNAL_FQDN }}` should have
-terminated and been launched elsewhere.
+After a few moments, all of the *Pods*, except those for Fluentd, Container
+Native Storage, and Prometheus previously running on `{{ NODE2_INTERNAL_FQDN
+}}` should have terminated and been launched elsewhere.
 
 ----
 oc get pods --all-namespaces -o wide
 ----
+
+[NOTE]
+====
+You can also use `oc adm manage-node` to list the pods on `{{
+NODE2_INTERNAL_FQDN }}` explicitly, if you like. 
+====
 
 The node `{{ NODE2_INTERNAL_FQDN }}` is now ready for an administrator to
 start maintenance operations. If those include a reboot of the system or

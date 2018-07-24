@@ -501,25 +501,18 @@
         - networking
         - networking_test
 
-    - name: Make node03 unschedulable
-      command: oc adm manage-node node03.internal.aws.testdrive.openshift.com --schedulable=false
+    - name: Make node02 unschedulable
+      command: oc adm manage-node node02.internal.aws.testdrive.openshift.com --schedulable=false
       tags:
         - maintenance
 
-    - name: Evacuate node03
-      command: oc adm manage-node node03.internal.aws.testdrive.openshift.com --evacuate
+    - name: Drain node02
+      command: oc adm drain node02.internal.aws.testdrive.openshift.com --ignore-daemonsets
       tags:
         - maintenance
 
-    # instead of waiting like this, should probably find the gluster pod and then wait for it to be ready
-    - name: Wait 120 seconds for evacuation and restart
-      pause:
-        seconds: 120
-      tags:
-        - maintenance
-
-    - name: Make node03 schedulable again
-      command: oc adm manage-node node03.internal.aws.testdrive.openshift.com --schedulable=true
+    - name: Make node02 schedulable again
+      command: oc adm manage-node node02.internal.aws.testdrive.openshift.com --schedulable=true
       tags:
         - maintenance
 

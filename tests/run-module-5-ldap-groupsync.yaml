@@ -132,3 +132,7 @@
           - "app-prod"
       tags:
         - ldap-verify
+
+      # we should do a prometheus login test for completeness here, but without
+      # using selenium or some other browser simulator, I'm not exactly sure
+      # how.

@@ -89,7 +89,7 @@ able to distinguish between them.
 assign to the fields in the OpenShift user's "account". If any attributes are
 not found / not populated when searching through the list, the entire
 authentication fails. In this case we are creating an identity that is
-assocuated with the LDAP `dn`, an email address from the LDAP `mail`, a name from
+associated with the LDAP `dn`, an email address from the LDAP `mail`, a name from
 the LDAP `cn`, and a username from the LDAP `uid`.
 
 <4> `bindDN`: When searching LDAP, bind to the server as this user.
@@ -425,3 +425,49 @@ See 'oc new-app -h' for examples.
 ----
 
 This failure is exactly what we wanted to see.
+
+#### Prometheus
+Now that you have a user with `cluster-reader` privileges (one that can see
+many administrative aspects of the cluster), we can revisit Prometheus and
+attempt to log-in to it.
+
+Find the `prometheus` `Route` with the following command:
+
+----
+oc get route prometheus -n openshift-metrics
+----
+
+You will see something like the following:
+
+----
+NAME         HOST/PORT                                                                    PATH      SERVICES     PORT      TERMINATION   WILDCARD
+prometheus   prometheus-openshift-metrics.{{OCP_ROUTING_SUFFIX}}             prometheus   <all>     reencrypt     None
+----
+
+The installer configured a `Route` for prometheus by default. Go ahead and
+click the
+link:https://prometheus-openshift-metrics.{{OCP_ROUTING_SUFFIX}}[Prometheus
+link] to open it in your browser. You'll be greeted with a login screen. Use
+the `fancyuser1` user that you gave `cluster-reader` privileges to earlier.
+More specifically, the `ose-fancy-dev` group has `cluster-reader`
+permissions, and `fancyuser1` is a member. Remember that the password for all
+of these users is `openshift`. You will probably get a certificate error
+because of the self-signed certificate. Make sure to accept it.
+
+Once you log-in, the first time you will be presented with an auth proxy
+permissions acknowledgement:
+
+.Auth Proxy Acceptance.
+image::prometheus-auth-proxy.png[]
+
+There is actually an OAuth proxy that sits in the flow between you and the
+Prometheus container. This proxy is used to validate your AuthenticatioN
+(AuthN) as well as authorize (AuthZ) what is allowed to happen. Here you are
+explicitly authorizing the permissions from your `fancyuser1` account to be
+used as part of accessing Prometheus. Hit _Allow selected permissions_.
+
+At this point you are viewing Prometheus. There are no alerts configured. If
+you look at `Status` and then `Targets` you can see some interesting
+information about the current state of the cluster. As we noted in the
+_Installation Verification_ module, there are no Prometheus exercises at this
+time.

@@ -16,7 +16,7 @@ In this lab you will be guided through the following operational topics:
 3. Project Template, Quota and Limit Settings
 4. External Authentication with LDAP
 5. Infrastructure Management Basics
-6. Container-Native Storage
+6. OpenShift Container Storage
 
 ## 2. Pre-requisites
 

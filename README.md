@@ -1,1 +1,1 @@
-# openshift-cns-testdrive
+# openshift-ocs-testdrive

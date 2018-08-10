@@ -3,20 +3,38 @@ osrelease: 3.10.14-1.git.0.ba8ae6d
 installer_release: 3.10.21-1.git.0.6446011
 
 ose_packages:
+  - cockpit-docker
+  - cockpit-ws
+  - cockpit-system
+  - cockpit-bridge
+  - ansible
+  - bash-completion
+  - dnsmasq
+  - ntp
+  - logrotate
+  - httpd-tools
+  - bind-utils
+  - firewalld
+  - libselinux-python
+  - conntrack-tools
+  - openssl
+  - iproute
+  - python-dbus
+  - PyYAML
+  - yum-utils
+  - glusterfs-fuse
   - vim
   - wget
   - git
   - net-tools
-  - bind-utils
   - iptables-services
   - bridge-utils
-  - bash-completion
-  - dnsmasq
   - openshift-ansible-{{ installer_release }}.el7.noarch
   - openshift-ansible-playbooks-{{ installer_release }}.el7.noarch
   - openshift-ansible-roles-{{ installer_release }}.el7.noarch
   - openshift-ansible-docs-{{ installer_release }}.el7.noarch
   - atomic-openshift-{{ osrelease }}.el7.x86_64
+  - atomic-openshift-node-{{ osrelease }}.el7.x86_64
   - atomic-openshift-excluder-{{ osrelease }}.el7.noarch
   - atomic-openshift-docker-excluder-{{ osrelease }}.el7.noarch
   - atomic-openshift-clients-{{ osrelease }}.el7.x86_64

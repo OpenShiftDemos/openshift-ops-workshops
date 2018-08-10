@@ -1,25 +1,6 @@
-- name: create temporary build directory for webssh2
-  tempfile:
-    state: directory
-    suffix: webssh2
-  register: webssh2_build
-
-- name: checkout webssh2 from GitHub
-  git:
-    repo: https://github.com/billchurch/WebSSH2.git
-    dest: "{{ webssh2_build.path }}"
-
-- name: copy Dockerfile to build directory
-  copy:
-    src: Dockerfile
-    dest: "{{ webssh2_build.path }}"
-    force: yes
-
-- name: run docker build
+- name: pull webssh2 image from quay
   docker_image:
-    path: "{{ webssh2_build.path }}"
-    name: webssh2
-    tag: latest
+    name: quay.io/thoraxe/webssh2:180809
 
 - name: create webssh2 systemd service
   copy:

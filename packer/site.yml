@@ -7,8 +7,8 @@
     - { role: authorized-key, tags: ['authorized-key']}
     - { role: instructor-user, tags: ['instructor-user']}
     - { role: registered-host, tags: ['registered-host']}
-    - { role: docker-host, tags: ['docker-host']}
     - { role: ocp-installer, tags: ['ocp-installer']}
+    - { role: docker-host, tags: ['docker-host']}
     - { role: aws-host, tags: ['aws-host']}
     - { role: webssh2, tags: ['webssh2']}
     - { role: registry-mirror, tags: ['registry-mirror']}

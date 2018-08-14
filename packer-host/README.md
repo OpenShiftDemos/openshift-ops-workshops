@@ -1,4 +1,5 @@
 ### Deploy AWS instance and then run packer 
+The instructor public key should be in your home directory or the path should be provided at run time.
 
 ```
 ansible-playbook -e "org_id=0000000 keypair=000000 act_key=000000" environment.yaml

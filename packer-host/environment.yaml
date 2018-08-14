@@ -1,0 +1,193 @@
+---
+- name: create network
+  become: false
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+     - vars.yaml
+  tasks:
+  - name: fail if variables aren't defined
+    fail:
+      msg: "Please see the README on all required variables"
+    when: org_id is not defined or act_key is not defined or keypair is not defined 
+
+  - name: ensure that instructor file exists
+    stat: 
+      path: "{{ instructor_key }}"
+    register: instructor_key
+
+  - name: fail if file does not exist
+    fail:
+      msg: "instructor key is missing"
+    when: instructor_key.stat.exists == False
+
+  - name: set aws key fact
+    set_fact:
+      aws_key: "{{ lookup('env','AWS_ACCESS_KEY_ID') }}"
+
+  - name: set aws secret fact
+    set_fact:
+      aws_secret: "{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
+      no_log: true
+
+  - name: create VPC
+    ec2_vpc_net:
+      name: packer_vpc 
+      cidr_block: 10.10.0.0/16
+      region: "{{ region }}" 
+      tenancy: default
+    register: packer_vpc
+    when: vpc_id is not defined
+
+  - name: set vpc fact
+    set_fact:
+      vpc_id: "{{ packer_vpc.vpc.id }}"
+    when: vpc_id is not defined
+
+  - name: Subnet 
+    ec2_vpc_subnet:
+      state: "present"
+      vpc_id: "{{ vpc_id }}"
+      cidr: 10.10.1.0/24 
+      az: "{{ az }}"
+      map_public: yes
+      region: "{{ region }}" 
+      resource_tags:
+        Name: "Public Subnet"
+    register: public_subnet
+    when: subnet_id is not defined
+
+  - name: Set Public Subnet ID in variable
+    set_fact:
+      subnet_id: "{{ public_subnet.subnet.id }}"
+    when: subnet_id is not defined
+
+  - name: Create Internet Gateway for VPC
+    ec2_vpc_igw:
+       vpc_id: "{{ vpc_id }}"
+       region: "{{ region }}"
+       state: "present"
+    register: vpc_igw 
+    when: public_subnet.changed and public_subnet is defined
+
+  - name: Set up public subnet route table
+    ec2_vpc_route_table:
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}" 
+      tags:
+        Name: "Public"
+      subnets:
+        - "{{ subnet_id }}"
+      routes:
+        - dest: "0.0.0.0/0"
+          gateway_id: "{{ vpc_igw.gateway_id }}"
+    when: public_subnet.changed and public_subnet is defined
+
+  - name: Create Security Group
+    ec2_group:
+      name: "ssh"
+      description: "SSH"
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}" 
+      rules:
+        - proto: "tcp"
+          from_port: "22"
+          to_port: "22"
+          cidr_ip: "0.0.0.0/0"
+    register: sg
+
+  - name: create instance 
+    ec2:
+      key_name: "{{ keypair }}"
+      instance_type: m5.large
+      group_id: "{{ sg.group_id }}"
+      region: "{{ region }}" 
+      image: "{{ ami }}" 
+      wait: yes
+      count: 1
+      vpc_subnet_id: "{{ subnet_id }}"
+      assign_public_ip: yes
+      instance_tags:
+         Name: packer-host 
+    register: packer_host
+
+  - name: Wait for SSH to come up
+    wait_for:
+      host: "{{ item.public_ip }}"
+      port: 22
+      delay: 40
+      timeout: 320
+      state: started
+    with_items:
+    - "{{ packer_host.instances }}"
+
+  - name: Add new instance to host group
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: packer
+    with_items:
+    - "{{ packer_host.instances }}"
+
+- name: register and add repos
+  hosts: packer 
+  become: True
+  remote_user: ec2-user
+  gather_facts: false
+  vars_files:
+     - vars.yaml
+  tasks:
+    - name: register instances
+      redhat_subscription:
+        state: present
+        activationkey: "{{ act_key }}"
+        org_id: "{{ org_id }}"
+
+    - name: repos
+      shell: 'subscription-manager repos --disable="*" --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.10-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rhel-7-server-ansible-2.4-rpms"'
+
+    - name: install packages
+      yum:
+        state: latest
+        name: "{{ item }}"
+      with_items:
+      - git
+      - unzip
+      - ansible
+
+    - name: unarchive packer
+      unarchive:
+        src: https://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip 
+        dest: /opt/
+        remote_src: yes
+
+    - name: clone repo
+      git:
+        repo: https://github.com/openshift/openshift-cns-testdrive.git
+        dest: /opt/openshift-cns-testdrive
+
+    - name: copy instructor key
+      copy:
+        src: "{{ instructor_key }}"
+        dest: /opt/instructor_key.pub
+
+    - name: run packer
+      shell: "cd /opt/openshift-cns-testdrive/packer && AWS_AMI={{ ami }} AWS_REGION={{ region }} AWS_ACCESS_KEY_ID={{ hostvars['localhost']['aws_key'] }} AWS_SECRET_ACCESS_KEY={{ hostvars['localhost']['aws_secret'] }} ORG_ID={{ org_id }} ACT_KEY={{ act_key }} SUBNET_ID={{ hostvars['localhost']['subnet_id'] }} VPC_ID={{ hostvars['localhost']['vpc_id'] }} INSTRUCTOR_PUB_KEY_FILE=/opt/instructor_key.pub /opt/packer build ocp-cns-aio.json -machine-readable"
+      register: packer_run
+
+    - name: packer output
+      debug:
+        var: "{{ packer_run.stdout }}"
+
+- name: create network
+  become: false
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+     - vars.yaml
+  tasks:
+  - name: terminate instance
+    ec2:
+      state: absent
+      instance_ids: '{{ packer_host.instance_ids }}'

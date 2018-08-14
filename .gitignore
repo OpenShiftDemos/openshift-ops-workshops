@@ -3,6 +3,7 @@
 #*#
 .idea
 *.iml
+*.retry
 *.komodoproject
 .loadpath
 .project

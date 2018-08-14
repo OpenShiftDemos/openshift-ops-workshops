@@ -173,13 +173,8 @@
 
     - name: run packer
       shell: "cd /opt/openshift-cns-testdrive/packer && AWS_AMI={{ ami }} AWS_REGION={{ region }} AWS_ACCESS_KEY_ID={{ hostvars['localhost']['aws_key'] }} AWS_SECRET_ACCESS_KEY={{ hostvars['localhost']['aws_secret'] }} ORG_ID={{ org_id }} ACT_KEY={{ act_key }} SUBNET_ID={{ hostvars['localhost']['subnet_id'] }} VPC_ID={{ hostvars['localhost']['vpc_id'] }} INSTRUCTOR_PUB_KEY_FILE=/opt/instructor_key.pub /opt/packer build ocp-cns-aio.json -machine-readable"
-      register: packer_run
 
-    - name: packer output
-      debug:
-        var: "{{ packer_run.stdout }}"
-
-- name: create network
+- name: cleanup instance
   become: false
   hosts: localhost
   connection: local
@@ -191,3 +186,107 @@
     ec2:
       state: absent
       instance_ids: '{{ packer_host.instance_ids }}'
+
+- name: list amis network
+  become: false
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+     - vars.yaml
+  tasks:
+  - name: Find latest AWS EC2 AMI by name
+    ec2_ami_facts:
+      filters: 
+        name: "ocp-cns-aio*"
+      region: us-east-1
+    register: east_amis 
+
+  - name: fact
+    set_fact:
+      east_sorted_amis: "{{ east_amis.images | sort(attribute='creation_date') }}"
+
+  - name: fact
+    set_fact:
+      east_latest_ami: "{{ east_sorted_amis | last }}"
+  
+  - name: print last ami
+    debug:
+      msg: "us-east-1: {{ east_latest_ami.image_id }}"
+
+  - name: Find latest AWS EC2 AMI by name
+    ec2_ami_facts:
+      filters:
+        name: "ocp-cns-aio*"
+      region: eu-central-1
+    register: central_amis
+
+  - name: fact
+    set_fact:
+      central_sorted_amis: "{{ central_amis.images | sort(attribute='creation_date') }}"
+
+  - name: fact
+    set_fact:
+      central_latest_ami: "{{ central_sorted_amis | last }}"
+
+  - name: print last ami
+    debug:
+      msg: "eu-central-1: {{ central_latest_ami.image_id }}"
+
+  - name: Find latest AWS EC2 AMI by name
+    ec2_ami_facts:
+      filters:
+        name: "ocp-cns-aio*"
+      region: eu-west-1
+    register: west_amis
+
+  - name: fact
+    set_fact:
+      west_sorted_amis: "{{ west_amis.images | sort(attribute='creation_date') }}"
+
+  - name: fact
+    set_fact:
+      west_latest_ami: "{{ west_sorted_amis | last }}"
+
+  - name: print last ami
+    debug:
+      msg: "eu-west-1: {{ west_latest_ami.image_id }}"
+
+  - name: Find latest AWS EC2 AMI by name
+    ec2_ami_facts:
+      filters:
+        name: "ocp-cns-aio*"
+      region: us-west-2
+    register: west2_amis
+
+  - name: fact
+    set_fact:
+      west2_sorted_amis: "{{ west2_amis.images | sort(attribute='creation_date') }}"
+
+  - name: fact
+    set_fact:
+      west2_latest_ami: "{{ west2_sorted_amis | last }}"
+
+  - name: print last ami
+    debug:
+      msg: "us-west-2: {{ west2_latest_ami.image_id }}"
+
+  - name: Find latest AWS EC2 AMI by name
+    ec2_ami_facts:
+      filters:
+        name: "ocp-cns-aio*"
+      region: ap-southeast-1
+    register: south_amis
+
+  - name: fact
+    set_fact:
+      south_sorted_amis: "{{ south_amis.images | sort(attribute='creation_date') }}"
+
+  - name: fact
+    set_fact:
+      south_latest_ami: "{{ south_sorted_amis | last }}"
+
+  - name: print last ami
+    debug:
+      msg: "ap-southeast-1: {{ south_latest_ami.image_id }}"
+

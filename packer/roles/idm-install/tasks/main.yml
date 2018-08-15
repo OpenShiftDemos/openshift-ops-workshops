@@ -5,6 +5,7 @@
   - name: install idm base packages
     yum: name={{ item }} state=present
     with_items:
+      - python2-pyasn1-0.1.9-7.el7.noarch
       - vim-enhanced
       - tmux
       - openssh-clients

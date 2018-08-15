@@ -163,8 +163,9 @@
 
     - name: clone repo
       git:
-        repo: https://github.com/openshift/openshift-cns-testdrive.git
+        repo: "{{ repo }}" 
         dest: /opt/openshift-cns-testdrive
+        version: "{{ branch }}"
 
     - name: copy instructor key
       copy:
@@ -184,6 +185,7 @@
   tasks:
   - name: terminate instance
     ec2:
+      region: "{{ region }}"
       state: absent
       instance_ids: '{{ packer_host.instance_ids }}'
 

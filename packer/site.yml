@@ -15,9 +15,9 @@
     - { role: ansible-host, tags: ['ansible-host']}
     - { role: master-cert, tags: ['master-cert']}
     - { role: inventory-fixup-script, tags: ['inventory-fixup-script']}
-    - { role: idm-install, tags: ['idm-install']}
     - { role: container-native-storage, tags: ['container-native-storage']}
     - { role: workshopper, tags: ['workshopper']}
+    - { role: idm-install, tags: ['idm-install']}
     - { role: local-repo, tags: ['local-repo']}
 
   tasks:

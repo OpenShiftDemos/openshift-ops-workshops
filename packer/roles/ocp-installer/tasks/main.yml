@@ -6,6 +6,9 @@
     - createrepo
     - yum-utils
 
+- name: install package but disable gluster repo
+  shell: yum install --disablerepo=rh-gluster-3-web-admin-server-for-rhel-7-server-rpms -y python2-pyasn1-0.1.9-7.el7.noarch
+
 - name: make repository directory
   file: state=directory owner=apache group=apache mode=755 path=/var/www/html/repo
 

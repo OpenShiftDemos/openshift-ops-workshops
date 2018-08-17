@@ -1000,7 +1000,6 @@ Resources:
                     osm_image=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose
                     openshift_release=v3.10.14
                     openshift_image_tag=v3.10.14
-                    openshift_node_local_quota_per_fsgroup=1Gi
 
                     container_runtime_extra_storage="[{'device': '/dev/xvdc', 'path': '/var/lib/origin/openshift.local.volumes', 'options': 'gquota', 'filesystem': 'xfs', 'format': 'True'}, {'device': '/dev/xvdd', 'path': '/var/lib/etcd', 'hosts': 'masters', 'filesystem': 'xfs', 'format': 'True'}]"
 

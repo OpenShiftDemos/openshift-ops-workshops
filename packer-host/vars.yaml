@@ -3,4 +3,4 @@ region: us-east-2
 az: us-east-2a
 instructor_key: ~/instructor_key.pub
 repo: https://github.com/cooktheryan/openshift-cns-testdrive.git
-branch: master
+branch: ejacobs-ocp-310

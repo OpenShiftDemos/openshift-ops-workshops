@@ -28,17 +28,10 @@
   shell: createrepo /var/www/html/repo
 
 - name: install ose base packages
-  yum: name={{ item }} state=present
-  with_items:
-  - "{{ ose_packages }}"
+  shell: "yum localinstall /var/www/html/repo/*"
 
 - name: remove firewalld
   yum: name=firewalld state=absent
-
-- name: install ose storage packages
-  yum: name={{ item }} state=present
-  with_items:
-  - "{{ storage_packages }}"
 
 - name: remove openshift packages from filter
   shell: atomic-openshift-excluder unexclude

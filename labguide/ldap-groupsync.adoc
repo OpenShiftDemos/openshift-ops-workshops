@@ -431,6 +431,12 @@ Now that you have a user with `cluster-reader` privileges (one that can see
 many administrative aspects of the cluster), we can revisit Prometheus and
 attempt to log-in to it.
 
+Login as a the user with `cluster-reader` privileges:
+
+----
+oc login -u fancyuser1 -p openshift
+----
+
 Find the `prometheus` `Route` with the following command:
 
 ----

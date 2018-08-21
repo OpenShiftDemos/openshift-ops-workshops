@@ -28,7 +28,7 @@
   shell: createrepo /var/www/html/repo
 
 - name: install ose base packages
-  shell: "yum localinstall /var/www/html/repo/*"
+  shell: "yum -y localinstall /var/www/html/repo/*"
 
 - name: remove firewalld
   yum: name=firewalld state=absent

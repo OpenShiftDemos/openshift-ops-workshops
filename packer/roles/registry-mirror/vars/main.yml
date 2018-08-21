@@ -81,6 +81,7 @@ ose_infra_images:
   - "openshift3/prometheus-alert-buffer:{{ ose_major_tag }}"
   - "openshift3/prometheus-node-exporter:{{ ose_minor_tag }}"
   - "openshift3/prometheus-node-exporter:{{ ose_major_tag }}"
+  - "openshift3/prometheus-alertmanager:{{ ose_major_tag }}"
   - "openshift3/ose-deployer:{{ ose_minor_tag }}"
   - "openshift3/ose-deployer:{{ ose_major_tag }}"
   - "openshift3/logging-deployer:{{ ose_deployer_tag }}"

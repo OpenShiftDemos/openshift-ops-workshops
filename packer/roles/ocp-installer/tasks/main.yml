@@ -6,6 +6,9 @@
     - createrepo
     - yum-utils
 
+- name: install package but disable gluster repo
+  shell: yum install --disablerepo=rh-gluster-3-web-admin-server-for-rhel-7-server-rpms -y python2-pyasn1-0.1.9-7.el7.noarch
+
 - name: make repository directory
   file: state=directory owner=apache group=apache mode=755 path=/var/www/html/repo
 
@@ -25,17 +28,10 @@
   shell: createrepo /var/www/html/repo
 
 - name: install ose base packages
-  yum: name={{ item }} state=present
-  with_items:
-  - "{{ ose_packages }}"
+  shell: "yum -y localinstall /var/www/html/repo/*"
 
 - name: remove firewalld
   yum: name=firewalld state=absent
-
-- name: install ose storage packages
-  yum: name={{ item }} state=present
-  with_items:
-  - "{{ storage_packages }}"
 
 - name: remove openshift packages from filter
   shell: atomic-openshift-excluder unexclude

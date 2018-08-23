@@ -42,10 +42,10 @@
         - quota-deploy
 
     - name: Restart the master services for changes to apply
-      command: systemctl restart {{ item }}
+      command: "/usr/local/bin/master-restart {{ item }}" 
       with_items:
-        - atomic-openshift-master-api
-        - atomic-openshift-master-controllers
+        - api
+        - controllers
       tags:
         - quota-deploy
 

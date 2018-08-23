@@ -2,60 +2,90 @@
 
 deploy_mirror: false
 image_src: registry.access.redhat.com
-ose_minor_tag: v3.9.30
-ose_major_tag: v3.9.30
-ose_release_tag: v3.9
-cns_release_tag: "{{ ose_release_tag }}"
+ose_minor_tag: v3.10.14
+ose_major_tag: v3.10.14
+ose_release_tag: v3.10
+cns_release_tag: v3.9
 ose_deployer_tag: latest
 image_source: registry.access.redhat.com
 
 ose_core_images:
+  - openshift3/csi-attacher:{{ ose_minor_tag }}
+  - openshift3/csi-driver-registrar:{{ ose_minor_tag }}
+  - openshift3/csi-livenessprobe:{{ ose_minor_tag }}
+  - openshift3/csi-provisioner:{{ ose_minor_tag }}
+  - openshift3/efs-provisioner:{{ ose_minor_tag }}
+  - openshift3/image-inspector:{{ ose_minor_tag }}
+  - openshift3/local-storage-provisioner:{{ ose_minor_tag }}
+  - openshift3/manila-provisioner:{{ ose_minor_tag }}
+  - openshift3/ose-cli:{{ ose_minor_tag }}
+  - openshift3/ose-cluster-capacity:{{ ose_minor_tag }}
+  - openshift3/ose-deployer:{{ ose_minor_tag }}
+  - openshift3/ose-descheduler:{{ ose_minor_tag }}
+  - openshift3/ose-docker-builder:{{ ose_minor_tag }}
+  - openshift3/ose-docker-registry:{{ ose_minor_tag }}
+  - openshift3/ose-egress-dns-proxy:{{ ose_minor_tag }}
+  - openshift3/ose-egress-http-proxy:{{ ose_minor_tag }}
+  - openshift3/ose-egress-router:{{ ose_minor_tag }}
+  - openshift3/ose-f5-router:{{ ose_minor_tag }}
+  - openshift3/ose-haproxy-router:{{ ose_minor_tag }}
+  - openshift3/ose-hyperkube:{{ ose_minor_tag }}
+  - openshift3/ose-hypershift:{{ ose_minor_tag }}
+  - openshift3/ose-keepalived-ipfailover:{{ ose_minor_tag }}
+  - openshift3/ose-pod:{{ ose_minor_tag }}
+  - openshift3/ose-docker-builder:{{ ose_minor_tag }}
+  - openshift3/ose-node-problem-detector:{{ ose_minor_tag }}
+  - openshift3/ose-recycler:{{ ose_minor_tag }}
+  - openshift3/ose-web-console:{{ ose_minor_tag }}
+  - openshift3/ose-node:latest
+  - openshift3/ose-node:{{ ose_minor_tag }}
+  - openshift3/ose-node:{{ ose_major_tag }}
+  - openshift3/ose-control-plane:{{ ose_minor_tag }}
+  - openshift3/registry-console:{{ ose_minor_tag }}
+  - openshift3/snapshot-controller:{{ ose_minor_tag }}
+  - openshift3/snapshot-provisioner:{{ ose_minor_tag }}
+  - rhel7/etcd
   - "openshift3/ose:latest"
   - "openshift3/ose:{{ ose_minor_tag }}"
   - "openshift3/ose:{{ ose_major_tag }}"
-  - "openshift3/node:latest"
-  - "openshift3/node:{{ ose_minor_tag }}"
-  - "openshift3/node:{{ ose_major_tag }}"
-  - "openshift3/openvswitch:latest"
-  - "openshift3/ose-web-console:{{ ose_major_tag }}"
-  - "openshift3/openvswitch:{{ ose_major_tag }}"
-  - "openshift3/openvswitch:{{ ose_minor_tag }}"
-  - "openshift3/openvswitch:{{ ose_release_tag }}"
   - rhel7/etcd:latest
 
 ose_infra_images:
-  - "openshift3/ose-haproxy-router:{{ ose_minor_tag }}"
-  - "openshift3/ose-haproxy-router:{{ ose_major_tag }}"
-  - "openshift3/ose-deployer:{{ ose_minor_tag }}"
-  - "openshift3/ose-deployer:{{ ose_major_tag }}"
-  - "openshift3/ose-sti-builder:{{ ose_minor_tag }}"
-  - "openshift3/ose-sti-builder:{{ ose_major_tag }}"
-  - "openshift3/ose-docker-builder:{{ ose_minor_tag }}"
-  - "openshift3/ose-docker-builder:{{ ose_major_tag }}"
-  - "openshift3/ose-pod:{{ ose_minor_tag }}"
-  - "openshift3/ose-pod:{{ ose_major_tag }}"
-  - "openshift3/ose-docker-registry:{{ ose_minor_tag }}"
-  - "openshift3/ose-docker-registry:{{ ose_major_tag }}"
-  - "openshift3/logging-deployer:{{ ose_deployer_tag }}"
-  - "openshift3/logging-elasticsearch:{{ ose_minor_tag }}"
-  - "openshift3/logging-elasticsearch:{{ ose_major_tag }}"
-  - "openshift3/logging-kibana:{{ ose_minor_tag }}"
-  - "openshift3/logging-kibana:{{ ose_major_tag }}"
-  - "openshift3/logging-fluentd:{{ ose_minor_tag }}"
-  - "openshift3/logging-fluentd:{{ ose_major_tag }}"
-  - "openshift3/logging-curator:{{ ose_minor_tag }}"
-  - "openshift3/logging-curator:{{ ose_major_tag }}"
   - "openshift3/logging-auth-proxy:{{ ose_minor_tag }}"
   - "openshift3/logging-auth-proxy:{{ ose_major_tag }}"
-  - "openshift3/metrics-deployer:{{ ose_deployer_tag }}"
-  - "openshift3/metrics-hawkular-metrics:{{ ose_minor_tag }}"
-  - "openshift3/metrics-hawkular-metrics:{{ ose_major_tag }}"
+  - "openshift3/logging-curator:{{ ose_minor_tag }}"
+  - "openshift3/logging-curator:{{ ose_major_tag }}"
+  - "openshift3/logging-elasticsearch:{{ ose_minor_tag }}"
+  - "openshift3/logging-elasticsearch:{{ ose_major_tag }}"
+  - "openshift3/logging-eventrouter:{{ ose_minor_tag }}"
+  - "openshift3/logging-eventrouter:{{ ose_major_tag }}"
+  - "openshift3/logging-fluentd:{{ ose_minor_tag }}"
+  - "openshift3/logging-fluentd:{{ ose_major_tag }}"
+  - "openshift3/logging-kibana:{{ ose_minor_tag }}"
+  - "openshift3/logging-kibana:{{ ose_major_tag }}"
+  - "openshift3/oauth-proxy:{{ ose_minor_tag }}"
+  - "openshift3/oauth-proxy:{{ ose_major_tag }}"
   - "openshift3/metrics-cassandra:{{ ose_minor_tag }}"
   - "openshift3/metrics-cassandra:{{ ose_major_tag }}"
+  - "openshift3/metrics-hawkular-metrics:{{ ose_minor_tag }}"
+  - "openshift3/metrics-hawkular-metrics:{{ ose_major_tag }}"
+  - "openshift3/metrics-hawkular-openshift-agent:{{ ose_minor_tag }}"
+  - "openshift3/metrics-hawkular-openshift-agent:{{ ose_major_tag }}"
   - "openshift3/metrics-heapster:{{ ose_minor_tag }}"
   - "openshift3/metrics-heapster:{{ ose_major_tag }}"
-  - "openshift3/registry-console:{{ ose_minor_tag }}"
-  - "openshift3/registry-console:{{ ose_major_tag }}"
+  - "openshift3/metrics-schema-installer:{{ ose_minor_tag }}"
+  - "openshift3/metrics-schema-installer:{{ ose_major_tag }}"
+  - "openshift3/prometheus:{{ ose_minor_tag }}"
+  - "openshift3/prometheus:{{ ose_major_tag }}"
+  - "openshift3/prometheus-alert-buffer:{{ ose_minor_tag }}"
+  - "openshift3/prometheus-alert-buffer:{{ ose_major_tag }}"
+  - "openshift3/prometheus-node-exporter:{{ ose_minor_tag }}"
+  - "openshift3/prometheus-node-exporter:{{ ose_major_tag }}"
+  - "openshift3/prometheus-alertmanager:{{ ose_major_tag }}"
+  - "openshift3/ose-deployer:{{ ose_minor_tag }}"
+  - "openshift3/ose-deployer:{{ ose_major_tag }}"
+  - "openshift3/logging-deployer:{{ ose_deployer_tag }}"
+  - "openshift3/metrics-deployer:{{ ose_deployer_tag }}"
 
 cns_core_images:
   - "rhgs3/rhgs-volmanager-rhel7:{{ cns_release_tag }}"

@@ -1,6 +1,6 @@
-ami: ami-ea073b8f 
-region: us-east-2
-az: us-east-2a
+ami: ami-0456c465f72bd0c95 
+region: us-east-1
+az: us-east-1a
 instructor_key: ~/instructor_key.pub
-repo: https://github.com/cooktheryan/openshift-cns-testdrive.git
-branch: ejacobs-ocp-310
+repo: https://github.com/openshift/openshift-cns-testdrive.git
+branch: master 

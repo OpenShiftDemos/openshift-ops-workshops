@@ -20,7 +20,6 @@ multi_ec2.yaml
 multi_inventory.yaml
 .vagrant
 .tags*
-*.ini
 add-node.json
 infrastructure.json
 ansible.log

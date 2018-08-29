@@ -16,7 +16,7 @@ started the lab.
 
 For more information on installing OpenShift Container Platform, please refer to
 the
-link:https://docs.openshift.com/container-platform/3.9/install_config/install/quick_install.html[installation
+link:https://docs.openshift.com/container-platform/3.10/install_config/install/quick_install.html[installation
 section] of the product documentation.
 
 [NOTE]
@@ -76,7 +76,7 @@ load balancer.
 
 For more information on the OpenShift Master's areas of responsibility, please refer to
 the
-link:https://docs.openshift.com/container-platform/3.9/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
+link:https://docs.openshift.com/container-platform/3.10/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
 
 ### Examining the provided Ansible inventory file
 First, let's examine the provided installer configuration file.
@@ -94,8 +94,7 @@ like *Masters* and *Nodes*.
 
 For more details on how OpenShift uses Ansible for its installation, please
 refer to the
-link:https://docs.openshift.com/container-platform/3.9/install_config/install/advanced_install.html#configuring-ansible[advanced
-installer's documentation].
+link:https://docs.openshift.com/container-platform/3.10/install/configuring_inventory_file.html[Configuring Your Inventory File].
 
 The top-level playbook in
 `/usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml` triggers
@@ -149,11 +148,13 @@ You have access to the following projects and can switch between them with 'oc p
   * default
     kube-public
     kube-system
-    logging
     management-infra
     openshift
     openshift-infra
+    openshift-logging
+    openshift-metrics
     openshift-node
+    openshift-sdn
     openshift-web-console
     storage
 
@@ -171,12 +172,12 @@ oc get nodes
 The output should look something like the following:
 
 ----
-NAME                                          STATUS    ROLES     AGE
-{{ INFRA_INTERNAL_FQDN }}    Ready     <none>    1m
-{{ MASTER_INTERNAL_FQDN }}   Ready     master    1m
-{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1m
-{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1m
-{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1m
+NAME                                          STATUS    ROLES     AGE	VERSION
+{{ INFRA_INTERNAL_FQDN }}    Ready     infra     1m	v1.10.0+b81c8f8
+{{ MASTER_INTERNAL_FQDN }}   Ready     master    1m	v1.10.0+b81c8f8
+{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1m	v1.10.0+b81c8f8
+{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1m	v1.10.0+b81c8f8
+{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1m	v1.10.0+b81c8f8
 ----
 
 All of the systems listed in the `[nodes]` group in the `/etc/ansible/hosts`
@@ -251,7 +252,7 @@ Pod Template:
   Service Account:  prometheus
   Containers:
    prom-proxy:
-    Image:  registry.access.redhat.com/openshift3/oauth-proxy:v3.9.30
+    Image:  registry.access.redhat.com/openshift3/oauth-proxy:v3.10.14
     Port:   8443/TCP
     Args:
       -provider=openshift
@@ -292,7 +293,7 @@ Pod Template:
   Service Account:  prometheus-node-exporter
   Containers:
    node-exporter:
-    Image:  registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.9.30
+    Image:  registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.10.14
     Port:   9100/TCP
     Limits:
       cpu:     200m

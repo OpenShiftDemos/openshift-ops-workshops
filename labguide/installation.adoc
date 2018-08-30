@@ -204,7 +204,7 @@ OpenShift is installed, by default, a CA and SSL certificates are generated for
 all inter-component communication within OpenShift, including the web console.
 It is possible to provide your own SSL certificates during the installation, and
 more information can be found in the
-link:https://docs.openshift.com/container-platform/3.9/install_config/install/advanced_install.html#advanced-install-custom-certificates[custom
+link:https://docs.openshift.com/container-platform/3.10/install_config/certificate_customization.html#ansible-configuring-custom-certificates[custom
 certificates] section of the installation documentation.
 
 #### Prometheus
@@ -214,7 +214,7 @@ Preview mode, with a non-production SLA. We encourage customers to explore
 Prometheus and its alerts, and to provide us feedback.
 
 More information about prometheus can be found in the
-link:https://docs.openshift.com/container-platform/3.9/install_config/cluster_metrics.html#openshift-prometheus[Prometheus
+link:https://docs.openshift.com/container-platform/3.10/install_config/cluster_metrics.html#openshift-prometheus[Prometheus
 documentation] for OpenShift.
 
 At this point, Prometheus is installed in your cluster. Until we configure
@@ -320,7 +320,7 @@ Events:            <none>
 A `DaemonSet` is another special Kubernetes resource. It makes sure that
 specified containers are running on certain nodes.
 
-There are no labs for these, so feel free to check the documentation for link:https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/[StatefulSet] and for link:https://docs.openshift.com/container-platform/3.9/dev_guide/daemonsets.html[DaemonSet].
+There are no labs for these, so feel free to check the documentation for link:https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/[StatefulSet] and for link:https://docs.openshift.com/container-platform/3.10/dev_guide/daemonsets.html[DaemonSet].
 
 Lastly, you can view that the Prometheus components have been exposed for access when outside of OpenShift using `Routes`. You'll learn about `Routes` later:
 

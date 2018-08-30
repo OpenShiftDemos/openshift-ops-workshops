@@ -1043,6 +1043,7 @@ Resources:
                     # logging configs
                     openshift_logging_install_logging=false
                     #logging_openshift_logging_install_logging=true
+                    #logging_openshift_logging_namespace=logging
                     #logging_openshift_logging_es_pvc_dynamic=true
                     #logging_openshift_logging_es_pvc_size=10Gi
                     #logging_openshift_logging_es_pvc_storage_class_name='glusterfs-registry-block'

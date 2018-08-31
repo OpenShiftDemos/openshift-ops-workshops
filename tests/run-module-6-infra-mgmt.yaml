@@ -270,7 +270,7 @@
         - logging
 
     - name: Check for logging before trying to install logging
-      command: oc get service logging-es-cluster -n logging
+      command: oc get service logging-es-cluster -n openshift-logging
       register: logging_es_cluster_service
       ignore_errors: true
       tags:
@@ -283,14 +283,14 @@
         - logging
 
     - name: Determine elasticsearch dc
-      shell: oc get dc -n logging | awk '/logging-es-*/{ print $1 }'
+      shell: oc get dc -n openshift-logging | awk '/logging-es-*/{ print $1 }'
       register: logging_es_dc
       tags:
         - logging
         - logging_test
 
     - name: Wait for elasticsearch to be running
-      command: oc get dc -n logging {{ logging_es_dc.stdout }} -o jsonpath='{.status.readyReplicas}'
+      command: oc get dc -n openshift-logging {{ logging_es_dc.stdout }} -o jsonpath='{.status.readyReplicas}'
       register: result
       until: '"1" in result.stdout'
       retries: 5
@@ -300,7 +300,7 @@
         - logging_test
 
     - name: Wait for curator to be running
-      command: oc get dc -n logging logging-curator -o jsonpath='{.status.availableReplicas}'
+      command: oc get dc -n openshift-logging logging-curator -o jsonpath='{.status.availableReplicas}'
       register: result
       until: '"1" in result.stdout'
       retries: 5
@@ -310,7 +310,7 @@
         - logging_test
 
     - name: Wait for kibana to be running
-      command: oc get dc -n logging logging-kibana -o jsonpath='{.status.availableReplicas}'
+      command: oc get dc -n openshift-logging logging-kibana -o jsonpath='{.status.availableReplicas}'
       register: result
       until: '"1" in result.stdout'
       retries: 5
@@ -321,7 +321,7 @@
 
     # This assumes that this test is being run after the cluster has been scaled
     - name: Wait for fluentd daemonset instances to be running
-      command: oc get daemonset logging-fluentd -n logging -o jsonpath='{.status.numberReady}'
+      command: oc get daemonset logging-fluentd -n openshift-logging -o jsonpath='{.status.numberReady}'
       register: result
       until: '"8" in result.stdout'
       retries: 5

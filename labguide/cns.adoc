@@ -1004,7 +1004,7 @@ If you look on the host running any of those service, you will see that there ar
 For example, pick the host running the ElasticSearch pod:
 
 ----
-oc get pod -l component=es -n logging -o wide
+oc get pod -l component=es -n openshift-logging -o wide
 ----
 
 You will see the IP and the hostname of the host the pod is running on.

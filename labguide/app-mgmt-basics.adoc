@@ -734,7 +734,7 @@ mapit-4-d872b    0/1       ContainerCreating   0          5s
 mapit-4-deploy   1/1       Running             0          10s
 ----
 
-We will look at how this storage was provisioned automatically in the background using _Red Hat Container-native Storage_ later. You will also learn how to request storage as part of a template.
+We will look at how this storage was provisioned automatically in the background using _Red Hat OpenShift Container Storage_ later. You will also learn how to request storage as part of a template.
 
 Suffice it to say, a 1GiB GlusterFS volume has been created and made available to the pod.
 

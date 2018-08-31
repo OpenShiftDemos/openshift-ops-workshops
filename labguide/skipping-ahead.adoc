@@ -21,7 +21,7 @@ the `{{ CODE_CLONE_LOCATION }}/tests` folder.
 |4. Project Request Template, Quotas, Limits|run-module-4-template-quota-limits.yaml
 |5. Using External Authentication Providers (LDAP)|run-module-5-ldap-groupsync.yaml
 |6. Infrastructure Management Basics|run-module-6-infra-mgmt.yaml
-|7. Container-native Storage|run-module-7-cns.yaml
+|7. OpenShift Container Storage|run-module-7-cns.yaml
 |==============================================
 
 Executing the skip module playbooks is trivial. They are self-contained

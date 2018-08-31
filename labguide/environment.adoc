@@ -1,7 +1,7 @@
-## Environment Overview
+OpenShift Container## Environment Overview
 
 You will be interacting with an OpenShift 3.9 cluster that is running on {{
-ENVIRONMENT }}. During the lab you will also install Container-Native Storage
+ENVIRONMENT }}. During the lab you will also install OpenShift Container Storage
 3.9. The complete environment consists of the following systems:
 
 * 1 master node

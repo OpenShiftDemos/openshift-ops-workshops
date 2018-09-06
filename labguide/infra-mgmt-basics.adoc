@@ -242,7 +242,7 @@ With all required lines uncommented you can start the deployment of the second O
 ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-glusterfs/config.yml
 ----
 
-This playbooks takes about 4 minutes to execute and will install an entirely independent OCS cluster, including a separate `heketi` management stack. Additional `StorageClasses` will be set up to make this storage usable.
+This playbooks takes about 1-2 minutes to execute and will install an entirely independent OCS cluster, including a separate `heketi` management stack. Additional `StorageClasses` will be set up to make this storage usable.
 
 Verify by using the `oc get sc` command that two new `StorageClasses` are available:
 
@@ -307,9 +307,9 @@ When finished, your inventory file should look like the following:
 ...
 openshift_metrics_install_metrics=true <1>
 openshift_metrics_cassandra_storage_type=dynamic <2>
-openshift_metrics_cassandra_pvc_size=10Gi <3>
-openshift_metrics_cassanda_pvc_storage_class_name= {{ CNS_BLOCK_STORAGECLASS }} <4>
-openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }} <5>
+openshift_metrics_storage_volume_size=10Gi <3>
+openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }} <4>
+openshift_metrics_cassanda_pvc_storage_class_name= {{ CNS_BLOCK_STORAGECLASS }} <5>
 ...
 ----
 <1> Instruct the installer to actually deploy the Metrics service
@@ -458,7 +458,6 @@ When finished, your inventory file should look like the following:
 [OSEv3:vars]
 ...
 openshift_logging_install_logging=true <1>
-openshift_logging_namespace=logging <2>
 openshift_logging_es_pvc_dynamic=true <3>
 openshift_logging_es_pvc_size=10Gi <4>
 openshift_logging_es_pvc_storage_class_name={{ CNS_BLOCK_STORAGECLASS }} <5>
@@ -468,13 +467,12 @@ openshift_logging_public_master_url=https://kibana.{{ OCP_ROUTING_SUFFIX }} <>
 ...
 ----
 <1> Trigger the installation of the Logging service
-<2> Deploy the resources of the Logging service in a project called `logging`
-<3> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`
-<4> The resulting PersistentVolumeClaim will be of `10Gi` in size
-<5> The name of the StorageClass to use for the PersistentVolumeClaim
-<6> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.9/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
-<7> The FQDN under which the Logging frontend UI (Kibana) will be available
-<8> The URL under which the Logging frontend UI (Kibana) will be available
+<2> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`
+<3> The resulting PersistentVolumeClaim will be of `10Gi` in size
+<4> The name of the StorageClass to use for the PersistentVolumeClaim
+<5> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.9/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
+<6> The FQDN under which the Logging frontend UI (Kibana) will be available
+<7> The URL under which the Logging frontend UI (Kibana) will be available
 
 #### Install Logging
 With these settings in place execute the `openshift-logging` Ansible playbook
@@ -485,10 +483,10 @@ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-loggin
 ----
 
 Once the installation finishes (roughly 4 minutes), log in as the cluster administrator, using the
-`logging` *Project*:
+`openshift-logging` *Project*:
 
 ----
-oc login -u system:admin -n logging
+oc login -u system:admin -n openshift-logging
 ----
 
 Verify the logging stack components are up and running:

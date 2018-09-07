@@ -16,7 +16,7 @@ started the lab.
 
 For more information on installing OpenShift Container Platform, please refer to
 the
-link:https://docs.openshift.com/container-platform/3.10/install_config/install/quick_install.html[installation
+link:https://docs.openshift.com/container-platform/3.10/install/index.html[installation
 section] of the product documentation.
 
 [NOTE]

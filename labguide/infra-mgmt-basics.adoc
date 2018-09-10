@@ -927,11 +927,11 @@ oc login -u system:admin -n default
 ----
 
 Just like with the file uploader example, you can simply add a volume (and have
-its *PersistentVolumeClaim* created automatically) with the `oc volume` command.
+its *PersistentVolumeClaim* created automatically) with the `oc set volume` command.
 Execute the following:
 
 ----
-oc volume dc/docker-registry --add --name=registry-storage -t pvc \
+oc set volume dc/docker-registry --add --name=registry-storage -t pvc \
 --claim-mode=ReadWriteMany --claim-size=5Gi \
 --claim-name=registry-storage --claim-class={{ CNS_INFRA_STORAGECLASS }} --overwrite
 ----

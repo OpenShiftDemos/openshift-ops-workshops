@@ -8,12 +8,14 @@ some maintenance of nodes, as well as manipulating the multitenant network.
 
 Log in as cluster administrator:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u system:admin
 ----
 
 Verify your cluster currently consists of 5 nodes.
 
+[source,bash,role="copypaste"]
 ----
 oc get nodes
 ----
@@ -33,6 +35,7 @@ Use the label specified as the default node selector for pods in the inventory
 file  `/etc/ansible/hosts` to verify that your cluster currently has 3
 application nodes:
 
+[source,bash,role="copypaste"]
 ----
 oc get nodes -l region=apps
 ----
@@ -60,14 +63,17 @@ Your environment already has 3 additional nodes, but you have not used
 them so far. They are already configured in the inventory file but commented out with a `#scaleup_` prefix.
 
 To see the lines run:
+
+[source,bash,role="copypaste"]
 ----
-sudo grep '#scaleup_' /etc/ansible/hosts
+grep '#scaleup_' /etc/ansible/hosts
 ----
 
 Remove the `#scaleup_` comment prefix by running the below `sed` command:
 
+[source,bash,role="copypaste"]
 ----
-sudo sed -i 's/#scaleup_//g' /etc/ansible/hosts
+sed -i 's/#scaleup_//g' /etc/ansible/hosts
 ----
 
 When finished, your inventory file should look like the following:
@@ -95,6 +101,7 @@ new_nodes
 Now that these hosts are properly defined (uncommented), you can use Ansible to
 verify that they are, in fact, online:
 
+[source,bash,role="copypaste"]
 ----
 ansible new_nodes -m ping
 ----
@@ -124,6 +131,7 @@ already taken care of.
 #### Run the Playbook to Extend the Cluster
 To extend your cluster run the following playbook:
 
+[source,bash,role="copypaste"]
 ----
 ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-node/scaleup.yml
 ----
@@ -131,6 +139,7 @@ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-node/s
 The playbook takes 1-2 minutes to complete. When done verify the amount of
 application nodes known to OpenShift has been increased from 3 to 6:
 
+[source,bash,role="copypaste"]
 ----
 oc get nodes -l region=apps
 ----
@@ -166,14 +175,17 @@ By definition you need a separate set of hosts for this - which you have just ma
 Several directives for a second, infrastructure-centric OCS cluster are in the `/etc/ansible/hosts` file. They have been prepared but commented out using the `#cnsinfra_` prefix.
 
 To see the lines run:
+
+[source,bash,role="copypaste"]
 ----
-sudo grep '#cnsinfra_' /etc/ansible/hosts
+grep '#cnsinfra_' /etc/ansible/hosts
 ----
 
 Remove the `#cnsinfra_` comment prefix by running the below `sed` command:
 
+[source,bash,role="copypaste"]
 ----
-sudo sed -i 's/#cnsinfra_//g' /etc/ansible/hosts
+sed -i 's/#cnsinfra_//g' /etc/ansible/hosts
 ----
 
 When finished, your inventory file should look like the following:
@@ -220,13 +232,16 @@ openshift_storage_glusterfs_registry_block_host_vol_size=30 <6>
 
 #### Install the OCS cluster for OpenShift infrastructure
 
-To illustrate what becomes available with this step, first look at the `StorageClass` definitions in the system as of now:
+To illustrate what becomes available with this step, first look at the
+`StorageClass` definitions in the system as of now:
 
+[source,bash,role="copypaste"]
 ----
 oc get sc
 ----
 
-There is only a single `StorageClass` defined, the default OCS cluster that shipped with this installation:
+There is only a single `StorageClass` defined, the default OCS cluster that
+shipped with this installation:
 
 ----
 NAME                          PROVISIONER                AGE
@@ -235,14 +250,17 @@ glusterfs-storage (default)   kubernetes.io/glusterfs    10m
 
 Don't worry about the concept of the `StorageClass` - we will explain it in more detail later.
 
+With all required lines uncommented you can start the deployment of the
+second OCS cluster, dedicated to OpenShift infrastructure workloads:
 
-With all required lines uncommented you can start the deployment of the second OCS cluster, dedicated to OpenShift infrastructure workloads:
-
+[source,bash,role="copypaste"]
 ----
 ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-glusterfs/config.yml
 ----
 
-This playbooks takes about 1-2 minutes to execute and will install an entirely independent OCS cluster, including a separate `heketi` management stack. Additional `StorageClasses` will be set up to make this storage usable.
+This playbook takes about 1-2 minutes to execute and will install an entirely
+independent OCS cluster, including a separate `heketi` management stack.
+Additional `StorageClasses` will be set up to make this storage usable.
 
 Verify by using the `oc get sc` command that two new `StorageClasses` are available:
 
@@ -255,10 +273,17 @@ glusterfs-storage (default)   kubernetes.io/glusterfs    15m
 <1> The `StorageClass` representing shared file storage from the OCS infra cluster
 <2> The `StorageClass` representing block storage from the OCS infra cluster
 
-The block storage service (identified by the `gluster.org/glusterblock` provisioner) provided by this second OCS cluster will be explained in the following module. For now, it's only important to know that for OCS serving storage Logging and Metrics, the OCS block storage service is the *only* supported option. +
-The regular file storage service of OCS (identified by the `kubernetes.io/glusterfs` provisioner) is *not supported* for Logging and Metrics.
+The block storage service (identified by the `gluster.org/glusterblock`
+provisioner) provided by this second OCS cluster will be explained in the
+following module. For now, it's only important to know that for OCS serving
+storage Logging and Metrics, the OCS block storage service is the *only*
+supported option. + The regular file storage service of OCS (identified by
+the `kubernetes.io/glusterfs` provisioner) is *not supported* for Logging and
+Metrics.
 
-The target use case for these additional storage services is to provide robust, persistent storage for the Registry, Logging and Metrics service - the latter 2 we will set up now.
+The target use case for these additional storage services is to provide
+robust, persistent storage for the Registry, Logging and Metrics service -
+the latter 2 we will set up now.
 
 ### OpenShift Metrics
 _Metrics_ in OpenShift refers to the continuous collection of performance and
@@ -276,25 +301,30 @@ facilitated by running a specific playbook that is part of the
 solution when the cluster was initially installed.
 
 #### Configure the Installer
-The lines to configure OpenShift Metrics are already configured in the inventory file but commented out with a `#metrics_` prefix.
+The lines to configure OpenShift Metrics are already configured in the
+inventory file but commented out with a `#metrics_` prefix.
 
 To see the lines run:
+
+[source,bash,role="copypaste"]
 ----
-sudo grep '#metrics_' /etc/ansible/hosts
+grep '#metrics_' /etc/ansible/hosts
 ----
 
 Remove the `#metrics_` comment prefix by running the below `sed` command:
 
+[source,bash,role="copypaste"]
 ----
-sudo sed -i 's/#metrics_//g' /etc/ansible/hosts
+sed -i 's/#metrics_//g' /etc/ansible/hosts
 ----
 
 The OpenShift installer variable `openshift_metrics_install_metrics=false` tells the
 installer to *not* install the metrics solution when it runs. Remove that line by
 running the below `sed` command:
 
+[source,bash,role="copypaste"]
 ----
-sudo sed -i '/openshift_metrics_install_metrics=false/d' /etc/ansible/hosts
+sed -i '/openshift_metrics_install_metrics=false/d' /etc/ansible/hosts
 ----
 
 When finished, your inventory file should look like the following:
@@ -321,6 +351,7 @@ openshift_metrics_cassanda_pvc_storage_class_name= {{ CNS_BLOCK_STORAGECLASS }} 
 #### Install Metrics
 There is a specific playbook included with the installer that will handle metrics. It can be run like so:
 
+[source,bash,role="copypaste"]
 ----
 ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-metrics/config.yml
 ----
@@ -333,6 +364,7 @@ information. It will take roughly 2 minutes to complete.
 Once the installation playbook has completed, you can then verify that the
 metrics components are running in the `openshift-infra` *Project*:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u system:admin -n openshift-infra
 oc get pods -o wide
@@ -428,22 +460,26 @@ belong to their projects. Like metrics the EFK stack runs on top of OpenShift.
 The lines to configure OpenShift Logging are already configured in the inventory file but commented out with a `#logging_` prefix.
 
 To see the lines run:
+
+[source,bash,role="copypaste"]
 ----
-sudo grep '#logging_' /etc/ansible/hosts
+grep '#logging_' /etc/ansible/hosts
 ----
 
 Remove the `#logging_` comment prefix by running the below `sed` command:
 
+[source,bash,role="copypaste"]
 ----
-sudo sed -i 's/#logging_//g' /etc/ansible/hosts
+sed -i 's/#logging_//g' /etc/ansible/hosts
 ----
 
 The OpenShift installer variable `openshift_logging_install_logging=false` tells the
 installer to *not* install the logging solution when it runs. Remove that line by
 running the below `sed` command:
 
+[source,bash,role="copypaste"]
 ----
-sudo sed -i '/openshift_logging_install_logging=false/d' /etc/ansible/hosts
+sed -i '/openshift_logging_install_logging=false/d' /etc/ansible/hosts
 ----
 
 When finished, your inventory file should look like the following:
@@ -478,6 +514,7 @@ openshift_logging_public_master_url=https://kibana.{{ OCP_ROUTING_SUFFIX }} <>
 With these settings in place execute the `openshift-logging` Ansible playbook
 that ships as part of the `openshift-ansible` installer:
 
+[source,bash,role="copypaste"]
 ----
 ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-logging/config.yml
 ----
@@ -485,12 +522,14 @@ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-loggin
 Once the installation finishes (roughly 4 minutes), log in as the cluster administrator, using the
 `openshift-logging` *Project*:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u system:admin -n openshift-logging
 ----
 
 Verify the logging stack components are up and running:
 
+[source,bash,role="copypaste"]
 ----
 oc get pods -o wide
 ----
@@ -516,6 +555,7 @@ The _Fluentd_ *Pods* are deployed as part of a *DaemonSet*, which is a mechanism
 to ensure that specific *Pods* run on specific *Nodes* in the cluster at all
 times:
 
+[source,bash,role="copypaste"]
 ----
 oc get daemonset
 ----
@@ -527,7 +567,16 @@ NAME              DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE SE
 logging-fluentd   8         8         8         8            8           logging-infra-fluentd=true   3m
 ----
 
-You will also see the storage for ElasticSearch being automatically provisioned from the OCS block storage service if you query the PersistentVolumeClaim objects in this project using `oc get pvc`:
+You will also see the storage for ElasticSearch being automatically
+provisioned from the OCS block storage service if you query the
+PersistentVolumeClaim objects in this project
+
+[source,bash,role="copypaste"]
+----
+oc get pvc
+----
+
+And you will see something like:
 
 ----
 NAME           STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS               AGE
@@ -537,6 +586,7 @@ logging-es-0   Bound     pvc-8188d8dd-6af7-11e8-af61-02cea7838d26   10Gi       R
 To reach the _Kibana_ user interface, first determine its public access URL by
 querying the *Route* that got set up to expose Kibana's *Service*:
 
+[source,bash,role="copypaste"]
 ----
 oc get route/logging-kibana
 ----
@@ -595,6 +645,7 @@ implementations make use of appc/CNI, which is outside the scope of this lab.
 Only users with cluster administration privileges can manipulate *Project*
 networks. First, make sure you are logged in as the cluster administrator:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u system:admin
 ----
@@ -602,6 +653,7 @@ oc login -u system:admin
 Then, execute a script that we have prepared for you. It will create two
 *Projects* and then deploy a *DeploymentConfig* with a *Pod* for you:
 
+[source,bash,role="copypaste"]
 ----
 bash /opt/lab/support/net-proj.sh
 ----
@@ -610,6 +662,7 @@ bash /opt/lab/support/net-proj.sh
 Two *Projects* were created for you, `netproj-a` and `netproj-b`. Execute the
 following command to see the network namespaces:
 
+[source,bash,role="copypaste"]
 ----
 oc get netnamespaces
 ----
@@ -644,6 +697,7 @@ Now that you have some networks and pods, you will need to find the IP address
 of the pod in the `netproj-b` *Project*. The following command will show you the
 IP address:
 
+[source,bash,role="copypaste"]
 ----
 bash /opt/lab/support/podbip.sh
 ----
@@ -652,7 +706,7 @@ The output will simply be the IP address of the pod in the `netproj-b` project.
 The everyday way to do this would be with a combination of the `get` and
 `describe` verbs. Feel free to do the following to verify what the script did:
 
-[source,bash,role=copypaste]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 oc get pod -n netproj-b
 oc describe pod ose-1-f0deb
@@ -666,7 +720,7 @@ you found above. It will look something like _10.1.4.12_.
 
 Export the IP address of your pod into a shell variable like so:
 
-[source,bash,role=copypaste]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 export POD_B_IP=10.1.4.12
 ----
@@ -682,13 +736,14 @@ connectivity between the two *Pods* you created.
 
 Get the name of the *Pod* running in the `netproj-a` *Project*:
 
+[source,bash,role="copypaste"]
 ----
 oc get pods -n netproj-a
 ----
 
 Then, export the *Pod* ID as a shell variable:
 
-[source,bash,role=copypaste]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 export POD_A_NAME=ose-1-q9mt5
 ----
@@ -698,6 +753,7 @@ Be sure to use the name that you saw in the output of your command.
 Now, go ahead and `exec` a `ping` command inside *Pod* A, trying to reach *Pod*
 B:
 
+[source,bash,role="copypaste"]
 ----
 oc exec -n netproj-a $POD_A_NAME -- ping -c1 -W1 $POD_B_IP
 ----
@@ -715,6 +771,7 @@ You will see 100% packet loss (your `ping` command sends 1 packet, waits 1 secon
 and gets no response). This is because the networks are not connected to one
 another. Now simply execute the following:
 
+[source,bash,role="copypaste"]
 ----
 ping -c1 -W1 $POD_B_IP
 ----
@@ -728,18 +785,21 @@ logged in to an OpenShift host can "see" and touch everything on the SDN.
 #### Join the Networks
 Now it’s time to join the networks. Execute the following:
 
+[source,bash,role="copypaste"]
 ----
 oc get netnamespace
 ----
 
 Take note of the network IDs for `netproj-a` and `netproj-b`. Then:
 
+[source,bash,role="copypaste"]
 ----
 oc adm pod-network join-projects netproj-a --to=netproj-b
 ----
 
 And then look at the network IDs again:
 
+[source,bash,role="copypaste"]
 ----
 oc get netnamespace
 ----
@@ -750,6 +810,7 @@ You should see that the network IDs of the two projects are now the same.
 Now that the projects are joined, your `ping` between the pods should work.
 Execute the original `ping` test again:
 
+[source,bash,role="copypaste"]
 ----
 oc exec -n netproj-a $POD_A_NAME -- ping -c1 -W1 $POD_B_IP
 ----
@@ -768,6 +829,7 @@ rtt min/avg/max/mdev = 1.075/1.075/1.075/0.000 ms
 #### Isolate Projects
 Now, go ahead and isolate (unjoin) the projects, and then run your `ping` again:
 
+[source,bash,role="copypaste"]
 ----
 oc adm pod-network isolate-projects netproj-a
 oc exec -n netproj-a $POD_A_NAME -- ping -c1 -W1 $POD_B_IP
@@ -791,12 +853,14 @@ marking it as non-schedulable followed by a _drain_ of all pods on the node.
 These operations require elevated privileges. Ensure you are logged in as
 cluster admin:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u system:admin
 ----
 
 You will see by now that there are pods running on almost all of your nodes:
 
+[source,bash,role="copypaste"]
 ----
 oc get pods --all-namespaces -o wide
 ----
@@ -808,6 +872,7 @@ like so:
 Mark node `{{ NODE2_INTERNAL_FQDN }}` as non-schedulable to prevent the
 schedulers in the system to place any new workloads on it:
 
+[source,bash,role="copypaste"]
 ----
 oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=false
 ----
@@ -822,6 +887,7 @@ NAME                                          STATUS                     AGE
 Marking the node as non-schedulable did not impact the pods it is running. List those
 pods:
 
+[source,bash,role="copypaste"]
 ----
 oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
 ----
@@ -833,6 +899,7 @@ The next step is to drain the *Pods* to other nodes in the cluster. You can
 first simulate what actions the system would perform during the drain with the
 following command:
 
+[source,bash,role="copypaste"]
 ----
 oc adm drain {{ NODE2_INTERNAL_FQDN }} --ignore-daemonsets --dry-run
 ----
@@ -849,6 +916,7 @@ handle such situations transparently.
 
 Start the drain process like this:
 
+[source,bash,role="copypaste"]
 ----
 oc adm drain {{ NODE2_INTERNAL_FQDN }} --ignore-daemonsets
 ----
@@ -857,6 +925,7 @@ After a few moments, all of the *Pods*, except those for Fluentd, Container
 Native Storage, and Prometheus previously running on `{{ NODE2_INTERNAL_FQDN
 }}` should have terminated and been launched elsewhere.
 
+[source,bash,role="copypaste"]
 ----
 oc get pods --all-namespaces -o wide
 ----
@@ -875,6 +944,7 @@ OCS and logging will come back up automatically.
 Now that our maintenance is complete, the node is still non-schedulable. Let's
 fix that:
 
+[source,bash,role="copypaste"]
 ----
 oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=true
 ----
@@ -922,6 +992,7 @@ storage for the registry before starting to really use your cluster.
 
 Make sure you are logged in as `system:admin` in the `default` namespace:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u system:admin -n default
 ----
@@ -930,6 +1001,7 @@ Just like with the file uploader example, you can simply add a volume (and have
 its *PersistentVolumeClaim* created automatically) with the `oc volume` command.
 Execute the following:
 
+[source,bash,role="copypaste"]
 ----
 oc volume dc/docker-registry --add --name=registry-storage -t pvc \
 --claim-mode=ReadWriteMany --claim-size=5Gi \
@@ -955,6 +1027,7 @@ It is also possible to use `openshift-ansible` to deploy the registry
 After a couple of seconds a new deployment of the registry should be available.
 Verify a new version of the registry's *DeploymentConfig* is running:
 
+[source,bash,role="copypaste"]
 ----
 oc get dc/docker-registry
 ----
@@ -971,6 +1044,7 @@ this is shared storage this also allows you to scale out the registry pods.
 
 You can scale the registry like this:
 
+[source,bash,role="copypaste"]
 ----
 oc scale dc/docker-registry --replicas=3
 ----
@@ -978,6 +1052,7 @@ oc scale dc/docker-registry --replicas=3
 After a short while you should see 3 healthy registry pods in the default
 *Project*:
 
+[source,bash,role="copypaste"]
 ----
 oc get pods
 ----
@@ -995,6 +1070,7 @@ router-1-hs9wp             1/1       Running   0          6h
 
 Check the registry's `DeploymentConfig` to verify it indeeds mounts a `PersistentVolume` to the `/registry` directory which is where the registry stores all container images:
 
+[source,bash,role="copypaste"]
 ----
 oc describe dc docker-registry
 ----

@@ -9,12 +9,14 @@ leveraged by example applications using different volume access modes.
 
 Make sure you are logged on as the super user in the `{{CNS_NAMESPACE}}`:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u system:admin -n {{CNS_NAMESPACE}}
 ----
 
 OpenShift Container Storage is GlusterFS running in containers, specifically in pods managed by OpenShift. We have looked at the pods making up the storage cluster already in the introduction chapter:
 
+[source,bash,role="copypaste"]
 ----
 oc get pods -o wide -n {{ CNS_NAMESPACE }}
 ----
@@ -55,6 +57,7 @@ image::cns_diagram_heketi.png[]
 #### Examine heketi
 To expose heketi's API outside of OpenShift for administrators (for monitoring and maintenance), a *Service* named _heketi-storage_ and a *Route* has been set up:
 
+[source,bash,role="copypaste"]
 ----
 oc get service,route
 ----
@@ -72,6 +75,7 @@ routes/heketi-storage   heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}} 
 
 You may verify external availability of this API and heketi being alive with a trivial health check:
 
+[source,bash,role="copypaste"]
 ----
 curl -w "\n" http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}/hello
 ----
@@ -93,6 +97,7 @@ name `my-database-app`.
 
 #### Create/Deploy the Application
 
+[source,bash,role="copypaste"]
 ----
 oc login -u fancyuser1 -p openshift
 oc new-project my-database-app
@@ -102,6 +107,7 @@ The example application ships in the form of ready-to-use resource templates. En
 the following command to look at the template for a sample Ruby on Rails
 application with a PostgreSQL database:
 
+[source,bash,role="copypaste"]
 ----
 oc get template/rails-pgsql-persistent -n openshift
 ----
@@ -113,6 +119,7 @@ in another pod.
 As part of the resource template, a PVC is created in the YAML. Run the following command to `grep` the relavant part:
 
 
+[source,bash,role="copypaste"]
 ----
 oc get template/rails-pgsql-persistent -n openshift -o yaml | grep PersistentVolumeClaim -A8
 ----
@@ -140,6 +147,7 @@ It will supply the PostgreSQL pod with persistent storage on the mount point `/v
 
 You can see this when inspecting how the pod is described as part of the `DeploymentConfig`:
 
+[source,bash,role="copypaste"]
 ----
 oc get template/rails-pgsql-persistent -n openshift -o yaml | grep mountPath -B60 -A5
 ----
@@ -235,6 +243,7 @@ image::cns_diagram_pvc.png[]
 
 Let's try it out. The storage size parameter in the template is called `VOLUME_CAPACITY`. The `new-app` command will again handle processing and interpreting a *Template* into the appropriate OpenShift objects. We will specify that we want _5Gi_ of storage as part of deploying a new app from the template as follows:
 
+[source,bash,role="copypaste"]
 ----
 oc new-app rails-pgsql-persistent -p VOLUME_CAPACITY=5Gi
 ----
@@ -314,6 +323,7 @@ It may take up to 5 minutes for the deployment to complete.
 On the CLI, you should now see a PVC that has been issued and has a status of _Bound_.
 state.
 
+[source,bash,role="copypaste"]
 ----
 oc get pvc
 ----
@@ -335,6 +345,7 @@ This PVC has been automatically fulfilled by OCS because the `{{ CNS_STORAGECLAS
 #### Try the Application
 Now go ahead and try out the application. The overview page in the OpenShift web console will tell you the *Route* which has been deployed as well. Otherwise get it on the CLI like this:
 
+[source,bash,role="copypaste"]
 ----
 oc get route
 ----
@@ -368,18 +379,21 @@ Note how the actual application is hosted under the */articles* path of the URL.
 Now let's take a look at how this was deployed on the GlusterFS side. First you
 need to acquire necessary permissions:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u system:admin
 ----
 
 Select the example project of the user `fancyuser1` if not already/still selected:
 
+[source,bash,role="copypaste"]
 ----
 oc project my-database-app
 ----
 
 Look at the PVC to determine the PV:
 
+[source,bash,role="copypaste"]
 ----
 oc get pvc
 ----
@@ -399,7 +413,7 @@ Your PV name will be different as it's dynamically generated. A lot of the follo
 
 Here's a little bash shortcut to store the name of the PVC in a Bash environment variable:
 
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 export PGSQL_PV_NAME=$(oc get pvc/postgresql -o jsonpath="{.spec.volumeName}" -n my-database-app)
 echo $PGSQL_PV_NAME
@@ -408,7 +422,7 @@ echo $PGSQL_PV_NAME
 Look at the details of the PV bound to the PVC, in this case
 `pvc-6de8449e-3f34-11e8-87ea-0298f449cc4c` (your's will be different, use the bash variable):
 
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 oc describe pv $PGSQL_PV_NAME
 ----
@@ -438,7 +452,7 @@ No events.
 
 Note the GlusterFS volume name, in this case *vol_e8fe7f46fedf7af7628feda0dcbf2f60*. The following is another Bash shortcut to store the name of the GlusterFS volume backing the `PersistentVolume`:
 
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 export PGSQL_GLUSTER_VOLUME=$(oc get pv $PGSQL_PV_NAME -o jsonpath='{.spec.glusterfs.path}')
 echo $PGSQL_GLUSTER_VOLUME
@@ -446,12 +460,14 @@ echo $PGSQL_GLUSTER_VOLUME
 
 Now let's switch to the namespace we used for OCS deployment:
 
+[source,bash,role="copypaste"]
 ----
 oc project {{ CNS_NAMESPACE }}
 ----
 
 Look at the GlusterFS pods running and pick one (which one is not important):
 
+[source,bash,role="copypaste"]
 ----
 oc get pods -o wide -l glusterfs=storage-pod
 ----
@@ -469,7 +485,7 @@ We are now going to select the first pod (which one doesn't really matter) and, 
 
 Again, for easy copying and pasting, here are some Bash shortcuts:
 
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 export FIRST_GLUSTER_POD=$(oc get pods -o jsonpath='{.items[0].metadata.name}' -l glusterfs=storage-pod)
 export FIRST_GLUSTER_IP=$(oc get pods -o jsonpath='{.items[0].status.podIP}' -l glusterfs=storage-pod)
@@ -481,7 +497,7 @@ We will again use the `oc rsh` facility to log on to the selected GlusterFS pod 
 
 Query GlusterFS from inside the first GlusterFS pod for all known volumes:
 
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 oc rsh $FIRST_GLUSTER_POD gluster volume list
 ----
@@ -499,7 +515,7 @@ vol_f2e8fda1d42a41efabbb4d4a3b4a5659
 
 Query GlusterFS about the topology of this volume:
 
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 oc rsh $FIRST_GLUSTER_POD gluster volume info $PGSQL_GLUSTER_VOLUME
 ----
@@ -532,19 +548,29 @@ you have just logged on to. `oc get pods -o wide` will give you this
 information. The host's IP will be noted next to one of the bricks.
 ====
 
-GlusterFS created this volume as a 3-way replica set across all GlusterFS pods,
-and therefore across all your OpenShift App nodes running OCS. Data written to such a replica volume is replicated 3 times to all *bricks*.
-*Bricks* are local storage in GlusterFS nodes, usually backed by a local SAS disk or NVMe device. Each node exposes its local storage via the GlusterFS protocol. The brick itself is simply a directory on a block device formatted with XFS. Hence you can look with a simple `ls` command  and see how the data is actually stored in each brick.
+GlusterFS created this volume as a 3-way replica set across all GlusterFS
+pods, and therefore across all your OpenShift App nodes running OCS. Data
+written to such a replica volume is replicated 3 times to all *bricks*.
+*Bricks* are local storage in GlusterFS nodes, usually backed by a local SAS
+*disk or NVMe device. Each node exposes its local storage via the GlusterFS
+*protocol. The brick itself is simply a directory on a block device formatted
+*with XFS. Hence you can look with a simple `ls` command and see how the data
+*is actually stored in each brick.
 
-For easy copying and pasting, here's another bash shortcut to extract the brick directory path of our PostgreSQL volume from the fist GlusterFS pod in the list:
+For easy copying and pasting, here's another bash shortcut to extract the
+brick directory path of our PostgreSQL volume from the fist GlusterFS pod in
+the list:
 
-[source,bash]
+[source,bash,role="copypaste"]
+----
 export PGSQL_GLUSTER_BRICK=$(echo -n $(oc rsh $FIRST_GLUSTER_POD gluster vol info $PGSQL_GLUSTER_VOLUME | grep $FIRST_GLUSTER_IP) | cut -d ':' -f 3 | tr -d $'\r' )
 echo $PGSQL_GLUSTER_BRICK
+----
 
-You can look at the brick directory of the first GlusterFS pod and see how GlusterFS stores the files from the clients in a brick:
+You can look at the brick directory of the first GlusterFS pod and see how
+GlusterFS stores the files from the clients in a brick:
 
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 oc rsh $FIRST_GLUSTER_POD ls -ahl $PGSQL_GLUSTER_BRICK
 ----
@@ -562,7 +588,7 @@ drwx------.  20 1000080000 2001 8.0K Jun  6 14:46 userdata
 
 Dig a bit deeper, try looking at the `userdata` folder:
 
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 oc rsh $FIRST_GLUSTER_POD ls -ahl $PGSQL_GLUSTER_BRICK/userdata
 ----
@@ -623,6 +649,7 @@ sharing a common storage repository.
 #### Deploy the File Uploader Application
 First log back in as `fancyuser1` using the password `openshift` and create a new project:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u fancyuser1 -p openshift
 oc new-project my-shared-storage
@@ -630,6 +657,7 @@ oc new-project my-shared-storage
 
 Next deploy the example PHP application called `file-uploader`:
 
+[source,bash,role="copypaste"]
 ----
 oc new-app openshift/php:7.0~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
 ----
@@ -664,6 +692,7 @@ You will see something like:
 
 Watch and wait for the application to be deployed:
 
+[source,bash,role="copypaste"]
 ----
 oc logs -f bc/file-uploader
 ----
@@ -693,6 +722,7 @@ built and did not involve a template. That's why it only created a *single Pod* 
 
 Let's make our application production ready by exposing it via a `Route` and scale to 3 instances for high availability:
 
+[source,bash,role="copypaste"]
 ----
 oc expose svc/file-uploader
 oc scale --replicas=3 dc/file-uploader
@@ -700,6 +730,7 @@ oc scale --replicas=3 dc/file-uploader
 
 Now, check the *Route* that has been created:
 
+[source,bash,role="copypaste"]
 ----
 oc get route
 ----
@@ -730,6 +761,7 @@ Do you see it? Don't worry if you don't.
 
 Change back to the command line and look at the running pods.
 
+[source,bash,role="copypaste"]
 ----
 oc get pods -l app=file-uploader
 ----
@@ -747,7 +779,7 @@ file-uploader-1-xjg9f            1/1       Running     0          1m
 
 Now let's look back at where this file got stored inside the pods. Again use the `oc rsh` utility to execute an `ls` command on the `upload` directory that the PHP code uses to store the files:
 
-[source,bash,role=copypaste]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 oc rsh file-uploader-1-k2v0d ls -hl uploaded
 oc rsh file-uploader-1-sz49r ls -hl uploaded
@@ -784,7 +816,7 @@ storage to this app.
 You can create a *PersistentVolumeClaim* and attach it into an application with
 the `oc volume` command. Execute the following
 
-[source]
+[source,bash,role="copypaste"]
 ----
 oc volume dc/file-uploader --add --name=my-shared-storage \
 -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi \
@@ -802,6 +834,7 @@ Like with the `mapit` application in "_Application Management Basics_" chapter, 
 For more information on what `oc volume` is capable of, look at its help output
 with `oc volume -h`. Now, let's look at the result of adding the volume:
 
+[source,bash,role="copypaste"]
 ----
 oc get pvc
 ----
@@ -822,6 +855,7 @@ pods will mount the volume identified by the PVC under
 
 Check you have a new set of pods:
 
+[source,bash,role="copypaste"]
 ----
 oc get pods -l app=file-uploader
 ----
@@ -846,7 +880,7 @@ Since the pod redeployed the file has been lost with the previous container's ro
 
 Once done, return to the command line and look at the contents of pods:
 
-[source,bash,role=copypaste]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 oc rsh file-uploader-2-qwzpz ls -hl uploaded
 oc rsh file-uploader-2-r4jr8 ls -hl uploaded
@@ -885,7 +919,7 @@ However, what happens when the volume is full?
 
 Let's try it. Run the following command to fill up the currently 1GiB of free space in the persistent volume. Since it's shared, you can use any the 3 file-uploader pods:
 
-[source,bash,role=copypaste]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 oc rsh file-uploader-2-jd22b dd if=/dev/zero of=uploaded/bigfile bs=1M count=1000
 ----
@@ -897,7 +931,8 @@ dd: closing output file 'uploaded/bigfile': Input/output error
 ----
 
 Oops. The file system seems to have a problem. Let's check it:
-[source,bash,role=copypaste]
+
+[source,bash,role="copypaste copypaste-warning"]
 ----
 oc rsh file-uploader-2-jd22b df -h /opt/app-root/src/uploaded
 ----
@@ -921,6 +956,7 @@ Fortunately that is easy to fix for the user or owner of the app, even without a
 
 Use the `oc edit` command to edit the `PersistentVolumeClaim` that we used to generate the `PersistentVolume`:
 
+[source,bash,role="copypaste"]
 ----
 oc edit pvc my-shared-storage
 ----
@@ -968,7 +1004,7 @@ Upon writing the file the `oc edit` command will update the `PersistentVolumeCla
 
 Give it a couple of seconds and then check the filesystem again:
 
-[source,bash,role=copypaste]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 oc rsh file-uploader-2-jd22b df -h /opt/app-root/src/uploaded
 ----
@@ -1003,6 +1039,7 @@ If you look on the host running any of those service, you will see that there ar
 
 For example, pick the host running the ElasticSearch pod:
 
+[source,bash,role="copypaste"]
 ----
 oc get pod -l component=es -n openshift-logging -o wide
 ----
@@ -1022,7 +1059,7 @@ Above you see one of the examples where a *Pod* actually contains two containers
 
 Sign on to this host (use the host shown in the last command) from the master using SSH and run the `iscsiadm` utility to display running iSCSI sessions:
 
-[source,bash,role=copypaste]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 ssh {{ NODE5_INTERNAL_FQDN }} sudo iscsiadm -m session
 ----
@@ -1040,7 +1077,7 @@ There are 3 sessions because every OCS pod of the second OCS cluster for Infrast
 
 Like all block storage supplied to OpenShift, it get's formatted with XFS which you can see if you look at mounts on the host running ElasticSearch:
 
-[source,bash,role=copypaste]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 ssh {{ NODE5_INTERNAL_FQDN }} mount | grep iscsi
 ----
@@ -1055,6 +1092,7 @@ As you can see the device `/dev/sda` is how the iSCSI LUN ended up (in this case
 
 To serve a block device from OCS a special external provisioner is shipping with it. You can see it's pod in the namespace that the second OCS cluster was deployed to:
 
+[source,bash,role="copypaste"]
 ----
 oc get pod -n {{ CNS_INFRA_NAMESPACE }} -l glusterfs=block-registry-provisioner-pod
 ----
@@ -1070,6 +1108,7 @@ This component contains the additional logic to carve out block devices from OCS
 
 You will also find evidence of the different provisioning mechanism if you look at the `StorageClass`:
 
+[source,bash,role="copypaste"]
 ----
 oc get sc
 ----
@@ -1128,6 +1167,7 @@ In the following we will manually add devices from node04, node05 and node06, wh
 
 Like in the _Installation_ module, we first set up some Bash environment variables to configure our `heketi-cli` client to talk to the second OCS cluster. This time we take a shortcut by programmatically determining the URL to heketi and the password by querying the `heketi` pod:
 
+[source,bash,role="copypaste"]
 ----
 export HEKETI_POD=$(oc get pods -l glusterfs=heketi-registry-pod -o jsonpath='{.items[0].metadata.name}' -n {{ CNS_INFRA_NAMESPACE }})
 export HEKETI_CLI_SERVER=http://$(oc get route -l glusterfs=heketi-registry-route -o jsonpath='{.items[0].spec.host}' -n {{ CNS_INFRA_NAMESPACE }})
@@ -1137,8 +1177,14 @@ export HEKETI_CLI_KEY=$(oc get pod/$HEKETI_POD -o jsonpath='{.spec.containers[0]
 
 We can now query `heketi` about the nodes in this cluster:
 
+[source,bash,role="copypaste"]
 ----
 heketi-cli node list
+----
+
+And you will see something like:
+
+----
 Id:33e0045354db4be29b18728cbe817605	Cluster:ca777ae0285ef6d8cd7237c862bd591c
 Id:d8443e7ee8314c0c9fb4d8274a370bbd	Cluster:ca777ae0285ef6d8cd7237c862bd591c
 Id:caaed3927e424b22b1a89d261f7617ad	Cluster:ca777ae0285ef6d8cd7237c862bd591c
@@ -1148,6 +1194,7 @@ The UUIDs of the nodes will be different for you. We however need them to tell `
 
 Run the following command to store the `heketi`-internal ID of the OCS cluster (there is only one for this `heketi` instance) in a bash variable:
 
+[source,bash,role="copypaste"]
 ----
 export CNS_INFRA_CLUSTER=$(heketi-cli cluster list --json | jq -r '.clusters[0]')
 echo $CNS_INFRA_CLUSTER
@@ -1155,6 +1202,7 @@ echo $CNS_INFRA_CLUSTER
 
 Then get a list of the nodes of this cluster into a Bash variable:
 
+[source,bash,role="copypaste"]
 ----
 export NODES=$(heketi-cli cluster info $CNS_INFRA_CLUSTER --json | jq -r '.nodes[]')
 export NODE_LIST=($NODES)
@@ -1163,6 +1211,7 @@ echo $NODES
 
 To illustrate the before and after effect, first inspect the output of:
 
+[source,bash,role="copypaste"]
 ----
 heketi-cli topology info
 ----
@@ -1172,11 +1221,10 @@ You should see that every node currently has a single device: `{{NODE_BRICK_DEVI
 These nodes of the second OCS cluster, have an additional, unused storage device
 `{{NODE_BRICK_DEVICE2}}`. For each node now go ahead and make `heketi` aware of this device using the `device add` directive
 
+[source,bash,role="copypaste"]
 ----
 heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=${NODE_LIST[0]}
-
 heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=${NODE_LIST[1]}
-
 heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=${NODE_LIST[2]}
 ----
 
@@ -1206,6 +1254,8 @@ OCS will try to do its best (but not enforce it) to replicate and rebalance data
 
 The first step is to determine the OCS node's internal UUID in heketi's
 database. You can do that manually:
+
+[source,bash,role="copypaste"]
 ----
 heketi-cli topology info | grep -B4 {{NODE4_INTERNAL_FQDN}}
 ----
@@ -1222,6 +1272,7 @@ heketi-cli topology info | grep -B4 {{NODE4_INTERNAL_FQDN}}
 
 Or you can do it programmatically, for easy copying and pasting, by asking `heketi` and parsing its JSON output using `jq`:
 
+[source,bash,role="copypaste"]
 ----
 NODE_4_ID=$(heketi-cli topology info --json | jq -r ".clusters[] | select(.id==\"$CNS_INFRA_CLUSTER\") | .nodes[] | select(.hostnames.manage[0] == \"{{NODE4_INTERNAL_FQDN}}\") | .id")
 echo $NODE_4_ID
@@ -1234,8 +1285,14 @@ Second, determine the device's UUID by querying the node (indicated above by
 
 Again, you could do this manually by looking at `heketi` information about the node:
 
+[source,bash,role="copypaste"]
 ----
 heketi-cli node info $NODE_4_ID
+----
+
+And then you will see:
+
+----
 Node Id: 33e0045354db4be29b18728cbe817605
 State: online
 Cluster Id: 119ea7f96ce132f15a04c28de9978018
@@ -1249,6 +1306,7 @@ Id:4fb2ae473d5ee451906d5489abfc653e   Name:{{ NODE_BRICK_DEVICE }}           Sta
 
 Or again, for easy copying and pasting, you can do it the smart way and retrieve the device ID of `{{NODE_BRICK_DEVICE}}` programmatically from the JSON output using `jq`:
 
+[source,bash,role="copypaste"]
 ----
 export FAILED_DEVICE_ID=$(heketi-cli node info $NODE_4_ID  --json | jq -r '.devices[] | select(.name=="{{ NODE_BRICK_DEVICE }}") | .id')
 echo $FAILED_DEVICE_ID
@@ -1258,7 +1316,7 @@ You should get the UUID of `{{ NODE_BRICK_DEVICE }}` from this command, in this 
 
 With the UUID we can first mark the device as offline to stop heketi from further attempts to allocate space from it:
 
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 heketi-cli device disable $FAILED_DEVICE_ID
 ----
@@ -1272,7 +1330,7 @@ Device 4fb2ae473d5ee451906d5489abfc653e is now offline
 The device is now offline but it's still part of replicated volumes. To remove
 it and trigger a self-healing operation in the background issue:
 
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 heketi-cli device remove $FAILED_DEVICE_ID
 ----
@@ -1292,7 +1350,7 @@ This is also an online operation and can be run in production.
 Our failed device is still lurking around in _failed_ state. To finally get rid of it
 issue:
 
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 heketi-cli device delete $FAILED_DEVICE_ID
 ----
@@ -1312,6 +1370,7 @@ to issue a `remove` operation first.
 
 You can now check that the device is gone from the topology by running:
 
+[source,bash,role="copypaste"]
 ----
 heketi-cli topology info
 ----

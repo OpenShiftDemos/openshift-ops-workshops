@@ -8,7 +8,7 @@ This method has, in the past, been referred to as the `advanced installation
 method` and it involves Ansible directly running the installation playbooks.
 The advanced installer supports many configuration and customization options.
 It also covers installation of supporting infrastructure like
-container-native storage, logging and metrics components.
+OpenShift Container storage, logging and metrics components.
 
 Your environment comes with a preinstalled cluster that has been deployed
 using the installer's configuration file (`/etc/ansible/hosts`) when you
@@ -16,7 +16,7 @@ started the lab.
 
 For more information on installing OpenShift Container Platform, please refer to
 the
-link:https://docs.openshift.com/container-platform/3.9/install_config/install/quick_install.html[installation
+link:https://docs.openshift.com/container-platform/3.10/install/index.html[installation
 section] of the product documentation.
 
 [NOTE]
@@ -76,7 +76,7 @@ load balancer.
 
 For more information on the OpenShift Master's areas of responsibility, please refer to
 the
-link:https://docs.openshift.com/container-platform/3.9/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
+link:https://docs.openshift.com/container-platform/3.10/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
 
 ### Examining the provided Ansible inventory file
 First, let's examine the provided installer configuration file.
@@ -94,8 +94,7 @@ like *Masters* and *Nodes*.
 
 For more details on how OpenShift uses Ansible for its installation, please
 refer to the
-link:https://docs.openshift.com/container-platform/3.9/install_config/install/advanced_install.html#configuring-ansible[advanced
-installer's documentation].
+link:https://docs.openshift.com/container-platform/3.10/install/configuring_inventory_file.html[Configuring Your Inventory File].
 
 The top-level playbook in
 `/usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml` triggers
@@ -149,11 +148,13 @@ You have access to the following projects and can switch between them with 'oc p
   * default
     kube-public
     kube-system
-    logging
     management-infra
     openshift
     openshift-infra
+    openshift-logging
+    openshift-metrics
     openshift-node
+    openshift-sdn
     openshift-web-console
     storage
 
@@ -171,12 +172,12 @@ oc get nodes
 The output should look something like the following:
 
 ----
-NAME                                          STATUS    ROLES     AGE
-{{ INFRA_INTERNAL_FQDN }}    Ready     <none>    1m
-{{ MASTER_INTERNAL_FQDN }}   Ready     master    1m
-{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1m
-{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1m
-{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1m
+NAME                                          STATUS    ROLES     AGE	VERSION
+{{ INFRA_INTERNAL_FQDN }}    Ready     infra     1m	v1.10.0+b81c8f8
+{{ MASTER_INTERNAL_FQDN }}   Ready     master    1m	v1.10.0+b81c8f8
+{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1m	v1.10.0+b81c8f8
+{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1m	v1.10.0+b81c8f8
+{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1m	v1.10.0+b81c8f8
 ----
 
 All of the systems listed in the `[nodes]` group in the `/etc/ansible/hosts`
@@ -203,7 +204,7 @@ OpenShift is installed, by default, a CA and SSL certificates are generated for
 all inter-component communication within OpenShift, including the web console.
 It is possible to provide your own SSL certificates during the installation, and
 more information can be found in the
-link:https://docs.openshift.com/container-platform/3.9/install_config/install/advanced_install.html#advanced-install-custom-certificates[custom
+link:https://docs.openshift.com/container-platform/3.10/install_config/certificate_customization.html#ansible-configuring-custom-certificates[custom
 certificates] section of the installation documentation.
 
 #### Prometheus
@@ -213,7 +214,7 @@ Preview mode, with a non-production SLA. We encourage customers to explore
 Prometheus and its alerts, and to provide us feedback.
 
 More information about prometheus can be found in the
-link:https://docs.openshift.com/container-platform/3.9/install_config/cluster_metrics.html#openshift-prometheus[Prometheus
+link:https://docs.openshift.com/container-platform/3.10/install_config/cluster_metrics.html#openshift-prometheus[Prometheus
 documentation] for OpenShift.
 
 At this point, Prometheus is installed in your cluster. Until we configure
@@ -251,7 +252,7 @@ Pod Template:
   Service Account:  prometheus
   Containers:
    prom-proxy:
-    Image:  registry.access.redhat.com/openshift3/oauth-proxy:v3.9.30
+    Image:  registry.access.redhat.com/openshift3/oauth-proxy:v3.10.14
     Port:   8443/TCP
     Args:
       -provider=openshift
@@ -292,7 +293,7 @@ Pod Template:
   Service Account:  prometheus-node-exporter
   Containers:
    node-exporter:
-    Image:  registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.9.30
+    Image:  registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.10.14
     Port:   9100/TCP
     Limits:
       cpu:     200m
@@ -308,18 +309,18 @@ Pod Template:
    proc:
     Type:          HostPath (bare host directory volume)
     Path:          /proc
-    HostPathType:  
+    HostPathType:
    sys:
     Type:          HostPath (bare host directory volume)
     Path:          /sys
-    HostPathType:  
+    HostPathType:
 Events:            <none>
 ----
 
 A `DaemonSet` is another special Kubernetes resource. It makes sure that
 specified containers are running on certain nodes.
 
-There are no labs for these, so feel free to check the documentation for link:https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/[StatefulSet] and for link:https://docs.openshift.com/container-platform/3.9/dev_guide/daemonsets.html[DaemonSet].
+There are no labs for these, so feel free to check the documentation for link:https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/[StatefulSet] and for link:https://docs.openshift.com/container-platform/3.10/dev_guide/daemonsets.html[DaemonSet].
 
 Lastly, you can view that the Prometheus components have been exposed for access when outside of OpenShift using `Routes`. You'll learn about `Routes` later:
 
@@ -339,7 +340,7 @@ prometheus     prometheus-openshift-metrics.{{OCP_ROUTING_SUFFIX}}              
 We will briefly come back to Prometheus once we're able to log in to it.
 
 #### Verify the Storage cluster
-In your environment Red Hat Container-native Storage was installed as part of
+In your environment Red Hat OpenShift Container Storage was installed as part of
 OpenShift. It will serve robust and persistent storage to both business
 applications as well as OpenShift infrastructure. It is based on Red Hat
 Gluster Storage, running in containers on OpenShift nodes and an additional
@@ -367,14 +368,14 @@ heketi-cli cluster list
 Clusters:
 ec7a9c8be8327a54839236791bf7ba24 [file][block]<1>
 ----
-<1> This is the internal UUID of the CNS cluster
+<1> This is the internal UUID of the OCS cluster
 
 [NOTE]
 ====
 The cluster UUID will be different for you since it's automatically generated.
 ====
 
-To get more detailed information about the topology of your CNS cluster (i.e.
+To get more detailed information about the topology of your OCS cluster (i.e.
 nodes, devices and volumes heketi has discovered) run the following command
 (output abbreviated):
 
@@ -439,7 +440,7 @@ Cluster Id: ec7a9c8be8327a54839236791bf7ba24
 ----
 <1> An internal GlusterFS volume that is automatically generated by the setup routine to hold the heketi database.
 
-This output tells you that Red Hat Container-native Storage currently
+This output tells you that Red Hat OpenShift Container Storage currently
 consists of a single cluster, which consists of 3 nodes, each with a single
 block device `/dev/xvdd` of 50GiB in size. The GlusterFS layer will turn
 these 3 devices/hosts into a single, flat storage pool from which OpenShift

@@ -1,11 +1,11 @@
-:experimental:
+OCSOpenShift Container:experimental:
 
-## Container-Native Storage Concepts
+## OpenShift Container Storage Concepts
 In this lab we are going to provide a view 'under the hood' of OpenShift
-`PersistentVolumes` provided by CNS. For this purpose we will examine volumes
+`PersistentVolumes` provided by OpenShift Container Storage (OCS). For this purpose we will examine volumes
 leveraged by example applications using different volume access modes.
 
-### How Container-Native Storage runs
+### How OpenShift Container Storage runs
 
 Make sure you are logged on as the super user in the `{{CNS_NAMESPACE}}`:
 
@@ -13,7 +13,7 @@ Make sure you are logged on as the super user in the `{{CNS_NAMESPACE}}`:
 oc login -u system:admin -n {{CNS_NAMESPACE}}
 ----
 
-Container-Native Storage is GlusterFS running in containers, specifically in pods managed by OpenShift. We have looked at the pods making up the storage cluster already in the introduction chapter:
+OpenShift Container Storage is GlusterFS running in containers, specifically in pods managed by OpenShift. We have looked at the pods making up the storage cluster already in the introduction chapter:
 
 ----
 oc get pods -o wide -n {{ CNS_NAMESPACE }}
@@ -28,7 +28,7 @@ glusterfs-storage-cq68l   1/1       Running   0          3m       {{NODE2_INTERN
 glusterfs-storage-m9fvl   1/1       Running   0          3m       {{NODE3_INTERNAL_IP}}         {{NODE3_INTERNAL_FQDN}} <1>
 heketi-storage-1-cd032    1/1       Running   0          1m       {{INFRA_INTERNAL_IP}}         {{INFRA_INTERNAL_FQDN}} <2>
 ----
-<1> CNS *Pods*, with each of the designated nodes running exactly one.
+<1> OCS *Pods*, with each of the designated nodes running exactly one.
 <2> heketi API frontend pod
 
 [NOTE]
@@ -37,19 +37,19 @@ The exact *pod* names will be different in your environment, since they are
 auto-generated. Also the heketi *pod* might run on any node.
 ====
 
-The CNS *Pods* use the host's network and block devices to run the
+The OCS *Pods* use the host's network and block devices to run the
 software-defined storage system. See schematic below for a visualization.
 
-.GlusterFS pods in CNS in detail.
+.GlusterFS pods in OCS in detail.
 image::cns_diagram_pod.png[]
 
 heketi is a component that exposes an API to the storage system for
-OpenShift. This allows OpenShift to dynamically allocate storage from CNS in a
+OpenShift. This allows OpenShift to dynamically allocate storage from OCS in a
 programmatic fashion. See below for a visualization. Note that for simplicity,
 in our example heketi runs on the OpenShift application nodes, not on the
 infrastructure node.
 
-.heketi pod running in CNS
+.heketi pod running in OCS
 image::cns_diagram_heketi.png[]
 
 #### Examine heketi
@@ -84,7 +84,7 @@ Hello from Heketi
 
 This how the heketi API is made available to both external clients, like `heketi-cli` which we examined in the introduction. But mainly it is leveraged by OpenShift to provision storage dynamically. Let's look at this use case.
 
-### A Simple CNS Use Case
+### A Simple OCS Use Case
 
 We are going to deploy a sample application that ships with OpenShift which
 creates a PVC as part of the deployment. Log on to the system as
@@ -329,7 +329,7 @@ Alternatively, in the web console, check the *"Storage"* menu.
 
 [TIP]
 ====
-This PVC has been automatically fulfilled by CNS because the `{{ CNS_STORAGECLASS }}` *StorageClass* was set up as the system-wide default as part of the installation. The responsible parameter in the inventory file was: `openshift_storage_glusterfs_storageclass_default=true`
+This PVC has been automatically fulfilled by OCS because the `{{ CNS_STORAGECLASS }}` *StorageClass* was set up as the system-wide default as part of the installation. The responsible parameter in the inventory file was: `openshift_storage_glusterfs_storageclass_default=true`
 ====
 
 #### Try the Application
@@ -355,7 +355,7 @@ The username/password to create articles and comments is by default
 
 You should be able to successfully create articles and comments. When they are
 saved they are actually saved in the PostgreSQL database which stores its table
-spaces on a GlusterFS volume provided by CNS.
+spaces on a GlusterFS volume provided by OCS.
 
 [NOTE]
 ====
@@ -364,7 +364,7 @@ the *Service* was automatically exposed. This is a good practice.
 Note how the actual application is hosted under the */articles* path of the URL.
 ====
 
-#### Explore the underlying CNS artifacts
+#### Explore the underlying OCS artifacts
 Now let's take a look at how this was deployed on the GlusterFS side. First you
 need to acquire necessary permissions:
 
@@ -444,7 +444,7 @@ export PGSQL_GLUSTER_VOLUME=$(oc get pv $PGSQL_PV_NAME -o jsonpath='{.spec.glust
 echo $PGSQL_GLUSTER_VOLUME
 ----
 
-Now let's switch to the namespace we used for CNS deployment:
+Now let's switch to the namespace we used for OCS deployment:
 
 ----
 oc project {{ CNS_NAMESPACE }}
@@ -533,7 +533,7 @@ information. The host's IP will be noted next to one of the bricks.
 ====
 
 GlusterFS created this volume as a 3-way replica set across all GlusterFS pods,
-and therefore across all your OpenShift App nodes running CNS. Data written to such a replica volume is replicated 3 times to all *bricks*.
+and therefore across all your OpenShift App nodes running OCS. Data written to such a replica volume is replicated 3 times to all *bricks*.
 *Bricks* are local storage in GlusterFS nodes, usually backed by a local SAS disk or NVMe device. Each node exposes its local storage via the GlusterFS protocol. The brick itself is simply a directory on a block device formatted with XFS. Hence you can look with a simple `ls` command  and see how the data is actually stored in each brick.
 
 For easy copying and pasting, here's another bash shortcut to extract the brick directory path of our PostgreSQL volume from the fist GlusterFS pod in the list:
@@ -607,7 +607,7 @@ Clients, like the OpenShift nodes and their application pods talk to this
 set of replicated brick storage via the GlusterFS protocol. Which abstracts the 3-way replication behind a single FUSE mount point - this is called a `volume` in GlusterFS.
 When a pod starts that mounts storage from a `PV` backed by GlusterFS, OpenShift will mount the GlusterFS volume on the right app node and then _bind-mount_ this directory to the right pod. This is happening transparently to the application inside the pod and looks like a normal local filesystem.
 
-### Providing Scalable, Shared Storage With CNS
+### Providing Scalable, Shared Storage With OCS
 Historically very few options, like basic NFS support, existed to provide a
 *PersistentVolume* to more than one container at a time. The access mode used for
 this in OpenShift is `ReadWriteMany`. Traditional block-based storage solutions are not able
@@ -615,7 +615,7 @@ to provide *PersistentVolumes* with this access mode.
 
 Also, once provisioned, most storage cannot easily be resized.
 
-With CNS these capabilities are now available to all OpenShift deployments, no
+With OCS these capabilities are now available to all OpenShift deployments, no
 matter where they are deployed. To illustrate the benefit of this, we will
 deploy a PHP file uploader application that has multiple front-end instances
 sharing a common storage repository.
@@ -876,7 +876,7 @@ That's it. You have successfully provided shared storage to pods throughout the
 entire system, therefore avoiding the need for data to be replicated at the
 application level to each pod.
 
-With CNS this is available wherever OpenShift is deployed without external
+With OCS this is available wherever OpenShift is deployed without external
 dependencies like NFS.
 
 ### Increasing volume capacity
@@ -980,22 +980,22 @@ Filesystem                                      Size  Used Avail Use% Mounted on
 10.0.1.36:vol_6320cd6974d8573f49f85a5d7255a7f2  5.0G  1.1G  4.0G  21% /opt/app-root/src/uploaded
 ----
 
-### Providing block storage with CNS
+### Providing block storage with OCS
 
-Container-native Storage also contains a block storage persona. At the very end of every *Pod* accessing a `PersistentVolume` is a filesystem directory bind-mounted to the container's filesystem namespace. In the case of GlusterFS it's the GlusterFS filesystem, a POSIX compatible, replicated shared network filesystem.
+OpenShift Container Storage also contains a block storage persona. At the very end of every *Pod* accessing a `PersistentVolume` is a filesystem directory bind-mounted to the container's filesystem namespace. In the case of GlusterFS it's the GlusterFS filesystem, a POSIX compatible, replicated shared network filesystem.
 As of today, OpenShift doesn't support provisioning a block device directly into a *Pod*. All block storage supported by OpenShift eventually gets formatted with a filesystem (like XFS), and is then bind-mounted into the container's filesystem namespace.
 
-When we speak of block storage in CNS, we are talking about an iSCSI LUN getting provisioned as part of a `PersistentVolumeClaim` against the block-based `StorageClass` of CNS. This iSCSI LUN is generated from the LIO stack running in the CNS pods. It is backed by a sparse file which is hosted on an internal GlusterFS volume. This subsystem is called `gluster-block`.
+When we speak of block storage in OCS, we are talking about an iSCSI LUN getting provisioned as part of a `PersistentVolumeClaim` against the block-based `StorageClass` of OCS. This iSCSI LUN is generated from the LIO stack running in the OCS pods. It is backed by a sparse file which is hosted on an internal GlusterFS volume. This subsystem is called `gluster-block`.
 See below graphic for a representation:
 
-.gluster-block IO flow in CNS
+.gluster-block IO flow in OCS
 image::cns_diagram_gluster_block.png[]
 
 Why is this beneficial? Some applications, like OpenShift Logging and Metrics services facilitate operations which are cheap on a local filesystem like XFS but expensive on distributed filesystem like GlusterFS.
 
 With `gluster-block` you get the advantage of resilient, scalable storage without the overhead on filesystem operations like locking and byte-range locking.
 
-OpenShift Metrics and Logging issue a lot of these operations, and hence *`gluster-block` is currently the only supported backend in CNS for those services*.
+OpenShift Metrics and Logging issue a lot of these operations, and hence *`gluster-block` is currently the only supported backend in OCS for those services*.
 
 `gluster-block` was deployed in the previous chapter (_Infrastructure Management Basics_) and used to supply storage to Cassandra as part of the Metrics service and to ElasticSearch as part of the Logging service.
 
@@ -1004,7 +1004,7 @@ If you look on the host running any of those service, you will see that there ar
 For example, pick the host running the ElasticSearch pod:
 
 ----
-oc get pod -l component=es -n logging -o wide
+oc get pod -l component=es -n openshift-logging -o wide
 ----
 
 You will see the IP and the hostname of the host the pod is running on.
@@ -1036,7 +1036,7 @@ tcp: [3] 10.0.1.145:3260,3 iqn.2016-12.org.gluster-block:1241c07c-68ec-40cf-ba75
 ----
 
 The IPs and LUN IDs are going to be different for you, but essentially you see 3 iSCSI sessions open to the same LUN (identified by the UUID after `iqn.2016-12.org.gluster-block`).
-There are 3 sessions because every CNS pod of the second CNS cluster for Infrastructure runs the Linux iSCSI target stack (TCMU) and each session represents an independent IO path to the same LUN, thus achieving high availability and path-based failover.
+There are 3 sessions because every OCS pod of the second OCS cluster for Infrastructure runs the Linux iSCSI target stack (TCMU) and each session represents an independent IO path to the same LUN, thus achieving high availability and path-based failover.
 
 Like all block storage supplied to OpenShift, it get's formatted with XFS which you can see if you look at mounts on the host running ElasticSearch:
 
@@ -1053,7 +1053,7 @@ You will see something similar to this:
 
 As you can see the device `/dev/sda` is how the iSCSI LUN ended up (in this case) on {{ NODE5_INTERNAL_FQDN}}.
 
-To serve a block device from CNS a special external provisioner is shipping with it. You can see it's pod in the namespace that the second CNS cluster was deployed to:
+To serve a block device from OCS a special external provisioner is shipping with it. You can see it's pod in the namespace that the second OCS cluster was deployed to:
 
 ----
 oc get pod -n {{ CNS_INFRA_NAMESPACE }} -l glusterfs=block-registry-provisioner-pod
@@ -1066,7 +1066,7 @@ NAME                                           READY     STATUS    RESTARTS   AG
 glusterblock-registry-provisioner-dc-1-vsgpg   1/1       Running   0          21m
 ----
 
-This component contains the additional logic to carve out block devices from CNS.
+This component contains the additional logic to carve out block devices from OCS.
 
 You will also find evidence of the different provisioning mechanism if you look at the `StorageClass`:
 
@@ -1101,15 +1101,15 @@ Id:a67906a197ad0c750a90c793452f83c7    Cluster:f68d7554542bab9d0fdeb683d66d951a 
 
 Using `heketi-cli` you could also provision new block volumes or even create new internal GlusterFS volumes to host block volumes. However this is rarely necessary, since this, at time of writing (2018), is only meant to be in place for Logging and Metrics and provisioning is handled automatically.
 
-### CNS Operations
+### OCS Operations
 
-#### Options to increase Storage Capacity in CNS
+#### Options to increase Storage Capacity in OCS
 
-At some point the overall CNS cluster capacity may need to be expanded. There are a couple of ways to increase the storage capacity offered by CNS.
+At some point the overall OCS cluster capacity may need to be expanded. There are a couple of ways to increase the storage capacity offered by OCS.
 
-1. add a second, independent CNS cluster with its own management stack (`heketi`) (like you did in the _Infrastructure Management_ module )
-2. add a second, independent CNS cluster to the existing management stack (as described in the link:https://access.redhat.com/documentation/en-us/container-native_storage/3.9/html-single/container-native_storage_for_openshift_container_platform/#idm140292314514720[documentation^])
-3. add additional nodes to an existing CNS cluster (as described in the link:https://access.redhat.com/documentation/en-us/container-native_storage/3.9/html-single/container-native_storage_for_openshift_container_platform/#idm140292314767904[documentation^])
+1. add a second, independent OCS cluster with its own management stack (`heketi`) (like you did in the _Infrastructure Management_ module )
+2. add a second, independent OCS cluster to the existing management stack (as described in the link:https://access.redhat.com/documentation/en-us/container-native_storage/3.9/html-single/container-native_storage_for_openshift_container_platform/#idm140292314514720[documentation^])
+3. add additional nodes to an existing OCS cluster (as described in the link:https://access.redhat.com/documentation/en-us/container-native_storage/3.9/html-single/container-native_storage_for_openshift_container_platform/#idm140292314767904[documentation^])
 4. add additional devices to existing nodes
 
 Option 1) is automated using `openshift-ansible`
@@ -1118,15 +1118,15 @@ Option 2) is an option you likely want to take when you have nodes with differen
 
 Option 3) allows you to easily expand the cluster capacity in-place. In this lab we however have no nodes left to add, so we will illustrate Option 4).
 
-#### Adding Additional Devices to a CNS Cluster
+#### Adding Additional Devices to a OCS Cluster
 
-To perform management operations we'll use the `heketi-cli` tool. It manages several entities that make up CNS, that is: clusters, nodes, volumes and devices.
+To perform management operations we'll use the `heketi-cli` tool. It manages several entities that make up OCS, that is: clusters, nodes, volumes and devices.
 
 For each entity there are several create/add, update, delete commands available. For initial cluster setup `heketi-cli` also offers batch processing via a JSON file.
 
-In the following we will manually add devices from node04, node05 and node06, which form the CNS cluster for OpenShift infrastructure.
+In the following we will manually add devices from node04, node05 and node06, which form the OCS cluster for OpenShift infrastructure.
 
-Like in the _Installation_ module, we first set up some Bash environment variables to configure our `heketi-cli` client to talk to the second CNS cluster. This time we take a shortcut by programmatically determining the URL to heketi and the password by querying the `heketi` pod:
+Like in the _Installation_ module, we first set up some Bash environment variables to configure our `heketi-cli` client to talk to the second OCS cluster. This time we take a shortcut by programmatically determining the URL to heketi and the password by querying the `heketi` pod:
 
 ----
 export HEKETI_POD=$(oc get pods -l glusterfs=heketi-registry-pod -o jsonpath='{.items[0].metadata.name}' -n {{ CNS_INFRA_NAMESPACE }})
@@ -1146,7 +1146,7 @@ Id:caaed3927e424b22b1a89d261f7617ad	Cluster:ca777ae0285ef6d8cd7237c862bd591c
 
 The UUIDs of the nodes will be different for you. We however need them to tell `heketi` from which nodes to add a device. To avoid repetitive copying and pasting here is another Bash short cut to parse above output in a Bash variable:
 
-Run the following command to store the `heketi`-internal ID of the CNS cluster (there is only one for this `heketi` instance) in a bash variable:
+Run the following command to store the `heketi`-internal ID of the OCS cluster (there is only one for this `heketi` instance) in a bash variable:
 
 ----
 export CNS_INFRA_CLUSTER=$(heketi-cli cluster list --json | jq -r '.clusters[0]')
@@ -1169,7 +1169,7 @@ heketi-cli topology info
 
 You should see that every node currently has a single device: `{{NODE_BRICK_DEVICE}}`.
 
-These nodes of the second CNS cluster, have an additional, unused storage device
+These nodes of the second OCS cluster, have an additional, unused storage device
 `{{NODE_BRICK_DEVICE2}}`. For each node now go ahead and make `heketi` aware of this device using the `device add` directive
 
 ----
@@ -1184,12 +1184,12 @@ Each command should return with the message `Device added successfully`.
 
 Check `heketi-cli topology info` again to verify the presence of the new devices.
 
-That's it - the devices are now available to `heketi` and will be considered the next time CNS serves a volume request. Adding devices and nodes are online operations, meaning they are non-disruptive and can be run in production without downtime.
+That's it - the devices are now available to `heketi` and will be considered the next time OCS serves a volume request. Adding devices and nodes are online operations, meaning they are non-disruptive and can be run in production without downtime.
 
 
 ### Replacing Failed Disks and Nodes
 
-When a device fails CNS  transparently continues operations with the remaining replicas.
+When a device fails, OCS transparently continues operations with the remaining replicas.
 You will need to replace such components to move out of a degraded state and get to 3 replicas again, either using other devices free capacity in the same node or in different nodes.
 
 For this exercise, let's assume the device `{{NODE_BRICK_DEVICE}}` of your node
@@ -1200,11 +1200,11 @@ topology).
 
 [TIP]
 ====
-CNS is aware of failure domains in your infrastructure. These could be racks in a data center or availability zones in public cloud environments. The zones are identified by distinct values in the `zone` parameter of each node. Nodes with the same value for `zone` are considered part of the same failure domain.
-CNS will try to do its best (but not enforce it) to replicate and rebalance data across 3 different failure domains at all times.
+OCS is aware of failure domains in your infrastructure. These could be racks in a data center or availability zones in public cloud environments. The zones are identified by distinct values in the `zone` parameter of each node. Nodes with the same value for `zone` are considered part of the same failure domain.
+OCS will try to do its best (but not enforce it) to replicate and rebalance data across 3 different failure domains at all times.
 ====
 
-The first step is to determine the CNS node's internal UUID in heketi's
+The first step is to determine the OCS node's internal UUID in heketi's
 database. You can do that manually:
 ----
 heketi-cli topology info | grep -B4 {{NODE4_INTERNAL_FQDN}}

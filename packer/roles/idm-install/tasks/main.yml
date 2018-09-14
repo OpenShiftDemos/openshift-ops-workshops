@@ -1,5 +1,5 @@
 ---
-  - name: create docker storage config
+  - name: create idm installation script
     copy: src=idm-install dest=/usr/local/bin/ mode=770
 
   - name: install idm base packages
@@ -14,4 +14,13 @@
       - ipa-server
       - bind 
       - bind-dyndb-ldap
+
+  - name: check version
+    shell: "rpm -q python2-pyasn1"
+    register: version
+
+  - name: force downgrade
+    shell: "yum downgrade -y python2-pyasn1"
+    when: version.stdout == "python2-pyasn1-0.3.7-2.el7rhgs.noarch"
+
 ...

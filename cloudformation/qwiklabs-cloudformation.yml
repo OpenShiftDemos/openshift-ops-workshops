@@ -72,23 +72,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-b1dfdace
+      ami: ami-0f6b786a45ce5229a
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-a62d72de
+      ami: ami-0e1c2f316bc086eab
     eu-west-1:
-      ami: ami-7bbfa191
+      ami: ami-0f687991e09a8c4bc
     eu-central-1:
-      ami: ami-24a8a9cf
+      ami: ami-0ef64a7e8a10fa056
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-71c6839b
+      ami: ami-09f821e7bdf3d917e
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -816,7 +816,12 @@ Resources:
           DeleteOnTermination: 'true'
       - DeviceName: /dev/xvdc
         Ebs:
-          VolumeSize: '5'
+          VolumeSize: '10'
+          VolumeType: 'gp2'
+          DeleteOnTermination: 'true'
+      - DeviceName: /dev/xvdd
+        Ebs:
+          VolumeSize: '10'
           VolumeType: 'gp2'
           DeleteOnTermination: 'true'
       UserData:
@@ -828,7 +833,7 @@ Resources:
               fs_setup:
               - label: etcd_storage
                 filesystem: xfs
-                device: /dev/xvdc
+                device: /dev/xvdd
                 partition: auto
 
               fqdn: master.internal.${PublicHostedZone}
@@ -977,10 +982,11 @@ Resources:
 
                     [OSEv3:vars]
                     ansible_become=true
-                    deployment_type=openshift-enterprise
+                    openshift_deployment_type=openshift-enterprise
                     openshift_disable_check=memory_availability,disk_availability,docker_storage,package_version,docker_image_availability,package_availability
-                    containerized=true
                     openshift_enable_service_catalog=false
+                    openshift_master_dynamic_provisioning_enabled=true
+                    osm_use_cockpit=false
 
                     openshift_master_api_port=443
                     openshift_master_console_port=443
@@ -988,9 +994,6 @@ Resources:
                     os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
                     openshift_master_default_subdomain=apps.${AWS::AccountId}.${PublicHostedZone}
                     openshift_master_cluster_public_hostname=openshift.${AWS::AccountId}.${PublicHostedZone}
-                    openshift_router_selector='region=infra'
-                    openshift_registry_selector='region=infra'
-                    openshift_web_console_nodeselector={'region':'infra'}
                     openshift_web_console_prefix='support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-'
 
                     openshift_examples_modify_imagestreams=false
@@ -1001,8 +1004,10 @@ Resources:
                     osm_etcd_image=support.internal.aws.testdrive.openshift.com:5000/rhel7/etcd
                     openshift_cli_image=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose
                     osm_image=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose
-                    openshift_release=v3.9.30
-                    openshift_image_tag=v3.9.30
+                    openshift_release=v3.10.14
+                    openshift_image_tag=v3.10.14
+
+                    container_runtime_extra_storage="[{'device': '/dev/xvdc', 'path': '/var/lib/origin/openshift.local.volumes', 'options': 'gquota', 'filesystem': 'xfs', 'format': 'True'}]"
 
                     # special storage configs
                     openshift_storage_glusterfs_version=v3.9
@@ -1030,9 +1035,10 @@ Resources:
                     openshift_metrics_install_metrics=false
                     #metrics_openshift_metrics_install_metrics=true
                     #metrics_openshift_metrics_cassandra_storage_type=dynamic
-                    #metrics_openshift_metrics_cassandra_pvc_size=10Gi
-                    #metrics_openshift_metrics_cassanda_pvc_storage_class_name=glusterfs-registry-block
+                    #metrics_openshift_metrics_storage_volume_size=10Gi
                     #metrics_openshift_metrics_hawkular_hostname=metrics.apps.${AWS::AccountId}.${PublicHostedZone}
+                    #metrics_openshift_metrics_cassandra_pvc_storage_class_name='glusterfs-registry-block'
+
 
                     # logging configs
                     openshift_logging_install_logging=false
@@ -1040,10 +1046,9 @@ Resources:
                     #logging_openshift_logging_namespace=logging
                     #logging_openshift_logging_es_pvc_dynamic=true
                     #logging_openshift_logging_es_pvc_size=10Gi
-                    #logging_openshift_logging_es_pvc_storage_class_name=glusterfs-registry-block
+                    #logging_openshift_logging_es_pvc_storage_class_name='glusterfs-registry-block'
                     #logging_openshift_logging_es_memory_limit=2G
                     #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
-                    #logging_openshift_logging_public_master_url=https://kibana.apps.${AWS::AccountId}.${PublicHostedZone}
 
                     # prometheus configs (future)
                     openshift_hosted_prometheus_deploy=true
@@ -1055,16 +1060,16 @@ Resources:
                     master.internal.${PublicHostedZone}
 
                     [nodes]
-                    master.internal.${PublicHostedZone} openshift_hostname=master.internal.${PublicHostedZone} openshift_public_hostname=master.${AWS::AccountId}.${PublicHostedZone}
-                    infra.internal.${PublicHostedZone} openshift_node_labels="{'region': 'infra'}" openshift_hostname=infra.internal.${PublicHostedZone} openshift_public_hostname=infra.${AWS::AccountId}.${PublicHostedZone}
-                    node01.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node01.internal.${PublicHostedZone} openshift_public_hostname=node01.${AWS::AccountId}.${PublicHostedZone}
-                    node02.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node02.internal.${PublicHostedZone} openshift_public_hostname=node02.${AWS::AccountId}.${PublicHostedZone}
-                    node03.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}"  openshift_hostname=node03.internal.${PublicHostedZone} openshift_public_hostname=node03.${AWS::AccountId}.${PublicHostedZone}
+                    master.internal.${PublicHostedZone} openshift_hostname=master.internal.${PublicHostedZone} openshift_public_hostname=master.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-master'
+                    infra.internal.${PublicHostedZone} openshift_hostname=infra.internal.${PublicHostedZone} openshift_public_hostname=infra.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-infra'
+                    node01.internal.${PublicHostedZone} openshift_hostname=node01.internal.${PublicHostedZone} openshift_public_hostname=node01.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
+                    node02.internal.${PublicHostedZone} openshift_hostname=node02.internal.${PublicHostedZone} openshift_public_hostname=node02.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
+                    node03.internal.${PublicHostedZone} openshift_hostname=node03.internal.${PublicHostedZone} openshift_public_hostname=node03.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
 
                     #scaleup_[new_nodes]
-                    #scaleup_node04.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node04.internal.${PublicHostedZone} openshift_public_hostname=node04.${AWS::AccountId}.${PublicHostedZone}
-                    #scaleup_node05.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node05.internal.${PublicHostedZone} openshift_public_hostname=node05.${AWS::AccountId}.${PublicHostedZone}
-                    #scaleup_node06.internal.${PublicHostedZone} openshift_node_labels="{'region': 'apps'}" openshift_hostname=node06.internal.${PublicHostedZone} openshift_public_hostname=node06.${AWS::AccountId}.${PublicHostedZone}
+                    #scaleup_node04.internal.${PublicHostedZone} openshift_node_group_name='node-config-compute' openshift_hostname=node04.internal.${PublicHostedZone} openshift_public_hostname=node04.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
+                    #scaleup_node05.internal.${PublicHostedZone} openshift_node_group_name='node-config-compute' openshift_hostname=node05.internal.${PublicHostedZone} openshift_public_hostname=node05.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
+                    #scaleup_node06.internal.${PublicHostedZone} openshift_node_group_name='node-config-compute' openshift_hostname=node06.internal.${PublicHostedZone} openshift_public_hostname=node06.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
 
                     [glusterfs]
                     node01.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode1.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
@@ -1091,7 +1096,7 @@ Resources:
                   owner: cloud-user:cloud-user
 
               mounts:
-              - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
+              - [ /dev/xvdd, /var/lib/etcd, xfs, "defaults" ]
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
 
   InfraNode1NetworkInterface:
@@ -1149,12 +1154,6 @@ Resources:
             #cloud-config
 
             fqdn: infra.internal.${PublicHostedZone}
-
-            runcmd:
-            - mkdir -p /var/lib/origin/openshift.local.volumes
-
-            mounts:
-            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
 
   IdmNode1NetworkInterface:
     Type: AWS::EC2::NetworkInterface
@@ -1399,18 +1398,6 @@ Resources:
 
             fqdn: node01.internal.${PublicHostedZone}
 
-            fs_setup:
-            - label: emptydir
-              filesystem: xfs
-              device: /dev/xvdb
-              partition: auto
-
-            runcmd:
-            - mkdir -p /var/lib/origin/openshift.local.volumes
-
-            mounts:
-            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
   WorkerNode2NetworkInterface:
     Type: AWS::EC2::NetworkInterface
     Properties:
@@ -1472,18 +1459,6 @@ Resources:
 
             fqdn: node02.internal.${PublicHostedZone}
 
-            fs_setup:
-            - label: emptydir
-              filesystem: xfs
-              device: /dev/xvdc
-              partition: auto
-
-            runcmd:
-            - mkdir -p /var/lib/origin/openshift.local.volumes
-
-            mounts:
-            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
   WorkerNode3NetworkInterface:
     Type: AWS::EC2::NetworkInterface
     Properties:
@@ -1544,18 +1519,6 @@ Resources:
             #cloud-config
 
             fqdn: node03.internal.${PublicHostedZone}
-
-            fs_setup:
-            - label: emptydir
-              filesystem: xfs
-              device: /dev/xvdc
-              partition: auto
-
-            runcmd:
-            - mkdir -p /var/lib/origin/openshift.local.volumes
-
-            mounts:
-            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
 
   WorkerNode4NetworkInterface:
     Type: AWS::EC2::NetworkInterface
@@ -1623,18 +1586,6 @@ Resources:
 
             fqdn: node04.internal.${PublicHostedZone}
 
-            fs_setup:
-            - label: emptydir
-              filesystem: xfs
-              device: /dev/xvdc
-              partition: auto
-
-            runcmd:
-            - mkdir -p /var/lib/origin/openshift.local.volumes
-
-            mounts:
-            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
   WorkerNode5NetworkInterface:
     Type: AWS::EC2::NetworkInterface
     Properties:
@@ -1701,18 +1652,6 @@ Resources:
 
             fqdn: node05.internal.${PublicHostedZone}
 
-            fs_setup:
-            - label: emptydir
-              filesystem: xfs
-              device: /dev/xvdc
-              partition: auto
-
-            runcmd:
-            - mkdir -p /var/lib/origin/openshift.local.volumes
-
-            mounts:
-            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
-
   WorkerNode6NetworkInterface:
     Type: AWS::EC2::NetworkInterface
     Properties:
@@ -1778,18 +1717,6 @@ Resources:
             #cloud-config
 
             fqdn: node06.internal.${PublicHostedZone}
-
-            fs_setup:
-            - label: emptydir
-              filesystem: xfs
-              device: /dev/xvdc
-              partition: auto
-
-            runcmd:
-            - mkdir -p /var/lib/origin/openshift.local.volumes
-
-            mounts:
-            - [ /dev/xvdc, /var/lib/origin/openshift.local.volumes, xfs, "defaults,gquota" ]
 
 Outputs:
    LabGuide:

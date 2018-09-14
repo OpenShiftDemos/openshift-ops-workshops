@@ -18,10 +18,17 @@
       shell: cat /tmp/master-config-new.json | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, allow_unicode=True, default_flow_style=False)' > /etc/origin/master/master-config.yaml
 
     - name: restart master services
-      service: name={{ item }} state=restarted
+      shell: "/usr/local/bin/master-restart {{ item }}"
       with_items:
-        - atomic-openshift-master-api.service
-        - atomic-openshift-master-controllers.service
+        - controllers
+        - api
+
+    - name: sleep
+      pause:
+        seconds: 60
+
+    - name: login
+      command: "oc login master.internal.aws.testdrive.openshift.com:443 -u system:admin"
 
     - name: Add  as the system-wide default
       command: "oc patch storageclass glusterfs-storage -p '{\"allowVolumeExpansion\": true }'"

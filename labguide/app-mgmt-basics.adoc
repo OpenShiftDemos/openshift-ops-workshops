@@ -170,7 +170,7 @@ The way that a *Service* maps to a set of *Pods* is via a system of *Labels* and
 protocols can be mapped.
 
 There is a lot more information about
-https://docs.openshift.com/container-platform/3.9/architecture/core_concepts/pods_and_services.html#services[Services],
+https://docs.openshift.com/container-platform/3.10/architecture/core_concepts/pods_and_services.html#services[Services],
 including the YAML format to make one by hand, in the official documentation.
 
 The `new-app` command used earlier caused a service to be created. You can see
@@ -315,7 +315,7 @@ somehow die/exit are not automatically restarted. *ReplicationControllers* are
 how OpenShift "self heals".
 
 A *DeploymentConfiguration* (DC) defines how something in OpenShift should be
-deployed. From the https://docs.openshift.com/container-platform/3.9/architecture/core_concepts/deployments.html[deployments documentation^]:
+deployed. From the https://docs.openshift.com/container-platform/3.10/architecture/core_concepts/deployments.html[deployments documentation^]:
 
 ----
 Building on replication controllers, OpenShift adds expanded support for the
@@ -734,7 +734,7 @@ mapit-4-d872b    0/1       ContainerCreating   0          5s
 mapit-4-deploy   1/1       Running             0          10s
 ----
 
-We will look at how this storage was provisioned automatically in the background using _Red Hat Container-native Storage_ later. You will also learn how to request storage as part of a template.
+We will look at how this storage was provisioned automatically in the background using _Red Hat OpenShift Container Storage_ later. You will also learn how to request storage as part of a template.
 
 Suffice it to say, a 1GiB GlusterFS volume has been created and made available to the pod.
 

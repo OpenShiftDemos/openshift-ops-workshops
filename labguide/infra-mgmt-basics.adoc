@@ -155,15 +155,15 @@ more information on multi-master and HA setups, please refer to the link:https:/
 ====
 
 
-### Container-native Storage for OpenShift Infrastructure
+### OpenShift Container Storage for OpenShift Infrastructure
 
 OpenShift infrastructure, like the Registry, Logging and Metrics (introduced in the following paragraphs in this module) have a requirement for reliable storage. +
-Container-native Storage can be configured directly in the installer, to provide a separate storage pool just for those workloads. This is a good practice in order to separate failure domains.
+OpenShift Container Storage can be configured directly in the installer, to provide a separate storage pool just for those workloads. This is a good practice in order to separate failure domains.
 
 By definition you need a separate set of hosts for this - which you have just made available in the previous paragraph.
 
 #### Configure the Installer
-Several directives for a second, infrastructure-centric CNS cluster are in the `/etc/ansible/hosts` file. They have been prepared but commented out using the `#cnsinfra_` prefix.
+Several directives for a second, infrastructure-centric OCS cluster are in the `/etc/ansible/hosts` file. They have been prepared but commented out using the `#cnsinfra_` prefix.
 
 To see the lines run:
 ----
@@ -209,16 +209,16 @@ openshift_storage_glusterfs_registry_block_host_vol_size=30 <6>
 
 ...
 ----
-<1> Deploys a resource of the CNS cluster for infrastructure in a separate namespace
-<2> Creates a StorageClass for the CNS infra cluster
+<1> Deploys a resource of the OCS cluster for infrastructure in a separate namespace
+<2> Creates a StorageClass for the OCS infra cluster
 <3> Enables support for block storage - the supported storage option for Logging and Metrics
-<4> Creates a StorageClass for the block storage service in the CNS infra cluster
-<5> Automatically create block-hosting volumes (see CNS module for further explanations)
-<6> Allocate a total of 30GiB for block storage based volumes from the CNS infra cluster
-<7> An additional group of hosts which form the CNS infra cluster
-<8> Each line is a node with a device list, consumed by CNS
+<4> Creates a StorageClass for the block storage service in the OCS infra cluster
+<5> Automatically create block-hosting volumes (see OCS module for further explanations)
+<6> Allocate a total of 30GiB for block storage based volumes from the OCS infra cluster
+<7> An additional group of hosts which form the OCS infra cluster
+<8> Each line is a node with a device list, consumed by OCS
 
-#### Install the CNS cluster for OpenShift infrastructure
+#### Install the OCS cluster for OpenShift infrastructure
 
 To illustrate what becomes available with this step, first look at the `StorageClass` definitions in the system as of now:
 
@@ -226,7 +226,7 @@ To illustrate what becomes available with this step, first look at the `StorageC
 oc get sc
 ----
 
-There is only a single `StorageClass` defined, the default CNS cluster that shipped with this installation:
+There is only a single `StorageClass` defined, the default OCS cluster that shipped with this installation:
 
 ----
 NAME                          PROVISIONER                AGE
@@ -236,13 +236,13 @@ glusterfs-storage (default)   kubernetes.io/glusterfs    10m
 Don't worry about the concept of the `StorageClass` - we will explain it in more detail later.
 
 
-With all required lines uncommented you can start the deployment of the second CNS cluster, dedicated to OpenShift infrastructure workloads:
+With all required lines uncommented you can start the deployment of the second OCS cluster, dedicated to OpenShift infrastructure workloads:
 
 ----
 ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-glusterfs/config.yml
 ----
 
-This playbooks takes about 4 minutes to execute and will install an entirely independent CNS cluster, including a separate `heketi` management stack. Additional `StorageClasses` will be set up to make this storage usable.
+This playbooks takes about 1-2 minutes to execute and will install an entirely independent OCS cluster, including a separate `heketi` management stack. Additional `StorageClasses` will be set up to make this storage usable.
 
 Verify by using the `oc get sc` command that two new `StorageClasses` are available:
 
@@ -252,11 +252,11 @@ glusterfs-registry            kubernetes.io/glusterfs    42s <1>
 glusterfs-registry-block      gluster.org/glusterblock   24s <2>
 glusterfs-storage (default)   kubernetes.io/glusterfs    15m
 ----
-<1> The `StorageClass` representing shared file storage from the CNS infra cluster
-<2> The `StorageClass` representing block storage from the CNS infra cluster
+<1> The `StorageClass` representing shared file storage from the OCS infra cluster
+<2> The `StorageClass` representing block storage from the OCS infra cluster
 
-The block storage service (identified by the `gluster.org/glusterblock` provisioner) provided by this second CNS cluster will be explained in the following module. For now, it's only important to know that for CNS serving storage Logging and Metrics, the CNS block storage service is the *only* supported option. +
-The regular file storage service of CNS (identified by the `kubernetes.io/glusterfs` provisioner) is *not supported* for Logging and Metrics.
+The block storage service (identified by the `gluster.org/glusterblock` provisioner) provided by this second OCS cluster will be explained in the following module. For now, it's only important to know that for OCS serving storage Logging and Metrics, the OCS block storage service is the *only* supported option. +
+The regular file storage service of OCS (identified by the `kubernetes.io/glusterfs` provisioner) is *not supported* for Logging and Metrics.
 
 The target use case for these additional storage services is to provide robust, persistent storage for the Registry, Logging and Metrics service - the latter 2 we will set up now.
 
@@ -307,15 +307,15 @@ When finished, your inventory file should look like the following:
 ...
 openshift_metrics_install_metrics=true <1>
 openshift_metrics_cassandra_storage_type=dynamic <2>
-openshift_metrics_cassandra_pvc_size=10Gi <3>
-openshift_metrics_cassanda_pvc_storage_class_name= {{ CNS_BLOCK_STORAGECLASS }} <4>
-openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }} <5>
+openshift_metrics_storage_volume_size=10Gi <3>
+openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }} <4>
+openshift_metrics_cassanda_pvc_storage_class_name= {{ CNS_BLOCK_STORAGECLASS }} <5>
 ...
 ----
 <1> Instruct the installer to actually deploy the Metrics service
 <2> Cassandra, part of the Metrics service, will get dynamically provisioned storage
 <3> The resulting PersistentVolumeClaim will be of `10Gi` in size
-<4> The name of the StorageClass to use for the PersistentVolumeClaim, makes it use block storage from CNS
+<4> The name of the StorageClass to use for the PersistentVolumeClaim, makes it use block storage from OCS
 <5> The Metrics frontend (`hawkular`) will be reachable under this domain.
 
 #### Install Metrics
@@ -347,7 +347,7 @@ hawkular-metrics-zkp0h       1/1       Running   0          3m        10.130.0.8
 heapster-r2l2v               1/1       Running   0          3m        10.131.2.2   {{ NODE5_INTERNAL_FQDN }}
 ----
 
-You will also see the storage for Cassandra being automatically provisioned from the CNS block storage service if you query the PersistentVolumeClaim objects in this project using `oc get pvc`:
+You will also see the storage for Cassandra being automatically provisioned from the OCS block storage service if you query the PersistentVolumeClaim objects in this project using `oc get pvc`:
 
 ----
 NAME                  STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS               AGE
@@ -458,7 +458,6 @@ When finished, your inventory file should look like the following:
 [OSEv3:vars]
 ...
 openshift_logging_install_logging=true <1>
-openshift_logging_namespace=logging <2>
 openshift_logging_es_pvc_dynamic=true <3>
 openshift_logging_es_pvc_size=10Gi <4>
 openshift_logging_es_pvc_storage_class_name={{ CNS_BLOCK_STORAGECLASS }} <5>
@@ -468,13 +467,12 @@ openshift_logging_public_master_url=https://kibana.{{ OCP_ROUTING_SUFFIX }} <>
 ...
 ----
 <1> Trigger the installation of the Logging service
-<2> Deploy the resources of the Logging service in a project called `logging`
-<3> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`
-<4> The resulting PersistentVolumeClaim will be of `10Gi` in size
-<5> The name of the StorageClass to use for the PersistentVolumeClaim
-<6> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.9/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
-<7> The FQDN under which the Logging frontend UI (Kibana) will be available
-<8> The URL under which the Logging frontend UI (Kibana) will be available
+<2> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`
+<3> The resulting PersistentVolumeClaim will be of `10Gi` in size
+<4> The name of the StorageClass to use for the PersistentVolumeClaim
+<5> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.9/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
+<6> The FQDN under which the Logging frontend UI (Kibana) will be available
+<7> The URL under which the Logging frontend UI (Kibana) will be available
 
 #### Install Logging
 With these settings in place execute the `openshift-logging` Ansible playbook
@@ -485,10 +483,10 @@ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-loggin
 ----
 
 Once the installation finishes (roughly 4 minutes), log in as the cluster administrator, using the
-`logging` *Project*:
+`openshift-logging` *Project*:
 
 ----
-oc login -u system:admin -n logging
+oc login -u system:admin -n openshift-logging
 ----
 
 Verify the logging stack components are up and running:
@@ -529,7 +527,7 @@ NAME              DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE SE
 logging-fluentd   8         8         8         8            8           logging-infra-fluentd=true   3m
 ----
 
-You will also see the storage for ElasticSearch being automatically provisioned from the CNS block storage service if you query the PersistentVolumeClaim objects in this project using `oc get pvc`:
+You will also see the storage for ElasticSearch being automatically provisioned from the OCS block storage service if you query the PersistentVolumeClaim objects in this project using `oc get pvc`:
 
 ----
 NAME           STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS               AGE
@@ -560,7 +558,7 @@ have access to.
 
 [IMPORTANT]
 ====
-The block-storage service of CNS (also referred to as `gluster-block`, introduced in the next chapter) is **only** supported for Logging and Metrics as of this release. This is about to change in the near future as we qualify more workloads.
+The block-storage service of OCS (also referred to as `gluster-block`, introduced in the next chapter) is **only** supported for Logging and Metrics as of this release. This is about to change in the near future as we qualify more workloads.
 ====
 
 ### OpenShift Multitenant Networking
@@ -842,10 +840,10 @@ oc adm drain {{ NODE2_INTERNAL_FQDN }} --ignore-daemonsets --dry-run
 [IMPORTANT]
 ====
 *Pods* running on the node as part of a `DaemonSet` like those associated to
-Logging or CNS will *not* be drained. They will not be accessible anymore
+Logging or OCS will *not* be drained. They will not be accessible anymore
 through OpenShift, but will continue to run as containers on the nodes until the
 local OpenShift services are stopped and/or the node is shutdown. This is not a
-problem since software like CNS or the OpenShift Metrics stack is designed to
+problem since software like OCS or the OpenShift Metrics stack is designed to
 handle such situations transparently.
 ====
 
@@ -866,13 +864,13 @@ oc get pods --all-namespaces -o wide
 [NOTE]
 ====
 You can also use `oc adm manage-node` to list the pods on `{{
-NODE2_INTERNAL_FQDN }}` explicitly, if you like. 
+NODE2_INTERNAL_FQDN }}` explicitly, if you like.
 ====
 
 The node `{{ NODE2_INTERNAL_FQDN }}` is now ready for an administrator to
 start maintenance operations. If those include a reboot of the system or
 upgrading OpenShift components, the *Pods* associated with
-CNS and logging will come back up automatically.
+OCS and logging will come back up automatically.
 
 Now that our maintenance is complete, the node is still non-schedulable. Let's
 fix that:
@@ -888,7 +886,7 @@ NAME                                          STATUS    AGE
 {{ NODE2_INTERNAL_FQDN }}   Ready     4h
 ----
 
-### Running the OpenShift Registry with CNS
+### Running the OpenShift Registry with OCS
 
 The Registry in OpenShift is a critical component. As it is the default
 destination for all container builds in the cluster, and is the source for
@@ -908,10 +906,10 @@ Your cluster only has one infrastructure node. In practice, you would want a
 minimum of three to achieve high-availability for all infrastructure services.
 ====
 
-#### Adding CNS to the Registry
+#### Adding OCS to the Registry
 Adding storage to the registry is as easy as it was for our file-uploader
 application. Simply make the registry *Pods* use a PVC in access mode *RWX*
-based on CNS. This way, a highly-available scale-out registry can be provided
+based on OCS. This way, a highly-available scale-out registry can be provided
 without external dependencies on NFS or Cloud Provider storage.
 
 [IMPORTANT]
@@ -968,7 +966,7 @@ NAME              REVISION   DESIRED   CURRENT   TRIGGERED BY
 docker-registry   2          1         1         config
 ----
 
-Now your OpenShift Registry is using persistent storage provided by CNS.  Since
+Now your OpenShift Registry is using persistent storage provided by OCS.  Since
 this is shared storage this also allows you to scale out the registry pods.
 
 You can scale the registry like this:

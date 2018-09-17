@@ -471,7 +471,7 @@ openshift_logging_kibana_hostname=kibana.{{ OCP_ROUTING_SUFFIX }} <7>
 <3> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`
 <4> The resulting PersistentVolumeClaim will be of `10Gi` in size
 <5> The name of the StorageClass to use for the PersistentVolumeClaim
-<6> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.9/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
+<6> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.10/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
 <7> The FQDN under which the Logging frontend UI (Kibana) will be available
 
 #### Install Logging
@@ -1018,7 +1018,7 @@ Pod Template:
   Service Account:	registry
   Containers:
    registry:
-    Image:	support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-docker-registry:v3.9.14
+    Image:	support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-docker-registry:v3.10.14
     Port:	5000/TCP
     Requests:
       cpu:	100m

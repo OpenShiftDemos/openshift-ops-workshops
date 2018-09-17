@@ -213,7 +213,7 @@
       delay: 10
 
     - name: add pvc to app deploymentconfig
-      shell: oc volume dc/file-uploader --add --name=my-shared-storage -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi --claim-name=my-shared-storage --mount-path=/opt/app-root/src/uploaded
+      shell: oc set volume dc/file-uploader --add --name=my-shared-storage -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi --claim-name=my-shared-storage --mount-path=/opt/app-root/src/uploaded
 
     - name: wait for php app replication controller to be updated
       shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="file-uploader")].spec.template.spec.volumes[?(@.persistentVolumeClaim.claimName=="my-shared-storage")].name}'

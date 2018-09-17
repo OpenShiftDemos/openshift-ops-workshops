@@ -34,7 +34,7 @@ file  `/etc/ansible/hosts` to verify that your cluster currently has 3
 application nodes:
 
 ----
-oc get nodes -l region=apps
+oc get nodes -l node-role.kubernetes.io/compute=true
 ----
 
 [TIP]
@@ -85,9 +85,9 @@ new_nodes
 ...
 
 [new_nodes]
-{{ NODE4_INTERNAL_FQDN }} openshift_node_labels="{'region': 'apps'}" openshift_hostname={{ NODE4_INTERNAL_FQDN }} openshift_public_hostname={{ NODE4_EXTERNAL_FQDN }}
-{{ NODE5_INTERNAL_FQDN }} openshift_node_labels="{'region': 'apps'}" openshift_hostname={{ NODE5_INTERNAL_FQDN }} openshift_public_hostname={{ NODE5_EXTERNAL_FQDN }}
-{{ NODE6_INTERNAL_FQDN }} openshift_node_labels="{'region': 'apps'}" openshift_hostname={{ NODE6_INTERNAL_FQDN }} openshift_public_hostname={{ NODE6_EXTERNAL_FQDN }}
+{{ NODE4_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE4_INTERNAL_FQDN }} openshift_public_hostname={{ NODE4_EXTERNAL_FQDN }}
+{{ NODE5_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE5_INTERNAL_FQDN }} openshift_public_hostname={{ NODE5_EXTERNAL_FQDN }}
+{{ NODE6_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE6_INTERNAL_FQDN }} openshift_public_hostname={{ NODE6_EXTERNAL_FQDN }}
 
 ...
 ----
@@ -118,7 +118,7 @@ You will see:
 
 Much like when you installed OpenShift originally, these new hosts have all of
 the
-link:https://docs.openshift.com/container-platform/3.9/install_config/install/prerequisites.html[prerequisites]
+link:https://docs.openshift.com/container-platform/3.10/install_config/install/prerequisites.html[prerequisites]
 already taken care of.
 
 #### Run the Playbook to Extend the Cluster
@@ -132,7 +132,7 @@ The playbook takes 1-2 minutes to complete. When done verify the amount of
 application nodes known to OpenShift has been increased from 3 to 6:
 
 ----
-oc get nodes -l region=apps
+oc get nodes -l node-role.kubernetes.io/compute=true
 ----
 
 You will see:
@@ -151,7 +151,7 @@ NAME                                          STATUS    ROLES     AGE
 ====
 When deploying a highly-available multi-master OpenShift environment, it is
 also possible to add new master nodes. There is a similar playbook to run. For
-more information on multi-master and HA setups, please refer to the link:https://docs.openshift.com/container-platform/3.9/architecture/infrastructure_components/kubernetes_infrastructure.html#high-availability-masters[documentation^].
+more information on multi-master and HA setups, please refer to the link:https://docs.openshift.com/container-platform/3.10/architecture/infrastructure_components/kubernetes_infrastructure.html#high-availability-masters[documentation^].
 ====
 
 
@@ -370,9 +370,9 @@ following:
 
 [source,ini]
 ----
-openshift_metrics_hawkular_nodeselector={"region":"infra"}
-openshift_metrics_cassandra_nodeselector={"region":"infra"}
-openshift_metrics_heapster_nodeselector={"region":"infra"}
+openshift_metrics_hawkular_nodeselector={"node-role.kubernetes.io/infra": "true"}
+openshift_metrics_cassandra_nodeselector={"node-role.kubernetes.io/infra": "true"}
+openshift_metrics_heapster_nodeselector={"node-role.kubernetes.io/infra": "true"}
 ----
 
 #### Explore the Metrics UI
@@ -458,21 +458,21 @@ When finished, your inventory file should look like the following:
 [OSEv3:vars]
 ...
 openshift_logging_install_logging=true <1>
+openshift_logging_namespace=logging <2>
 openshift_logging_es_pvc_dynamic=true <3>
 openshift_logging_es_pvc_size=10Gi <4>
 openshift_logging_es_pvc_storage_class_name={{ CNS_BLOCK_STORAGECLASS }} <5>
 openshift_logging_es_memory_limit=2G <6>
 openshift_logging_kibana_hostname=kibana.{{ OCP_ROUTING_SUFFIX }} <7>
-openshift_logging_public_master_url=https://kibana.{{ OCP_ROUTING_SUFFIX }} <>
 ...
 ----
 <1> Trigger the installation of the Logging service
-<2> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`
-<3> The resulting PersistentVolumeClaim will be of `10Gi` in size
-<4> The name of the StorageClass to use for the PersistentVolumeClaim
-<5> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.9/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
-<6> The FQDN under which the Logging frontend UI (Kibana) will be available
-<7> The URL under which the Logging frontend UI (Kibana) will be available
+<2> The namespace in which the Logging components will be deployed
+<3> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`
+<4> The resulting PersistentVolumeClaim will be of `10Gi` in size
+<5> The name of the StorageClass to use for the PersistentVolumeClaim
+<6> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.10/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
+<7> The FQDN under which the Logging frontend UI (Kibana) will be available
 
 #### Install Logging
 With these settings in place execute the `openshift-logging` Ansible playbook
@@ -483,10 +483,10 @@ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-loggin
 ----
 
 Once the installation finishes (roughly 4 minutes), log in as the cluster administrator, using the
-`openshift-logging` *Project*:
+`logging` *Project*:
 
 ----
-oc login -u system:admin -n openshift-logging
+oc login -u system:admin -n logging
 ----
 
 Verify the logging stack components are up and running:
@@ -585,7 +585,7 @@ vSwitch.
 
 The multitenant network plugin was introduced in OpenShift 3.1, and more
 information about it and its configuration can be found in the
-link:https://docs.openshift.com/container-platform/3.9/architecture/networking/sdn.html[networking
+link:https://docs.openshift.com/container-platform/3.10/architecture/networking/sdn.html[networking
 documentation^]. Additionally, other vendors are working with the upstream
 Kubernetes community to implement their own SDN plugins, and several of these
 are supported by the vendors for use with OpenShift. These plugin
@@ -780,7 +780,7 @@ between two projects, or completely restrict access. Don't fret, though. If you
 need finer-grained control of inter-*Pod* and *Service* communication, there is
 a Tech Preview network implementation called `NetworkPolicy`. You can learn more
 about it in the
-link:https://docs.openshift.com/container-platform/3.9/admin_guide/managing_networking.html#admin-guide-networking-networkpolicy[product
+link:https://docs.openshift.com/container-platform/3.10/admin_guide/managing_networking.html#admin-guide-networking-networkpolicy[product
 documentation].
 
 ### Node Maintenance
@@ -943,7 +943,7 @@ The registry will now redeploy.
 The registry is preconfigured with a volume called `registry-storage` that is
 using the `emptyDir` storage type. The above command will `--overwrite` the existing
 volume with our new PVC. More information can be found in the
-link:https://docs.openshift.com/container-platform/3.9/dev_guide/volumes.html[volumes
+link:https://docs.openshift.com/container-platform/3.10/dev_guide/volumes.html[volumes
 documentation^].
 ====
 
@@ -1018,7 +1018,7 @@ Pod Template:
   Service Account:	registry
   Containers:
    registry:
-    Image:	support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-docker-registry:v3.9.14
+    Image:	support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-docker-registry:v3.10.14
     Port:	5000/TCP
     Requests:
       cpu:	100m

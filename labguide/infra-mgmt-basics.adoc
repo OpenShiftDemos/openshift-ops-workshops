@@ -4,7 +4,7 @@ This includes extending the OpenShift cluster and installation of the
 Logging and Metrics components, all automated by the installer. It also includes
 some maintenance of nodes, as well as manipulating the multitenant network.
 
-### Extending the cluster
+### Quick Background on Nodes, Groups and Selectors
 
 Log in as cluster administrator:
 
@@ -12,7 +12,9 @@ Log in as cluster administrator:
 oc login -u system:admin
 ----
 
-Verify your cluster currently consists of 5 nodes.
+Verify your cluster currently consists of 5 nodes. Remember that the Master
+is also a node, and that we have a host dedicated to running OpenShift's
+infrastructure.
 
 ----
 oc get nodes
@@ -21,51 +23,102 @@ oc get nodes
 You should see:
 
 ----
-NAME                                          STATUS    ROLES     AGE
-{{ INFRA_INTERNAL_FQDN }}    Ready     <none>    1h
-{{ MASTER_INTERNAL_FQDN }}   Ready     master    1h
-{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1h
-{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1h
-{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1h
+NAME                                          STATUS    ROLES     AGE       VERSION
+{{ INFRA_INTERNAL_FQDN }}    Ready     infra     9m        v1.10.0+b81c8f8
+{{ MASTER_INTERNAL_FQDN }}   Ready     master    15m       v1.10.0+b81c8f8
+{{ NODE1_INTERNAL_FQDN }}   Ready     compute   9m        v1.10.0+b81c8f8
+{{ NODE2_INTERNAL_FQDN }}   Ready     compute   9m        v1.10.0+b81c8f8
+{{ NODE3_INTERNAL_FQDN }}   Ready     compute   9m        v1.10.0+b81c8f8
 ----
 
-Use the label specified as the default node selector for pods in the inventory
-file  `/etc/ansible/hosts` to verify that your cluster currently has 3
-application nodes:
+In the App Management lab we talked a little bit about `Selectors` as they
+are used with `Services` to find `Pods`. But there is also a concept of a
+`NodeSelector`. It is used to tell a `Pod` which `Node` it should run on.
+During the installation process, when you don't specify anything, OpenShift
+will configure a default `NodeSelector`. You can find it with the following
+command:
+
+[source,bash,role="copypaste"]
+----
+grep defaultNodeSelector /etc/origin/master/master-config.yaml
+----
+
+You'll see:
+
+[source,yaml]
+----
+defaultNodeSelector: node-role.kubernetes.io/compute=true
+----
+
+This looks like the `key=value` syntax we are used to seeing when we have
+talked previously about `Labels`. Execute the following:
+
+[source,bash,role="copypaste"]
+----
+oc get node --show-labels
+----
+
+You'll see something like:
 
 ----
-oc get nodes -l region=apps
+NAME                                          STATUS    ROLES     AGE       VERSION           LABELS
+{{ INFRA_INTERNAL_FQDN }}    Ready     infra     14m       v1.10.0+b81c8f8   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/hostname=infra.internal.aws.testdrive.openshift.com,node-role.kubernetes.io/infra=true
+{{ MASTER_INTERNAL_FQDN }}   Ready     master    20m       v1.10.0+b81c8f8   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/hostname=master.internal.aws.testdrive.openshift.com,node-role.kubernetes.io/master=true
+{{ NODE1_INTERNAL_FQDN }}   Ready     compute   14m       v1.10.0+b81c8f8   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,glusterfs=storage-host,kubernetes.io/hostname=node01.internal.aws.testdrive.openshift.com,node-role.kubernetes.io/compute=true
+{{ NODE2_INTERNAL_FQDN }}   Ready     compute   14m       v1.10.0+b81c8f8   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,glusterfs=storage-host,kubernetes.io/hostname=node02.internal.aws.testdrive.openshift.com,node-role.kubernetes.io/compute=true
+{{ NODE3_INTERNAL_FQDN }}   Ready     compute   14m       v1.10.0+b81c8f8   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,glusterfs=storage-host,kubernetes.io/hostname=node03.internal.aws.testdrive.openshift.com,node-role.kubernetes.io/compute=true
 ----
 
-[TIP]
+[NOTE]
 ====
-The `-l` switch works for many subcommands of the `oc` utility and filters the output matching objects that carry the supplied key-value-pair as a `label`.
+The above has line wraps in it, especially at larger font sizes. To get slightly reduced output you can also use the following command:
+
+[source,bash,role="copypaste"]
+----
+oc get node --show-labels | awk '{ print $1, $6 }' | column -t
+----
 ====
 
-You should see:
+Every node has a `Label` for its role, as well as some extra labels that
+specify other details about the host. Where do these `Labels` come from?
+Execute the following:
 
+[source,bash,role="copypaste"]
 ----
-NAME                                          STATUS    ROLES     AGE
-{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1h
-{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1h
-{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1h
+grep openshift_node_group_name /etc/ansible/hosts
 ----
 
+You will see that each node has a node group name specified. The OpenShift
+installer has several node group definitions built-in for things like
+`compute` nodes (the generic hosts where all your apps will run), `masters`,
+`infra` nodes, and etc. If you want to define additional types, specify
+additional kubelet arguments, add additional labels to hosts, or similar
+things, you will need to define custom node groups. This is quite trivial,
+and you can find out how to do it in the
+link:https://docs.openshift.com/container-platform/latest/install/configuring_inventory_file.html#configuring-inventory-defining-node-group-and-host-mappings[documentation for node groups].
+
+Thinking back to the previous paragraphs, since the default `NodeSelector` is
+`node-role.kubernetes.io/compute=true`, we can expect that pods without a
+`NodeSelector` specified will only end up on these `compute` hosts.
+
+### Extending the Cluster
 Extending the cluster is easy. Simply add a new set of hosts to an Ansible group
 called `new_nodes` in the `openshift-ansible` installer's inventory. Then, run
 the `scaleup` playbook.
 
 #### Configure the Installer
-Your environment already has 3 additional nodes, but you have not used
-them so far. They are already configured in the inventory file but commented out with a `#scaleup_` prefix.
+Your environment already has 3 additional nodes provisioned, but you have not used
+them so far. They are already configured in the inventory file, but commented out with a `#scaleup_` prefix.
 
 To see the lines run:
+[source,bash,role="copypaste"]
 ----
 sudo grep '#scaleup_' /etc/ansible/hosts
 ----
 
 Remove the `#scaleup_` comment prefix by running the below `sed` command:
 
+[source,bash,role="copypaste"]
 ----
 sudo sed -i 's/#scaleup_//g' /etc/ansible/hosts
 ----
@@ -85,9 +138,9 @@ new_nodes
 ...
 
 [new_nodes]
-{{ NODE4_INTERNAL_FQDN }} openshift_node_labels="{'region': 'apps'}" openshift_hostname={{ NODE4_INTERNAL_FQDN }} openshift_public_hostname={{ NODE4_EXTERNAL_FQDN }}
-{{ NODE5_INTERNAL_FQDN }} openshift_node_labels="{'region': 'apps'}" openshift_hostname={{ NODE5_INTERNAL_FQDN }} openshift_public_hostname={{ NODE5_EXTERNAL_FQDN }}
-{{ NODE6_INTERNAL_FQDN }} openshift_node_labels="{'region': 'apps'}" openshift_hostname={{ NODE6_INTERNAL_FQDN }} openshift_public_hostname={{ NODE6_EXTERNAL_FQDN }}
+{{ NODE4_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE4_INTERNAL_FQDN }} openshift_public_hostname={{ NODE4_EXTERNAL_FQDN }} openshift_node_group_name='node-config-compute'
+{{ NODE5_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE5_INTERNAL_FQDN }} openshift_public_hostname={{ NODE5_EXTERNAL_FQDN }} openshift_node_group_name='node-config-compute'
+{{ NODE6_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE6_INTERNAL_FQDN }} openshift_public_hostname={{ NODE6_EXTERNAL_FQDN }} openshift_node_group_name='node-config-compute'
 
 ...
 ----
@@ -95,6 +148,7 @@ new_nodes
 Now that these hosts are properly defined (uncommented), you can use Ansible to
 verify that they are, in fact, online:
 
+[source,bash,role="copypaste"]
 ----
 ansible new_nodes -m ping
 ----
@@ -124,27 +178,28 @@ already taken care of.
 #### Run the Playbook to Extend the Cluster
 To extend your cluster run the following playbook:
 
+[source,bash,role="copypaste"]
 ----
 ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-node/scaleup.yml
 ----
 
-The playbook takes 1-2 minutes to complete. When done verify the amount of
-application nodes known to OpenShift has been increased from 3 to 6:
+The playbook takes 1-2 minutes to complete. When done, you can verify that there are now 6 `compute` nodes:
 
+[source,bash,role="copypaste"]
 ----
-oc get nodes -l region=apps
+oc get nodes -l node-role.kubernetes.io/compute=true
 ----
 
 You will see:
 
 ----
-NAME                                          STATUS    ROLES     AGE
-{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1h
-{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1h
-{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1h
-{{ NODE4_INTERNAL_FQDN }}   Ready     compute   2m
-{{ NODE5_INTERNAL_FQDN }}   Ready     compute   2m
-{{ NODE6_INTERNAL_FQDN }}   Ready     compute   2m
+NAME                                          STATUS    ROLES     AGE       VERSION
+{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1h        v1.10.0+b81c8f8
+{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1h        v1.10.0+b81c8f8
+{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1h        v1.10.0+b81c8f8
+{{ NODE4_INTERNAL_FQDN }}   Ready     compute   18m       v1.10.0+b81c8f8
+{{ NODE5_INTERNAL_FQDN }}   Ready     compute   18m       v1.10.0+b81c8f8
+{{ NODE6_INTERNAL_FQDN }}   Ready     compute   18m       v1.10.0+b81c8f8
 ----
 
 [TIP]

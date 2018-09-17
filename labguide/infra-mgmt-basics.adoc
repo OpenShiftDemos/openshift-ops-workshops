@@ -13,6 +13,7 @@ It is recommended that you `sudo -i` to `root` before performing these exercises
 
 Log in as cluster administrator:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u system:admin
 ----
@@ -21,6 +22,7 @@ Verify your cluster currently consists of 5 nodes. Remember that the Master
 is also a node, and that we have a host dedicated to running OpenShift's
 infrastructure.
 
+[source,bash,role="copypaste"]
 ----
 oc get nodes
 ----
@@ -116,6 +118,7 @@ Your environment already has 3 additional nodes provisioned, but you have not us
 them so far. They are already configured in the inventory file, but commented out with a `#scaleup_` prefix.
 
 To see the lines run:
+
 [source,bash,role="copypaste"]
 ----
 grep '#scaleup_' /etc/ansible/hosts
@@ -283,14 +286,16 @@ openshift_storage_glusterfs_registry_block_host_vol_size=30 <6>
 
 #### Install the OCS cluster for OpenShift infrastructure
 
-To illustrate what becomes available with this step, first look at the `StorageClass` definitions in the system as of now:
+To illustrate what becomes available with this step, first look at the
+`StorageClass` definitions in the system as of now:
 
 [source,bash,role="copypaste"]
 ----
 oc get sc
 ----
 
-There is only a single `StorageClass` defined, the default OCS cluster that shipped with this installation:
+There is only a single `StorageClass` defined, the default OCS cluster that
+shipped with this installation:
 
 ----
 NAME                          PROVISIONER                AGE
@@ -307,10 +312,9 @@ second OCS cluster, dedicated to OpenShift infrastructure workloads:
 ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-glusterfs/config.yml
 ----
 
-This playbook takes about 1-2 minutes to execute and will install an
-entirely independent OCS cluster, including a separate `heketi` management
-stack. Additional `StorageClasses` will be set up to make this storage
-usable.
+This playbook takes about 1-2 minutes to execute and will install an entirely
+independent OCS cluster, including a separate `heketi` management stack.
+Additional `StorageClasses` will be set up to make this storage usable.
 
 Verify by using the `oc get sc` command that two new `StorageClasses` are available:
 
@@ -619,7 +623,14 @@ logging-fluentd   8         8         8         8            8           logging
 
 You will also see the storage for ElasticSearch being automatically
 provisioned from the OCS block storage service if you query the
-PersistentVolumeClaim objects in this project using `oc get pvc`:
+PersistentVolumeClaim objects in this project
+
+[source,bash,role="copypaste"]
+----
+oc get pvc
+----
+
+And you will see something like:
 
 [source,bash,role="copypaste"]
 ----

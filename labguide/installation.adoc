@@ -84,6 +84,7 @@ First, let's examine the provided installer configuration file.
 #### Look at the file
 Use `cat`, `less`, or an editor to look at the `/etc/ansible/hosts` file:
 
+[source,bash,role="copypaste"]
 ----
 cat /etc/ansible/hosts
 ----
@@ -132,6 +133,7 @@ preconfigured to access this OpenShift "super administrator" without a
 password. Type the following command to login as the internal super-user on
 OpenShift:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u system:admin
 ----
@@ -165,6 +167,7 @@ Using project "default".
 Execute the following command to see a list of the *Nodes* that OpenShift knows
 about:
 
+[source,bash,role="copypaste"]
 ----
 oc get nodes
 ----
@@ -226,12 +229,14 @@ release.
 
 Change to the `openshift-metrics` project:
 
+[source,bash,role="copypaste"]
 ----
 oc project openshift-metrics
 ----
 
 Now, `describe` the `StatefulSet` for Prometheus:
 
+[source,bash,role="copypaste"]
 ----
 oc describe statefulset prometheus
 ----
@@ -268,6 +273,7 @@ total containers in the core Prometheus stack.
 
 There is also a `node-exporter` container that runs as a `DaemonSet`. You can look at it by executing the following:
 
+[source,bash,role="copypaste"]
 ----
 oc describe daemonset prometheus-node-exporter
 ----
@@ -324,6 +330,7 @@ There are no labs for these, so feel free to check the documentation for link:ht
 
 Lastly, you can view that the Prometheus components have been exposed for access when outside of OpenShift using `Routes`. You'll learn about `Routes` later:
 
+[source,bash,role="copypaste"]
 ----
 oc get routes
 ----
@@ -350,6 +357,7 @@ We will now use a command line client on the *master* to talk via this server
 to the container storage cluster. It's password protected, so let's export a
 couple of environment variables first to configure the client:
 
+[source,bash,role="copypaste"]
 ----
 export HEKETI_CLI_SERVER=http://heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
 export HEKETI_CLI_USER=admin
@@ -358,6 +366,7 @@ export HEKETI_CLI_KEY={{HEKETI_ADMIN_PW}}
 
 Then use the CLI tool `heketi-cli` to query `heketi` about all the storage clusters it knows about:
 
+[source,bash,role="copypaste"]
 ----
 heketi-cli cluster list
 ----
@@ -379,6 +388,7 @@ To get more detailed information about the topology of your OCS cluster (i.e.
 nodes, devices and volumes heketi has discovered) run the following command
 (output abbreviated):
 
+[source,bash,role="copypaste"]
 ----
 heketi-cli topology info
 ----

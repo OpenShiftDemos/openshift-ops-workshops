@@ -556,6 +556,7 @@ openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra": "true"}
 openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra": "true"}
 ...
 ----
+
 <1> Trigger the installation of the Logging service
 <2> The namespace in which the Logging components will be deployed
 <3> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`

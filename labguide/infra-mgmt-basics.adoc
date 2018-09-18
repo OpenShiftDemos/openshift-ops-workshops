@@ -226,20 +226,20 @@ OpenShift Container Storage can be configured directly in the installer, to prov
 By definition you need a separate set of hosts for this - which you have just made available in the previous paragraph.
 
 #### Configure the Installer
-Several directives for a second, infrastructure-centric OCS cluster are in the `/etc/ansible/hosts` file. They have been prepared but commented out using the `#cnsinfra_` prefix.
+Several directives for a second, infrastructure-centric OCS cluster are in the `/etc/ansible/hosts` file. They have been prepared but commented out using the `#ocsinfra_` prefix.
 
 To see the lines run:
 
 [source,bash,role="copypaste"]
 ----
-grep '#cnsinfra_' /etc/ansible/hosts
+grep '#ocsinfra_' /etc/ansible/hosts
 ----
 
-Remove the `#cnsinfra_` comment prefix by running the below `sed` command:
+Remove the `#ocsinfra_` comment prefix by running the below `sed` command:
 
 [source,bash,role="copypaste"]
 ----
-sed -i 's/#cnsinfra_//g' /etc/ansible/hosts
+sed -i 's/#ocsinfra_//g' /etc/ansible/hosts
 ----
 
 When finished, your inventory file should look like the following:

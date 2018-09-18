@@ -1002,8 +1002,6 @@ Resources:
                     openshift_docker_additional_registries=support.internal.aws.testdrive.openshift.com:5000
                     oreg_url=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-${!component}:${!version}
                     osm_etcd_image=support.internal.aws.testdrive.openshift.com:5000/rhel7/etcd
-                    openshift_cli_image=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose
-                    osm_image=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose
                     openshift_release=v3.10.14
                     openshift_image_tag=v3.10.14
 

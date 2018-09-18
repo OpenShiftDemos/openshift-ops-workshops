@@ -35,6 +35,7 @@ The installation of OpenShift already included setting up LDAP authentication in
 the inventory file. As the `root` user on the master host, examine the master
 config with `cat`, `less`, or your favorite editor:
 
+[source,bash,role="copypaste"]
 ----
 sudo cat /etc/origin/master/master-config.yaml
 ----
@@ -124,6 +125,7 @@ the various groups.
 We have provided a `groupsync` configuration file for you already. Using `cat`,
 `less`, or your favorite editor, look at the following file:
 
+[source,bash,role="copypaste"]
 ----
 cat /opt/lab/support/groupsync.yaml
 ----
@@ -139,18 +141,25 @@ Without going into too much detail (you can look at the documentation), the
 * uses the `dn` and `uid` as the UID and name attributes, respectively, in
   OpenShift
 
-Now that you understand how the `groupsync` is configured, first make sure you
-are logged in as the `root` user. Then, make sure you are logged in as a cluster
-administrator:
+Make sure you are logged in as the `root` user:
 
+[source,bash,role="copypaste"]
 ----
-sudo oc login -u system:admin
+sudo -i
+----
+
+Then, make sure you are logged in as a cluster administrator:
+
+[source,bash,role="copypaste"]
+----
+oc login -u system:admin
 ----
 
 And then execute the `groupsync`:
 
+[source,bash,role="copypaste"]
 ----
-sudo oc adm groups sync --sync-config=/opt/lab/support/groupsync.yaml --confirm
+oc adm groups sync --sync-config=/opt/lab/support/groupsync.yaml --confirm
 ----
 
 You will see output like the following:
@@ -168,8 +177,9 @@ output of the help with `oc adm groups sync -h`.
 
 If you want to see the *Groups* that were created, execute the following:
 
+[source,bash,role="copypaste"]
 ----
-sudo oc get groups
+oc get groups
 ----
 
 You will see output like the following:
@@ -184,8 +194,9 @@ ose-user         normaluser1, fancyuser1, fancyuser2, teamuser1, teamuser2
 
 Take a look at a specific group in YAML:
 
+[source,bash,role="copypaste"]
 ----
-sudo oc get group ose-fancy-dev -o yaml
+oc get group ose-fancy-dev -o yaml
 ----
 
 The YAML looks like:
@@ -216,8 +227,9 @@ has listed the users who are in the group.
 
 What happens if you list the *Users*?
 
+[source,bash,role="copypaste"]
 ----
-sudo oc get user
+oc get user
 ----
 
 If you logged into the web console as `teamuser1` previously, you will see:
@@ -249,8 +261,9 @@ For example, they can see the list of all *Projects* in the cluster.
 
 Change the policy for the `ose-fancy-dev` *Group*:
 
+[source,bash,role="copypaste"]
 ----
-sudo oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
+oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
 ----
 
 [NOTE]
@@ -263,12 +276,14 @@ link:https://docs.openshift.com/container-platform/3.10/admin_guide/manage_rbac.
 #### Examine `cluster-reader` policy
 Go ahead and login as a regular user:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u normaluser1 -p openshift
 ----
 
 Then, try to list *Projects*:
 
+[source,bash,role="copypaste"]
 ----
 oc get projects
 ----
@@ -281,6 +296,7 @@ No resources found.
 
 Now, login as a member of `ose-fancy-dev`:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u fancyuser1 -p openshift
 ----
@@ -311,12 +327,14 @@ Platform can work.
 #### Create Projects for Collaboration
 Make sure you login as the cluster administrator:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u system:admin
 ----
 
 Then, create several *Projects* for people to collaborate:
 
+[source,bash,role="copypaste"]
 ----
 oc adm new-project app-dev --display-name="Application Development"
 oc adm new-project app-test --display-name="Application Testing"
@@ -352,6 +370,7 @@ preconfigured. When it comes to *Projects*, you similarly can grant view, edit,
 or administrative access. Let's give our `ose-teamed-app` users access to edit the
 development and testing projects:
 
+[source,bash,role="copypaste"]
 ----
 oc adm policy add-role-to-group edit ose-teamed-app -n app-dev
 oc adm policy add-role-to-group edit ose-teamed-app -n app-test
@@ -359,12 +378,14 @@ oc adm policy add-role-to-group edit ose-teamed-app -n app-test
 
 And then give them access to view production:
 
+[source,bash,role="copypaste"]
 ----
 oc adm policy add-role-to-group view ose-teamed-app -n app-prod
 ----
 
 Now, give the `ose-fancy-dev` group edit access to the production project:
 
+[source,bash,role="copypaste"]
 ----
 oc adm policy add-role-to-group edit ose-fancy-dev -n app-prod
 ----
@@ -372,6 +393,7 @@ oc adm policy add-role-to-group edit ose-fancy-dev -n app-prod
 #### Examine Group Access
 Log in as `normaluser1` and see what *Projects* you can see:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u normaluser1 -p openshift
 oc get projects
@@ -386,6 +408,7 @@ No resources found.
 
 Then, try `teamuser1` from the `ose-teamed-app` group:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u teamuser1 -p openshift
 oc get projects
@@ -403,6 +426,7 @@ app-test   Application Testing       Active
 You did not grant the team users edit access to the production project. Go ahead
 and try to create something in the production project as `teamuser1`:
 
+[source,bash,role="copypaste"]
 ----
 oc project app-prod
 oc new-app docker.io/siamaksade/mapit
@@ -439,12 +463,14 @@ attempt to log-in to it.
 
 Login as a the user with `cluster-reader` privileges:
 
+[source,bash,role="copypaste"]
 ----
 oc login -u fancyuser1 -p openshift
 ----
 
 Find the `prometheus` `Route` with the following command:
 
+[source,bash,role="copypaste"]
 ----
 oc get route prometheus -n openshift-metrics
 ----

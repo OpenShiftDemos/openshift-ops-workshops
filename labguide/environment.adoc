@@ -54,10 +54,12 @@ the command blocks can be copy/pasted directly. Others will require modification
 of the command before execution. If you see a command block with a red border
 (see below), the command will require slight modification.
 
-[source,none,role=copypaste]
+[source,none,role="copypaste copypaste-warning"]
 ----
 some command to modify
 ----
+
+Most command blocks support auto highlighting with a click. If you hover over the command block above and click, it should automatically highlight all the text to make for easier copying.
 
 ### Logging in
 Most of the exercises in this lab will be facilitated using the OpenShift command line client on the master node. For convenient access to the master's command line we provide a web-based SSH console: {{ SSH_CONSOLE_URL }}
@@ -69,7 +71,7 @@ image::webssh_login.png[]
 
 If you prefer to use an SSH client on your system you can do that too, using the same credentials:
 
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 ssh -l cloud-user {{MASTER_EXTERNAL_FQDN}}
 ----

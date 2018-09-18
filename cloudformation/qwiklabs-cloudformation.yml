@@ -72,23 +72,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-0f6b786a45ce5229a
+      ami: ami-0293a54f126268125
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-0e1c2f316bc086eab
+      ami: ami-0bca911471ced57f3
     eu-west-1:
-      ami: ami-0f687991e09a8c4bc
+      ami: ami-0ebecc9a86d4b32eb
     eu-central-1:
-      ami: ami-0ef64a7e8a10fa056
+      ami: ami-0b9193025e3c5a38a
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-09f821e7bdf3d917e
+      ami: ami-0662317e5be2bdf18
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -1002,8 +1002,6 @@ Resources:
                     openshift_docker_additional_registries=support.internal.aws.testdrive.openshift.com:5000
                     oreg_url=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-${!component}:${!version}
                     osm_etcd_image=support.internal.aws.testdrive.openshift.com:5000/rhel7/etcd
-                    openshift_cli_image=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose
-                    osm_image=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose
                     openshift_release=v3.10.14
                     openshift_image_tag=v3.10.14
 
@@ -1038,7 +1036,9 @@ Resources:
                     #metrics_openshift_metrics_storage_volume_size=10Gi
                     #metrics_openshift_metrics_hawkular_hostname=metrics.apps.${AWS::AccountId}.${PublicHostedZone}
                     #metrics_openshift_metrics_cassandra_pvc_storage_class_name='glusterfs-registry-block'
-
+                    #metrics_openshift_metrics_hawkular_nodeselector={"node-role.kubernetes.io/infra": "true"}
+                    #metrics_openshift_metrics_cassandra_nodeselector={"node-role.kubernetes.io/infra": "true"}
+                    #metrics_openshift_metrics_heapster_nodeselector={"node-role.kubernetes.io/infra": "true"}
 
                     # logging configs
                     openshift_logging_install_logging=false
@@ -1049,6 +1049,9 @@ Resources:
                     #logging_openshift_logging_es_pvc_storage_class_name='glusterfs-registry-block'
                     #logging_openshift_logging_es_memory_limit=2G
                     #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
+                    #logging_openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra": "true"}
+                    #logging_openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra": "true"}
+                    #logging_openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra": "true"}
 
                     # prometheus configs (future)
                     openshift_hosted_prometheus_deploy=true

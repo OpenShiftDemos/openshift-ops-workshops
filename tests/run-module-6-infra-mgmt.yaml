@@ -49,9 +49,9 @@
         - scaleup
         - scaleup_test
 
-    - name: Uncomment cnsinfra lines
+    - name: Uncomment ocsinfra lines
       replace:
-        regexp: '#cnsinfra_'
+        regexp: '#ocsinfra_'
         replace: ''
         path: /etc/ansible/hosts
       tags:

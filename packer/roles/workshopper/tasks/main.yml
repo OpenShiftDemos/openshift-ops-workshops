@@ -4,7 +4,7 @@
 
   - name: Pulling the workshopper docker image
     docker_image:
-      name: osevg/workshopper:0.2
+      name: quay.io/osevg/workshopper@sha256:c40b92f5d257134807fd9ff1443ff2456c683e9126f7710524a5f28763375264
 
   - name: put the systemd-docker binary file at /usr/bin
     copy:

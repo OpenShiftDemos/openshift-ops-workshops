@@ -112,7 +112,7 @@ modules:
       CNS_BLOCK_STORAGECLASS: "glusterfs-registry-block"
       CNS_INFRA_STORAGECLASS: "glusterfs-registry"
   cns:
-    name: Container-native Storage
+    name: OpenShift Container Storage
     requires:
       - installation
       - infra-mgmt-basics

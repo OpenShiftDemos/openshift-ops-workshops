@@ -1,5 +1,3 @@
-OCSOpenShift Container:experimental:
-
 ## OpenShift Container Storage Concepts
 In this lab we are going to provide a view 'under the hood' of OpenShift
 `PersistentVolumes` provided by OpenShift Container Storage (OCS). For this purpose we will examine volumes

@@ -23,6 +23,7 @@ them, and users may be able to access multiple *Projects*.
 
 For this exercise, first create a *Project* to hold our resources:
 
+[source,bash,role="copypaste"]
 ----
 oc new-project app-management
 ----
@@ -36,6 +37,7 @@ instantiate templates, and so on.
 
 You will now launch a specific image that exists on Dockerhub
 
+[source,bash,role="copypaste"]
 ----
 oc new-app docker.io/siamaksade/mapit
 ----
@@ -82,6 +84,7 @@ pod definition while running.
 
 You can get a list of pods:
 
+[source,bash,role="copypaste"]
 ----
 oc get pods
 ----
@@ -99,7 +102,7 @@ which you will learn about shortly. Your name will be slightly different.
 The `describe` command will give you more information on the details of a pod.
 In the case of the pod name above:
 
-[source,bash,role=copypaste]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 oc describe pod mapit-1-6lczv
 ----
@@ -176,6 +179,7 @@ including the YAML format to make one by hand, in the official documentation.
 The `new-app` command used earlier caused a service to be created. You can see
 the current list of services in a project with:
 
+[source,bash,role="copypaste"]
 ----
 oc get services
 ----
@@ -194,6 +198,7 @@ the service is deleted. Your service IP will likely be different.
 Just like with pods, you can `describe` services, too. In fact, you can
 `describe` most objects in OpenShift:
 
+[source,bash,role="copypaste"]
 ----
 oc describe service mapit
 ----
@@ -223,6 +228,7 @@ this data can be represented as serializable data objects (JSON, YAML).
 
 Take a look at the YAML output for the service:
 
+[source,bash,role="copypaste"]
 ----
 oc get service mapit -o yaml
 ----
@@ -273,7 +279,7 @@ It is also of interest to view the YAML of the *Pod* to understand how OpenShift
 wires components together. Go back and find the name of your `mapit` *Pod*, and
 then execute the following:
 
-[source,bash,role=copypaste]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 oc get pod mapit-1-6lczv -o yaml
 ----
@@ -341,6 +347,7 @@ Now that we know the background of what a *ReplicatonController* and
 look at the *DeploymentConfig* (DC) that was created for you when you told
 OpenShift to stand up the `mapit` image:
 
+[source,bash,role="copypaste"]
 ----
 oc get dc
 ----
@@ -357,6 +364,7 @@ To get more details, we can look into the *ReplicationController* (*RC*).
 Take a look at the *ReplicationController* (RC) that was created for you when
 you told OpenShift to stand up the `mapit` image:
 
+[source,bash,role="copypaste"]
 ----
 oc get rc
 ----
@@ -377,12 +385,14 @@ the desired number, we can tell OpenShift that we want more or less *Pods*.
 Let's scale our mapit "application" up to 2 instances. We can do this with
 the `scale` command.
 
+[source,bash,role="copypaste"]
 ----
 oc scale --replicas=2 dc/mapit
 ----
 
 To verify that we changed the number of replicas, issue the following command:
 
+[source,bash,role="copypaste"]
 ----
 oc get rc
 ----
@@ -397,6 +407,7 @@ mapit-1      2         2         1         4h
 You can see that we now have 2 replicas. Let's verify the number of pods with
 the `oc get pods` command:
 
+[source,bash,role="copypaste"]
 ----
 oc get pods
 ----
@@ -412,6 +423,7 @@ mapit-1-rq6t6   1/1       Running   0          1m
 And lastly, let's verify that the *Service* that we learned about in the
 previous lab accurately reflects two endpoints:
 
+[source,bash,role="copypaste"]
 ----
 oc describe svc mapit
 ----
@@ -437,6 +449,7 @@ No events.
 
 Another way to look at a *Service*'s endpoints is with the following:
 
+[source,bash,role="copypaste"]
 ----
 oc get endpoints mapit
 ----
@@ -481,7 +494,7 @@ Since we have two *Pods* running right now, let's see what happens if we
 "accidentally" kill one. Run the `oc get pods` command again, and choose a *Pod*
 name. Then, do the following:
 
-[source,bash,role=copypaste]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 oc delete pod mapit-1-6lczv && oc get pods
 ----
@@ -523,6 +536,7 @@ Do you remember setting up the router? You probably don't. That's because the
 installer settings created a router for you! The router lives in the `default`
 *Project*, and you can see information about it with the following command:
 
+[source,bash,role="copypaste"]
 ----
 oc describe dc router -n default
 ----
@@ -533,6 +547,7 @@ the *Service* via the command line. If you remember from earlier, your *Service*
 name is `mapit`. With the *Service* name, creating a *Route* is a simple
 one-command task:
 
+[source,bash,role="copypaste"]
 ----
 oc expose service mapit
 ----
@@ -545,6 +560,7 @@ route "mapit" exposed
 
 Verify the *Route* was created with the following command:
 
+[source,bash,role="copypaste"]
 ----
 oc get route
 ----
@@ -566,7 +582,6 @@ How does this work? Firstly, the `ROUTINGSUBDOMAIN` can be configured at install
 time. We did this for you. In the `/etc/ansible/hosts` file you will find the
 following line:
 
-[source,yaml]
 ----
 openshift_master_default_subdomain={{OCP_ROUTING_SUFFIX}}
 ----
@@ -596,6 +611,7 @@ oc expose service mapit
 Before we continue, go ahead and scale your application down to a single
 instance:
 
+[source,bash,role="copypaste"]
 ----
 oc scale --replicas=1 dc/mapit
 ----
@@ -633,6 +649,7 @@ which is creating and/or modifying probes. The `mapit` application exposes an
 endpoint which we can check to see if it is alive and ready to respond. You can
 test it using `curl`:
 
+[source,bash,role="copypaste"]
 ----
 curl mapit-app-management.{{OCP_ROUTING_SUFFIX}}/health
 ----
@@ -647,12 +664,14 @@ You will get some JSON as a response:
 We can ask OpenShift to probe this endpoint for liveness with the following
 command:
 
+[source,bash,role="copypaste"]
 ----
 oc set probe dc/mapit --liveness --get-url=http://:8080/health --initial-delay-seconds=30
 ----
 
 You can then see that this probe is defined in the `oc describe` output:
 
+[source,bash,role="copypaste"]
 ----
 oc describe dc mapit
 ----
@@ -674,6 +693,7 @@ You will see a section like:
 
 Similarly, you can set a readiness probe in the same manner:
 
+[source,bash,role="copypaste"]
 ----
 oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30
 ----
@@ -694,8 +714,9 @@ We will talk about this concept in more detail later. But let's imagine for a mo
 
 Here's how you would instruct OpenShift to create a *PersistentVolume* object, which represents external, persistent storage, and have it *mounted* inside the container's filesystem:
 
+[source,bash,role="copypaste"]
 ----
-oc volume dc/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi --claim-name=mapit-storage --mount-path=/app-storage
+oc set volume dc/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi --claim-name=mapit-storage --mount-path=/app-storage
 ----
 
 The output looks like this:
@@ -710,6 +731,7 @@ Next the `DeploymentConfig` of `mapit` is updated to reference this storage and 
 
 You can see the new `DeploymentConfig` like this:
 
+[source,bash,role="copypaste"]
 ----
 oc get dc mapit
 ----
@@ -723,6 +745,7 @@ mapit     4          1         1         config,image(mapit:latest)
 
 Likely, depending when you ran the command you may or may not see that the new pod is still being spawned:
 
+[source,bash,role="copypaste"]
 ----
 oc get pod
 ----
@@ -740,13 +763,14 @@ Suffice it to say, a 1GiB GlusterFS volume has been created and made available t
 
 Log on to the new pod (**your pod names will be different**) using the remote-shell capability of the `oc` client:
 
-[source,none,role=copypaste]
+[source,none,role="copypaste copypaste-warning"]
 ----
 oc rsh mapit-4-d872b
 ----
 
 *Being in the container's shell session*, list the content of the root directory from the perspective of the container's namespace:
 
+[source,bash,role="copypaste"]
 ----
 ls -ahl /
 ----
@@ -787,6 +811,7 @@ One of the interesting aspects of persistent storage from GlusterFS is that it i
 
 Let's try this. First write a file to the persistent, shared storage and then exit the remote shell session.
 
+[source,bash,role="copypaste"]
 ----
 echo "Hello World from OpenShift" > /app-storage/hello.txt
 exit
@@ -794,12 +819,14 @@ exit
 
 Now, let's scale your deployment to two pods:
 
+[source,bash,role="copypaste"]
 ----
 oc scale --replicas=2 dc/mapit
 ----
 
 After some time, ensure both are in the `Running` state:
 
+[source,bash,role="copypaste"]
 ----
 oc get pods
 ----
@@ -812,7 +839,7 @@ mapit-4-d872b   1/1       Running   0          25m
 
 Read the text file from the other pod using the `cat` command appended directly to the `oc rsh` call:
 
-[source,none,role=copypaste]
+[source,none,role="copypaste copypaste-warning"]
 ----
 oc rsh mapit-4-ljjmf cat /app-storage/hello.txt
 ----

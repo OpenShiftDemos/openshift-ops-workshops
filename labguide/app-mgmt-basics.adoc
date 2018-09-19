@@ -716,7 +716,7 @@ Here's how you would instruct OpenShift to create a *PersistentVolume* object, w
 
 [source,bash,role="copypaste"]
 ----
-oc volume dc/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi --claim-name=mapit-storage --mount-path=/app-storage
+oc set volume dc/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi --claim-name=mapit-storage --mount-path=/app-storage
 ----
 
 The output looks like this:

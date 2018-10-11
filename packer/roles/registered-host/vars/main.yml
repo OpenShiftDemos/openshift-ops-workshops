@@ -9,6 +9,5 @@ rhsm_repos:
   - rhel-7-server-extras-rpms
   - rh-gluster-3-for-rhel-7-server-rpms
   - rhel-server-rhscl-7-rpms 
-  - rhel-7-server-ansible-2.4-rpms
-
+  - rhel-7-server-ansible-2.6-rpms
 ...

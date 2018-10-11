@@ -1,6 +1,6 @@
 ---
 osrelease: 3.11.16-1.git.0.b48b8f8.el7
-installer_release: 3.7.54-1.git.12.b93b431
+installer_release: 3.11.16-1.git.0.4ac6f81
 
 ose_packages:
   - cockpit-docker

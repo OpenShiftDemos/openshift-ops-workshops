@@ -51,7 +51,7 @@
     "playbook_file": "site.yml",
     "extra_arguments": [
         "--become",
-        "--extra-vars", "rhsm_org_id={{user `org_id`}} registry_docker_user={{user `docker_user`}} registry_docker_user={{user `docker_password`}} rh_upstream_cns_mirror={{user `upstream_cns_mirror`}} rhsm_act_key={{user `activation_key`}} instructor_pub_key_file={{user `instructor_pub_key_file` }}"
+        "--extra-vars", "rhsm_org_id={{user `org_id`}} registry_docker_user={{user `docker_user`}} registry_docker_password={{user `docker_password`}} rh_upstream_cns_mirror={{user `upstream_cns_mirror`}} rhsm_act_key={{user `activation_key`}} instructor_pub_key_file={{user `instructor_pub_key_file` }}"
       ]
   }]
 }

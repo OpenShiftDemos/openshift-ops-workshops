@@ -1,6 +1,6 @@
 ---
-osrelease: 3.10.45-1.git.0.3b98bf6
-installer_release: 3.10.47-1.git.0.95bc2d2
+osrelease: 3.11.16-1.git.0.b48b8f8
+installer_release: 3.7.54-1.git.12.b93b431
 
 ose_packages:
   - cockpit-docker
@@ -29,10 +29,10 @@ ose_packages:
   - net-tools
   - iptables-services
   - bridge-utils
-  - openshift-ansible-{{ installer_release }}.el7_5
-  - openshift-ansible-playbooks-{{ installer_release }}.el7_5
-  - openshift-ansible-roles-{{ installer_release }}.el7_5
-  - openshift-ansible-docs-{{ installer_release }}.el7_5
+  - openshift-ansible-{{ installer_release }}.el7
+  - openshift-ansible-playbooks-{{ installer_release }}.el7
+  - openshift-ansible-roles-{{ installer_release }}.el7
+  - openshift-ansible-docs-{{ installer_release }}.el7
   - atomic-openshift-{{ osrelease }}.el7.x86_64
   - atomic-openshift-node-{{ osrelease }}.el7.x86_64
   - atomic-openshift-excluder-{{ osrelease }}.el7.noarch

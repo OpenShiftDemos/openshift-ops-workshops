@@ -1,0 +1,9 @@
+---
+
+- name: debug 
+  debug: var={{ registery_docker_user }}
+
+- name: debug 
+  debug: var={{ registery_docker_password }}
+
+...

@@ -5,10 +5,14 @@
     name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     state: present
 
-- name: install jq utility
+- name: install utilities
   yum:
-    name: jq
+    name: {{ item }}
     state: present
+  with_items:
+  - jq
+  - emacs
+  - nano
 
 - name: remove epel
   yum:

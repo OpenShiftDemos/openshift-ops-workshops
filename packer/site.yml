@@ -3,7 +3,6 @@
 - hosts: default
 
   roles:
-    - { role: debug, tags: ['debug']}
     - { role: tools, tags: ['tools']}
     - { role: authorized-key, tags: ['authorized-key']}
     - { role: instructor-user, tags: ['instructor-user']}

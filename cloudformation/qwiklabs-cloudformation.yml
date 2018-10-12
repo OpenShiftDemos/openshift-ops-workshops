@@ -12,10 +12,8 @@ Parameters:
 
   InfraInstanceType:
     Type: String
-    Default: m4.large
+    Default: m4.xlarge
     AllowedValues:
-      - t2.large
-      - t2.xlarge
       - m4.large
       - m4.xlarge
     ConstraintDescription: Must be a valid EC2 instance type.

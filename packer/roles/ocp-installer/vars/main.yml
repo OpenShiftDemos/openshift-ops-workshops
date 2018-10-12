@@ -29,6 +29,7 @@ ose_packages:
   - net-tools
   - iptables-services
   - bridge-utils
+  - atomic
   - openshift-ansible-{{ installer_release }}.el7
   - openshift-ansible-playbooks-{{ installer_release }}.el7
   - openshift-ansible-roles-{{ installer_release }}.el7

@@ -545,12 +545,11 @@ When finished, your inventory file should look like the following:
 [OSEv3:vars]
 ...
 openshift_logging_install_logging=true <1>
-openshift_logging_namespace=logging <2>
-openshift_logging_es_pvc_dynamic=true <3>
-openshift_logging_es_pvc_size=10Gi <4>
-openshift_logging_es_pvc_storage_class_name={{ CNS_BLOCK_STORAGECLASS }} <5>
-openshift_logging_es_memory_limit=2G <6>
-openshift_logging_kibana_hostname=kibana.{{ OCP_ROUTING_SUFFIX }} <7>
+openshift_logging_es_pvc_dynamic=true <2>
+openshift_logging_es_pvc_size=10Gi <3>
+openshift_logging_es_pvc_storage_class_name={{ CNS_BLOCK_STORAGECLASS }} <4>
+openshift_logging_es_memory_limit=2G <5>
+openshift_logging_kibana_hostname=kibana.{{ OCP_ROUTING_SUFFIX }} <6>
 openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra": "true"}
 openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra": "true"}
 openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra": "true"}
@@ -558,12 +557,11 @@ openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra": "true"}
 ----
 
 <1> Trigger the installation of the Logging service
-<2> The namespace in which the Logging components will be deployed
-<3> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`
-<4> The resulting PersistentVolumeClaim will be of `10Gi` in size
-<5> The name of the StorageClass to use for the PersistentVolumeClaim
-<6> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.10/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
-<7> The FQDN under which the Logging frontend UI (Kibana) will be available
+<2> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`
+<3> The resulting PersistentVolumeClaim will be of `10Gi` in size
+<4> The name of the StorageClass to use for the PersistentVolumeClaim
+<5> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.10/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
+<6> The FQDN under which the Logging frontend UI (Kibana) will be available
 
 #### Install Logging
 With these settings in place execute the `openshift-logging` Ansible playbook
@@ -575,11 +573,11 @@ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-loggin
 ----
 
 Once the installation finishes (roughly 4 minutes), log in as the cluster administrator, using the
-`logging` *Project*:
+`openshift-logging` *Project*:
 
 [source,bash,role="copypaste"]
 ----
-oc login -u system:admin -n logging
+oc login -u system:admin -n openshift-logging
 ----
 
 Verify the logging stack components are up and running:
@@ -1063,12 +1061,12 @@ oc login -u system:admin -n default
 ----
 
 Just like with the file uploader example, you can simply add a volume (and have
-its *PersistentVolumeClaim* created automatically) with the `oc volume` command.
+its *PersistentVolumeClaim* created automatically) with the `oc set volume` command.
 Execute the following:
 
 [source,bash,role="copypaste"]
 ----
-oc volume dc/docker-registry --add --name=registry-storage -t pvc \
+oc set volume dc/docker-registry --add --name=registry-storage -t pvc \
 --claim-mode=ReadWriteMany --claim-size=5Gi \
 --claim-name=registry-storage --claim-class={{ CNS_INFRA_STORAGECLASS }} --overwrite
 ----

@@ -531,7 +531,7 @@
       shell: oc login -u system:admin -n default
 
     - name: update registry deployment
-      shell: oc volume dc/docker-registry --add --name=registry-storage -t pvc --claim-mode=ReadWriteMany --claim-size=10Gi --claim-class={{ cns_infra_storageclass }} --claim-name=registry-storage --overwrite
+      shell: oc set volume dc/docker-registry --add --name=registry-storage -t pvc --claim-mode=ReadWriteMany --claim-size=10Gi --claim-class={{ cns_infra_storageclass }} --claim-name=registry-storage --overwrite
 
     - name: wait for pvc to be bound
       shell: oc get pvc/registry-storage -o jsonpath='{$.status.phase}'

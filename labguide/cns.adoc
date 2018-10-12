@@ -812,11 +812,11 @@ The app is of course not usable like this. We can fix this by providing shared
 storage to this app.
 
 You can create a *PersistentVolumeClaim* and attach it into an application with
-the `oc volume` command. Execute the following
+the `oc set volume` command. Execute the following
 
 [source,bash,role="copypaste"]
 ----
-oc volume dc/file-uploader --add --name=my-shared-storage \
+oc set volume dc/file-uploader --add --name=my-shared-storage \
 -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi \
 --claim-name=my-shared-storage --mount-path=/opt/app-root/src/uploaded
 ----
@@ -829,8 +829,8 @@ Like with the `mapit` application in "_Application Management Basics_" chapter, 
   `mount-path`
 * cause a new deployment of the application *Pods*
 
-For more information on what `oc volume` is capable of, look at its help output
-with `oc volume -h`. Now, let's look at the result of adding the volume:
+For more information on what `oc set volume` is capable of, look at its help output
+with `oc set volume -h`. Now, let's look at the result of adding the volume:
 
 [source,bash,role="copypaste"]
 ----

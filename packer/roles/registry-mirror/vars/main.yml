@@ -14,7 +14,7 @@ ose_core_images:
   - openshift3/csi-driver-registrar:{{ ose_major_tag }}
   - openshift3/csi-livenessprobe:{{ ose_major_tag }}
   - openshift3/csi-provisioner:{{ ose_major_tag }}
-  - openshift3/efs-provisioner:{{ ose_major_tag }}
+#  - openshift3/efs-provisioner:{{ ose_major_tag }}
   - openshift3/image-inspector:{{ ose_major_tag }}
 #  - openshift3/local-storage-provisioner:{{ ose_major_tag }}
 #  - openshift3/manila-provisioner:{{ ose_major_tag }}

@@ -73,23 +73,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-09ff5ae382ef8efe5
+      ami: 071d60e95af08b5e1
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-0ce9b1039e24638cd
+      ami: ami-08cc2693e7a83809a
     eu-west-1:
-      ami: ami-08dd12f410c095940
+      ami: ami-05a6b51dd5fc567b1
     eu-central-1:
-      ami: ami-07f93fe4da56c46c0
+      ami: ami-0c42abe93998c09f3
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-06a3ecd58153b70e4
+      ami: ami-0e5bce4a842d9f3d4
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -1003,8 +1003,8 @@ Resources:
                     openshift_docker_additional_registries=support.internal.aws.testdrive.openshift.com:5000
                     oreg_url=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-${!component}:${!version}
                     osm_etcd_image=support.internal.aws.testdrive.openshift.com:5000/rhel7/etcd
-                    openshift_release=v3.10.14
-                    openshift_image_tag=v3.10.14
+                    openshift_release=v3.11.16
+                    openshift_image_tag=v3.11.16
 
                     container_runtime_extra_storage="[{'device': '/dev/xvdc', 'path': '/var/lib/origin/openshift.local.volumes', 'options': 'gquota', 'filesystem': 'xfs', 'format': 'True'}]"
 

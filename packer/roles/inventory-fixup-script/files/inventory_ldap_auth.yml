@@ -15,7 +15,7 @@
 
     - name: configure OpenShift LDAP auth with IDM
       lineinfile:
-        line: "openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=admin,cn=users,cn=accounts,dc=auth,{{ dc_values }}', 'bindPassword': 'ldapadmin', 'ca': '/etc/origin/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://{{ idm_fqdn }}/cn=users,cn=accounts,dc=auth,{{ dc_values }}?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,{{ dc_values }})'}]"
+        line: "openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=admin,cn=users,cn=accounts,dc=auth,{{ dc_values }}', 'bindPassword': 'ldapadmin', 'ca': '/etc/origin/master/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://{{ idm_fqdn }}/cn=users,cn=accounts,dc=auth,{{ dc_values }}?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,{{ dc_values }})'}]"
         regexp: '^openshift_master_identity_providers='
         path: /etc/ansible/hosts    
 ...

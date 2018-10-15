@@ -2,7 +2,7 @@
 
 OpenShift supports a number of different authentication providers, and you can
 find the complete list in the
-link:https://docs.openshift.com/container-platform/3.10/install_config/configuring_authentication.html[authentication
+link:https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html[authentication
 documentation]. One of the most commonly used authentication providers is LDAP,
 whether provided by Microsoft Active Directory or by other sources.
 
@@ -78,7 +78,7 @@ Some notable fields under `identityProviders:`:
 <1> `mappingMethod: claim`: This section has to do with how usernames are
 assigned within an OpenShift cluster when multiple providers are configured. See
 the
-link:https://docs.openshift.com/container-platform/3.10/install_config/configuring_authentication.html#identity-providers_parameters[Identity provider Parameters] section for more information.
+link:https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#identity-providers_parameters[Identity provider Parameters] section for more information.
 
 <2> `name`: The unique ID of the identity provider. It is possible to have
 multiple authentication providers in an OpenShift environment, and OpenShift is
@@ -103,7 +103,7 @@ LDAP server.
 
 For more information on the specific details of LDAP authentication in OpenShift
 you can refer to the
-link:https://docs.openshift.com/container-platform/3.10/install_config/configuring_authentication.html#LDAPPasswordIdentityProvider[LDAP
+link:https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#LDAPPasswordIdentityProvider[LDAP
 provider documentation^].
 
 [NOTE]
@@ -116,7 +116,7 @@ by looking in `/etc/ansible/hosts` at the line that begins with
 #### Syncing LDAP Groups to OpenShift Groups
 In OpenShift, groups can be used to manage users and control permissions for
 multiple users at once. There is a section in the documentation on how to
-link:https://docs.openshift.com/container-platform/3.10/install_config/syncing_groups_with_ldap.html[sync
+link:https://docs.openshift.com/container-platform/3.11/install_config/syncing_groups_with_ldap.html[sync
 groups with LDAP^]. Syncing groups involves running a program called `groupsync`
 when logged into OpenShift as a user with `cluster-admin` privileges, and using
 a configuration file that tells OpenShift what to do with the users it finds in
@@ -270,7 +270,7 @@ oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
 ====
 If you are interested in the different roles that come with OpenShift, you can
 learn more about them in the
-link:https://docs.openshift.com/container-platform/3.10/admin_guide/manage_rbac.html#admin-guide-manage-rbac[role-based access control (RBAC)^] documentation.
+link:https://docs.openshift.com/container-platform/3.11/admin_guide/manage_rbac.html#admin-guide-manage-rbac[role-based access control (RBAC)^] documentation.
 ====
 
 #### Examine `cluster-reader` policy

@@ -16,7 +16,7 @@ started the lab.
 
 For more information on installing OpenShift Container Platform, please refer to
 the
-link:https://docs.openshift.com/container-platform/3.10/install/index.html[installation
+link:https://docs.openshift.com/container-platform/3.11/install/index.html[installation
 section] of the product documentation.
 
 [NOTE]
@@ -76,7 +76,7 @@ load balancer.
 
 For more information on the OpenShift Master's areas of responsibility, please refer to
 the
-link:https://docs.openshift.com/container-platform/3.10/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
+link:https://docs.openshift.com/container-platform/3.11/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
 
 ### Examining the provided Ansible inventory file
 First, let's examine the provided installer configuration file.
@@ -95,7 +95,7 @@ like *Masters* and *Nodes*.
 
 For more details on how OpenShift uses Ansible for its installation, please
 refer to the
-link:https://docs.openshift.com/container-platform/3.10/install/configuring_inventory_file.html[Configuring Your Inventory File].
+link:https://docs.openshift.com/container-platform/3.11/install/configuring_inventory_file.html[Configuring Your Inventory File].
 
 The top-level playbook in
 `/usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml` triggers
@@ -207,7 +207,7 @@ OpenShift is installed, by default, a CA and SSL certificates are generated for
 all inter-component communication within OpenShift, including the web console.
 It is possible to provide your own SSL certificates during the installation, and
 more information can be found in the
-link:https://docs.openshift.com/container-platform/3.10/install_config/certificate_customization.html#ansible-configuring-custom-certificates[custom
+link:https://docs.openshift.com/container-platform/3.11/install_config/certificate_customization.html#ansible-configuring-custom-certificates[custom
 certificates] section of the installation documentation.
 
 #### Prometheus
@@ -217,7 +217,7 @@ Preview mode, with a non-production SLA. We encourage customers to explore
 Prometheus and its alerts, and to provide us feedback.
 
 More information about prometheus can be found in the
-link:https://docs.openshift.com/container-platform/3.10/install_config/cluster_metrics.html#openshift-prometheus[Prometheus
+link:https://docs.openshift.com/container-platform/3.11/install_config/cluster_metrics.html#openshift-prometheus[Prometheus
 documentation] for OpenShift.
 
 At this point, Prometheus is installed in your cluster. Until we configure
@@ -257,7 +257,7 @@ Pod Template:
   Service Account:  prometheus
   Containers:
    prom-proxy:
-    Image:  registry.access.redhat.com/openshift3/oauth-proxy:v3.10.14
+    Image:  registry.access.redhat.com/openshift3/oauth-proxy:v3.11.16
     Port:   8443/TCP
     Args:
       -provider=openshift
@@ -299,7 +299,7 @@ Pod Template:
   Service Account:  prometheus-node-exporter
   Containers:
    node-exporter:
-    Image:  registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.10.14
+    Image:  registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.11.16
     Port:   9100/TCP
     Limits:
       cpu:     200m
@@ -326,7 +326,7 @@ Events:            <none>
 A `DaemonSet` is another special Kubernetes resource. It makes sure that
 specified containers are running on certain nodes.
 
-There are no labs for these, so feel free to check the documentation for link:https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/[StatefulSet] and for link:https://docs.openshift.com/container-platform/3.10/dev_guide/daemonsets.html[DaemonSet].
+There are no labs for these, so feel free to check the documentation for link:https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/[StatefulSet] and for link:https://docs.openshift.com/container-platform/3.11/dev_guide/daemonsets.html[DaemonSet].
 
 Lastly, you can view that the Prometheus components have been exposed for access when outside of OpenShift using `Routes`. You'll learn about `Routes` later:
 

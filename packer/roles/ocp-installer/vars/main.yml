@@ -30,6 +30,7 @@ ose_packages:
   - iptables-services
   - bridge-utils
   - atomic
+  - etcd
   - openshift-ansible-{{ installer_release }}.el7
   - openshift-ansible-playbooks-{{ installer_release }}.el7
   - openshift-ansible-roles-{{ installer_release }}.el7

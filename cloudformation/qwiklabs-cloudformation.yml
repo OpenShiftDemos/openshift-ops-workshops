@@ -861,7 +861,7 @@ Resources:
                     kind: LDAPSyncConfig
                     apiVersion: v1
                     url: ldap://idm.internal.aws.testdrive.openshift.com
-                    ca: /etc/origin/master/ipa-ca.crt
+                    ca: /etc/origin/master/idm_ldap_ca.crt
                     bindDN: uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
                     bindPassword: bindingpassword
                     rfc2307:
@@ -991,7 +991,7 @@ Resources:
 
                     openshift_master_api_port=443
                     openshift_master_console_port=443
-                    openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com', 'bindPassword': 'bindingpassword', 'ca': '/etc/origin/master/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com)'}]
+                    openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com', 'bindPassword': 'bindingpassword', 'ca': '/etc/origin/master/idm_ldap_ca.crt', 'insecure': 'false', 'url': 'ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com)'}]
                     os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
                     openshift_master_default_subdomain=apps.${AWS::AccountId}.${PublicHostedZone}
                     openshift_master_cluster_public_hostname=openshift.${AWS::AccountId}.${PublicHostedZone}
@@ -1330,7 +1330,7 @@ Resources:
               - ansible localhost -m wait_for -a "port=22 host=${Master1.PrivateIp}"
               - ansible localhost -m wait_for -a "port=80 host=${Master1.PrivateIp}"
               - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
-              - ansible master.internal.aws.testdrive.openshift.com, -m wait_for -a "path=/etc/origin/master/ipa-ca.crt timeout=600"
+              - ansible master.internal.aws.testdrive.openshift.com, -m wait_for -a "path=/etc/origin/master/idm_ldap_ca.crt timeout=600"
               - ansible localhost -m wait_for -a "port=80 host=localhost"
               - ansible localhost -m wait_for -a "port=5000 host=localhost"
               - ansible all -i master.internal.aws.testdrive.openshift.com, -m fetch -a "src=/etc/ansible/hosts dest=/etc/ansible/hosts flat=yes"

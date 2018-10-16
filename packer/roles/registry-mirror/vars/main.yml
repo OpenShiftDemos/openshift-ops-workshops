@@ -28,6 +28,7 @@ ose_core_images:
   - openshift3/ose-egress-http-proxy:{{ ose_major_tag }}
   - openshift3/ose-egress-router:{{ ose_major_tag }}
 #  - openshift3/ose-f5-router:{{ ose_major_tag }}
+  - openshift3/ose-prometheus-operator:{{ ose_major_tag }}
   - openshift3/ose-haproxy-router:{{ ose_major_tag }}
   - openshift3/ose-hyperkube:{{ ose_major_tag }}
   - openshift3/ose-hypershift:{{ ose_major_tag }}

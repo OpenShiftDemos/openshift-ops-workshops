@@ -14,10 +14,7 @@ ose_core_images:
   - openshift3/csi-driver-registrar:{{ ose_major_tag }}
   - openshift3/csi-livenessprobe:{{ ose_major_tag }}
   - openshift3/csi-provisioner:{{ ose_major_tag }}
-#  - openshift3/efs-provisioner:{{ ose_major_tag }}
   - openshift3/image-inspector:{{ ose_major_tag }}
-#  - openshift3/local-storage-provisioner:{{ ose_major_tag }}
-#  - openshift3/manila-provisioner:{{ ose_major_tag }}
   - openshift3/ose-cli:{{ ose_major_tag }}
   - openshift3/ose-cluster-capacity:{{ ose_major_tag }}
   - openshift3/ose-deployer:{{ ose_major_tag }}
@@ -27,8 +24,8 @@ ose_core_images:
   - openshift3/ose-egress-dns-proxy:{{ ose_major_tag }}
   - openshift3/ose-egress-http-proxy:{{ ose_major_tag }}
   - openshift3/ose-egress-router:{{ ose_major_tag }}
-#  - openshift3/ose-f5-router:{{ ose_major_tag }}
   - openshift3/ose-prometheus-operator:{{ ose_major_tag }}
+  - openshift3/grafana:{{ ose_major_tag }}
   - openshift3/ose-haproxy-router:{{ ose_major_tag }}
   - openshift3/ose-hyperkube:{{ ose_major_tag }}
   - openshift3/ose-hypershift:{{ ose_major_tag }}
@@ -46,8 +43,8 @@ ose_core_images:
   - openshift3/ose-console:{{ ose_major_tag }}
   - rhel7/etcd
   - openshift3/ose-cluster-monitoring-operator:{{ ose_major_tag }} 
-  - "openshift3/ose:latest"
-  - "openshift3/ose:{{ ose_major_tag }}"
+  - openshift3/ose:latest
+  - openshift3/ose:{{ ose_major_tag }}
   - rhel7/etcd:latest
 
 ose_infra_images:

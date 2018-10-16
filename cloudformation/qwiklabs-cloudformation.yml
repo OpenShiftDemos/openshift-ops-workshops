@@ -12,7 +12,7 @@ Parameters:
 
   InfraInstanceType:
     Type: String
-    Default: m4.2xlarge
+    Default: m4.xlarge
     AllowedValues:
       - t2.large
       - t2.xlarge
@@ -74,7 +74,7 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-0464d7eb013913049 
+      ami: ami-07f9a07ea120529bb 
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
@@ -1048,7 +1048,7 @@ Resources:
                     #logging_openshift_logging_es_pvc_dynamic=true
                     #logging_openshift_logging_es_pvc_size=10Gi
                     #logging_openshift_logging_es_pvc_storage_class_name='glusterfs-registry-block'
-                    #logging_openshift_logging_es_memory_limit=2G
+                    #logging_openshift_logging_es_memory_limit=1G
                     #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
                     #logging_openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra": "true"}
                     #logging_openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra": "true"}

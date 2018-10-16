@@ -42,6 +42,7 @@ ose_core_images:
   - openshift3/snapshot-provisioner:{{ ose_major_tag }}
   - openshift3/ose-console:{{ ose_major_tag }}
   - rhel7/etcd
+  - openshift3/ose-configmap-reloader:{{ ose_major_tag }}
   - openshift3/ose-cluster-monitoring-operator:{{ ose_major_tag }} 
   - openshift3/ose:latest
   - openshift3/ose:{{ ose_major_tag }}

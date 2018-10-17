@@ -77,17 +77,17 @@ Mappings:
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-011bbf30a63e09861
+      ami: ami-0850bacc1c2c00bef 
     eu-west-1:
-      ami: ami-0131a3183dfc5cdca
+      ami: ami-075fdf6a196b61565
     eu-central-1:
-      ami: ami-00db54e87d301a5aa
+      ami: ami-0dfc7fa4ae90e3dd1
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-0bc848746c660f131
+      ami: ami-0887dfac40ff69949
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:

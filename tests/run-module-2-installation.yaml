@@ -18,8 +18,8 @@
 
     - assert:
         that:
-          - "'v3.10.14' in version.stdout"
-          - "'v1.10.0+b81c8f8' in version.stdout"
+          - "'v3.11.16' in version.stdout"
+          - "'v1.11.0+d4cacc0' in version.stdout"
 
     - name: Checking status of all the nodes to be 'Ready'
       command: oc get -o jsonpath='{.status.conditions[?(@.reason=="KubeletReady")].type}' node {{ item }}

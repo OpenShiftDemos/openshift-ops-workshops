@@ -49,7 +49,7 @@ ose_core_images:
   - rhel7/etcd:latest
 
 ose_infra_images:
-  - "openshift3/ose-logging-auth-proxy:{{ ose_major_tag }}"
+#  - "openshift3/ose-logging-auth-proxy:{{ ose_major_tag }}"
   - "openshift3/ose-logging-curator5:{{ ose_major_tag }}"
   - "openshift3/ose-logging-elasticsearch5:{{ ose_major_tag }}"
   - "openshift3/ose-logging-eventrouter:{{ ose_major_tag }}"

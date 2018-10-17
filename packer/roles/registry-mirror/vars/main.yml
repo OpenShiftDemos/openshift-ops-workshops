@@ -5,7 +5,6 @@ image_src: registry.redhat.io
 ose_major_tag: v3.11.16
 ose_release_tag: v3.11
 cns_release_tag: v3.10
-logging: v3.10.45-2
 ose_deployer_tag: latest
 image_source: registry.redhat.io
 
@@ -49,13 +48,13 @@ ose_core_images:
   - rhel7/etcd:latest
 
 ose_infra_images:
-  - "openshift3/logging-auth-proxy:{{ logging }}"
-  - "openshift3/logging-auth-proxy:{{ logging }}"
-  - "openshift3/logging-curator:{{ logging }}"
-  - "openshift3/logging-elasticsearch:{{ logging }}"
-  - "openshift3/logging-eventrouter:{{ logging }}"
-  - "openshift3/logging-fluentd:{{ logging }}"
-  - "openshift3/logging-kibana:{{ logging }}"
+  - "openshift3/logging-auth-proxy:{{ ose_major_tag }}"
+  - "openshift3/logging-auth-proxy:{{ ose_major_tag }}"
+  - "openshift3/logging-curator:{{ ose_major_tag }}"
+  - "openshift3/logging-elasticsearch:{{ ose_major_tag }}"
+  - "openshift3/logging-eventrouter:{{ ose_major_tag }}"
+  - "openshift3/logging-fluentd:{{ ose_major_tag }}"
+  - "openshift3/logging-kibana:{{ ose_major_tag }}"
   - "openshift3/oauth-proxy:{{ ose_major_tag }}"
   - "openshift3/metrics-cassandra:{{ ose_major_tag }}"
   - "openshift3/metrics-hawkular-metrics:{{ ose_major_tag }}"

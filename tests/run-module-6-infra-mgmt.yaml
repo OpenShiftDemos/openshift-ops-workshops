@@ -299,16 +299,6 @@
         - logging
         - logging_test
 
-    - name: Wait for curator to be running
-      command: oc get dc -n openshift-logging logging-curator -o jsonpath='{.status.availableReplicas}'
-      register: result
-      until: '"1" in result.stdout'
-      retries: 5
-      delay: 60
-      tags:
-        - logging
-        - logging_test
-
     - name: Wait for kibana to be running
       command: oc get dc -n openshift-logging logging-kibana -o jsonpath='{.status.availableReplicas}'
       register: result

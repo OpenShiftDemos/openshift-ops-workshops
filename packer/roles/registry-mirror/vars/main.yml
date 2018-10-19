@@ -82,6 +82,7 @@ cns_core_images:
 other_images:
   - "rhscl/postgresql-95-rhel7"
   - "rhscl/ruby-23-rhel7"
+  - "rhscl/php-71-rhel7"
 
 non_rh_images:
   - "siamaksade/mapit"

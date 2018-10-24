@@ -58,7 +58,7 @@ sets of OpenShift objects with powerful parameterization. They can be used to
 quickly deploy more complicated and related components into OpenShift, and can be a
 useful part of your organization's software development lifecycle (SDLC). More
 information can be found in the
-link:https://docs.openshift.com/container-platform/3.10/dev_guide/templates.html[template
+link:https://docs.openshift.com/container-platform/3.11/dev_guide/templates.html[template
 documentation^]. We will not go into more detail on *Templates* in these
 exercises.
 
@@ -77,7 +77,7 @@ Take note that there are two new sections added: *ResourceQuota* and
 
 ### Background: ResourceQuota
 The
-link:https://docs.openshift.com/container-platform/3.10/admin_guide/quota.html[quota
+link:https://docs.openshift.com/container-platform/3.11/admin_guide/quota.html[quota
 documentation^] provides a great description of what *ResourceQuota* is about:
 
 ----
@@ -125,12 +125,12 @@ when we get to the *LimitRange* object.
 <8> This setting limits the number of **PersistentVolumeClaims** for a **StorageClass** called `{{ CNS_BLOCK_STORAGECLASS }}`. A value of 0 means that creating **PersistentVolumeClaims** from this storage class is not allowed in this project.
 
 For more details on the available quota options, refer back to the
-link:https://docs.openshift.com/container-platform/3.10/admin_guide/quota.html[quota
+link:https://docs.openshift.com/container-platform/3.11/admin_guide/quota.html[quota
 documentation^].
 
 ### Background: LimitRange
 The
-link:https://docs.openshift.com/container-platform/3.10/admin_guide/limits.html[limit
+link:https://docs.openshift.com/container-platform/3.11/admin_guide/limits.html[limit
 range documentation^] provides some good background:
 
 ----
@@ -173,7 +173,7 @@ Take a look at the sample `LimitRange` definition that we have provided in the
 ----
 
 The difference between requests and default limits is important, and is covered
-in the link:https://docs.openshift.com/container-platform/3.10/admin_guide/limits.html[limit
+in the link:https://docs.openshift.com/container-platform/3.11/admin_guide/limits.html[limit
 range documentation^]. But, generally speaking:
 
 <1> `max` is the highest value that may be specified for limits and requests
@@ -186,7 +186,7 @@ nothing is specified
 In addition to these topics, there are things like *Quality of Service Tiers* as
 well as a *Limit* : *Request* ratio. There is additionally more information in
 the
-link:https://docs.openshift.com/container-platform/3.10/dev_guide/compute_resources.html[compute
+link:https://docs.openshift.com/container-platform/3.11/dev_guide/compute_resources.html[compute
 resources^] section of the documentation.
 
 For the sake of brevity, suffice it to say that there is a complex and powerful
@@ -220,7 +220,7 @@ NOTE: Remember that quotas and limits are applied at the *Project* level. *Users
 may have access to multiple *Projects*, but quotas and limits do not apply
 directly to *Users*. If you want to apply one quota across multiple *Projects*,
 then you should look at the
-link:https://docs.openshift.com/container-platform/3.10/admin_guide/multiproject_quota.html[multi-project
+link:https://docs.openshift.com/container-platform/3.11/admin_guide/multiproject_quota.html[multi-project
 quota^] documentation. We will not cover multi-project quota in these exercises.
 
 ### Installing the Project Request Template
@@ -294,7 +294,7 @@ sudo /usr/local/bin/master-restart controllers
 
 [TIP]
 ====
-In OpenShift 3.10 there were some underlying changes to how the master
+In OpenShift 3.11 there were some underlying changes to how the master
 software is run. Part of this change included running the control plane
 itself in containers. This involved a switch from a more traditional
 `systemd`-type service to using a script to restart the various components.

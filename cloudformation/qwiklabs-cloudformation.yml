@@ -12,12 +12,10 @@ Parameters:
 
   InfraInstanceType:
     Type: String
-    Default: m4.large
+    Default: m4.xlarge
     AllowedValues:
-      - t2.large
-      - t2.xlarge
-      - m4.large
       - m4.xlarge
+      - m4.2xlarge
     ConstraintDescription: Must be a valid EC2 instance type.
 
   WorkerInstanceType:
@@ -73,23 +71,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-0293a54f126268125
+      ami: ami-0b15bd5f595845bf5
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-0bca911471ced57f3
+      ami: ami-0483ed70f9aa03e76 
     eu-west-1:
-      ami: ami-0ebecc9a86d4b32eb
+      ami: ami-003b289a92d1acd4f
     eu-central-1:
-      ami: ami-0b9193025e3c5a38a
+      ami: ami-0943624a36a343da1
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-0662317e5be2bdf18
+      ami: ami-00ce58fbf48577b99
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -861,7 +859,7 @@ Resources:
                     kind: LDAPSyncConfig
                     apiVersion: v1
                     url: ldap://idm.internal.aws.testdrive.openshift.com
-                    ca: /etc/origin/master/ipa-ca.crt
+                    ca: /etc/origin/master/idm_ldap_ca.crt
                     bindDN: uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
                     bindPassword: bindingpassword
                     rfc2307:
@@ -979,7 +977,7 @@ Resources:
                     etcd
                     glusterfs
                     #scaleup_new_nodes
-                    #cnsinfra_glusterfs_registry
+                    #ocsinfra_glusterfs_registry
 
                     [OSEv3:vars]
                     ansible_become=true
@@ -991,44 +989,44 @@ Resources:
 
                     openshift_master_api_port=443
                     openshift_master_console_port=443
-                    openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com', 'bindPassword': 'bindingpassword', 'ca': '/etc/origin/master/ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com)'}]
+                    openshift_master_identity_providers=[{'name': 'idm', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['dn'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com', 'bindPassword': 'bindingpassword', 'ca': '/etc/origin/master/idm_ldap_ca.crt', 'insecure': 'false', 'url': 'ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com)'}]
                     os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
                     openshift_master_default_subdomain=apps.${AWS::AccountId}.${PublicHostedZone}
                     openshift_master_cluster_public_hostname=openshift.${AWS::AccountId}.${PublicHostedZone}
                     openshift_web_console_prefix='support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-'
 
-                    openshift_examples_modify_imagestreams=false
+                    openshift_examples_modify_imagestreams=true
                     openshift_additional_repos=[{'id': 'openshift_packages', 'name': 'OpenShift_Packages', 'baseurl': 'http://master.internal.aws.testdrive.openshift.com/repo', 'enabled': 1, 'gpgcheck': 0}]
                     openshift_docker_insecure_registries=support.internal.aws.testdrive.openshift.com:5000
                     openshift_docker_additional_registries=support.internal.aws.testdrive.openshift.com:5000
                     oreg_url=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-${!component}:${!version}
                     osm_etcd_image=support.internal.aws.testdrive.openshift.com:5000/rhel7/etcd
-                    openshift_release=v3.10.14
-                    openshift_image_tag=v3.10.14
+                    openshift_release=v3.11.16
+                    openshift_image_tag=v3.11.16
 
-                    container_runtime_extra_storage="[{'device': '/dev/xvdc', 'path': '/var/lib/origin/openshift.local.volumes', 'options': 'gquota', 'filesystem': 'xfs', 'format': 'True'}]"
+                    container_runtime_extra_storage=[{'device': '/dev/xvdc', 'path': '/var/lib/origin/openshift.local.volumes', 'options': 'gquota', 'filesystem': 'xfs', 'format': 'True'}]
 
                     # special storage configs
-                    openshift_storage_glusterfs_version=v3.9
-                    openshift_storage_glusterfs_heketi_version=v3.9
-                    openshift_storage_glusterfs_block_version=v3.9
-                    openshift_storage_glusterfs_s3_version=v3.9
+                    openshift_storage_glusterfs_version=v3.10
+                    openshift_storage_glusterfs_heketi_version=v3.10
+                    openshift_storage_glusterfs_block_version=v3.10
+                    openshift_storage_glusterfs_s3_version=v3.10
                     openshift_storage_glusterfs_namespace=storage
                     openshift_storage_glusterfs_heketi_admin_key=myS3cr3tpassw0rd
                     openshift_storage_glusterfs_storageclass=true
                     openshift_storage_glusterfs_storageclass_default=true
                     openshift_storage_glusterfs_block_deploy=false
-                    #cnsinfra_openshift_storage_glusterfs_registry_version=v3.9
-                    #cnsinfra_openshift_storage_glusterfs_registry_heketi_version=v3.9
-                    #cnsinfra_openshift_storage_glusterfs_registry_block_version=v3.9
-                    #cnsinfra_openshift_storage_glusterfs_registry_s3_version=v3.9
-                    #cnsinfra_openshift_storage_glusterfs_registry_namespace=infra-storage
-                    #cnsinfra_openshift_storage_glusterfs_registry_heketi_admin_key=myS3cr3tpassw0rd
-                    #cnsinfra_openshift_storage_glusterfs_registry_storageclass=true
-                    #cnsinfra_openshift_storage_glusterfs_registry_block_deploy=true
-                    #cnsinfra_openshift_storage_glusterfs_registry_block_storageclass=true
-                    #cnsinfra_openshift_storage_glusterfs_registry_block_host_vol_create=true
-                    #cnsinfra_openshift_storage_glusterfs_registry_block_host_vol_size=30
+                    #ocsinfra_openshift_storage_glusterfs_registry_version=v3.10
+                    #ocsinfra_openshift_storage_glusterfs_registry_heketi_version=v3.10
+                    #ocsinfra_openshift_storage_glusterfs_registry_block_version=v3.10
+                    #ocsinfra_openshift_storage_glusterfs_registry_s3_version=v3.10
+                    #ocsinfra_openshift_storage_glusterfs_registry_namespace=infra-storage
+                    #ocsinfra_openshift_storage_glusterfs_registry_heketi_admin_key=myS3cr3tpassw0rd
+                    #ocsinfra_openshift_storage_glusterfs_registry_storageclass=true
+                    #ocsinfra_openshift_storage_glusterfs_registry_block_deploy=true
+                    #ocsinfra_openshift_storage_glusterfs_registry_block_storageclass=true
+                    #ocsinfra_openshift_storage_glusterfs_registry_block_host_vol_create=true
+                    #ocsinfra_openshift_storage_glusterfs_registry_block_host_vol_size=30
 
                     # metrics configs
                     openshift_metrics_install_metrics=false
@@ -1047,7 +1045,7 @@ Resources:
                     #logging_openshift_logging_es_pvc_dynamic=true
                     #logging_openshift_logging_es_pvc_size=10Gi
                     #logging_openshift_logging_es_pvc_storage_class_name='glusterfs-registry-block'
-                    #logging_openshift_logging_es_memory_limit=2G
+                    #logging_openshift_logging_es_memory_limit=1G
                     #logging_openshift_logging_kibana_hostname=kibana.apps.${AWS::AccountId}.${PublicHostedZone}
                     #logging_openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra": "true"}
                     #logging_openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra": "true"}
@@ -1079,16 +1077,16 @@ Resources:
                     node02.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode2.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
                     node03.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode3.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
 
-                    #cnsinfra_[glusterfs_registry]
-                    #cnsinfra_node04.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode4.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
-                    #cnsinfra_node05.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode5.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
-                    #cnsinfra_node06.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode6.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
+                    #ocsinfra_[glusterfs_registry]
+                    #ocsinfra_node04.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode4.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'
+                    #ocsinfra_node05.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode5.PrivateIp} glusterfs_zone=2 glusterfs_devices='[ "/dev/xvdd" ]'
+                    #ocsinfra_node06.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode6.PrivateIp} glusterfs_zone=3 glusterfs_devices='[ "/dev/xvdd" ]'
 
                     [glusterfs:vars]
                     ansible_become=true
 
-                    #cnsinfra_[glusterfs_registry:vars]
-                    #cnsinfra_ansible_become=true
+                    #ocsinfra_[glusterfs_registry:vars]
+                    #ocsinfra_ansible_become=true
 
                     [idm]
                     idm.internal.${PublicHostedZone}
@@ -1330,14 +1328,18 @@ Resources:
               - ansible localhost -m wait_for -a "port=22 host=${Master1.PrivateIp}"
               - ansible localhost -m wait_for -a "port=80 host=${Master1.PrivateIp}"
               - ansible localhost -m wait_for -a "port=389 host=${IdmNode1.PrivateIp}"
-              - ansible master.internal.aws.testdrive.openshift.com, -m wait_for -a "path=/etc/origin/master/ipa-ca.crt timeout=600"
+              - ansible master.internal.aws.testdrive.openshift.com, -m wait_for -a "path=/etc/origin/master/idm_ldap_ca.crt timeout=600"
               - ansible localhost -m wait_for -a "port=80 host=localhost"
               - ansible localhost -m wait_for -a "port=5000 host=localhost"
               - ansible all -i master.internal.aws.testdrive.openshift.com, -m fetch -a "src=/etc/ansible/hosts dest=/etc/ansible/hosts flat=yes"
               - "ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml ; /usr/local/bin/cfn-signal.sh $? '${OpenShiftWaitHandle}'"
               - "ansible-playbook /opt/lab/support/pv-resize-post-deploy-config.yml ; /usr/local/bin/cfn-signal.sh $? '${PostDeployWaitHandle}'"
-              - ansible master.internal.aws.testdrive.openshift.com, -m raw -a "oc get is ruby -n openshift -o json | jq '(.spec.tags[] | select(.name == \"2.3\").from.name) = \"support.internal.aws.testdrive.openshift.com:5000/rhscl/ruby-23-rhel7:latest\"' | jq '(.spec.tags[] | select(.name == \"2.3\").importPolicy.insecure) = true' | oc replace -f -"
-              - ansible master.internal.aws.testdrive.openshift.com, -m raw -a "oc get is postgresql -n openshift -o json | jq '(.spec.tags[] | select(.name == \"9.5\").from.name) = \"support.internal.aws.testdrive.openshift.com:5000/rhscl/postgresql-95-rhel7:latest\"' | jq '(.spec.tags[] | select(.name == \"9.5\").importPolicy.insecure) = true' | oc replace -f -"
+              - ansible master.internal.aws.testdrive.openshift.com, -m raw -a "oc patch -n openshift is ruby -p '{\"metadata\":{\"annotations\":{\"openshift.io/image.insecureRepository\":\"true\"}}}'"
+              - ansible master.internal.aws.testdrive.openshift.com, -m raw -a "oc patch -n openshift is postgresql -p '{\"metadata\":{\"annotations\":{\"openshift.io/image.insecureRepository\":\"true\"}}}'"
+              - ansible master.internal.aws.testdrive.openshift.com, -m raw -a "oc patch -n openshift is php -p '{\"metadata\":{\"annotations\":{\"openshift.io/image.insecureRepository\":\"true\"}}}'"
+              - ansible master.internal.aws.testdrive.openshift.com, -m raw -a "oc import-image ruby:2.3 -n openshift"
+              - ansible master.internal.aws.testdrive.openshift.com, -m raw -a "oc import-image postgresql:9.5 -n openshift"
+              - ansible master.internal.aws.testdrive.openshift.com, -m raw -a "oc import-image php:7.1 -n openshift"
             - { RepoAccount: !Select [0, !Split [",", !Ref QwiklabId]], RepoBranch: !Select [1, !Split [",", !Ref QwiklabId]] }
 
   WorkerNode1NetworkInterface:

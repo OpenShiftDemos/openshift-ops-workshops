@@ -173,7 +173,7 @@ The way that a *Service* maps to a set of *Pods* is via a system of *Labels* and
 protocols can be mapped.
 
 There is a lot more information about
-https://docs.openshift.com/container-platform/3.10/architecture/core_concepts/pods_and_services.html#services[Services],
+https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/pods_and_services.html#services[Services],
 including the YAML format to make one by hand, in the official documentation.
 
 The `new-app` command used earlier caused a service to be created. You can see
@@ -321,7 +321,7 @@ somehow die/exit are not automatically restarted. *ReplicationControllers* are
 how OpenShift "self heals".
 
 A *DeploymentConfiguration* (DC) defines how something in OpenShift should be
-deployed. From the https://docs.openshift.com/container-platform/3.10/architecture/core_concepts/deployments.html[deployments documentation^]:
+deployed. From the https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/deployments.html[deployments documentation^]:
 
 ----
 Building on replication controllers, OpenShift adds expanded support for the

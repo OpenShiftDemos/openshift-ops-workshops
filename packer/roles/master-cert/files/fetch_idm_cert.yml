@@ -50,7 +50,7 @@
     - name: copy IDM certificate to configuration directory
       copy:
         src: /tmp/ca.crt
-        dest: /etc/origin/master/ipa-ca.crt
+        dest: /etc/origin/master/idm_ldap_ca.crt
         owner: root
         group: root
         mode: "u=rw,g=r,o=r"

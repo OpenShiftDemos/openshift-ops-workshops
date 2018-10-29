@@ -1,7 +1,8 @@
 ## OpenShift Container Storage Concepts
 In this lab we are going to provide a view 'under the hood' of OpenShift
-`PersistentVolumes` provided by OpenShift Container Storage (OCS). For this purpose we will examine volumes
-leveraged by example applications using different volume access modes.
+`PersistentVolumes` provided by OpenShift Container Storage (OCS). For this
+purpose we will examine volumes leveraged by example applications using
+different volume access modes.
 
 ### How OpenShift Container Storage runs
 
@@ -12,21 +13,31 @@ Make sure you are logged on as the super user in the `{{CNS_NAMESPACE}}`:
 oc login -u system:admin -n {{CNS_NAMESPACE}}
 ----
 
-OpenShift Container Storage is GlusterFS running in containers, specifically in pods managed by OpenShift. We have looked at the pods making up the storage cluster already in the introduction chapter:
+OpenShift Container Storage is GlusterFS running in containers, specifically
+in pods managed by OpenShift. We have looked at the pods making up the
+storage cluster already in the introduction chapter. Go ahead and switch to the
+storage project:
 
 [source,bash,role="copypaste"]
 ----
-oc get pods -o wide -n {{ CNS_NAMESPACE }}
+oc project -n {{ CNS_NAMESPACE }}
+----
+
+Then, take a look at the storage *Pods*:
+
+[source,bash,role="copypaste"]
+----
+oc get pods -o wide
 ----
 
 Which yields:
 
 ----
-NAME              READY     STATUS    RESTARTS   AGE       IP              NODE
-glusterfs-storage-37vn8   1/1       Running   0          3m       {{NODE1_INTERNAL_IP}}         {{NODE1_INTERNAL_FQDN}} <1>
-glusterfs-storage-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}         {{NODE2_INTERNAL_FQDN}} <1>
-glusterfs-storage-m9fvl   1/1       Running   0          3m       {{NODE3_INTERNAL_IP}}         {{NODE3_INTERNAL_FQDN}} <1>
-heketi-storage-1-cd032    1/1       Running   0          1m       {{INFRA_INTERNAL_IP}}         {{INFRA_INTERNAL_FQDN}} <2>
+NAME                      READY     STATUS    RESTARTS   AGE       IP           NODE                                          NOMINATED NODE
+glusterfs-storage-7qzsm   1/1       Running   0          2h        10.0.3.252   {{NODE1_INTERNAL_FQDN}} <1>   <none>
+glusterfs-storage-7rds5   1/1       Running   0          2h        10.0.1.238   {{NODE2_INTERNAL_FQDN}} <1>   <none>
+glusterfs-storage-x7chr   1/1       Running   0          2h        10.0.4.221   {{NODE3_INTERNAL_FQDN}} <1>   <none>
+heketi-storage-1-bxqr2    1/1       Running   0          2h        10.131.0.6   {{INFRA_INTERNAL_FQDN}} <2>   <none>
 ----
 <1> OCS *Pods*, with each of the designated nodes running exactly one.
 <2> heketi API frontend pod
@@ -43,7 +54,7 @@ software-defined storage system. See schematic below for a visualization.
 .GlusterFS pods in OCS in detail.
 image::cns_diagram_pod.png[]
 
-heketi is a component that exposes an API to the storage system for
+`heketi` is a component that exposes an API to the storage system for
 OpenShift. This allows OpenShift to dynamically allocate storage from OCS in a
 programmatic fashion. See below for a visualization. Note that for simplicity,
 in our example heketi runs on the OpenShift application nodes, not on the
@@ -53,7 +64,9 @@ infrastructure node.
 image::cns_diagram_heketi.png[]
 
 #### Examine heketi
-To expose heketi's API outside of OpenShift for administrators (for monitoring and maintenance), a *Service* named _heketi-storage_ and a *Route* has been set up:
+To expose heketi's API outside of OpenShift for administrators (for
+monitoring and maintenance), a *Service* named _heketi-storage_ and a *Route*
+has been set up:
 
 [source,bash,role="copypaste"]
 ----
@@ -67,8 +80,8 @@ NAME                              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT
 svc/heketi-db-storage-endpoints   ClusterIP   172.30.228.77   <none>        1/TCP      2h
 svc/heketi-storage                ClusterIP   172.30.54.191   <none>        8080/TCP   2h
 
-NAME                    HOST/PORT                                                              PATH      SERVICES         PORT      TERMINATION   WILDCARD
-routes/heketi-storage   heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}             heketi-storage   <all>                   None
+NAME                                      HOST/PORT                                                              PATH      SERVICES         PORT      TERMINATION   WILDCARD
+route.route.openshift.io/heketi-storage   heketi-storage-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}             heketi-storage   <all>                   None
 ----
 
 You may verify external availability of this API and heketi being alive with a trivial health check:
@@ -84,7 +97,10 @@ This should return:
 Hello from Heketi
 ----
 
-This how the heketi API is made available to both external clients, like `heketi-cli` which we examined in the introduction. But mainly it is leveraged by OpenShift to provision storage dynamically. Let's look at this use case.
+This how the heketi API is made available to both external clients, like
+`heketi-cli` which we examined in the introduction. But mainly it is
+leveraged by OpenShift to provision storage dynamically. Let's look at this
+use case.
 
 ### A Simple OCS Use Case
 
@@ -137,21 +153,27 @@ spec:
       storage: ${VOLUME_CAPACITY}
 ----
 
-This will request a *PersistentVolume* in `RWO` mode. Storage provided in this mode can only be mounted by a single pod at a time. For a database that is usually what you want.
-The requested capacity under `spec.resources.requests.storage` is coming in via a parameter when the template is parsed. This is how storage is _requested_.
+This will request a *PersistentVolume* in `RWO` mode. Storage provided in
+this mode can only be mounted by a single pod at a time. For a database that
+is usually what you want. The requested capacity under
+`spec.resources.requests.storage` is coming in via a parameter when the
+template is parsed. This is how storage is _requested_.
 
-Using persistent storage is done via a `PersistentVolume` provided in response to this `PersistentVolumeClaim`. A `PersistentVolume` is a representation of some physical storage capacity provisioned by the backing storage system.
-It will supply the PostgreSQL pod with persistent storage on the mount point `/var/lib/pgsql/data`.
+Using persistent storage is done via a `PersistentVolume` provided in
+response to this `PersistentVolumeClaim`. A `PersistentVolume` is a
+representation of some physical storage capacity provisioned by the backing
+storage system. It will supply the PostgreSQL pod with persistent storage on
+the mount point `/var/lib/pgsql/data`.
 
-You can see this when inspecting how the pod is described as part of the `DeploymentConfig`:
+You can see this when inspecting how the pod is described as part of the
+`DeploymentConfig`:
 
 [source,bash,role="copypaste"]
 ----
-oc get template/rails-pgsql-persistent -n openshift -o yaml | grep mountPath -B60 -A5
+oc get template/rails-pgsql-persistent -n openshift -o yaml | grep mountPath -B58 -A5
 ----
 
 Will show:
-
 
 [source,yaml]
 ----
@@ -228,18 +250,25 @@ Will show:
 
 [TIP]
 ====
-In the above snippet you see there are even more parameters in this template. If you want to see more about the parameters or other details of this template,
-you can execute the following:
+In the above snippet you see there are even more parameters in this template.
+If you want to see more about the parameters or other details of this
+template, you can execute the following:
 
  oc describe template rails-pgsql-persistent -n openshift
 ====
 
-The following diagram sums up how storage get's provisioned in OpenShift and depicts the relationship of `PersistentVolumes`, `PersistentVolumeClaims` and `StorageClasses`:
+The following diagram sums up how storage get's provisioned in OpenShift and
+depicts the relationship of `PersistentVolumes`, `PersistentVolumeClaims` and
+`StorageClasses`:
 
 .OpenShift Persistent Volume Framework
 image::cns_diagram_pvc.png[]
 
-Let's try it out. The storage size parameter in the template is called `VOLUME_CAPACITY`. The `new-app` command will again handle processing and interpreting a *Template* into the appropriate OpenShift objects. We will specify that we want _5Gi_ of storage as part of deploying a new app from the template as follows:
+Let's try it out. The storage size parameter in the template is called
+`VOLUME_CAPACITY`. The `new-app` command will again handle processing and
+interpreting a *Template* into the appropriate OpenShift objects. We will
+specify that we want _5Gi_ of storage as part of deploying a new app from the
+template as follows:
 
 [source,bash,role="copypaste"]
 ----
@@ -257,16 +286,15 @@ repositories. It is a developer's good friend.
 You will then see something like the following:
 
 ----
---> Deploying template "openshift/rails-pgsql-persistent" to project my-database-app
+--> Deploying template "openshift/rails-pgsql-persistent" to project my-database-app                                                                                                                       [2/1622]
 
-     Rails + PostgreSQL (Persistent)
+     Rails + PostgreSQL
      ---------
      An example Rails application with a PostgreSQL database. For more information about using this template, including OpenShift considerations, see https://github.com/openshift/rails-ex/blob/master/README.md.
 
      The following service(s) have been created in your project: rails-pgsql-persistent, postgresql.
-
+     
      For more information about using this template, including OpenShift considerations, see https://github.com/openshift/rails-ex/blob/master/README.md.
-
 
      * With parameters:
         * Name=rails-pgsql-persistent
@@ -278,14 +306,14 @@ You will then see something like the following:
         * Git Reference=
         * Context Directory=
         * Application Hostname=
-        * GitHub Webhook Secret=yGhTIuuUjH7JHClrCtYYbY2FdtT0RF5oxA77tGWO # generated
-        * Secret Key=8phdjyreu8vaai84ffmvyw18vc3awvgje1c4mw42uplrcvf0dbdyvy1gav4d8dpqwd340l3r6m2otas7eat1cdixpxv65d7rbdbmjhma2jmf2wf0darnou8hhn56ecq # generated
+        * GitHub Webhook Secret=pIXDthfeGR7PHxxbASEjCM7jQ0hAJ8Ph8HTIttvl # generated
+        * Secret Key=ij54gqv7w04habvy6dn2sninbbdgmlicwnsvpfwa1gdn6of2rrxgo211njqaekqlhg1503xdnvo2oc7h3dk7dd3cmk7h8mvnmijikovjw5jnl2w2pnfrukkwx0sq0uj # generated
         * Application Username=openshift
         * Application Password=secret
         * Rails Environment=production
         * Database Service Name=postgresql
-        * Database Username=userP8B # generated
-        * Database Password=USrJhqh6 # generated
+        * Database Username=userAFJ # generated
+        * Database Password=pn6A2x3B # generated
         * Database Name=root
         * Maximum Database Connections=100
         * Shared Buffer Amount=12MB
@@ -294,14 +322,15 @@ You will then see something like the following:
 --> Creating resources ...
     secret "rails-pgsql-persistent" created
     service "rails-pgsql-persistent" created
-    route "rails-pgsql-persistent" created
-    imagestream "rails-pgsql-persistent" created
-    buildconfig "rails-pgsql-persistent" created
-    deploymentconfig "rails-pgsql-persistent" created
+    route.route.openshift.io "rails-pgsql-persistent" created
+    imagestream.image.openshift.io "rails-pgsql-persistent" created
+    buildconfig.build.openshift.io "rails-pgsql-persistent" created
+    deploymentconfig.apps.openshift.io "rails-pgsql-persistent" created
     persistentvolumeclaim "postgresql" created
     service "postgresql" created
-    deploymentconfig "postgresql" created
+    deploymentconfig.apps.openshift.io "postgresql" created
 --> Success
+    Access your application via route 'rails-pgsql-persistent-my-database-app.apps.790442527540.aws.testdrive.openshift.com' 
     Build scheduled, use 'oc logs -f bc/rails-pgsql-persistent' to track its progress.
     Run 'oc status' to view your app.
 ----
@@ -310,8 +339,10 @@ Go back to the OpenShift web console:
 
 *{{WEB_CONSOLE_URL}}*
 
-Make sure you are logged in as _fancyuser1_ and find your newly created project
-`my-database-app`. You can now follow the deployment process here. The deployment is complete when both the PostgreSQL pod and the Ruby application pod have one healthy instance (rings are dark, solid blue).
+Make sure you are logged in as _fancyuser1_ and find your newly created
+project `my-database-app`. You can now follow the deployment process here.
+The deployment is complete when both the PostgreSQL pod and the Ruby
+application pod have one healthy instance (rings are dark, solid blue).
 
 [NOTE]
 ====
@@ -337,11 +368,16 @@ Alternatively, in the web console, check the *"Storage"* menu.
 
 [TIP]
 ====
-This PVC has been automatically fulfilled by OCS because the `{{ CNS_STORAGECLASS }}` *StorageClass* was set up as the system-wide default as part of the installation. The responsible parameter in the inventory file was: `openshift_storage_glusterfs_storageclass_default=true`
+This PVC has been automatically fulfilled by OCS because the `{{
+CNS_STORAGECLASS }}` *StorageClass* was set up as the system-wide default as
+part of the installation. The responsible parameter in the inventory file
+was: `openshift_storage_glusterfs_storageclass_default=true`
 ====
 
 #### Try the Application
-Now go ahead and try out the application. The overview page in the OpenShift web console will tell you the *Route* which has been deployed as well. Otherwise get it on the CLI like this:
+Now go ahead and try out the application. The overview page in the OpenShift
+web console will tell you the *Route* which has been deployed as well.
+Otherwise get it on the CLI like this:
 
 [source,bash,role="copypaste"]
 ----
@@ -368,9 +404,9 @@ spaces on a GlusterFS volume provided by OCS.
 
 [NOTE]
 ====
-This application's template included a *Route* object definition, which is why
-the *Service* was automatically exposed. This is a good practice.
-Note how the actual application is hosted under the */articles* path of the URL.
+This application's template included a *Route* object definition, which is
+why the *Service* was automatically exposed. This is a good practice. Note
+how the actual application is hosted under the */articles* path of the URL.
 ====
 
 #### Explore the underlying OCS artifacts
@@ -405,7 +441,8 @@ postgresql   Bound     pvc-6de8449e-3f34-11e8-87ea-0298f449cc4c   5Gi        RWO
 
 [NOTE]
 ====
-Your PV name will be different as it's dynamically generated. A lot of the following things contain dynamically generated names.
+Your PV name will be different as it's dynamically generated. A lot of the
+following things contain dynamically generated names.
 *Use the supplied bash shortcuts to easy copying and pasting.*
 ====
 
@@ -428,27 +465,39 @@ oc describe pv $PGSQL_PV_NAME
 You will see something like:
 
 ----
-Name:		pvc-6de8449e-3f34-11e8-87ea-0298f449cc4c <1>
-Labels:		<none>
-StorageClass:	{{ CNS_STORAGECLASS }}
-Status:		Bound
-Claim:		my-database-app/postgresql
-Reclaim Policy:	Delete
-Access Modes:	RWO
-Capacity:	5Gi
-Message:
+Name:		         pvc-6de8449e-3f34-11e8-87ea-0298f449cc4c <1>
+Labels:          <none>
+Annotations:     Description=Gluster-Internal: Dynamically provisioned PV
+                 gluster.kubernetes.io/heketi-volume-id=7da624d82941c50d704dd01b366c5806
+                 gluster.org/type=file
+                 kubernetes.io/createdby=heketi-dynamic-provisioner
+                 pv.beta.kubernetes.io/gid=2001
+                 pv.kubernetes.io/bound-by-controller=yes
+                 pv.kubernetes.io/provisioned-by=kubernetes.io/glusterfs
+                 volume.beta.kubernetes.io/mount-options=auto_unmount
+Finalizers:      [kubernetes.io/pv-protection]
+StorageClass:	   {{ CNS_STORAGECLASS }}
+Status:          Bound
+Claim:           my-database-app/postgresql
+Reclaim Policy:  Delete
+Access Modes:    RWO
+Capacity:        5Gi
+Node Affinity:   <none>
+Message:         
 Source:
-    Type:		Glusterfs (a Glusterfs mount on the host that shares a pod's lifetime)
-    EndpointsName:	glusterfs-dynamic-postgresql
-    Path:		vol_e8fe7f46fedf7af7628feda0dcbf2f60 <2>
-    ReadOnly:		false
-No events.
+    Type:           Glusterfs (a Glusterfs mount on the host that shares a pod's lifetime)
+    EndpointsName:  glusterfs-dynamic-postgresql
+    Path:		        vol_e8fe7f46fedf7af7628feda0dcbf2f60 <2>
+    ReadOnly:       false
+Events:             <none>
 ----
 <1> The unique name of this PV in the system OpenShift refers to
 <2> The unique volume name backing the PV known to GlusterFS
 
-
-Note the GlusterFS volume name, in this case *vol_e8fe7f46fedf7af7628feda0dcbf2f60*. The following is another Bash shortcut to store the name of the GlusterFS volume backing the `PersistentVolume`:
+Note the GlusterFS volume name, in this case
+*vol_e8fe7f46fedf7af7628feda0dcbf2f60*. The following is another Bash
+shortcut to store the name of the GlusterFS volume backing the
+`PersistentVolume`:
 
 [source,bash,role="copypaste"]
 ----
@@ -473,13 +522,15 @@ oc get pods -o wide -l glusterfs=storage-pod
 You will see something like:
 
 ----
-NAME                      READY     STATUS    RESTARTS   AGE      IP                    NODE
-glusterfs-storage-37vn8   1/1       Running   0          3m       {{NODE1_INTERNAL_IP}}         {{NODE1_INTERNAL_FQDN}}
-glusterfs-storage-cq68l   1/1       Running   0          3m       {{NODE2_INTERNAL_IP}}         {{NODE2_INTERNAL_FQDN}}
-glusterfs-storage-m9fvl   1/1       Running   0          3m       {{NODE3_INTERNAL_IP}}         {{NODE3_INTERNAL_FQDN}}
+NAME                      READY     STATUS    RESTARTS   AGE       IP           NODE                                          NOMINATED NODE
+glusterfs-storage-7qzsm   1/1       Running   0          2h        10.0.3.252   {{NODE1_INTERNAL_FQDN}}   <none>
+glusterfs-storage-7rds5   1/1       Running   0          2h        10.0.1.238   {{NODE2_INTERNAL_FQDN}}   <none>
+glusterfs-storage-x7chr   1/1       Running   0          2h        10.0.4.221   {{NODE3_INTERNAL_FQDN}}   <none>
 ----
 
-We are now going to select the first pod (which one doesn't really matter) and, store it's IP address in above example that is: *{{NODE1_INTERNAL_IP}}* of pod *glusterfs-storage-37vn8*.
+We are now going to select the first pod (which one doesn't really matter)
+and, store it's IP address in above example that is: *{{NODE1_INTERNAL_IP}}*
+of pod *glusterfs-storage-37vn8*.
 
 Again, for easy copying and pasting, here are some Bash shortcuts:
 
@@ -491,7 +542,10 @@ echo $FIRST_GLUSTER_POD
 echo $FIRST_GLUSTER_IP
 ----
 
-We will again use the `oc rsh` facility to log on to the selected GlusterFS pod which has the GlusterFS CLI utilities installed. This time we will use the non-interactive mode which immediately drops out after executing the supplied command.
+We will again use the `oc rsh` facility to log on to the selected GlusterFS
+pod which has the GlusterFS CLI utilities installed. This time we will use
+the non-interactive mode which immediately drops out after executing the
+supplied command.
 
 Query GlusterFS from inside the first GlusterFS pod for all known volumes:
 
@@ -534,8 +588,9 @@ Brick2: {{NODE1_INTERNAL_IP}}:/var/lib/heketi/mounts/vg_0246fd563709384a3cbc3f3b
 Brick3: {{NODE3_INTERNAL_IP}}:/var/lib/heketi/mounts/vg_5a8c767e65feef7455b58d01c6936b83/brick_25972cf5ed7ea81c947c62443ccb308c/brick
 Options Reconfigured:
 transport.address-family: inet
-performance.readdir-ahead: on
 nfs.disable: on
+performance.client-io-threads: off
+cluster.brick-multiplex: on
 ----
 <1> According to the output of `oc get pods -o wide` this is the container we are logged on to.
 
@@ -627,15 +682,21 @@ drwx------.  3 1000080000 root   60 Jun  6 14:44 pg_xlog
 You are looking at the PostgreSQL internal data file structure from the
 perspective of the GlusterFS server side. It's a normal local filesystem here.
 
-Clients, like the OpenShift nodes and their application pods talk to this
-set of replicated brick storage via the GlusterFS protocol. Which abstracts the 3-way replication behind a single FUSE mount point - this is called a `volume` in GlusterFS.
-When a pod starts that mounts storage from a `PV` backed by GlusterFS, OpenShift will mount the GlusterFS volume on the right app node and then _bind-mount_ this directory to the right pod. This is happening transparently to the application inside the pod and looks like a normal local filesystem.
+Clients, like the OpenShift nodes and their application pods talk to this set
+of replicated brick storage via the GlusterFS protocol. Which abstracts the
+3-way replication behind a single FUSE mount point - this is called a
+`volume` in GlusterFS. When a pod starts that mounts storage from a `PV`
+backed by GlusterFS, OpenShift will mount the GlusterFS volume on the right
+app node and then _bind-mount_ this directory to the right pod. This is
+happening transparently to the application inside the pod and looks like a
+normal local filesystem.
 
 ### Providing Scalable, Shared Storage With OCS
 Historically very few options, like basic NFS support, existed to provide a
-*PersistentVolume* to more than one container at a time. The access mode used for
-this in OpenShift is `ReadWriteMany`. Traditional block-based storage solutions are not able
-to provide *PersistentVolumes* with this access mode.
+*PersistentVolume* to more than one container at a time. The access mode used
+*for
+this in OpenShift is `ReadWriteMany`. Traditional block-based storage
+solutions are not able to provide *PersistentVolumes* with this access mode.
 
 Also, once provisioned, most storage cannot easily be resized.
 
@@ -645,7 +706,8 @@ deploy a PHP file uploader application that has multiple front-end instances
 sharing a common storage repository.
 
 #### Deploy the File Uploader Application
-First log back in as `fancyuser1` using the password `openshift` and create a new project:
+First log back in as `fancyuser1` using the password `openshift` and create a
+new project:
 
 [source,bash,role="copypaste"]
 ----
@@ -657,34 +719,36 @@ Next deploy the example PHP application called `file-uploader`:
 
 [source,bash,role="copypaste"]
 ----
-oc new-app openshift/php:7.0~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
+oc new-app openshift/php:7.1~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
 ----
 
 You will see something like:
 
 ----
---> Found image a1ebebb (6 weeks old) in image stream "openshift/php" under tag "7.0" for "openshift/php:7.0"
+--> Found image 691930e (5 weeks old) in image stream "openshift/php" under tag "7.1" for "openshift/php:7.1"
 
-    Apache 2.4 with PHP 7.0
-    -----------------------
-    Platform for building and running PHP 7.0 applications
+    Apache 2.4 with PHP 7.1 
+    ----------------------- 
+    PHP 7.1 available as container is a base platform for building and running various PHP 7.1 applications and frameworks. PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated web pages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.
 
-    Tags: builder, php, php70, rh-php70
+    Tags: builder, php, php71, rh-php71
 
     * A source build using source code from https://github.com/christianh814/openshift-php-upload-demo will be created
-      * The resulting image will be pushed to image stream "file-uploader:latest"
+      * The resulting image will be pushed to image stream tag "file-uploader:latest"
       * Use 'start-build' to trigger a new build
     * This image will be deployed in deployment config "file-uploader"
-    * Port 8080/tcp will be load balanced by service "file-uploader"
+    * Ports 8080/tcp, 8443/tcp will be load balanced by service "file-uploader"
       * Other containers can access this service through the hostname "file-uploader"
 
 --> Creating resources ...
-    imagestream "file-uploader" created
-    buildconfig "file-uploader" created
-    deploymentconfig "file-uploader" created
+    imagestream.image.openshift.io "file-uploader" created
+    buildconfig.build.openshift.io "file-uploader" created
+    deploymentconfig.apps.openshift.io "file-uploader" created
     service "file-uploader" created
 --> Success
     Build scheduled, use 'oc logs -f bc/file-uploader' to track its progress.
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose svc/file-uploader' 
     Run 'oc status' to view your app.
 ----
 
@@ -715,10 +779,12 @@ The command prompt returns out of the tail mode once you see _Push successful_.
 [NOTE]
 ====
 This use of the `new-app` command directly asked for application code to be
-built and did not involve a template. That's why it only created a *single Pod* deployment with a *Service* and no *Route*.
+built and did not involve a template. That's why it only created a *single
+Pod* deployment with a *Service* and no *Route*.
 ====
 
-Let's make our application production ready by exposing it via a `Route` and scale to 3 instances for high availability:
+Let's make our application production ready by exposing it via a `Route` and
+scale to 3 instances for high availability:
 
 [source,bash,role="copypaste"]
 ----
@@ -753,7 +819,8 @@ Select an arbitrary file from your local machine and upload it to the app.
 .A simple PHP-based file upload tool
 image::uploader_screen_upload.png[]
 
-Once done click *_List uploaded files_* to see the list of all currently uploaded files.
+Once done click *_List uploaded files_* to see the list of all currently
+uploaded files.
 
 Do you see it? Don't worry if you don't.
 
@@ -767,48 +834,48 @@ oc get pods -l app=file-uploader
 You will see 3 pods running:
 
 ----
-NAME                             READY     STATUS      RESTARTS   AGE
-file-uploader-1-k2v0d            1/1       Running     0          1m
-file-uploader-1-sz49r            1/1       Running     0          1m
-file-uploader-1-xjg9f            1/1       Running     0          1m
-...
+NAME                    READY     STATUS    RESTARTS   AGE
+file-uploader-1-5hhqb   1/1       Running   0          6m
+file-uploader-1-trkxr   1/1       Running   0          6m
+file-uploader-1-vqszb   1/1       Running   0          7m
 ----
 
+Now let's look back at where this file got stored inside the pods. Again use
+the `oc rsh` utility via a scriptlet to execute an `ls` command on the
+`upload` directory that the PHP code uses to store the files:
 
-Now let's look back at where this file got stored inside the pods. Again use the `oc rsh` utility to execute an `ls` command on the `upload` directory that the PHP code uses to store the files:
-
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="copypaste"]
 ----
-oc rsh file-uploader-1-k2v0d ls -hl uploaded
-oc rsh file-uploader-1-sz49r ls -hl uploaded
-oc rsh file-uploader-1-xjg9f ls -hl uploaded
+for pod in $(oc get pod -l app=file-uploader --no-headers | awk '{print $1}'); do echo $pod; oc rsh $pod ls -hl uploaded; done
 ----
 
-[NOTE]
-====
-The exact name of the *Pods* will be different in your environment. Use the names from the `oc get pods` output above.
-====
 
 You will see that only one of the pods has the uploaded file
 ----
-total 144K
--rw-r--r--. 1 1000180000 root 141K Apr 18 10:01 shakespeare-romeo-48.txt
-----
-----
+file-uploader-1-5hhqb
 total 0
-----
-----
+file-uploader-1-trkxr
+total 352K
+-rw-r--r--. 1 1000380000 root 352K Oct 29 16:00 firefly-episode-list.txt
+file-uploader-1-vqszb
 total 0
 ----
 
-Why is that? These pods currently do not use any persistent storage. They store the file locally in the container root file system. That means the application cannot effectively be scaled since the pods do not share data and every client would see different uploaded files. To verify this, try accessing the URL with a second _Icognito_ browser session.
+Why is that? These pods currently do not use any persistent storage. They
+store the file locally in the container root file system. That means the
+application cannot effectively be scaled since the pods do not share data and
+every client would see different uploaded files. To verify this, try
+accessing the URL with a second _Icognito_ browser session.
 
 [CAUTION]
 ====
-Never attempt to store persistent data in a *Pod*. *Pods* and their containers are ephemeral by definition, and any stored data will be lost as soon as the *Pod* terminates for whatever reason.
+Never attempt to store persistent data in a *Pod* that has no persistent
+volume associated with it. *Pods* and their containers are ephemeral by
+definition, and any stored data will be lost as soon as the *Pod* terminates
+for whatever reason.
 ====
 
-The app is of course not usable like this. We can fix this by providing shared
+The app is of course not useful like this. We can fix this by providing shared
 storage to this app.
 
 You can create a *PersistentVolumeClaim* and attach it into an application with
@@ -821,7 +888,8 @@ oc set volume dc/file-uploader --add --name=my-shared-storage \
 --claim-name=my-shared-storage --mount-path=/opt/app-root/src/uploaded
 ----
 
-Like with the `mapit` application in "_Application Management Basics_" chapter, this command will:
+Like with the `mapit` application in "_Application Management Basics_"
+chapter, this command will:
 
 * create a *PersistentVolumeClaim*
 * update the *DeploymentConfig* to include a `volume` definition
@@ -845,10 +913,15 @@ my-shared-storage   Bound     pvc-62aa4dfe-4ad2-11e7-b56f-2cc2602a6dc8   1Gi    
 ...
 ----
 
-Notice the `ACCESSMODE` being set to *RWX* (short for `ReadWriteMany`, equivalent to "shared storage"). Without this `ACCESSMODE`, OpenShift will not attempt to attach multiple *Pods* to the same *PersistentVolume* reliably. If you attempt to scale up deployments that are using `ReadWriteOnce` storage, they will actually all become co-located on the same node.
+Notice the `ACCESSMODE` being set to *RWX* (short for `ReadWriteMany`,
+equivalent to "shared storage"). Without this `ACCESSMODE`, OpenShift will
+not attempt to attach multiple *Pods* to the same *PersistentVolume*
+reliably. If you attempt to scale up deployments that are using
+`ReadWriteOnce` storage, they will actually all become co-located on the same
+node.
 
-The app has now re-deployed (in a rolling fashion) with the new settings - all
-pods will mount the volume identified by the PVC under
+The app has now re-deployed (in a rolling fashion) with the new settings -
+all pods will mount the volume identified by the PVC under
 `/opt/app-root/src/upload`.
 
 Check you have a new set of pods:
@@ -862,46 +935,42 @@ You will see something like:
 
 ----
 NAME                    READY     STATUS    RESTARTS   AGE
-file-uploader-2-qwzpz   1/1       Running   0          2m
-file-uploader-2-r4jr8   1/1       Running   0          2m
-file-uploader-2-z8h7t   1/1       Running   0          2m
+file-uploader-2-4h7bx   1/1       Running   0          2m
+file-uploader-2-gqbsn   1/1       Running   0          2m
+file-uploader-2-pkmpj   1/1       Running   0          2m
 ----
 
-Try it out in your file uploader web application using your browser. Upload new files and see that they are visible from within all application pods.
+Try it out in your file uploader web application using your browser. Upload
+new files and see that they are visible from within all application pods.
 
 [CAUTION]
 ====
 Where is my previously uploaded file?
 
-Since the pod redeployed the file has been lost with the previous container's root filesystem going away as part of the configuration update. One more reason to provide persistent storage!
+Since the pod redeployed the file has been lost with the previous container's
+root filesystem going away as part of the configuration update. One more
+reason to provide persistent storage!
 ====
 
 Once done, return to the command line and look at the contents of pods:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="copypaste"]
 ----
-oc rsh file-uploader-2-qwzpz ls -hl uploaded
-oc rsh file-uploader-2-r4jr8 ls -hl uploaded
-oc rsh file-uploader-2-z8h7t ls -hl uploaded
+for pod in $(oc get pod -l app=file-uploader --no-headers | awk '{print $1}'); do echo $pod; oc rsh $pod ls -hl uploaded; done
 ----
 
-[NOTE]
-====
-The exact name of the *Pods* will be different in your environment. Use the names from the `oc get pods` output above.
-====
 
 You will see that now all of the pods have the uploaded file:
 ----
-total 144K
--rw-r--r--. 1 1000180000 root 141K Apr 18 10:01 shakespeare-romeo-48.txt
-----
-----
-total 144K
--rw-r--r--. 1 1000180000 root 141K Apr 18 10:01 shakespeare-romeo-48.txt
-----
-----
-total 144K
--rw-r--r--. 1 1000180000 root 141K Apr 18 10:01 shakespeare-romeo-48.txt
+file-uploader-2-4h7bx
+total 352K
+-rw-r--r--. 1 1000380000 2002 352K Oct 29 16:10 firefly-episode-list.txt
+file-uploader-2-gqbsn
+total 352K
+-rw-r--r--. 1 1000380000 2002 352K Oct 29 16:10 firefly-episode-list.txt
+file-uploader-2-pkmpj
+total 352K
+-rw-r--r--. 1 1000380000 2002 352K Oct 29 16:10 firefly-episode-list.txt
 ----
 
 That's it. You have successfully provided shared storage to pods throughout the
@@ -915,24 +984,27 @@ dependencies like NFS.
 
 However, what happens when the volume is full?
 
-Let's try it. Run the following command to fill up the currently 1GiB of free space in the persistent volume. Since it's shared, you can use any the 3 file-uploader pods:
+Let's try it. Run the following command to fill up the currently 1GiB of free
+space in the persistent volume. Since it's shared, you can use any the 3
+file-uploader pods:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="copypaste"]
 ----
-oc rsh file-uploader-2-jd22b dd if=/dev/zero of=uploaded/bigfile bs=1M count=1000
+oc rsh $(oc get pod -l app=file-uploader --no-headers | head -n1 | awk '{print $1}') dd if=/dev/zero of=uploaded/bigfile bs=100M count=1000
 ----
 
-The result after around 30 seconds is:
+The result after some time is:
 ----
-dd: error writing 'uploaded/bigfile': Input/output error
-dd: closing output file 'uploaded/bigfile': Input/output error
+dd: error writing 'uploaded/bigfile': No space left on device
+dd: closing output file 'uploaded/bigfile': No space left on device
+command terminated with exit code 1
 ----
 
 Oops. The file system seems to have a problem. Let's check it:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="copypaste"]
 ----
-oc rsh file-uploader-2-jd22b df -h /opt/app-root/src/uploaded
+oc rsh $(oc get pod -l app=file-uploader --no-headers | head -n1 | awk '{print $1}') df -h /opt/app-root/src/uploaded
 ----
 
 Clearly the file system is full:
@@ -952,14 +1024,24 @@ failed to open stream: No space left on device in /opt/app-root/src/upload.php o
 
 Fortunately that is easy to fix for the user or owner of the app, even without administrator intervention.
 
-Use the `oc edit` command to edit the `PersistentVolumeClaim` that we used to generate the `PersistentVolume`:
+[WARNING]
+====
+If you are unfamiliar with the `vi` editor, please run the following command before continuing:
+
+    export EDITOR=nano
+====
+
+Use the `oc edit` command to edit the `PersistentVolumeClaim` that we used to
+generate the `PersistentVolume`:
 
 [source,bash,role="copypaste"]
 ----
 oc edit pvc my-shared-storage
 ----
 
-You end up in a `vi` session editing the `PVC` object properties in YAML. Go to line that says `storage: 1Gi` below spec -> resources -> requests and increase to `5Gi` like shown below:
+You end up in a `vi` session editing the `PVC` object properties in YAML. Go
+to line that says `storage: 1Gi` below spec -> resources -> requests and
+increase to `5Gi` like shown below:
 
 [source,yaml]
 ----
@@ -997,14 +1079,16 @@ Exit out of `vi` mode with the `:wq` command.
 
 [TIP]
 ====
-Upon writing the file the `oc edit` command will update the `PersistentVolumeClaim` definition in OpenShift. This way of ad-hoc editing works with many objects in OpenShift.
+Upon writing the file the `oc edit` command will update the
+`PersistentVolumeClaim` definition in OpenShift. This way of ad-hoc editing
+works with many objects in OpenShift.
 ====
 
 Give it a couple of seconds and then check the filesystem again:
 
 [source,bash,role="copypaste copypaste-warning"]
 ----
-oc rsh file-uploader-2-jd22b df -h /opt/app-root/src/uploaded
+oc rsh $(oc get pod -l app=file-uploader --no-headers | head -n1 | awk '{print $1}') df -h /opt/app-root/src/uploaded
 ----
 
 The situation should look much better now:
@@ -1016,24 +1100,43 @@ Filesystem                                      Size  Used Avail Use% Mounted on
 
 ### Providing block storage with OCS
 
-OpenShift Container Storage also contains a block storage persona. At the very end of every *Pod* accessing a `PersistentVolume` is a filesystem directory bind-mounted to the container's filesystem namespace. In the case of GlusterFS it's the GlusterFS filesystem, a POSIX compatible, replicated shared network filesystem.
-As of today, OpenShift doesn't support provisioning a block device directly into a *Pod*. All block storage supported by OpenShift eventually gets formatted with a filesystem (like XFS), and is then bind-mounted into the container's filesystem namespace.
+OpenShift Container Storage also contains a block storage persona. At the
+very end of every *Pod* accessing a `PersistentVolume` is a filesystem
+directory bind-mounted to the container's filesystem namespace. In the case
+of GlusterFS it's the GlusterFS filesystem, a POSIX compatible, replicated
+shared network filesystem. As of today, OpenShift doesn't support
+provisioning a block device directly into a *Pod*. All block storage
+supported by OpenShift eventually gets formatted with a filesystem (like
+XFS), and is then bind-mounted into the container's filesystem namespace.
 
-When we speak of block storage in OCS, we are talking about an iSCSI LUN getting provisioned as part of a `PersistentVolumeClaim` against the block-based `StorageClass` of OCS. This iSCSI LUN is generated from the LIO stack running in the OCS pods. It is backed by a sparse file which is hosted on an internal GlusterFS volume. This subsystem is called `gluster-block`.
+When we speak of block storage in OCS, we are talking about an iSCSI LUN
+getting provisioned as part of a `PersistentVolumeClaim` against the
+block-based `StorageClass` of OCS. This iSCSI LUN is generated from the LIO
+stack running in the OCS pods. It is backed by a sparse file which is hosted
+on an internal GlusterFS volume. This subsystem is called `gluster-block`.
 See below graphic for a representation:
 
 .gluster-block IO flow in OCS
 image::cns_diagram_gluster_block.png[]
 
-Why is this beneficial? Some applications, like OpenShift Logging and Metrics services facilitate operations which are cheap on a local filesystem like XFS but expensive on distributed filesystem like GlusterFS.
+Why is this beneficial? Some applications, like OpenShift Logging and Metrics
+services facilitate operations which are cheap on a local filesystem like XFS
+but expensive on distributed filesystem like GlusterFS.
 
-With `gluster-block` you get the advantage of resilient, scalable storage without the overhead on filesystem operations like locking and byte-range locking.
+With `gluster-block` you get the advantage of resilient, scalable storage
+without the overhead on filesystem operations like locking and byte-range
+locking.
 
-OpenShift Metrics and Logging issue a lot of these operations, and hence *`gluster-block` is currently the only supported backend in OCS for those services*.
+OpenShift Metrics and Logging issue a lot of these operations, and hence
+*`gluster-block` is currently the only supported backend in OCS for those
+services*.
 
-`gluster-block` was deployed in the previous chapter (_Infrastructure Management Basics_) and used to supply storage to Cassandra as part of the Metrics service and to ElasticSearch as part of the Logging service.
+`gluster-block` was deployed in the previous chapter (_Infrastructure
+Management Basics_) and used to supply storage to Cassandra as part of the
+Metrics service and to ElasticSearch as part of the Logging service.
 
-If you look on the host running any of those service, you will see that there are iSCSI sessions open.
+If you look on the host running any of those service, you will see that there
+are iSCSI sessions open.
 
 For example, pick the host running the ElasticSearch pod:
 
@@ -1046,49 +1149,74 @@ You will see the IP and the hostname of the host the pod is running on.
 In this example the pod is running on {{ NODE5_INTERNAL_FQDN }}.
 
 ----
-NAME                                      READY     STATUS    RESTARTS   AGE       IP           NODE
-logging-es-data-master-nsgqvac6-1-jsfnb   2/2       Running   0          3m        10.131.2.4   {{ NODE5_INTERNAL_FQDN }}
+NAME                                      READY     STATUS    RESTARTS   AGE       IP            NODE                                         NOMINATED NODE
+logging-es-data-master-uud3jzgn-1-tkxsd   2/2       Running   0          1h        10.131.0.24   {{ INFRA_INTERNAL_FQDN }}   <none>
 ----
 
 [TIP]
 ====
-Above you see one of the examples where a *Pod* actually contains two containers. The ElasticSearch pod contains an additional proxy service, living in its own container but running with the actual ElasticSearch service on the same host.
+Above you see one of the examples where a *Pod* actually contains two
+containers. The ElasticSearch pod contains an additional proxy service,
+living in its own container but running with the actual ElasticSearch service
+on the same host.
 ====
 
-Sign on to this host (use the host shown in the last command) from the master using SSH and run the `iscsiadm` utility to display running iSCSI sessions:
+[NOTE]
+====
+To SSH to hosts in the environment you need to do so from the `cloud-user`
+account. The `root` account does not have the SSH keys and `root` SSH is
+disabled in this environment.
+====
+
+Sign on to this host (use the host shown in the last command) from the master
+using SSH and run the `iscsiadm` utility to display running iSCSI sessions:
 
 [source,bash,role="copypaste copypaste-warning"]
 ----
-ssh {{ NODE5_INTERNAL_FQDN }} sudo iscsiadm -m session
+ssh {{ INFRA_INTERNAL_FQDN }} sudo iscsiadm -m session
 ----
 
 Answer "*yes*" to the SSH security prompt. You should see output similar to the below:
 
 ----
-tcp: [1] 10.0.3.234:3260,1 iqn.2016-12.org.gluster-block:1241c07c-68ec-40cf-ba75-c10661806a16 (non-flash)
-tcp: [2] 10.0.4.75:3260,2 iqn.2016-12.org.gluster-block:1241c07c-68ec-40cf-ba75-c10661806a16 (non-flash)
-tcp: [3] 10.0.1.145:3260,3 iqn.2016-12.org.gluster-block:1241c07c-68ec-40cf-ba75-c10661806a16 (non-flash)
+tcp: [1] 10.0.4.80:3260,1 iqn.2016-12.org.gluster-block:f625464b-42b7-4251-8dce-ae78f1bdb17d (non-flash)
+tcp: [2] 10.0.1.105:3260,2 iqn.2016-12.org.gluster-block:f625464b-42b7-4251-8dce-ae78f1bdb17d (non-flash)
+tcp: [3] 10.0.3.126:3260,3 iqn.2016-12.org.gluster-block:f625464b-42b7-4251-8dce-ae78f1bdb17d (non-flash)
+tcp: [4] 10.0.4.80:3260,1 iqn.2016-12.org.gluster-block:236d8c72-3229-4863-9576-3e59055336ec (non-flash)
+tcp: [5] 10.0.1.105:3260,2 iqn.2016-12.org.gluster-block:236d8c72-3229-4863-9576-3e59055336ec (non-flash)
+tcp: [6] 10.0.3.126:3260,3 iqn.2016-12.org.gluster-block:236d8c72-3229-4863-9576-3e59055336ec (non-flash)
 ----
 
-The IPs and LUN IDs are going to be different for you, but essentially you see 3 iSCSI sessions open to the same LUN (identified by the UUID after `iqn.2016-12.org.gluster-block`).
-There are 3 sessions because every OCS pod of the second OCS cluster for Infrastructure runs the Linux iSCSI target stack (TCMU) and each session represents an independent IO path to the same LUN, thus achieving high availability and path-based failover.
+The IPs and LUN IDs are going to be different for you, but essentially you
+see 3 iSCSI sessions open to the same LUN (identified by the UUID after
+`iqn.2016-12.org.gluster-block`). There are 3 sessions because every OCS pod
+of the second OCS cluster for Infrastructure runs the Linux iSCSI target
+stack (TCMU) and each session represents an independent IO path to the same
+LUN, thus achieving high availability and path-based failover.
 
-Like all block storage supplied to OpenShift, it get's formatted with XFS which you can see if you look at mounts on the host running ElasticSearch:
+Like all block storage supplied to OpenShift, it gets formatted with XFS
+which you can see if you look at mounts on the host running ElasticSearch:
 
 [source,bash,role="copypaste copypaste-warning"]
 ----
-ssh {{ NODE5_INTERNAL_FQDN }} mount | grep iscsi
+ssh {{ INFRA_INTERNAL_FQDN }} mount | grep iscsi
 ----
 
 You will see something similar to this:
 
 ----
-/dev/sda on /var/lib/origin/openshift.local.volumes/plugins/kubernetes.io/iscsi/iface-default/10.0.3.234:3260-iqn.2016-12.org.gluster-block:1241c07c-68ec-40cf-ba75-c10661806a16-lun-0 type xfs (rw,relatime,seclabel,attr2,inode64,noquota)
+/dev/mapper/mpatha on /var/lib/origin/openshift.local.volumes/plugins/kubernetes.io/iscsi/iface-default/10.0.4.80:3260-iqn.2016-12.org.gluster-block:f625464b-42b7-4251-8dce-ae78f1bdb17d-lun-0 type xfs (rw,relatime,seclabel,attr2,inode64,noquota)
+/dev/mapper/mpatha on /var/lib/origin/openshift.local.volumes/pods/7c8f4b23-db86-11e8-882a-0e4710a83b18/volumes/kubernetes.io~iscsi/pvc-756ad53d-db86-11e8-882a-0e4710a83b18 type xfs (rw,relatime,seclabel,attr2,inode64,noquota)
+/dev/mapper/mpathb on /var/lib/origin/openshift.local.volumes/plugins/kubernetes.io/iscsi/iface-default/10.0.4.80:3260-iqn.2016-12.org.gluster-block:236d8c72-3229-4863-9576-3e59055336ec-lun-0 type xfs (rw,relatime,seclabel,attr2,inode64,noquota)
+/dev/mapper/mpathb on /var/lib/origin/openshift.local.volumes/pods/4e4cc348-db87-11e8-882a-0e4710a83b18/volumes/kubernetes.io~iscsi/pvc-20fccede-db87-11e8-882a-0e4710a83b18 type xfs (rw,relatime,seclabel,attr2,inode64,noquota)
 ----
 
-As you can see the device `/dev/sda` is how the iSCSI LUN ended up (in this case) on {{ NODE5_INTERNAL_FQDN}}.
+As you can see the devicemapper mulipath devices are how the iSCSI LUN ended
+up (in this case) on {{ INFRA_INTERNAL_FQDN}}.
 
-To serve a block device from OCS a special external provisioner is shipping with it. You can see it's pod in the namespace that the second OCS cluster was deployed to:
+To serve a block device from OCS, a special external provisioner is used. You
+can see its *Pod* in the namespace that the second OCS cluster
+was deployed to:
 
 [source,bash,role="copypaste"]
 ----
@@ -1102,9 +1230,11 @@ NAME                                           READY     STATUS    RESTARTS   AG
 glusterblock-registry-provisioner-dc-1-vsgpg   1/1       Running   0          21m
 ----
 
-This component contains the additional logic to carve out block devices from OCS.
+This component contains the additional logic to carve out block devices from
+OCS.
 
-You will also find evidence of the different provisioning mechanism if you look at the `StorageClass`:
+You will also find evidence of the different provisioning mechanism if you
+look at the `StorageClass`:
 
 [source,bash,role="copypaste"]
 ----
@@ -1119,11 +1249,15 @@ glusterfs-registry            kubernetes.io/glusterfs    58m
 glusterfs-registry-block      gluster.org/glusterblock   58m <1>
 glusterfs-storage (default)   kubernetes.io/glusterfs    1h
 ----
-<1> The provisioner does not start with `kubernetes.io` which indicates it's an external provisioner (shipping as an additional component, not as part of OpenShift or Kubernetes)
+<1> The provisioner does not start with `kubernetes.io` which indicates it's
+an external provisioner (shipping as an additional component, not as part of
+OpenShift or Kubernetes)
 
-Finally, the block device is reflected as a specific type of volume, a `blockvolume` in `heketi`.
+Finally, the block device is reflected as a specific type of volume, a
+`blockvolume` in `heketi`.
 
-Run the following command to ask `heketi` about all block volumes currently present using the `heketi-cli` tool:
+Run the following command to ask `heketi` about all block volumes currently
+present using the `heketi-cli` tool:
 
 ----
 heketi-cli --server http://heketi-registry-{{CNS_INFRA_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}} --user=admin --secret {{ HEKETI_ADMIN_PW }} blockvolume list
@@ -1136,7 +1270,10 @@ Id:a2ceeabc91d453a30e197da764fca8c9    Cluster:f68d7554542bab9d0fdeb683d66d951a 
 Id:a67906a197ad0c750a90c793452f83c7    Cluster:f68d7554542bab9d0fdeb683d66d951a    Name:blockvol_a67906a197ad0c750a90c793452f83c7
 ----
 
-Using `heketi-cli` you could also provision new block volumes or even create new internal GlusterFS volumes to host block volumes. However this is rarely necessary, since this, at time of writing (2018), is only meant to be in place for Logging and Metrics and provisioning is handled automatically.
+Using `heketi-cli` you could also provision new block volumes or even create
+new internal GlusterFS volumes to host block volumes. However this is rarely
+necessary, since this, at time of writing (2018), is only meant to be in
+place for Logging and Metrics and provisioning is handled automatically.
 
 ### OCS Operations
 
@@ -1151,19 +1288,29 @@ At some point the overall OCS cluster capacity may need to be expanded. There ar
 
 Option 1) is automated using `openshift-ansible`
 
-Option 2) is an option you likely want to take when you have nodes with different media types (SSD vs. HDD) and you want to offer quality of service. +
+Option 2) is an option you likely want to take when you have nodes with
+different media types (SSD vs. HDD) and you want to offer quality of service.
 
-Option 3) allows you to easily expand the cluster capacity in-place. In this lab we however have no nodes left to add, so we will illustrate Option 4).
+Option 3) allows you to easily expand the cluster capacity in-place. In this
+lab we however have no nodes left to add, so we will illustrate Option 4).
 
 #### Adding Additional Devices to a OCS Cluster
 
-To perform management operations we'll use the `heketi-cli` tool. It manages several entities that make up OCS, that is: clusters, nodes, volumes and devices.
+To perform management operations we'll use the `heketi-cli` tool. It manages
+several entities that make up OCS, that is: clusters, nodes, volumes and
+devices.
 
-For each entity there are several create/add, update, delete commands available. For initial cluster setup `heketi-cli` also offers batch processing via a JSON file.
+For each entity there are several create/add, update, delete commands
+available. For initial cluster setup `heketi-cli` also offers batch
+processing via a JSON file.
 
-In the following we will manually add devices from node04, node05 and node06, which form the OCS cluster for OpenShift infrastructure.
+In the following we will manually add devices from `node04`, `node05` and
+`node06`, which form the OCS cluster for OpenShift infrastructure.
 
-Like in the _Installation_ module, we first set up some Bash environment variables to configure our `heketi-cli` client to talk to the second OCS cluster. This time we take a shortcut by programmatically determining the URL to heketi and the password by querying the `heketi` pod:
+Like in the _Installation_ module, we first set up some Bash environment
+variables to configure our `heketi-cli` client to talk to the second OCS
+cluster. This time we take a shortcut by programmatically determining the URL
+to heketi and the password by querying the `heketi` pod:
 
 [source,bash,role="copypaste"]
 ----
@@ -1188,9 +1335,13 @@ Id:d8443e7ee8314c0c9fb4d8274a370bbd	Cluster:ca777ae0285ef6d8cd7237c862bd591c
 Id:caaed3927e424b22b1a89d261f7617ad	Cluster:ca777ae0285ef6d8cd7237c862bd591c
 ----
 
-The UUIDs of the nodes will be different for you. We however need them to tell `heketi` from which nodes to add a device. To avoid repetitive copying and pasting here is another Bash short cut to parse above output in a Bash variable:
+The UUIDs of the nodes will be different for you. We however need them to
+tell `heketi` from which nodes to add a device. To avoid repetitive copying
+and pasting here is another Bash short cut to parse above output in a Bash
+variable:
 
-Run the following command to store the `heketi`-internal ID of the OCS cluster (there is only one for this `heketi` instance) in a bash variable:
+Run the following command to store the `heketi`-internal ID of the OCS
+cluster (there is only one for this `heketi` instance) in a bash variable:
 
 [source,bash,role="copypaste"]
 ----
@@ -1216,8 +1367,9 @@ heketi-cli topology info
 
 You should see that every node currently has a single device: `{{NODE_BRICK_DEVICE}}`.
 
-These nodes of the second OCS cluster, have an additional, unused storage device
-`{{NODE_BRICK_DEVICE2}}`. For each node now go ahead and make `heketi` aware of this device using the `device add` directive
+These nodes of the second OCS cluster, have an additional, unused storage
+device `{{NODE_BRICK_DEVICE2}}`. For each node now go ahead and make `heketi`
+aware of this device using the `device add` directive
 
 [source,bash,role="copypaste"]
 ----
@@ -1228,26 +1380,35 @@ heketi-cli device add --name={{NODE_BRICK_DEVICE2}} --node=${NODE_LIST[2]}
 
 Each command should return with the message `Device added successfully`.
 
-Check `heketi-cli topology info` again to verify the presence of the new devices.
+Check `heketi-cli topology info` again to verify the presence of the new
+devices.
 
-That's it - the devices are now available to `heketi` and will be considered the next time OCS serves a volume request. Adding devices and nodes are online operations, meaning they are non-disruptive and can be run in production without downtime.
-
+That's it - the devices are now available to `heketi` and will be considered
+the next time OCS serves a volume request. Adding devices and nodes are
+online operations, meaning they are non-disruptive and can be run in
+production without downtime.
 
 ### Replacing Failed Disks and Nodes
 
-When a device fails, OCS transparently continues operations with the remaining replicas.
-You will need to replace such components to move out of a degraded state and get to 3 replicas again, either using other devices free capacity in the same node or in different nodes.
+When a device fails, OCS transparently continues operations with the
+remaining replicas. You will need to replace such components to move out of a
+degraded state and get to 3 replicas again, either using other devices free
+capacity in the same node or in different nodes.
 
-For this exercise, let's assume the device `{{NODE_BRICK_DEVICE}}` of your node
-{{NODE4_INTERNAL_FQDN}} failed and you need to replace it. You can do that as
-long as there is enough spare capacity somewhere else in the cluster,
-preferrable but not necessarily in the same failure domain (as specifed in the
-topology).
+For this exercise, let's assume the device `{{ NODE_BRICK_DEVICE }}` of your
+node {{ NODE4_INTERNAL_FQDN }} failed and you need to replace it. You can do
+that as long as there is enough spare capacity somewhere else in the cluster,
+preferrable but not necessarily in the same failure domain (as specifed in
+the topology).
 
 [TIP]
 ====
-OCS is aware of failure domains in your infrastructure. These could be racks in a data center or availability zones in public cloud environments. The zones are identified by distinct values in the `zone` parameter of each node. Nodes with the same value for `zone` are considered part of the same failure domain.
-OCS will try to do its best (but not enforce it) to replicate and rebalance data across 3 different failure domains at all times.
+OCS is aware of failure domains in your infrastructure. These could be racks
+in a data center or availability zones in public cloud environments. The
+zones are identified by distinct values in the `zone` parameter of each node.
+Nodes with the same value for `zone` are considered part of the same failure
+domain. OCS will try to do its best (but not enforce it) to replicate and
+rebalance data across 3 different failure domains at all times.
 ====
 
 The first step is to determine the OCS node's internal UUID in heketi's
@@ -1310,9 +1471,11 @@ export FAILED_DEVICE_ID=$(heketi-cli node info $NODE_4_ID  --json | jq -r '.devi
 echo $FAILED_DEVICE_ID
 ----
 
-You should get the UUID of `{{ NODE_BRICK_DEVICE }}` from this command, in this example `4fb2ae473d5ee451906d5489abfc653e`.
+You should get the UUID of `{{ NODE_BRICK_DEVICE }}` from this command, in
+this example `4fb2ae473d5ee451906d5489abfc653e`.
 
-With the UUID we can first mark the device as offline to stop heketi from further attempts to allocate space from it:
+With the UUID we can first mark the device as offline to stop heketi from
+further attempts to allocate space from it:
 
 [source,bash,role="copypaste"]
 ----
@@ -1339,14 +1502,20 @@ You will see something like:
 Device 4fb2ae473d5ee451906d5489abfc653e is now removed
 ----
 
-This command can take a bit long as it will go through the topology and search
-for the next available device on the same node, in the same failure domain or
-in the rest of the cluster (in that order) and trigger a *brick-replacement
-operation*. That is, the data from the failed brick is re-replicated to another health storage device and the 3-way replicated storage volume moves out of degraded state. +
-This is also an online operation and can be run in production.
+[NOTE]
+====
+This command can take a bit long as it will go through the topology and
+search for the next available device on the same node, in the same failure
+domain or in the rest of the cluster (in that order) and trigger a
+*brick-replacement operation*. That is, the data from the failed brick is
+re-replicated to another health storage device and the 3-way replicated
+storage volume moves out of degraded state.
+====
 
-Our failed device is still lurking around in _failed_ state. To finally get rid of it
-issue:
+This is an online operation and can absolutely be run in production.
+
+Our failed device is still lurking around in _failed_ state. To finally get
+rid of it issue:
 
 [source,bash,role="copypaste"]
 ----
@@ -1361,9 +1530,9 @@ Device 4fb2ae473d5ee451906d5489abfc653e deleted
 
 [NOTE]
 ====
-Only devices that are not used by other Gluster volumes can be deleted. If
-that's not the case `heketi-cli` will tell you about it. In that case you need
-to issue a `remove` operation first.
+Only devices that are not currently used by other Gluster volumes can be
+deleted. If that's not the case, `heketi-cli` will tell you about it. Devices
+that are in use always need to have `remove` performed first.
 ====
 
 You can now check that the device is gone from the topology by running:

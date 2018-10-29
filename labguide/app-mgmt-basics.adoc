@@ -110,39 +110,53 @@ oc describe pod mapit-1-6lczv
 And you will see output similar to the following:
 
 ----
-Name:                   mapit-1-6lczv
-Namespace:              app-management
-Security Policy:        restricted
-Node:                   node02.internal.aws.testdrive.openshift.com/10.0.3.32
-Start Time:             Thu, 17 Aug 2017 13:41:00 +0000
-Labels:                 app=mapit
-                        deployment=mapit-1
-                        deploymentconfig=mapit
-Status:                 Running
-IP:                     10.129.0.3
-Controllers:            ReplicationController/mapit-1
+Name:               mapit-1-r2sjj
+Namespace:          app-management
+Priority:           0
+PriorityClassName:  <none>
+Node:               node02.internal.aws.testdrive.openshift.com/10.0.3.98
+Start Time:         Wed, 24 Oct 2018 17:17:38 +0000
+Labels:             app=mapit
+                    deployment=mapit-1
+                    deploymentconfig=mapit
+Annotations:        openshift.io/deployment-config.latest-version=1
+                    openshift.io/deployment-config.name=mapit
+                    openshift.io/deployment.name=mapit-1
+                    openshift.io/generated-by=OpenShiftNewApp
+                    openshift.io/scc=restricted
+Status:             Running
+IP:                 10.129.0.2
+Controlled By:      ReplicationController/mapit-1
 Containers:
   mapit:
-    Container ID:       docker://7eb42d5d95b38f7804e38f05cd423314cdb6bacb3e156c1d97e38eac1d9dc63f
-    Image:              docker.io/siamaksade/mapit@sha256:338a3031df6354e3adc3ba7d559ae22a0f2c79eade68aa72447f821cc7b8370c
-    Image ID:           docker-pullable://docker.io/siamaksade/mapit@sha256:338a3031df6354e3adc3ba7d559ae22a0f2c79eade68aa72447f821cc7b8370c
-    Ports:              8080/TCP, 8778/TCP, 9779/TCP
-    State:              Running
-      Started:          Thu, 17 Aug 2017 13:41:27 +0000
-    Ready:              True
-    Restart Count:      0
-    Volume Mounts:
-      /var/run/secrets/kubernetes.io/serviceaccount from default-token-kthcr (ro)
-    Environment Variables:      <none>
+    Container ID:   docker://b00a80b47411665930b5f2f08b6df76d49f40869a599500af99d073aac730654
+    Image:          docker.io/siamaksade/mapit@sha256:338a3031df6354e3adc3ba7d559ae22a0f2c79eade68aa72447f821cc7b8370c
+    Image ID:       docker-pullable://docker.io/siamaksade/mapit@sha256:338a3031df6354e3adc3ba7d559ae22a0f2c79eade68aa72447f821cc7b8370c
+    Ports:          8080/TCP, 8778/TCP, 9779/TCP
+    Host Ports:     0/TCP, 0/TCP, 0/TCP
+    State:          Running
+      Started:      Wed, 24 Oct 2018 17:17:42 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-nh85v (ro)
 Conditions:
-  Type          Status
-  Initialized   True
-  Ready         True
-  PodScheduled  True
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
 Volumes:
-  default-token-kthcr:
-    Type:       Secret (a volume populated by a Secret)
-    SecretName: default-token-kthcr
+  default-token-nh85v:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-nh85v
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  node-role.kubernetes.io/compute=true
+Tolerations:     <none>
+Events:
+
 ...
 ----
 
@@ -187,8 +201,8 @@ oc get services
 You will see something like the following:
 
 ----
-NAME      CLUSTER-IP     EXTERNAL-IP   PORT(S)                      AGE
-mapit     172.30.3.117   <none>        8080/TCP,8778/TCP,9779/TCP   14m
+NAME      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
+mapit     ClusterIP   172.30.48.204   <none>        8080/TCP,8778/TCP,9779/TCP   3m
 ----
 
 NOTE: Service IP addresses are dynamically assigned on creation and are
@@ -206,20 +220,24 @@ oc describe service mapit
 You will see something like the following:
 
 ----
-Name:                   mapit
-Namespace:              app-management
-Labels:                 app=mapit
-Selector:               app=mapit,deploymentconfig=mapit
-Type:                   ClusterIP
-IP:                     172.30.3.117
-Port:                   8080-tcp        8080/TCP
-Endpoints:              10.129.0.3:8080
-Port:                   8778-tcp        8778/TCP
-Endpoints:              10.129.0.3:8778
-Port:                   9779-tcp        9779/TCP
-Endpoints:              10.129.0.3:9779
-Session Affinity:       None
-No events.
+Name:              mapit
+Namespace:         app-management
+Labels:            app=mapit
+Annotations:       openshift.io/generated-by=OpenShiftNewApp
+Selector:          app=mapit,deploymentconfig=mapit
+Type:              ClusterIP
+IP:                172.30.48.204
+Port:              8080-tcp  8080/TCP
+TargetPort:        8080/TCP
+Endpoints:         10.129.0.2:8080
+Port:              8778-tcp  8778/TCP
+TargetPort:        8778/TCP
+Endpoints:         10.129.0.2:8778
+Port:              9779-tcp  9779/TCP
+TargetPort:        9779/TCP
+Endpoints:         10.129.0.2:9779
+Session Affinity:  None
+Events:            <none>
 ----
 
 Information about all objects (their definition, their state, and so forth) is
@@ -241,16 +259,16 @@ kind: Service
 metadata:
   annotations:
     openshift.io/generated-by: OpenShiftNewApp
-  creationTimestamp: 2017-08-17T13:40:51Z
+  creationTimestamp: 2018-10-24T17:17:35Z
   labels:
     app: mapit
   name: mapit
   namespace: app-management
-  resourceVersion: "1492"
+  resourceVersion: "19394"
   selfLink: /api/v1/namespaces/app-management/services/mapit
-  uid: af2cb9cd-8351-11e7-afdc-0a128c2d4cfe
+  uid: b2e86550-d7b0-11e8-bb81-02f850fb3182
 spec:
-  clusterIP: 172.30.3.117
+  clusterIP: 172.30.48.204
   ports:
   - name: 8080-tcp
     port: 8080
@@ -271,6 +289,7 @@ spec:
   type: ClusterIP
 status:
   loadBalancer: {}
+
 ----
 
 Take note of the `selector` stanza. Remember it.
@@ -431,20 +450,25 @@ oc describe svc mapit
 You will see something like the following:
 
 ----
-Name:                   mapit
-Namespace:              app-management
-Labels:                 app=mapit
-Selector:               app=mapit,deploymentconfig=mapit
-Type:                   ClusterIP
-IP:                     172.30.3.117
-Port:                   8080-tcp        8080/TCP
-Endpoints:              10.128.2.3:8080,10.129.0.3:8080
-Port:                   8778-tcp        8778/TCP
-Endpoints:              10.128.2.3:8778,10.129.0.3:8778
-Port:                   9779-tcp        9779/TCP
-Endpoints:              10.128.2.3:9779,10.129.0.3:9779
-Session Affinity:       None
-No events.
+Name:              mapit
+Namespace:         app-management
+Labels:            app=mapit
+Annotations:       openshift.io/generated-by=OpenShiftNewApp
+Selector:          app=mapit,deploymentconfig=mapit
+Type:              ClusterIP
+IP:                172.30.48.204
+Port:              8080-tcp  8080/TCP
+TargetPort:        8080/TCP
+Endpoints:         10.129.0.2:8080,10.130.0.3:8080
+Port:              8778-tcp  8778/TCP
+TargetPort:        8778/TCP
+Endpoints:         10.129.0.2:8778,10.130.0.3:8778
+Port:              9779-tcp  9779/TCP
+TargetPort:        9779/TCP
+Endpoints:         10.129.0.2:9779,10.130.0.3:9779
+Session Affinity:  None
+Events:            <none>
+
 ----
 
 Another way to look at a *Service*'s endpoints is with the following:
@@ -502,19 +526,18 @@ oc delete pod mapit-1-6lczv && oc get pods
 And you will see something like the following:
 
 ----
-pod "mapit-1-6lczv" deleted
+pod "mapit-1-lhqgq" deleted
 NAME            READY     STATUS              RESTARTS   AGE
-mapit-1-6lczv   1/1       Terminating         0          4h
-mapit-1-qtdks   0/1       ContainerCreating   0          0s
-mapit-1-rq6t6   1/1       Running             0          6m
+mapit-1-7dw5t   1/1       Running             0          3m
+mapit-1-rgnht   0/1       ContainerCreating   0          2s
 ----
 
-Did you notice anything? There is a container being terminated (the one we deleted),
-and there's a new container already being created.
+Did you notice anything? There's a new container already being created.
 
-Also, the names of the *Pods* are slightly changed.  That's because OpenShift
-almost immediately detected that the current state (1 *Pod*) didn't match the
-desired state (2 *Pods*), and it fixed it by scheduling another *Pod*.
+Also, the `ContainerCreating` *Pod* has a different name. That's because
+OpenShift almost immediately detected that the current state (1 *Pod*,
+because one was deleted) didn't match the desired state (2 *Pods*), and it
+fixed it by scheduling another *Pod*.
 
 ### Background: Routes
 .OpenShift Route
@@ -555,7 +578,7 @@ oc expose service mapit
 You will see:
 
 ----
-route "mapit" exposed
+route.route.openshift.io/mapit exposed
 ----
 
 Verify the *Route* was created with the following command:
@@ -722,8 +745,7 @@ oc set volume dc/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteM
 The output looks like this:
 
 ----
-persistentvolumeclaims/mapit-storage
-deploymentconfig "mapit" updated
+deploymentconfig.apps.openshift.io/mapit volume updated
 ----
 
 In the first step a *PersistentVolumeClaim* was created. This object represents a request for storage of a certain kind, with a certain capacity from the user to OpenShift.

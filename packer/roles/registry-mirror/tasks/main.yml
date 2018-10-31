@@ -1,4 +1,7 @@
 ---
+- name: login to registry.redhat.io
+  shell: "docker login -u={{ registry_docker_user }} -p={{ registry_docker_password }} registry.redhat.io" 
+
 - name: download ose container images
   docker_image:
     name: "{{ image_source }}/{{ item }}"

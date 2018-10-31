@@ -30,3 +30,6 @@ id_rsa*
 instructor_key*
 labguide/qwiklab-index/site
 ci-test-container/qwiklab-secret.yaml
+build.hwm
+build.pwd
+build.pwi

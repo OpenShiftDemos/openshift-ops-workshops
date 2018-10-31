@@ -58,7 +58,7 @@ sets of OpenShift objects with powerful parameterization. They can be used to
 quickly deploy more complicated and related components into OpenShift, and can be a
 useful part of your organization's software development lifecycle (SDLC). More
 information can be found in the
-link:https://docs.openshift.com/container-platform/3.10/dev_guide/templates.html[template
+link:https://docs.openshift.com/container-platform/3.11/dev_guide/templates.html[template
 documentation^]. We will not go into more detail on *Templates* in these
 exercises.
 
@@ -77,7 +77,7 @@ Take note that there are two new sections added: *ResourceQuota* and
 
 ### Background: ResourceQuota
 The
-link:https://docs.openshift.com/container-platform/3.10/admin_guide/quota.html[quota
+link:https://docs.openshift.com/container-platform/3.11/admin_guide/quota.html[quota
 documentation^] provides a great description of what *ResourceQuota* is about:
 
 ----
@@ -125,12 +125,12 @@ when we get to the *LimitRange* object.
 <8> This setting limits the number of **PersistentVolumeClaims** for a **StorageClass** called `{{ CNS_BLOCK_STORAGECLASS }}`. A value of 0 means that creating **PersistentVolumeClaims** from this storage class is not allowed in this project.
 
 For more details on the available quota options, refer back to the
-link:https://docs.openshift.com/container-platform/3.10/admin_guide/quota.html[quota
+link:https://docs.openshift.com/container-platform/3.11/admin_guide/quota.html[quota
 documentation^].
 
 ### Background: LimitRange
 The
-link:https://docs.openshift.com/container-platform/3.10/admin_guide/limits.html[limit
+link:https://docs.openshift.com/container-platform/3.11/admin_guide/limits.html[limit
 range documentation^] provides some good background:
 
 ----
@@ -173,7 +173,7 @@ Take a look at the sample `LimitRange` definition that we have provided in the
 ----
 
 The difference between requests and default limits is important, and is covered
-in the link:https://docs.openshift.com/container-platform/3.10/admin_guide/limits.html[limit
+in the link:https://docs.openshift.com/container-platform/3.11/admin_guide/limits.html[limit
 range documentation^]. But, generally speaking:
 
 <1> `max` is the highest value that may be specified for limits and requests
@@ -186,7 +186,7 @@ nothing is specified
 In addition to these topics, there are things like *Quality of Service Tiers* as
 well as a *Limit* : *Request* ratio. There is additionally more information in
 the
-link:https://docs.openshift.com/container-platform/3.10/dev_guide/compute_resources.html[compute
+link:https://docs.openshift.com/container-platform/3.11/dev_guide/compute_resources.html[compute
 resources^] section of the documentation.
 
 For the sake of brevity, suffice it to say that there is a complex and powerful
@@ -220,7 +220,7 @@ NOTE: Remember that quotas and limits are applied at the *Project* level. *Users
 may have access to multiple *Projects*, but quotas and limits do not apply
 directly to *Users*. If you want to apply one quota across multiple *Projects*,
 then you should look at the
-link:https://docs.openshift.com/container-platform/3.10/admin_guide/multiproject_quota.html[multi-project
+link:https://docs.openshift.com/container-platform/3.11/admin_guide/multiproject_quota.html[multi-project
 quota^] documentation. We will not cover multi-project quota in these exercises.
 
 ### Installing the Project Request Template
@@ -255,31 +255,12 @@ project-request                 5 (5 blank)   7
 ----
 
 #### Edit the `master-config.yaml`
-For this exercise, we have not already configured things for you. Use your
-favourite editor (`vim`, `vi`, `nano`, etc.) to edit the master's configuration
-file using `sudo` privileges. For example:
+This handy command will replace the default configuration (a blank entry of
+`''`) with the desired setting of `default/project-request`:
 
 [source,bash,role="copypaste"]
 ----
-sudo vim /etc/origin/master/master-config.yaml
-----
-
-WARNING: If you are unfamiliar with the `vi` editor, you should probably use
-the `nano` editor. In the `nano` editor, you can use `^O` (Control + O)
-to save/write out the file after editing, and then `^X` to exit.
-
-In the master's configuration file, you will find a line that mentions
-`projectRequestTemplate`. It will not have anything specified. When nothing is
-specified, OpenShift uses the built-in *Template* that you exported in the first
-exercise.
-
-You will want to edit the config to look like the following (just that section):
-
-----
-...
-projectConfig:
-  projectRequestTemplate: 'default/project-request'
-  ...
+sed -i "s/projectRequestTemplate: ''/projectRequestTemplate: 'default\/project-request'/" /etc/origin/master/master-config.yaml
 ----
 
 #### Restart the Master
@@ -294,7 +275,7 @@ sudo /usr/local/bin/master-restart controllers
 
 [TIP]
 ====
-In OpenShift 3.10 there were some underlying changes to how the master
+In OpenShift 3.11 there were some underlying changes to how the master
 software is run. Part of this change included running the control plane
 itself in containers. This involved a switch from a more traditional
 `systemd`-type service to using a script to restart the various components.
@@ -325,37 +306,38 @@ oc describe project template-test
 The output will look something like:
 
 ----
-Name:           template-test
-Namespace:      <none>
-Created:        5 seconds ago
-Labels:         <none>
-Annotations:    openshift.io/description=
-                openshift.io/display-name=
-                openshift.io/requester=fancyuser1
-                openshift.io/sa.scc.mcs=s0:c12,c9
-                openshift.io/sa.scc.supplemental-groups=1000150000/10000
-                openshift.io/sa.scc.uid-range=1000150000/10000
-Display Name:   <none>
-Description:    <none>
-Status:         Active
-Node Selector:  <none>
+Name:		template-test
+Created:	7 seconds ago
+Labels:		<none>
+Annotations:	openshift.io/description=
+		openshift.io/display-name=
+		openshift.io/requester=system:admin
+		openshift.io/sa.scc.mcs=s0:c10,c0
+		openshift.io/sa.scc.supplemental-groups=1000090000/10000
+		openshift.io/sa.scc.uid-range=1000090000/10000
+Display Name:	<none>
+Description:	<none>
+Status:		Active
+Node Selector:	<none>
 Quota:
-Resource								Used	Hard
---------								----	----
-glusterfs-block.storageclass.storage.k8s.io/persistentvolumeclaims	0	0
-glusterfs.storageclass.storage.k8s.io/requests.storage			0	25Gi
-persistentvolumeclaims							0	5
-pods									0	10
-requests.cpu								0	4
-requests.memory								0	8Gi
-requests.storage							0	50Gi
-resourcequotas								1	1
+	Name:										template-test-quota
+	Resource									Used	Hard
+	--------									----	----
+	glusterfs-registry-block.storageclass.storage.k8s.io/persistentvolumeclaims	0	0
+	glusterfs-storage.storageclass.storage.k8s.io/requests.storage			0	25Gi
+	persistentvolumeclaims								0	5
+	pods										0	10
+	requests.cpu									0	4
+	requests.memory									0	8Gi
+	requests.storage								0	50Gi
+	resourcequotas									0	1
 Resource limits:
-        Name:           template-test-limits
-        Type            Resource        Min     Max     Default
-        ----            --------        ---     ---     ---
-        Container       cpu             10m     4       4
-        Container       memory          5Mi     1Gi     1Gi
+	Name:		template-test-limits
+	Type		Resource	Min	Max	Default	Limit	Limit/Request
+	----		--------	---	---	---	-----	-------------
+	Container	memory		5Mi	1Gi	1Gi	1Gi	-
+	Container	cpu		10m	4	4	4	-
+
 ----
 
 You can also see that the *Quota* and *LimitRange* objects were created:
@@ -368,8 +350,8 @@ oc get quota -n template-test
 You will see:
 
 ----
-NAME                  AGE
-template-test-quota   2m
+NAME                  CREATED AT
+template-test-quota   2018-10-24T19:19:40Z
 ----
 
 And:
@@ -382,8 +364,8 @@ oc get limitrange -n template-test
 You will see:
 
 ----
-NAME                   AGE
-template-test-limits   2m
+NAME                   CREATED AT
+template-test-limits   2018-10-24T19:19:40Z
 ----
 
 ### Configure Using the Installer

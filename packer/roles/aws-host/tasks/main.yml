@@ -13,3 +13,9 @@
     owner: root
     group: root
     mode: "u=rwx,g=rx,o=rx"
+
+- name: manage vm.max_map_count for elasticsearch
+  sysctl:
+    name: vm.max_map_count
+    value: 262145
+    state: present

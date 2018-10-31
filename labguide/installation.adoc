@@ -16,7 +16,7 @@ started the lab.
 
 For more information on installing OpenShift Container Platform, please refer to
 the
-link:https://docs.openshift.com/container-platform/3.10/install/index.html[installation
+link:https://docs.openshift.com/container-platform/3.11/install/index.html[installation
 section] of the product documentation.
 
 [NOTE]
@@ -76,7 +76,7 @@ load balancer.
 
 For more information on the OpenShift Master's areas of responsibility, please refer to
 the
-link:https://docs.openshift.com/container-platform/3.10/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
+link:https://docs.openshift.com/container-platform/3.11/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
 
 ### Examining the provided Ansible inventory file
 First, let's examine the provided installer configuration file.
@@ -95,7 +95,7 @@ like *Masters* and *Nodes*.
 
 For more details on how OpenShift uses Ansible for its installation, please
 refer to the
-link:https://docs.openshift.com/container-platform/3.10/install/configuring_inventory_file.html[Configuring Your Inventory File].
+link:https://docs.openshift.com/container-platform/3.11/install/configuring_inventory_file.html[Configuring Your Inventory File].
 
 The top-level playbook in
 `/usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml` triggers
@@ -142,8 +142,7 @@ You will see that you got logged in to a project called 'default'. More on
 projects later.
 
 ----
-Logged into "https://master.internal.aws.testdrive.openshift.com:443" as
-"system:admin" using existing credentials.
+Logged into "https://master.internal.aws.testdrive.openshift.com:443" as "system:admin" using existing credentials.
 
 You have access to the following projects and can switch between them with 'oc project <projectname>':
 
@@ -152,9 +151,11 @@ You have access to the following projects and can switch between them with 'oc p
     kube-system
     management-infra
     openshift
+    openshift-console
     openshift-infra
     openshift-logging
     openshift-metrics
+    openshift-monitoring
     openshift-node
     openshift-sdn
     openshift-web-console
@@ -176,11 +177,11 @@ The output should look something like the following:
 
 ----
 NAME                                          STATUS    ROLES     AGE	VERSION
-{{ INFRA_INTERNAL_FQDN }}    Ready     infra     1m	v1.10.0+b81c8f8
-{{ MASTER_INTERNAL_FQDN }}   Ready     master    1m	v1.10.0+b81c8f8
-{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1m	v1.10.0+b81c8f8
-{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1m	v1.10.0+b81c8f8
-{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1m	v1.10.0+b81c8f8
+{{ INFRA_INTERNAL_FQDN }}    Ready     infra     1m	v1.11.0+d4cacc0
+{{ MASTER_INTERNAL_FQDN }}   Ready     master    1m	v1.11.0+d4cacc0
+{{ NODE1_INTERNAL_FQDN }}   Ready     compute   1m	v1.11.0+d4cacc0
+{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1m	v1.11.0+d4cacc0
+{{ NODE3_INTERNAL_FQDN }}   Ready     compute   1m	v1.11.0+d4cacc0
 ----
 
 All of the systems listed in the `[nodes]` group in the `/etc/ansible/hosts`
@@ -207,7 +208,7 @@ OpenShift is installed, by default, a CA and SSL certificates are generated for
 all inter-component communication within OpenShift, including the web console.
 It is possible to provide your own SSL certificates during the installation, and
 more information can be found in the
-link:https://docs.openshift.com/container-platform/3.10/install_config/certificate_customization.html#ansible-configuring-custom-certificates[custom
+link:https://docs.openshift.com/container-platform/3.11/install_config/certificate_customization.html#ansible-configuring-custom-certificates[custom
 certificates] section of the installation documentation.
 
 #### Prometheus
@@ -217,7 +218,7 @@ Preview mode, with a non-production SLA. We encourage customers to explore
 Prometheus and its alerts, and to provide us feedback.
 
 More information about prometheus can be found in the
-link:https://docs.openshift.com/container-platform/3.10/install_config/cluster_metrics.html#openshift-prometheus[Prometheus
+link:https://docs.openshift.com/container-platform/3.11/install_config/cluster_metrics.html#openshift-prometheus[Prometheus
 documentation] for OpenShift.
 
 At this point, Prometheus is installed in your cluster. Until we configure
@@ -246,19 +247,21 @@ You'll see something like the following:
 ----
 Name:               prometheus
 Namespace:          openshift-metrics
-CreationTimestamp:  Mon, 09 Jul 2018 12:57:55 +0000
+CreationTimestamp:  Wed, 24 Oct 2018 14:52:32 +0000
 Selector:           app=prometheus
 Labels:             app=prometheus
 Annotations:        <none>
 Replicas:           1 desired | 1 total
+Update Strategy:    RollingUpdate
 Pods Status:        1 Running / 0 Waiting / 0 Succeeded / 0 Failed
 Pod Template:
   Labels:           app=prometheus
   Service Account:  prometheus
   Containers:
    prom-proxy:
-    Image:  registry.access.redhat.com/openshift3/oauth-proxy:v3.10.14
-    Port:   8443/TCP
+    Image:      support.internal.aws.testdrive.openshift.com:5000/openshift3/oauth-proxy:v3.11.16
+    Port:       8443/TCP
+    Host Port:  0/TCP
     Args:
       -provider=openshift
       -https-address=:8443
@@ -299,8 +302,12 @@ Pod Template:
   Service Account:  prometheus-node-exporter
   Containers:
    node-exporter:
-    Image:  registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.10.14
-    Port:   9100/TCP
+    Image:      support.internal.aws.testdrive.openshift.com:5000/openshift3/prometheus-node-exporter:v3.11.16
+    Port:       9102/TCP
+    Host Port:  9102/TCP
+    Args:
+      --no-collector.wifi
+      --web.listen-address=:9102
     Limits:
       cpu:     200m
       memory:  50Mi
@@ -315,18 +322,18 @@ Pod Template:
    proc:
     Type:          HostPath (bare host directory volume)
     Path:          /proc
-    HostPathType:
+    HostPathType:  
    sys:
     Type:          HostPath (bare host directory volume)
     Path:          /sys
-    HostPathType:
+    HostPathType:  
 Events:            <none>
 ----
 
 A `DaemonSet` is another special Kubernetes resource. It makes sure that
 specified containers are running on certain nodes.
 
-There are no labs for these, so feel free to check the documentation for link:https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/[StatefulSet] and for link:https://docs.openshift.com/container-platform/3.10/dev_guide/daemonsets.html[DaemonSet].
+There are no labs for these, so feel free to check the documentation for link:https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/[StatefulSet] and for link:https://docs.openshift.com/container-platform/3.11/dev_guide/daemonsets.html[DaemonSet].
 
 Lastly, you can view that the Prometheus components have been exposed for access when outside of OpenShift using `Routes`. You'll learn about `Routes` later:
 

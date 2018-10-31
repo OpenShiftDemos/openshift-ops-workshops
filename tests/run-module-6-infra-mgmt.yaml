@@ -49,9 +49,9 @@
         - scaleup
         - scaleup_test
 
-    - name: Uncomment cnsinfra lines
+    - name: Uncomment ocsinfra lines
       replace:
-        regexp: '#cnsinfra_'
+        regexp: '#ocsinfra_'
         replace: ''
         path: /etc/ansible/hosts
       tags:
@@ -291,16 +291,6 @@
 
     - name: Wait for elasticsearch to be running
       command: oc get dc -n openshift-logging {{ logging_es_dc.stdout }} -o jsonpath='{.status.readyReplicas}'
-      register: result
-      until: '"1" in result.stdout'
-      retries: 5
-      delay: 60
-      tags:
-        - logging
-        - logging_test
-
-    - name: Wait for curator to be running
-      command: oc get dc -n openshift-logging logging-curator -o jsonpath='{.status.availableReplicas}'
       register: result
       until: '"1" in result.stdout'
       retries: 5

@@ -1,9 +1,0 @@
----
-- name: add local repository
-  yum_repository:
-    name: local
-    description: local
-    baseurl: http://master.internal.aws.testdrive.openshift.com/repo 
-    gpgcheck: no
-    enabled: yes
-...

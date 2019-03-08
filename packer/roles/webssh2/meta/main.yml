@@ -1,3 +1,0 @@
----
-dependencies:
-  - { role: workshopper, tags: ['workshopper'] }

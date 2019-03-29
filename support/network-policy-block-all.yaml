@@ -1,0 +1,10 @@
+# deny everything into the project
+# even resources in project can't reach each other
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: deny-by-default
+spec:
+  podSelector:
+  ingress: []

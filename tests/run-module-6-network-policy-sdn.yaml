@@ -1,0 +1,89 @@
+#!/usr/bin/ansible-playbook
+- name: Network Policy SDN
+  hosts: localhost
+#  become: true
+  tasks:
+  - include_vars: /opt/lab/environment.yml
+    tags: always
+
+  - name: Login as system:admin
+    command: oc login -u system:admin
+    tags:
+    - networking
+    - networking_test
+
+  - name: Switch to default namespace
+    command: oc project default
+    tags:
+    - networking
+    - networking_test
+
+  - name: Create projects and deployment configs
+    command: /opt/lab/support/create-net-projects.sh
+    tags:
+    - networking
+    - networking_test
+
+  - name: Wait for ose pods to be running
+    command: oc get dc ose -n {{ item }} -o jsonpath='{.status.readyReplicas}'
+    register: result
+    until: '"1" in result.stdout'
+    retries: 2
+    delay: 60
+    with_items:
+    - "netproj-a"
+    - "netproj-b"
+    tags:
+    - networking
+    - networking_test
+
+  - name: "test netproj-[ab] exist"
+    k8s_facts:
+      kind: Namespace
+      name: "{{ item }}"
+    register: netproj_exists
+    failed_when: netproj_exists.resources | length != 1
+    with_items:
+    - "netproj-a"
+    - "netproj-b"
+    tags:
+    - networking
+    - networking_test
+
+  - name: "test netproj-a -> netproj-b connectivity #1 (should work)"
+    command: /opt/lab/support/test-connectivity.sh
+    tags:
+    - networking
+    - networking_test
+
+  - name: "restrict access to netproj-b"
+    k8s:
+      state: present
+      src: /opt/lab/support/network-policy-block-all.yaml
+      namespace: netproj-b
+    tags:
+    - networking
+    - networking_test
+
+  - name: "test netproj-a -> netproj-b connectivity #2 (should fail)"
+    command: /opt/lab/support/test-connectivity.sh
+    register: test_connectivity_2
+    failed_when: test_connectivity_2 is success
+    tags:
+    - networking
+    - networking_test
+
+  - name: "allow access from netproj-a to netproj-b"
+    k8s:
+      state: present
+      src: /opt/lab/support/network-policy-allow-all-from-netproj-a.yaml
+      namespace: netproj-b
+    tags:
+    - networking
+    - networking_test
+
+  - name: "test netproj-a -> netproj-b connectivity #3 (should work)"
+    command: /opt/lab/support/test-connectivity.sh
+    tags:
+    - networking
+    - networking_test

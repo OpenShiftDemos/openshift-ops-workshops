@@ -11,39 +11,49 @@ for a little restraint.
 [WARNING]
 =====
 Before continuing, make sure you are logged in with the built-in system administrator account in OpenShift.
+=====
 
 [source,bash,role="copypaste"]
 ----
 oc login -u system:admin
 ----
 
-=====
 
 ### Background: Project Request Template
-When users use the `new-project` command, what is actually happening behind the
-scenes is a project request flow. Much like it sounds, there is a *Template*
-that is processed during the project request.
+When users invoke the `oc new-project` command, a new project request flow is initiated. During part of this this workflow, a default project *Template* is processed to create the newly requested project.
 
 #### View the Default Project Request Template
-Execute the following command to view the built-in default *Project Request
-Template*:
+To view the built-in default *Project Request Template*, execute the following command:
 
 [source,bash,role="copypaste"]
 ----
-oc adm create-bootstrap-project-template
+oc adm create-bootstrap-project-template -o yaml
 ----
 
-If you dig into the JSON output of this command, you will notice that there are
-various parameters defined at the end. Take a look at the help output for the
-`new-project` command:
+Inspecting the the JSON output of this command, you will notice that there are
+various parameters associated with this *Template* displayed towards the bottom.
+
+[source,bash,role="copypaste"]
+----
+...
+parameters:
+- name: PROJECT_NAME
+- name: PROJECT_DISPLAYNAME
+- name: PROJECT_DESCRIPTION
+- name: PROJECT_ADMIN_USER
+- name: PROJECT_REQUESTING_USER
+...
+----
+
+
+ Next, let's take a look at the help output for the `oc new-project` command:
 
 [source,bash,role="copypaste"]
 ----
 oc new-project -h
 ----
 
-Do you see how there is a `--display-name` directive on `new-project` and how
-there is a `PROJECT_DISPLAYNAME` parameter?
+Notice there is a `--display-name` directive on `oc new-project`? This option corresponds to the `PROJECT_DISPLAYNAME` parameter we saw in the output of the default *Template*.
 
 The `new-project` workflow involves the user providing information to fulfill the
 project request. OpenShift decides if this request should be allowed (for
@@ -53,14 +63,16 @@ example, are users allowed to create *Projects*? Does this user have too many
 If you look at the objects defined in the *Template*, you will notice that
 there's no mention of quota or limits. You'll change that now.
 
-NOTE: *Templates* are a powerful tool that enable you to easily create reusable
+NOTE: *Templates* are a powerful tool that enable the user to easily create reusable
 sets of OpenShift objects with powerful parameterization. They can be used to
 quickly deploy more complicated and related components into OpenShift, and can be a
 useful part of your organization's software development lifecycle (SDLC). More
 information can be found in the
+// FIXME: Need 4.0 template doc link here
 link:https://docs.openshift.com/container-platform/3.11/dev_guide/templates.html[template
 documentation^]. We will not go into more detail on *Templates* in these
 exercises.
+
 
 #### Modify the Project Request Template
 You won't actually have to make template changes in this lab -- we've made them
@@ -72,13 +84,14 @@ for you already. Use `cat`, `less`, or your favorite editor to view the modified
 cat /opt/lab/support/project_request_template.yaml
 ----
 
-Take note that there are two new sections added: *ResourceQuota* and
+Please take note that there are two new sections added: *ResourceQuota* and
 *LimitRange*.
 
 ### Background: ResourceQuota
 The
+// FIXME: 4.0 Doc Link Needed
 link:https://docs.openshift.com/container-platform/3.11/admin_guide/quota.html[quota
-documentation^] provides a great description of what *ResourceQuota* is about:
+documentation^] provides a great description of *ResourceQuota*:
 
 ----
 A resource quota, defined by a ResourceQuota object, provides constraints that
@@ -125,11 +138,13 @@ when we get to the *LimitRange* object.
 <8> This setting limits the number of **PersistentVolumeClaims** for a **StorageClass** called `{{ CNS_BLOCK_STORAGECLASS }}`. A value of 0 means that creating **PersistentVolumeClaims** from this storage class is not allowed in this project.
 
 For more details on the available quota options, refer back to the
+// FIXME: 4.0 Doc Link Needed
 link:https://docs.openshift.com/container-platform/3.11/admin_guide/quota.html[quota
 documentation^].
 
 ### Background: LimitRange
 The
+// FIXME: 4.0 Doc Link Needed
 link:https://docs.openshift.com/container-platform/3.11/admin_guide/limits.html[limit
 range documentation^] provides some good background:
 
@@ -224,7 +239,7 @@ link:https://docs.openshift.com/container-platform/3.11/admin_guide/multiproject
 quota^] documentation. We will not cover multi-project quota in these exercises.
 
 ### Installing the Project Request Template
-OK, with this background in place, let's go ahead and actually tell OpenShift to
+With this background in place, let's go ahead and actually tell OpenShift to
 use this new *Project Request Template*.
 
 #### Create the Template
@@ -236,15 +251,15 @@ Go ahead and execute the following:
 
 [source,bash,role="copypaste"]
 ----
-oc create -f /opt/lab/support/project_request_template.yaml -n default
+oc create -f /opt/lab/support/project_request_template.yaml -n openshift-config
 ----
 
-This will create the *Template* object in the `default` *Project*. You can now
-see the *Templates* in the `default` project with the following:
+This will create the *Template* object in the `openshift-config` *Project*. You can now
+see the *Templates* in the `openshift-config` project with the following:
 
 [source,bash,role="copypaste"]
 ----
-oc get template -n default
+oc get template -n openshift-config
 ----
 
 You will see something like the following:
@@ -254,38 +269,58 @@ NAME              DESCRIPTION   PARAMETERS    OBJECTS
 project-request                 5 (5 blank)   7
 ----
 
-#### Edit the `master-config.yaml`
-This handy command will replace the default configuration (a blank entry of
-`''`) with the desired setting of `default/project-request`:
+#### Setting the Default ProjectRequestTemplate
+The default *projectRequestTemplate* is configured in the Openshift API Server configuration. This is stored in a *ConfigMap* in the `openshift-apiserver` project.  You can view the API Server configuration with the following command:
 
 [source,bash,role="copypaste"]
 ----
-sudo sed -i "s/projectRequestTemplate: ''/projectRequestTemplate: 'default\/project-request'/" /etc/origin/master/master-config.yaml
+oc get cm config -n openshift-apiserver  -o go-template='{{index .data "config.yaml"}}' | jq
 ----
 
-#### Restart the Master
-Since you have made a configuration change to the master, you will need to
-restart its service. You can do so with the following command with `sudo` privileges:
+
+This configuration is configured via an Openshift operator.  To add the default project request tempalate configuration, a *CustomResource* (CR) needs to be created.  The *CustomResource* will look like:
+
+[source,yaml]
+----
+apiVersion: "config.openshift.io/v1"
+kind: "Project"
+metadata: 
+  name: "cluster"
+  namespace: ""
+spec: 
+  projectRequestMessage: "You requested a new project with Limits & Quotas!"
+  projectRequestTemplate: 
+    name: "project-request"
+----
+
+Notice the *projectRequestTemplate* name matches the name of the template we created earlier in the `openshift-config` project.
+
+The next step is to create this *CustomResource*.  Once this *CR* is created, the Openshift operator will notice the *CR*, and apply the configuration changes.  To create the *CustomResource*, issue this command:
 
 [source,bash,role="copypaste"]
 ----
-sudo /usr/local/bin/master-restart api
-sudo /usr/local/bin/master-restart controllers
+oc create -f /opt/lab/support/cr_project_request.yaml -n openshift-config
 ----
 
-[TIP]
-====
-In OpenShift 3.11 there were some underlying changes to how the master
-software is run. Part of this change included running the control plane
-itself in containers. This involved a switch from a more traditional
-`systemd`-type service to using a script to restart the various components.
-====
+Once this command is run, the Openshift API Server configurations will be updated.  This can be verified by viewing the configuration:
 
-### Test the Project Request Template
-At this point you have reconfigured the master to use the *Project Request
-Template* (a special kind of *Template*) called `project-request` that is
-located in the `default` *Project*. Now it is time to observe this change in
-action.
+[source,bash,role="copypaste"]
+----
+oc get cm config -n openshift-apiserver  -o go-template='{{index .data "config.yaml"}}' | jq
+----
+
+Notice the new *projectConfig* section:
+
+[source,yaml]
+----
+...
+  "kind": "OpenShiftAPIServerConfig",
+  "projectConfig": {
+    "projectRequestMessage": "You requested a new project with Limits & Quotas!",
+    "projectRequestTemplate": "openshift-config/project-request"
+  },
+...
+----
 
 #### Create a New Project
 When creating a new project, you should see that a *Quota* and a *LimitRange*
@@ -351,7 +386,7 @@ You will see:
 
 ----
 NAME                  CREATED AT
-template-test-quota   2018-10-24T19:19:40Z
+template-test-quota   2019-03-30T14:26:43Z
 ----
 
 And:
@@ -368,18 +403,7 @@ NAME                   CREATED AT
 template-test-limits   2018-10-24T19:19:40Z
 ----
 
-### Configure Using the Installer
-While it is possible to configure the *ProjectRequestTemplate* using the advanced
-installer, you are still responsible for installing the template into the
-*Project* that you specify. For example, we could have specified the following:
-
-----
-osm_project_request_template='default/project-request'
-----
-
-But, until a *Template* was created in the `default` *Project* called
-`project-request`, user *Project* creation would have failed due to a lack of
-the template. So, beware.
+NOTE: Please make sure that the `project-request` template is created in the `openshift-config` project. Defining it in the Openshift API server configurion without having the template in place will cause new projects to fail to create.
 
 ### Clean Up
 If you wish, you can deploy the application from the Application Management

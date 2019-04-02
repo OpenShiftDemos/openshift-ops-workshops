@@ -1,0 +1,9 @@
+apiVersion: "config.openshift.io/v1"
+kind: "Project"
+metadata: 
+  name: "cluster"
+  namespace: ""
+spec: 
+  projectRequestMessage: "You requested a new project with Limits & Quotas!"
+  projectRequestTemplate: 
+    name: "project-request"

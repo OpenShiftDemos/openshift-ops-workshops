@@ -3,25 +3,10 @@
 - hosts: default
 
   roles:
-    - { role: tools, tags: ['tools']}
-    - { role: authorized-key, tags: ['authorized-key']}
     - { role: instructor-user, tags: ['instructor-user']}
     - { role: registered-host, tags: ['registered-host']}
-    - { role: ocp-installer, tags: ['ocp-installer']}
-    - { role: docker-host, tags: ['docker-host']}
-    - { role: aws-host, tags: ['aws-host']}
-    - { role: webssh2, tags: ['webssh2']}
-    - { role: registry-mirror, tags: ['registry-mirror']}
-    - { role: ansible-host, tags: ['ansible-host']}
-    - { role: master-cert, tags: ['master-cert']}
-    - { role: inventory-fixup-script, tags: ['inventory-fixup-script']}
-    - { role: container-native-storage, tags: ['container-native-storage']}
-    - { role: workshopper, tags: ['workshopper']}
     - { role: idm-install, tags: ['idm-install']}
-    - { role: local-repo, tags: ['local-repo']}
-
   tasks:
-
     - name: unsubscribe system
       redhat_subscription: state=absent
 

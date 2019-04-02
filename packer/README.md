@@ -21,15 +21,6 @@ VPC_ID=<any-aws-vpc-id-with-internet-access>
 SUBNET_ID=<any-subnet-with-internet-access-on-vpc>
 INSTRUCTOR_PUB_KEY_FILE=<absolute-path-to-instructor-ssh-pubkey-file>
 ```
-
-You also need the CSV file containing all the Red Hat fleet accounts reserved on Qwiklab. Suppose it's in ~/Downloads/redhat_qwiklab_500_fleet_accounts.csv run the following to option the value containing all comma-separated AWS account id's:
-
-```
-awk 'BEGIN { FS=","; OFS=","; } {print $1}' ~/Downloads/redhat_qwiklab_500_fleet_accounts.csv | sed -n -e 's/^\([0-9].*\)\.aws\.testdrive\.openshift\.com\./\"\1\"/p' | paste -d, -s - -
-```
-
-Replace XXXX into "ami_users": ["XXXX"] in ocp-cns-aio.json with this value.
-
 ### Launching Packer
 
 ```

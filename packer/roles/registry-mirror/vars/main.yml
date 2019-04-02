@@ -47,6 +47,9 @@ ose_core_images:
   - openshift3/ose:latest
   - openshift3/ose:{{ ose_major_tag }}
   - rhel7/etcd:latest
+  - openshift3/ose-prometheus-config-reloader:{{ ose_major_tag }}
+  - openshift3/ose-kube-rbac-proxy:{{ ose_major_tag }}
+  - openshift3/ose-kube-state-metrics:{{ ose_major_tag }}
 
 ose_infra_images:
 #  - "openshift3/ose-logging-auth-proxy:{{ ose_major_tag }}"

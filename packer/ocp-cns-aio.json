@@ -24,7 +24,7 @@
     "instance_type": "t2.medium",
     "ami_name": "ocp-four-idm-{{timestamp}}",
     "ami_regions": ["us-east-1"],
-    "ami_users": ["550201621713"],
+    "ami_users": ["550201621713","939345161466"],
     "ami_description": "IDM Authentication used for OpenShift 4",
     "tags": {
       "Name": "ocp-four-idm",

@@ -14,6 +14,13 @@ Parameters:
     Default: generic-qwiklab
     ConstraintDescription: Must be the name of an existing EC2 key pair.
 
+  IdmInstanceType:
+    Type: String
+    Default: t2.medium
+    AllowedValues:
+      - t2.medium
+    ConstraintDescription: Must be a valid EC2 instance type.
+
 Mappings:
   AWSRegion2AMI:
     us-east-1:
@@ -72,7 +79,6 @@ Mappings:
         domain: sa-east-1.compute.internal
 
 Resources:
-
   VPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -167,62 +173,6 @@ Resources:
       RouteTableId:
         Ref: PublicRouteTable
 
-  PublicSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId:
-        Ref: VPC
-      CidrBlock:
-        Fn::FindInMap:
-        - Subnet2Cidr
-        - public2
-        - cidr
-      MapPublicIpOnLaunch: 'true'
-      AvailabilityZone:
-        Fn::Select:
-          - 1
-          - Fn::GetAZs: ""
-      Tags:
-      - Key: Application
-        Value:
-          Ref: AWS::StackId
-
-  PublicSubnetRouteTableAssociation2:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId:
-        Ref: PublicSubnet2
-      RouteTableId:
-        Ref: PublicRouteTable
-
-  PublicSubnet3:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId:
-        Ref: VPC
-      CidrBlock:
-        Fn::FindInMap:
-        - Subnet2Cidr
-        - public3
-        - cidr
-      MapPublicIpOnLaunch: 'true'
-      AvailabilityZone:
-        Fn::Select:
-          - 2
-          - Fn::GetAZs: ""
-      Tags:
-      - Key: Application
-        Value:
-          Ref: AWS::StackId
-
-  PublicSubnetRouteTableAssociation3:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId:
-        Ref: PublicSubnet3
-      RouteTableId:
-        Ref: PublicRouteTable
-
   IdmSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -237,7 +187,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: 389
         ToPort: 389
-        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+        CidrIp: 0.0.0.0/0 
       - IpProtocol: tcp
         FromPort: 88
         ToPort: 88
@@ -265,7 +215,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: 636
         ToPort: 636
-        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+        CidrIp: 0.0.0.0/0 
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
@@ -273,11 +223,11 @@ Resources:
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
-        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+        CidrIp: 0.0.0.0/0 
       - IpProtocol: tcp
         FromPort: 443
         ToPort: 443
-        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+        CidrIp: 0.0.0.0/0
       - IpProtocol: icmp
         FromPort: -1
         ToPort: -1
@@ -293,9 +243,9 @@ Resources:
     DependsOn:
       - IdmNode1
     Properties:
-      HostedZoneName: !Join ['', [!Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
+      HostedZoneName: !Ref 'PublicHostedZone'
       RecordSets:
-        - Name: !Join ['', [idm., !Ref 'AWS::AccountId', ., !Ref 'PublicHostedZone', .]]
+        - Name: !Join ['', [idm., !Ref 'PublicHostedZone', .]]
           Type: A
           TTL: '900'
           ResourceRecords:
@@ -339,13 +289,13 @@ Resources:
         Value:
           Ref: AWS::StackId
       - Key: Name
-        Value: !Join [ ., [idm, !Ref 'AWS::AccountId', !Ref 'PublicHostedZone' ] ]
+        Value: idm-openshift-cns-testdrive
       UserData:
         Fn::Base64:
           !Sub |
             #cloud-config
 
-            fqdn: idm.internal.${PublicHostedZone}
+            fqdn: idm..${PublicHostedZone}
 
             runcmd:
             - /usr/local/bin/idm-install > /var/log/idm-install.log
@@ -353,21 +303,5 @@ Resources:
 
 Outputs:
    LabGuide:
-     Description: "Student Lab Guide"
-     Value: !Sub "http://support.${AWS::AccountId}.${PublicHostedZone}/"
-
-   SSHConsole:
-     Description: "SSH Remote Console to OpenShift Master"
-     Value: !Sub "http://ssh.${AWS::AccountId}.${PublicHostedZone}:8080/ssh/host/master.internal.${PublicHostedZone}"
-
-   SSHUserName:
-     Description: "Name of the SSH user to login on the master"
-     Value: "cloud-user"
-
-   SSHPassword:
-     Description: "SSH Password of the user to login on the master"
-     Value: !Ref 'KeyName'
-
-   MasterHost:
-     Description: "Fully-qualified domain name of the OpenShift Master node"
-     Value: !Sub "master.${AWS::AccountId}.${PublicHostedZone}"
+     Description: "IDM URL"
+     Value: !Sub "https://idm.${PublicHostedZone}/"

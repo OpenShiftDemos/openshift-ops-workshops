@@ -24,27 +24,7 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-0b15bd5f595845bf5
-    us-east-2:
-      ami: NOT_SUPPORTED
-    us-west-1:
-      ami: NOT_SUPPORTED
-    us-west-2:
-      ami: ami-0483ed70f9aa03e76
-    eu-west-1:
-      ami: ami-003b289a92d1acd4f
-    eu-central-1:
-      ami: ami-0943624a36a343da1
-    ap-northeast-1:
-      ami: NOT_SUPPORTED
-    ap-northeast-2:
-      ami: NOT_SUPPORTED
-    ap-southeast-1:
-      ami: ami-00ce58fbf48577b99
-    ap-southeast-2:
-      ami: NOT_SUPPORTED
-    sa-east-1:
-      ami: NOT_SUPPORTED
+      ami: ami-0d86375165dbc388c
 
   Subnet2Cidr:
     vpc:
@@ -243,7 +223,7 @@ Resources:
     DependsOn:
       - IdmNode1
     Properties:
-      HostedZoneName: !Ref 'PublicHostedZone'
+      HostedZoneName: !Join ['', [!Ref 'PublicHostedZone', .]]
       RecordSets:
         - Name: !Join ['', [idm., !Ref 'PublicHostedZone', .]]
           Type: A
@@ -295,11 +275,15 @@ Resources:
           !Sub |
             #cloud-config
 
-            fqdn: idm..${PublicHostedZone}
+            fqdn: idm.${PublicHostedZone}
 
             runcmd:
             - /usr/local/bin/idm-install > /var/log/idm-install.log
             - reboot
+            - mkdir /var/www/html/pub
+            - while [ ! -f /etc/ipa/ca.crt ]; do sleep 2; done 
+            - cp /etc/ipa/ca.crt /var/www/html/pub/
+            - chown 744 /var/www/html/pub/ca.crt
 
 Outputs:
    LabGuide:

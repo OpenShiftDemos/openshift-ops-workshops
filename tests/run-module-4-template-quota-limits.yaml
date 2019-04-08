@@ -1,86 +1,126 @@
 ---
 - name: Automation of project request template, quota, limits module
-  hosts: masters
+  hosts: localhost
   tasks:
-    - name: Login as system:admin to create projects
-      command: oc login -u system:admin
-      tags:
-        - quota-deploy
-        - quota-verify
+  - name: Create the project-request template in the namespace 'openshift-config'
+    k8s:
+      state: present
+      namespace: openshift-config
+      src: /opt/lab/support/project_request_template.yaml
+    tags:
+    - quota-deploy
 
-    - name: Check for the project request template
-      command: oc get template project-request -n default
-      register: template_output
-      ignore_errors: true
-      tags:
-        - quota-deploy
+  - name: Create the CR that will configure the Openshift API Server to use a the specified project-request template in the namespace 'openshift-config'
+    k8s:
+      state: present
+      namespace: openshift-config
+      src: /opt/lab/support/cr_project_request.yaml
+    tags:
+    - quota-deploy
 
-    - name: Create the project-request template in the namespace 'default'
-      command: oc create -f /opt/lab/support/project_request_template.yaml -n default
-      when: template_output | failed
-      tags:
-        - quota-deploy
+  - name: Check for template-test project
+    k8s_facts:
+      kind: Template
+      name: project-request
+      namespace: openshift-config
+    register: template_out
+    tags:
+    - quota-deploy
+    - quota-verify
 
-    - name: read master config from file
-      slurp:
-        src: /etc/origin/master/master-config.yaml
-      register: master_config_file
+  - name: Show the project-request template
+    debug:
+      var: template_out
+      verbosity: 1
 
-    - set_fact:
-        master_config: "{{ master_config_file['content'] | b64decode | from_yaml }}"
+  - name: fail if the project-request template is not found
+    fail:
+      msg: "The Project Request Template is not found! Please re-run setup!"
+    when: template_out.resources | length < 1
+    tags:
+    - quota-verify
 
-    - name: output new master config
-      template:
-        src: templates/master-config.yaml.j2
-        dest: /etc/origin/master/master-config.yaml
-        owner: root
-        group: root
-        mode: 0600
-      vars:
-        newProjectRequestTemplate: "default/project-request"
-      tags:
-        - quota-deploy
+  - name: Check if the project 'template-test' exists
+    k8s_facts:
+      kind: namespace
+      name: template-test
+    register: namespace_out
+    tags:
+    - quota-deploy
+    - quota-verify
 
-    - name: Restart the master services for changes to apply
-      command: "/usr/local/bin/master-restart {{ item }}" 
-      with_items:
-        - api
-        - controllers
-      tags:
-        - quota-deploy
+  # need to use new-project rather than k8s because pure api call doesn't support
+  #  using the project-request template
+  - name: Creating the creation of a new project
+    command: oc new-project template-test
+    when: namespace_out.resources | length < 1
+    tags:
+    - quota-deploy
+    - quota-verify
 
-    - name: Check for template-test project
-      command: oc get project template-test
-      register: template_out
-      ignore_errors: true
-      tags:
-        - quota-deploy
-        - quota-verify
+  ###################
+  # Check Quota
+  ###################
+  - name: Check if the 'template-test-quota' exists
+    k8s_facts:
+      kind: quota
+      name: template-test-quota
+      namespace: template-test
+    register: quota_out
+    tags:
+    - quota-verify
 
-    - name: Creating the creation of a new project
-      command: oc new-project template-test
-      when: template_out | failed
-      tags:
-        - quota-deploy
-        - quota-verify
+  - name: Show the template-test-quota
+    debug:
+      var: quota_out
+      verbosity: 1
+    tags:
+    - quota-verify
 
-    - name: Check again for template-test project
-      command: oc get project template-test
-      tags:
-        - quota-verify
+  - name: fail if the template-test-quota is not found
+    fail:
+      msg: "The template-test-quota is not found! Please investigate!"
+    when: quota_out.resources | length < 1
+    tags:
+    - quota-verify
+  ###################
+  # END Check Quota
+  ###################
 
-    - name: Checking if quota is present for this project
-      command: oc get quota template-test-quota -n template-test
-      tags:
-        - quota-verify
+  ###################
+  # Check Limits
+  ###################
+  - name: Check if 'template-test-limits' exists
+    k8s_facts:
+      kind: limits
+      name: template-test-limits
+      namespace: template-test
+    register: limits_out
+    tags:
+    - quota-verify
 
-    - name: Checking if limitrange is present for the created project
-      command: oc get limits template-test-limits -n template-test
-      tags:
-        - quota-verify
+  - name: Show the template-test-limits
+    debug:
+      var: limits_out
+      verbosity: 1
+    tags:
+    - quota-verify
 
-    - name: Delete template-test project
-      command: oc delete project template-test
-      tags:
-        - quota-deploy
-        - quota-verify
+  - name: fail if the template-test-limits is not found
+    fail:
+      msg: "The template-test-limits is not found! Please investigate!"
+    when: limits_out.resources | length < 1
+    tags:
+    - quota-verify
+  ###################
+  # END Check Limits
+  ###################
+
+  - name: Delete template-test project
+    k8s:
+      state: absent
+      kind: Namespace
+      name: template-test
+    tags:
+    - quota-deploy
+    - quota-verify

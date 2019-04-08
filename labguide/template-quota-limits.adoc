@@ -30,7 +30,7 @@ To view the built-in default *Project Request Template*, execute the following c
 oc adm create-bootstrap-project-template -o yaml
 ----
 
-Inspecting the the JSON output of this command, you will notice that there are
+Inspecting the the YAML output of this command, you will notice that there are
 various parameters associated with this *Template* displayed towards the bottom.
 
 [source,bash,role="copypaste"]

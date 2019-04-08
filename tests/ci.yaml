@@ -1,8 +1,8 @@
-
 ---
 - import_playbook: run-module-2-installation.yaml
 - import_playbook: run-module-3-app-mgmt-basics.yaml
 - import_playbook: run-module-4-template-quota-limits.yaml
 - import_playbook: run-module-5-ldap-groupsync.yaml
 - import_playbook: run-module-6-infra-mgmt.yaml
+- import_playbook: run-module-6-network-policy-sdn.yaml
 - import_playbook: run-module-7-cns.yaml

@@ -66,9 +66,7 @@ ose_infra_images:
   - "openshift3/metrics-schema-installer:{{ ose_major_tag }}"
   - "openshift3/prometheus:{{ ose_major_tag }}"
   - "openshift3/prometheus:{{ ose_major_tag }}"
-  - "openshift3/prometheus-alert-buffer:{{ ose_major_tag }}"
-  - "openshift3/prometheus-alert-buffer:{{ ose_major_tag }}"
-  - "openshift3/prometheus-node-exporter:{{ ose_major_tag }}"
+  - "openshift3/prometheus-alert-buffer:v3.11.51-3
   - "openshift3/prometheus-node-exporter:{{ ose_major_tag }}"
   - "openshift3/prometheus-alertmanager:{{ ose_major_tag }}"
   - "openshift3/ose-deployer:{{ ose_major_tag }}"

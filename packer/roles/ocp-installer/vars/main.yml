@@ -7,7 +7,7 @@ ose_packages:
   - cockpit-ws
   - cockpit-system
   - cockpit-bridge
-  - ansible-2.5.7
+  - ansible
   - bash-completion
   - dnsmasq
   - ntp

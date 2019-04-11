@@ -14,7 +14,8 @@ ose_core_images:
   - openshift3/csi-driver-registrar:{{ ose_major_tag }}
   - openshift3/csi-livenessprobe:{{ ose_major_tag }}
   - openshift3/csi-provisioner:{{ ose_major_tag }}
-  - openshift3/image-inspector:{{ ose_major_tag }}
+  - openshift3/image-inspector:{{ ose_release_tag }}
+  - openshift3/image-inspector:v3.11.59-2
   - openshift3/ose-cli:{{ ose_major_tag }}
   - openshift3/ose-cluster-capacity:{{ ose_major_tag }}
   - openshift3/ose-deployer:{{ ose_major_tag }}

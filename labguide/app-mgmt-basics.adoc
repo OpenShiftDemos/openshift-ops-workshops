@@ -14,7 +14,7 @@ core building blocks as it relates to applications. Understanding these building
 blocks will help you better see the big picture of application management on the
 platform.
 
-#### Projects
+### Projects
 A *Project* is a "bucket" of sorts. It's a meta construct where all of a
 user's resources live. From an administrative perspective, each *Project* can
 be thought of like a tenant. *Projects* may have multiple users who can
@@ -29,7 +29,7 @@ For this exercise, first create a *Project* to hold some resources:
 oc new-project app-management
 ----
 
-#### Deploy a Sample Application
+### Deploy a Sample Application
 The `new-app` command provides a very simple way to tell OpenShift to run
 things. You simply provide it with one of a wide array of inputs, and it figures
 out what to do. Users will commonly use this command to get OpenShift to launch
@@ -70,7 +70,7 @@ created.
 For more information on the capabilities of `new-app`, take a look at its help
 message by running `oc new-app -h`.
 
-#### Pods
+### Pods
 
 .OpenShift Pods
 image::openshift_pod.png[]
@@ -184,7 +184,7 @@ This is a more detailed description of the pod that is running. You can see what
 node the pod is running on, the internal IP address of the pod, various labels,
 and other information about what is going on.
 
-#### Services
+### Services
 .OpenShift Service
 image::openshift_service.png[]
 
@@ -378,7 +378,7 @@ There are some edge cases where you might want some *Pods* and an *RC* without a
 or a *Service*, and others, but these are advanced topics not covered in these
 exercises.
 
-#### Exploring Deployment-related Objects
+### Exploring Deployment-related Objects
 
 Now that we know the background of what a *ReplicatonController* and
 *DeploymentConfig* are, we can explore how they work and are related. Take a
@@ -418,7 +418,7 @@ This lets us know that, right now, we expect one *Pod* to be deployed
 (`Desired`), and we have one *Pod* actually deployed (`Current`). By changing
 the desired number, we can tell OpenShift that we want more or less *Pods*.
 
-#### Scaling the Application
+### Scaling the Application
 
 Let's scale our mapit "application" up to 2 instances. We can do this with
 the `scale` command.
@@ -527,7 +527,7 @@ In this `mapit` case, the image we ran has several `EXPOSE` statements in the
 `Dockerfile`, so OpenShift automatically created ports on the service and mapped
 them into the *Pods*.
 
-#### Application "Self Healing"
+### Application "Self Healing"
 
 Because OpenShift's *RCs* are constantly monitoring to see that the desired number
 of *Pods* actually is running, you might also expect that OpenShift will "fix" the
@@ -590,7 +590,7 @@ namely around `triggers` and what caues new deployments to take place.
 
 You will explore the Operator for the router more in a subsequent exercise.
 
-#### Creating a Route
+### Creating a Route
 Creating a *Route* is a pretty straight-forward process.  You simply `expose`
 the *Service* via the command line. If you remember from earlier, your *Service*
 name is `mapit`. With the *Service* name, creating a *Route* is a simple
@@ -654,7 +654,7 @@ oc scale --replicas=2 dc/mapit
 oc expose service mapit
 ----
 
-#### Scale Down
+### Scale Down
 Before we continue, go ahead and scale your application down to a single
 instance:
 
@@ -690,7 +690,7 @@ More information on probing applications is available in the
 https://docs.openshift.com/container-platform/latest/dev_guide/application_health.html[Application
 Health] section of the documentation.
 
-#### Add Probes to the Application
+### Add Probes to the Application
 The `oc set` command can be used to perform several different functions, one of
 which is creating and/or modifying probes. The `mapit` application exposes an
 endpoint which we can check to see if it is alive and ready to respond. You can

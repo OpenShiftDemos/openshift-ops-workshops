@@ -1,0 +1,30 @@
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+  - name: idm
+    challenge: false
+    login: true
+    mappingMethod: claim
+    type: LDAP
+    ldap:
+      attributes:
+        id:
+        - dn
+        email:
+        - mail
+        name:
+        - cn
+        preferredUsername:
+        - uid
+      bindDN: "uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=openshiftworkshop,dc=com"
+      bindPassword:
+        name: ldap-secret
+      ca:
+        name: ca-config-map
+      insecure: false
+      url: "ldap://idm.openshiftworkshop.com/cn=users,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com)"
+  tokenConfig:
+    accessTokenMaxAgeSeconds: 86400

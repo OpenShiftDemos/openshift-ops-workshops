@@ -1,6 +1,22 @@
 ## Application Storage Basics
+If a pod in OpenShift needs reliable storage, for example, to host a database,
+we would need to supply a **persistent** volume to the pod. This type of
+storage outlives the container, i.e. it persists when the pod dies. It
+typically comes from an external storage system.
+
+[WARNING]
+====
+Doing these exercises requires that you already have deployed the application
+featured in the Application Management Basics exercises. You should do those
+exercises now before continuing.
+====
+
 The `mapit` application currently doesn't leverage any persistent storage. If
 the pod dies, so does all the content inside the container.
+
+We will talk about this concept in more detail later. But let's imagine for a
+moment, the `mapit` application needs persistent storage available under the
+`/app-storage` directory inside the container.
 
 [NOTE]
 ====
@@ -10,15 +26,6 @@ layer that is added as soon as a container instance is started from the
 image. The writable layer is disposed of once the container is deleted which
 can happen regularly in a dynamic container orchestration environment.
 ====
-
-If a pod in OpenShift needs reliable storage, for example, to host a database,
-we would need to supply a **persistent** volume to the pod. This type of
-storage outlives the container, i.e. it persists when the pod dies. It
-typically comes from an external storage system.
-
-We will talk about this concept in more detail later. But let's imagine for a
-moment, the `mapit` application needs persistent storage available under the
-`/app-storage` directory inside the container.
 
 ### Adding Persistent Volume Claims
 Here's how you would instruct OpenShift to create a `PersistentVolume`

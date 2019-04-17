@@ -11,6 +11,7 @@ ose_packages:
   - bash-completion
   - cifs-utils
   - dnsmasq
+  - samba-client
   - ntp
   - logrotate
   - httpd-tools

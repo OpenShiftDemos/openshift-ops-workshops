@@ -63,7 +63,7 @@ metadata:
 [NOTE]
 ====
 You might see some `annotations` on your `MachineSet` if you dumped
-*one that had a `MachineAutoScaler` defined.
+one that had a `MachineAutoScaler` defined.
 ====
 
 #### Selector
@@ -99,7 +99,7 @@ make sure that things match here when we make changes:
 ```
 
 #### Template Spec
-The `template` needs to `spec`ify how the `Machine`/node should be created.
+The `template` needs to specify how the `Machine`/node should be created.
 You will notice that the `spec` and, more specifically, the `providerSpec`
 contains all of the important AWS data to help get the `Machine` created
 correctly and bootstrapped.
@@ -134,14 +134,14 @@ rules for creating one, at least for a simple change like we're making:
 1. Even though you're changing `MachineSet` `name` references, be sure not to change the `subnet`.
 
 This sounds complicated, so we created a little scriptlet that will do it for
-you. The following scriptlet assumes you have an AWS region called
+you. The following scriptlet assumes you have an AWS AZ (availability zone) called
 `us-east-1e` and will build and create an infra `MachineSet` for you with 3
 replicas. It requires the `jq` program be installed.
 
 [source,bash]
 ----
-export REGION=us-east-1e
-export NAME="infra-$REGION"
+export AWS_AZ=us-east-1e
+export NAME="infra-$AWS_AZ"
 oc get machineset -n openshift-machine-api -o json\
 | jq '.items[0]'\
 | jq '.metadata.name=env["NAME"]'\

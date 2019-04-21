@@ -111,6 +111,10 @@ modules:
       CNS_STORAGECLASS: "glusterfs-storage"
       CNS_BLOCK_STORAGECLASS: "glusterfs-registry-block"
       CNS_INFRA_STORAGECLASS: "glusterfs-registry"
+  monitoring-basics:
+    name: Monitoring Basics
+    requires:
+      - installation
   cns:
     name: OpenShift Container Storage
     requires:

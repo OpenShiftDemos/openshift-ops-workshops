@@ -1,7 +1,7 @@
-## Infrastructure Management, Metrics and Logging
+## Infrastructure Management and Logging
 In this lab you will explore various aspects of managing cluster infrastructure.
 This includes extending the OpenShift cluster and installation of the
-Logging and Metrics components, all automated by the installer. It also includes
+Logging components, all automated by the installer. It also includes
 some maintenance of nodes, as well as manipulating the network policy based SDN.
 
 [NOTE]
@@ -220,7 +220,7 @@ more information on multi-master and HA setups, please refer to the link:https:/
 
 ### OpenShift Container Storage for OpenShift Infrastructure
 
-OpenShift infrastructure, like the Registry, Logging and Metrics (introduced in the following paragraphs in this module) have a requirement for reliable storage. +
+OpenShift infrastructure, like the Registry and Logging (introduced in the following paragraphs in this module) have a requirement for reliable storage. +
 OpenShift Container Storage can be configured directly in the installer, to provide a separate storage pool just for those workloads. This is a good practice in order to separate failure domains.
 
 By definition you need a separate set of hosts for this - which you have just made available in the previous paragraph.
@@ -277,7 +277,7 @@ openshift_storage_glusterfs_registry_block_host_vol_size=30 <6>
 ----
 <1> Deploys a resource of the OCS cluster for infrastructure in a separate namespace
 <2> Creates a StorageClass for the OCS infra cluster
-<3> Enables support for block storage - the supported storage option for Logging and Metrics
+<3> Enables support for block storage - the supported storage option for Logging
 <4> Creates a StorageClass for the block storage service in the OCS infra cluster
 <5> Automatically create block-hosting volumes (see OCS module for further explanations)
 <6> Allocate a total of 30GiB for block storage based volumes from the OCS infra cluster
@@ -330,184 +330,23 @@ glusterfs-storage (default)   kubernetes.io/glusterfs    15m
 The block storage service (identified by the `gluster.org/glusterblock`
 provisioner) provided by this second OCS cluster will be explained in the
 following module. For now, it's only important to know that for OCS serving
-storage Logging and Metrics, the OCS block storage service is the *only*
+storage Logging, the OCS block storage service is the *only*
 supported option. The regular file storage service of OCS (identified by
-the `kubernetes.io/glusterfs` provisioner) is *not supported* for Logging and
-Metrics.
+the `kubernetes.io/glusterfs` provisioner) is *not supported* for Logging.
 
 The target use case for these additional storage services is to provide
-robust, persistent storage for the Registry, Logging and Metrics service -
+robust, persistent storage for the Registry, Logging service -
 the latter 2 we will set up now.
 
-### OpenShift Metrics
-_Metrics_ in OpenShift refers to the continuous collection of performance and
-utilization data of pods in the cluster. It allows for centralized monitoring in
-the OpenShift UI and automated horizontal scaling of pods based on utilization.
-
-The metrics implementation is based on http://www.hawkular.org/[Hawkular], a
-metrics collection system running on OpenShift persisting data in a Cassandra
-database.
-
-In your environment metrics is not yet deployed. Configuration is done by
-customizing the Ansible inventory file `/etc/ansible/hosts` and deployment is
-facilitated by running a specific playbook that is part of the
-`openshift-ansible` installer. You could have chosen to install the metrics
-solution when the cluster was initially installed.
-
-#### Configure the Installer
-The lines to configure OpenShift Metrics are already configured in the
-inventory file but commented out with a `#metrics_` prefix.
-
-To see the lines run:
-
-[source,bash,role="copypaste"]
-----
-grep '#metrics_' /etc/ansible/hosts
-----
-
-Remove the `#metrics_` comment prefix by running the below `sed` command:
-
-[source,bash,role="copypaste"]
-----
-sed -i 's/#metrics_//g' /etc/ansible/hosts
-----
-
-The OpenShift installer variable `openshift_metrics_install_metrics=false` tells the
-installer to *not* install the metrics solution when it runs. Remove that line by
-running the below `sed` command:
-
-[source,bash,role="copypaste"]
-----
-sed -i '/openshift_metrics_install_metrics=false/d' /etc/ansible/hosts
-----
-
-When finished, your inventory file should look like the following:
-
-[source,ini]
-./etc/ansible/hosts
-----
-...
-[OSEv3:vars]
-...
-openshift_metrics_install_metrics=true <1>
-openshift_metrics_cassandra_storage_type=dynamic <2>
-openshift_metrics_storage_volume_size=10Gi <3>
-openshift_metrics_hawkular_hostname=metrics.{{ OCP_ROUTING_SUFFIX }} <4>
-openshift_metrics_cassanda_pvc_storage_class_name= {{ CNS_BLOCK_STORAGECLASS }} <5>
-...
-----
-<1> Instruct the installer to actually deploy the Metrics service
-<2> Cassandra, part of the Metrics service, will get dynamically provisioned storage
-<3> The resulting PersistentVolumeClaim will be of `10Gi` in size
-<4> The name of the StorageClass to use for the PersistentVolumeClaim, makes it use block storage from OCS
-<5> The Metrics frontend (`hawkular`) will be reachable under this domain.
-
-#### Install Metrics
-There is a specific playbook included with the installer that will handle metrics. It can be run like so:
-
-[source,bash,role="copypaste"]
-----
-ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-metrics/config.yml
-----
-
-This will deploy the metric collection and visualization stack on OpenShift. All
-resources will be stood up in the `openshift-infra` *Project*. As part of the
-deployment, persistent storage will automatically be used for storing the metrics
-information. It will take roughly 2 minutes to complete.
-
-Once the installation playbook has completed, you can then verify that the
-metrics components are running in the `openshift-infra` *Project*:
-
-[source,bash,role="copypaste"]
-----
-oc login -u system:admin -n openshift-infra
-oc get pods -o wide
-----
-
-It might take a while but after some time you will see something like:
-
-----
-NAME                            READY     STATUS      RESTARTS   AGE       IP            NODE                                          NOMINATED NODE
-hawkular-cassandra-1-gmqv8      1/1       Running     0          4m        10.129.0.19   {{ INFRA_INTERNAL_FQDN }}    <none>
-hawkular-metrics-schema-llf7v   0/1       Completed   0          4m        10.129.2.4    {{ INFRA_INTERNAL_FQDN }}    <none>
-hawkular-metrics-sv5mb          1/1       Running     0          4m        10.129.0.17   {{ INFRA_INTERNAL_FQDN }}    <none>
-heapster-z9lgv                  1/1       Running     0          4m        10.129.0.18   {{ INFRA_INTERNAL_FQDN }}    <none>
-
-----
-
-You will also see the storage for Cassandra being automatically provisioned
-from the OCS block storage service if you query the PersistentVolumeClaim
-objects in this project using `oc get pvc`:
-
-----
-NAME                  STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS               AGE
-metrics-cassandra-1   Bound     pvc-e289ba7c-6af6-11e8-af61-02cea7838d26   10Gi       RWO            {{ CNS_BLOCK_STORAGECLASS }}   3m
-----
-
-[NOTE]
-====
-In this lab environment it can take up to 2-3 minutes after the metrics playbook
-finishes for the metrics stack to finish initialization and for all pods to reach
-the _Ready_ state.
-====
-
-In the `NODE` column you will notice that the *Pods* for Metrics are all located on the infra node. This is because we have set the `NodeSelector` for all of the metrics components using the following bits of the Ansible `hosts` file:
-
-[source,ini]
-----
-openshift_metrics_hawkular_nodeselector={"node-role.kubernetes.io/infra": "true"}
-openshift_metrics_cassandra_nodeselector={"node-role.kubernetes.io/infra": "true"}
-openshift_metrics_heapster_nodeselector={"node-role.kubernetes.io/infra": "true"}
-----
-
-#### Explore the Metrics UI
-If you don't have it open, return to the OpenShift web console:
-
-*link:{{ WEB_CONSOLE_URL }}[]*
-
-You will want to be sure you are logged in as `fancyuser1` with the password
-`openshift`, who is a `cluster-reader` and can see interesting *Projects*.
-
-Click on the `default` project.
-
-[IMPORTANT]
-====
-At this point the OpenShift UI will display an error message, stating
-that the metrics URL could not be reached:
-
-image:openshift-metrics-url-error.png[]
-
-This is because OpenShift generated a self-signed certificate for the Hawkular
-API. Go ahead and click the metrics URL https://metrics.{{ OCP_ROUTING_SUFFIX }}/
-to access Hawkular and accept the untrusted certificate. Then, return to the
-OpenShift web console and refresh the page, and the metrics should begin to
-display.
-
-When working properly and the resource view is expanded, it looks like this:
-
-.The OpenShift UI will show history metrics for applications
-image::openshift-metrics-overview.png[]
-====
-
-In the context of a specific *Pod*, the _Metrics_ tab in the UI will show CPU,
-memory and network throughput for this particular *Pod* with a configurable
-time-range. Also optionally a _donut_ chart next to a resource appears if the
-pod was given a consumption limit on this resource (e.g. RAM).
-
-image::openshift-metrics-pods.png[]
-
-If you want to see interesting metrics, explore the *Project* for metrics
-itself, `openshift-infra`.
-
 ### OpenShift Logging
-Equally important to performance metrics is collecting and aggregating logs from
+Equally important to OpenShift performance is collecting and aggregating logs from
 the environments and the application pods it is running. OpenShift ships with an
 elastic log aggregation solution: *EFK*. **E**lasticSearch, **F**luentd and
 **K**ibana form a configuration where logs from all nodes and applications are
 consolidated (Fluentd) in a central place (ElasticSearch) on top of which rich
 queries can be made from a single UI (Kibana). Administrators can see and search
 through all logs. Application owners and developers can allow access to logs that
-belong to their projects. Like metrics the EFK stack runs on top of OpenShift.
+belong to their projects. Like the registry, the EFK stack runs on top of OpenShift.
 
 #### Configuring the Inventory
 The lines to configure OpenShift Logging are already configured in the inventory file but commented out with a `#logging_` prefix.
@@ -639,7 +478,7 @@ logging-es-0   Bound     pvc-8188d8dd-6af7-11e8-af61-02cea7838d26   10Gi       R
 
 [NOTE]
 ====
-Much like with the Metrics solution, we defined the appropriate
+Much like with the other OpenShift components, we defined the appropriate
 `NodeSelector` in the Logging configuration to ensure that the Logging
 components only landed on the infra node. That being said, the `DaemonSet`
 ensures FluentD runs on *all* nodes. Otherwise we would not capture all of
@@ -671,7 +510,7 @@ have access to.
 
 [IMPORTANT]
 ====
-The block-storage service of OCS (also referred to as `gluster-block`, introduced in the next chapter) is **only** supported for Logging and Metrics as of this release. This is about to change in the near future as we qualify more workloads.
+The block-storage service of OCS (also referred to as `gluster-block`, introduced in the next chapter) is **only** supported for Logging as of this release. This is about to change in the near future as we qualify more workloads.
 ====
 
 ### OpenShift Network Policy Based SDN
@@ -953,8 +792,7 @@ The next step is to drain the *Pods* to other nodes in the cluster.
 Logging or OCS will *not* be drained. They will not be accessible anymore
 through OpenShift, but will continue to run as containers on the nodes until the
 local OpenShift services are stopped and/or the node is shutdown. This is not a
-problem since software like OCS or the OpenShift Metrics stack is designed to
-handle such situations transparently.
+problem since software like OCS is designed to handle such situations transparently.
 ====
 
 Start the drain process like this:

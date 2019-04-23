@@ -2,9 +2,10 @@
 
 OpenShift supports a number of different authentication providers, and you can
 find the complete list in the
-link:https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html[authentication
-documentation]. One of the most commonly used authentication providers is LDAP,
-whether provided by Microsoft Active Directory or by other sources.
+link:https://docs.openshift.com/container-platform/4.0/authentication/understanding-identity-provider.html[understanding 
+identity provider configuration]. One of the most commonly used authentication 
+providers is LDAP, whether provided by Microsoft Active Directory or by other 
+sources.
 
 OpenShift can perform user authentication against an LDAP server, and can also
 configure group membership and certain RBAC attributes based on LDAP group
@@ -30,60 +31,61 @@ group
 ** A group of users that will have access to the same OpenShift *Project*
 ** Contains: `teamuser1`, `teamuser2`
 
-#### Examine the master configuration
-The installation of OpenShift already included setting up LDAP authentication in
-the inventory file. As the `root` user on the master host, examine the master
-config with `cat`, `less`, or your favorite editor:
+#### Examine the OAuth configuration
+The installation of OpenShift comes with the stock OAuth resource.  For this lab we are 
+configuring LDAP as our identityProvider. Review the OAuth configuration before we apply it:
 
 [source,bash,role="copypaste"]
 ----
-sudo cat /etc/origin/master/master-config.yaml
+cat /opt/lab/support/oauth-cluster.yaml
 ----
 
-Look for one of the `oauthConfig` sections that looks like the following:
+Look for the element in `identityProviders` with `type: LDAP` like the following:
 
 [source,yaml]
 ----
-oauthConfig:
-  assetPublicURL: https://{{ MASTER_EXTERNAL_FQDN }}/console/
-  grantConfig:
-    method: auto
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
   identityProviders:
-  - challenge: true
-    login: true
-    mappingMethod: claim <1>
-    name: idm <2>
-    provider:
-      apiVersion: v1
+  - name: idm <1>
+    challenge: false 
+    login: true 
+    mappingMethod: claim <2>
+    type: LDAP
+    ldap:
       attributes: <3>
-        email:
-        - mail
-        id:
+        id: 
         - dn
-        name:
+        email: 
+        - mail
+        name: 
         - cn
-        preferredUsername:
+        preferredUsername: 
         - uid
-      bindDN: uid=admin,cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com <4>
-      bindPassword: ldapadmin <5>
-      ca: /etc/origin/master/idm_ldap_ca.crt <6>
-      insecure: false
-      kind: LDAPPasswordIdentityProvider
-      url: ldap://idm.internal.aws.testdrive.openshift.com/cn=users,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=unset,dc=ocp-admin,dc=aws,dc=openshifttestdrive,dc=com) <7>
-  ...
+      bindDN: "uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=openshiftworkshop,dc=com" <4>
+      bindPassword: <5>
+        name: ldap-secret
+      ca: <6>
+        name: ca-config-map
+      insecure: false 
+      url: "ldap://idm.openshiftworkshop.com/cn=users,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com)" <7>
+  tokenConfig:
+    accessTokenMaxAgeSeconds: 86400
 ----
 
 Some notable fields under `identityProviders:`:
 
-<1> `mappingMethod: claim`: This section has to do with how usernames are
-assigned within an OpenShift cluster when multiple providers are configured. See
-the
-link:https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#identity-providers_parameters[Identity provider Parameters] section for more information.
-
-<2> `name`: The unique ID of the identity provider. It is possible to have
+<1> `name`: The unique ID of the identity provider. It is possible to have
 multiple authentication providers in an OpenShift environment, and OpenShift is
 able to distinguish between them.
 
+<2> `mappingMethod: claim`: This section has to do with how usernames are
+assigned within an OpenShift cluster when multiple providers are configured. See
+the
+link:https://docs.openshift.com/container-platform/4.0/authentication/understanding-identity-provider.html#identity-provider-parameters-understanding-identity-provider[Identity provider parameters] section for more information.
 
 <3> `attributes`: This section defines the LDAP fields to iterate over and
 assign to the fields in the OpenShift user's "account". If any attributes are
@@ -94,17 +96,32 @@ the LDAP `cn`, and a username from the LDAP `uid`.
 
 <4> `bindDN`: When searching LDAP, bind to the server as this user.
 
-<5> `bindPassword`: The password to use when binding for searching.
+<5> `bindPassword`: Reference to the Secret that has the password to use when binding for searching.
 
-<6> `ca`: The CA certificate to use for validating the SSL certificate of the
-LDAP server.
+<6> `ca`: Reference to the ConfigMap that contains the CA certificate to use for 
+validating the SSL certificate of the LDAP server.
 
 <7> `url`: Identifies the LDAP server and the search to perform.
 
 For more information on the specific details of LDAP authentication in OpenShift
 you can refer to the
-link:https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#LDAPPasswordIdentityProvider[LDAP
-provider documentation^].
+link:https://docs.openshift.com/container-platform/4.0/authentication/identity_providers/configuring-ldap-identity-provider.html[Configuring an LDAP identity provider^].
+
+To setup the LDAP identity provider we must:
+
+1. Create a `Secret` with the bind password.
+2. Create a `ConfigMap` with the CA certificate.
+3. Update the `cluster` `OAuth` object with the LDAP identity provider.
+
+As the `system:admin` user apply the OAuth configuration with `oc`.
+
+[source,bash,role="copypaste"]
+----
+oc create secret generic ldap-secret --from-literal=bindPassword=bindingpassword -n openshift-config
+oc create configmap ca-config-map --from-file=/opt/lab/support/ca.crt -n openshift-config
+oc apply -f /opt/lab/support/oauth-cluster.yaml
+----
+
 
 [NOTE]
 ====
@@ -122,7 +139,7 @@ when logged into OpenShift as a user with `cluster-admin` privileges, and using
 a configuration file that tells OpenShift what to do with the users it finds in
 the various groups.
 
-We have provided a `groupsync` configuration file for you already. Using `cat`,
+We have provided a `groupsync` configuration file for you on the bastion node. Using `cat`,
 `less`, or your favorite editor, look at the following file:
 
 [source,bash,role="copypaste"]
@@ -203,20 +220,20 @@ The YAML looks like:
 
 [source,yaml]
 ----
-apiVersion: v1
+apiVersion: user.openshift.io/v1
 kind: Group
 metadata:
   annotations:
-    openshift.io/ldap.sync-time: 2017-08-29T14:29:33Z
-    openshift.io/ldap.uid: cn=ose-fancy-dev,cn=groups,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
-    openshift.io/ldap.url: idm.internal.aws.testdrive.openshift.com:389
-  creationTimestamp: 2017-08-29T14:29:33Z
+    openshift.io/ldap.sync-time: 2019-04-18T13:54:35Z
+    openshift.io/ldap.uid: cn=ose-fancy-dev,cn=groups,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com
+    openshift.io/ldap.url: idm.openshiftworkshop.com:389
+  creationTimestamp: 2019-04-18T13:46:15Z
   labels:
-    openshift.io/ldap.host: idm.internal.aws.testdrive.openshift.com
+    openshift.io/ldap.host: idm.openshiftworkshop.com
   name: ose-fancy-dev
-  resourceVersion: "5242"
-  selfLink: /oapi/v1/groups/ose-fancy-dev
-  uid: 7a353ec7-8cc6-11e7-b355-0ee4d6c98466
+  resourceVersion: "2239168"
+  selfLink: /apis/user.openshift.io/v1/groups/ose-fancy-dev
+  uid: 55c57ee9-61e0-11e9-b61c-0a580a82002f
 users:
 - fancyuser1
 - fancyuser2
@@ -236,7 +253,7 @@ If you logged into the web console as `teamuser1` previously, you will see:
 
 ----
 NAME        UID                                    FULL NAME        IDENTITIES
-teamuser1   ace42f02-4bcf-11e8-98be-0a8fee356162   OpenShift User   idm:uid=teamuser1,cn=users,cn=accounts,dc=auth,dc=internal,dc=aws,dc=testdrive,dc=openshift,dc=com
+teamuser1   ace42f02-4bcf-11e8-98be-0a8fee356162   OpenShift User   idm:uid=teamuser1,cn=users,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com
 ----
 
 Or, if you did not login with the UI before, you will get:
@@ -305,20 +322,59 @@ And then perform the same `oc get projects` and you will now see the list of all
 of the projects in the cluster:
 
 ----
-NAME               DISPLAY NAME   STATUS
-app-management                         Active
-default                                Active
-kube-public                            Active
-kube-system                            Active
-management-infra                       Active
-openshift                              Active
-openshift-infra                        Active
-openshift-logging                      Active
-openshift-metrics                      Active
-openshift-node                         Active
-openshift-sdn                          Active
-openshift-web-console                  Active
-storage                                Active
+NAME                                                    DISPLAY NAME                        STATUS
+default                                                                                     Active
+kube-public                                                                                 Active
+kube-system                                                                                 Active
+openshift                                                                                   Active
+openshift-apiserver                                                                         Active
+openshift-apiserver-operator                                                                Active
+openshift-authentication                                                                    Active
+openshift-authentication-operator                                                           Active
+openshift-automation-broker                             OpenShift Automation Broker         Active
+openshift-cloud-credential-operator                                                         Active
+openshift-cluster-machine-approver                                                          Active
+openshift-cluster-node-tuning-operator                                                      Active
+openshift-cluster-samples-operator                                                          Active
+openshift-cluster-storage-operator                                                          Active
+openshift-cluster-version                                                                   Active
+openshift-config                                                                            Active
+openshift-config-managed                                                                    Active
+openshift-console                                                                           Active
+openshift-console-operator                                                                  Active
+openshift-controller-manager                                                                Active
+openshift-controller-manager-operator                                                       Active
+openshift-dns                                                                               Active
+openshift-dns-operator                                                                      Active
+openshift-image-registry                                                                    Active
+openshift-infra                                                                             Active
+openshift-ingress                                                                           Active
+openshift-ingress-operator                                                                  Active
+openshift-kube-apiserver                                                                    Active
+openshift-kube-apiserver-operator                                                           Active
+openshift-kube-controller-manager                                                           Active
+openshift-kube-controller-manager-operator                                                  Active
+openshift-kube-scheduler                                                                    Active
+openshift-kube-scheduler-operator                                                           Active
+openshift-logging                                                                           Active
+openshift-machine-api                                                                       Active
+openshift-machine-config-operator                                                           Active
+openshift-marketplace                                                                       Active
+openshift-monitoring                                                                        Active
+openshift-multus                                                                            Active
+openshift-network-operator                                                                  Active
+openshift-node                                                                              Active
+openshift-operator-lifecycle-manager                                                        Active
+openshift-operators                                                                         Active
+openshift-sdn                                                                               Active
+openshift-service-ca                                                                        Active
+openshift-service-ca-operator                                                               Active
+openshift-service-catalog-apiserver                                                         Active
+openshift-service-catalog-apiserver-operator                                                Active
+openshift-service-catalog-controller-manager                                                Active
+openshift-service-catalog-controller-manager-operator                                       Active
+openshift-template-service-broker                       OpenShift Template Service Broker   Active
+terminal                                                Workshop Terminal                   Active
 ----
 
 You should now be starting to understand how RBAC in OpenShift Container
@@ -435,7 +491,7 @@ oc new-app docker.io/siamaksade/mapit
 You will see that it will not work:
 
 ----
-error: can't lookup images: imagestreamimports.image.openshift.io is forbidden: User "teamuser1" cannot create imagestreamimports.image.openshift.io in the namespace "app-prod": User "teamuser1" cannot create imagestreamimports.image.openshift.io in project "app-prod"
+error: can't lookup images: imagestreamimports.image.openshift.io is forbidden: User "teamuser1" cannot create resource "imagestreamimports" in API group "image.openshift.io" in the namespace "app-prod"
 error:  local file access failed with: stat docker.io/siamaksade/mapit: no such file or directory
 error: unable to locate any images in image streams, templates loaded in accessible projects, template files, local docker images with name "docker.io/siamaksade/mapit"
 
@@ -472,19 +528,19 @@ Find the `prometheus` `Route` with the following command:
 
 [source,bash,role="copypaste"]
 ----
-oc get route prometheus -n openshift-metrics
+oc get route prometheus-k8s -n openshift-monitoring
 ----
 
 You will see something like the following:
 
 ----
-NAME         HOST/PORT                                                                    PATH      SERVICES     PORT      TERMINATION   WILDCARD
-prometheus   prometheus-openshift-metrics.{{OCP_ROUTING_SUFFIX}}             prometheus   <all>     reencrypt     None
+NAME             HOST/PORT                                                                          PATH   SERVICES         PORT   TERMINATION          WILDCARD
+prometheus-k8s   prometheus-k8s-openshift-monitoring.apps.cluster-48ea.48ea.openshiftworkshop.com          prometheus-k8s   web    reencrypt/Redirect   None
 ----
 
 The installer configured a `Route` for prometheus by default. Go ahead and
 click the
-link:https://prometheus-openshift-metrics.{{OCP_ROUTING_SUFFIX}}[Prometheus
+link:https://prometheus-k8s-openshift-monitoring.{{OCP_ROUTING_SUFFIX}}[Prometheus
 link] to open it in your browser. You'll be greeted with a login screen. Use
 the `fancyuser1` user that you gave `cluster-reader` privileges to earlier.
 More specifically, the `ose-fancy-dev` group has `cluster-reader`

@@ -217,6 +217,57 @@ also possible to add new master nodes. There is a similar playbook to run. For
 more information on multi-master and HA setups, please refer to the link:https://docs.openshift.com/container-platform/3.11/architecture/infrastructure_components/kubernetes_infrastructure.html#high-availability-masters[documentation^].
 ====
 
+After the scaleup succeeds you need to remove the `new_nodes` entry from [osev3:children]. You also need to remove the '[new_nodes]' section to add the new nodes to the regular [nodes] section of the inventory file.
+
+Check the two lines that got added to enable the scaleup operation:
+----
+grep new_nodes /etc/ansible/hosts
+----
+
+You will see:
+
+----
+new_nodes
+[new_nodes]
+----
+
+Remove [new_nodes] to add new nodes to the [nodes] section in the inventory file. 
+
+----
+sed -i '/^\[new_nodes/d' /etc/ansible/hosts
+----
+
+Remove new_nodes from [osev3:children] section of the inventory file.
+
+----
+sed -i '/^new_nodes/d' /etc/ansible/hosts
+----
+
+Your modified inventory file should now look like this:
+
+----
+[OSEv3:children]
+masters
+nodes
+etcd
+glusterfs
+#ocsinfra_glusterfs_registry
+
+...
+
+[nodes]
+master.internal.aws.testdrive.openshift.com openshift_public_hostname=master.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-master'
+infra.internal.aws.testdrive.openshift.com openshift_public_hostname=infra.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-infra'
+node01.internal.aws.testdrive.openshift.com openshift_public_hostname=node01.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute'
+node02.internal.aws.testdrive.openshift.com openshift_public_hostname=node02.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute'
+node03.internal.aws.testdrive.openshift.com openshift_public_hostname=node03.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute'
+
+node04.internal.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute' openshift_public_hostname=node04.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute'
+node05.internal.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute' openshift_public_hostname=node05.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute'
+node06.internal.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute' openshift_public_hostname=node06.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute'
+
+...
+----
 
 ### OpenShift Container Storage for OpenShift Infrastructure
 

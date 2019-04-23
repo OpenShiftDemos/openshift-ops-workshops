@@ -2,19 +2,20 @@
 
 deploy_mirror: false
 image_src: registry.redhat.io
-ose_major_tag: v3.11.16
+ose_major_tag: v3.11.98
 ose_release_tag: v3.11
-cns_release_tag: v3.10
+cns_release_tag: v3.11
 ose_deployer_tag: latest
 image_source: registry.redhat.io
-logging: v3.10.45
+logging: v3.11.98
 
 ose_core_images:
   - openshift3/csi-attacher:{{ ose_major_tag }}
   - openshift3/csi-driver-registrar:{{ ose_major_tag }}
   - openshift3/csi-livenessprobe:{{ ose_major_tag }}
   - openshift3/csi-provisioner:{{ ose_major_tag }}
-  - openshift3/image-inspector:{{ ose_major_tag }}
+  - openshift3/image-inspector:{{ ose_release_tag }}
+  - openshift3/image-inspector:v3.11.59-2
   - openshift3/ose-cli:{{ ose_major_tag }}
   - openshift3/ose-cluster-capacity:{{ ose_major_tag }}
   - openshift3/ose-deployer:{{ ose_major_tag }}
@@ -47,6 +48,9 @@ ose_core_images:
   - openshift3/ose:latest
   - openshift3/ose:{{ ose_major_tag }}
   - rhel7/etcd:latest
+  - openshift3/ose-prometheus-config-reloader:{{ ose_major_tag }}
+  - openshift3/ose-kube-rbac-proxy:{{ ose_major_tag }}
+  - openshift3/ose-kube-state-metrics:{{ ose_major_tag }}
 
 ose_infra_images:
 #  - "openshift3/ose-logging-auth-proxy:{{ ose_major_tag }}"
@@ -63,9 +67,7 @@ ose_infra_images:
   - "openshift3/metrics-schema-installer:{{ ose_major_tag }}"
   - "openshift3/prometheus:{{ ose_major_tag }}"
   - "openshift3/prometheus:{{ ose_major_tag }}"
-  - "openshift3/prometheus-alert-buffer:{{ ose_major_tag }}"
-  - "openshift3/prometheus-alert-buffer:{{ ose_major_tag }}"
-  - "openshift3/prometheus-node-exporter:{{ ose_major_tag }}"
+  - "openshift3/prometheus-alert-buffer:v3.11.51-3"
   - "openshift3/prometheus-node-exporter:{{ ose_major_tag }}"
   - "openshift3/prometheus-alertmanager:{{ ose_major_tag }}"
   - "openshift3/ose-deployer:{{ ose_major_tag }}"

@@ -71,23 +71,23 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      ami: ami-0b15bd5f595845bf5
+      ami: ami-0f886c892630f2867
     us-east-2:
       ami: NOT_SUPPORTED
     us-west-1:
       ami: NOT_SUPPORTED
     us-west-2:
-      ami: ami-0483ed70f9aa03e76 
+      ami: ami-07888eef4e88247d2 
     eu-west-1:
-      ami: ami-003b289a92d1acd4f
+      ami: ami-0feb604889573bc0f
     eu-central-1:
-      ami: ami-0943624a36a343da1
+      ami: ami-07921c214b0cd2e94 
     ap-northeast-1:
       ami: NOT_SUPPORTED
     ap-northeast-2:
       ami: NOT_SUPPORTED
     ap-southeast-1:
-      ami: ami-00ce58fbf48577b99
+      ami: ami-016d15a23d53193a2
     ap-southeast-2:
       ami: NOT_SUPPORTED
     sa-east-1:
@@ -490,6 +490,18 @@ Resources:
         Ref: VPC
       GroupDescription: Firewall definition for OpenShift Master and Heketi
       SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 8444
+        ToPort: 8444
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 9100
+        ToPort: 9100
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
+      - IpProtocol: tcp
+        FromPort: 10250
+        ToPort: 10250
+        CidrIp: !FindInMap [ Subnet2Cidr, vpc, cidr ]
       - IpProtocol: tcp
         FromPort: 443
         ToPort: 443
@@ -1001,25 +1013,21 @@ Resources:
                     openshift_docker_additional_registries=support.internal.aws.testdrive.openshift.com:5000
                     oreg_url=support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-${!component}:${!version}
                     osm_etcd_image=support.internal.aws.testdrive.openshift.com:5000/rhel7/etcd
-                    openshift_release=v3.11.16
-                    openshift_image_tag=v3.11.16
+                    openshift_release=v3.11.98
+                    openshift_image_tag=v3.11.98
 
                     container_runtime_extra_storage=[{'device': '/dev/xvdc', 'path': '/var/lib/origin/openshift.local.volumes', 'options': 'gquota', 'filesystem': 'xfs', 'format': 'True'}]
 
                     # special storage configs
-                    openshift_storage_glusterfs_version=v3.10
-                    openshift_storage_glusterfs_heketi_version=v3.10
-                    openshift_storage_glusterfs_block_version=v3.10
-                    openshift_storage_glusterfs_s3_version=v3.10
+                    openshift_storage_glusterfs_image=registry.redhat.io/rhgs3/rhgs-server-rhel7:v3.11
+                    openshift_storage_glusterfs_block_image=registry.redhat.io/rhgs3/rhgs-gluster-block-prov-rhel7:v3.11
+                    openshift_storage_glusterfs_s3_image=registry.redhat.io/rhgs3/rhgs-s3-server-rhel7:v3.11
+                    openshift_storage_glusterfs_heketi_image=registry.redhat.io/rhgs3/rhgs-volmanager-rhel7:v3.11
                     openshift_storage_glusterfs_namespace=storage
                     openshift_storage_glusterfs_heketi_admin_key=myS3cr3tpassw0rd
                     openshift_storage_glusterfs_storageclass=true
                     openshift_storage_glusterfs_storageclass_default=true
                     openshift_storage_glusterfs_block_deploy=false
-                    #ocsinfra_openshift_storage_glusterfs_registry_version=v3.10
-                    #ocsinfra_openshift_storage_glusterfs_registry_heketi_version=v3.10
-                    #ocsinfra_openshift_storage_glusterfs_registry_block_version=v3.10
-                    #ocsinfra_openshift_storage_glusterfs_registry_s3_version=v3.10
                     #ocsinfra_openshift_storage_glusterfs_registry_namespace=infra-storage
                     #ocsinfra_openshift_storage_glusterfs_registry_heketi_admin_key=myS3cr3tpassw0rd
                     #ocsinfra_openshift_storage_glusterfs_registry_storageclass=true
@@ -1052,7 +1060,7 @@ Resources:
                     #logging_openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra": "true"}
 
                     # prometheus configs (future)
-                    openshift_hosted_prometheus_deploy=true
+                    openshift_cluster_monitoring_operator_install=true
 
                     [etcd]
                     master.internal.${PublicHostedZone}
@@ -1061,16 +1069,16 @@ Resources:
                     master.internal.${PublicHostedZone}
 
                     [nodes]
-                    master.internal.${PublicHostedZone} openshift_hostname=master.internal.${PublicHostedZone} openshift_public_hostname=master.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-master'
-                    infra.internal.${PublicHostedZone} openshift_hostname=infra.internal.${PublicHostedZone} openshift_public_hostname=infra.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-infra'
-                    node01.internal.${PublicHostedZone} openshift_hostname=node01.internal.${PublicHostedZone} openshift_public_hostname=node01.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
-                    node02.internal.${PublicHostedZone} openshift_hostname=node02.internal.${PublicHostedZone} openshift_public_hostname=node02.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
-                    node03.internal.${PublicHostedZone} openshift_hostname=node03.internal.${PublicHostedZone} openshift_public_hostname=node03.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
+                    master.internal.${PublicHostedZone} openshift_public_hostname=master.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-master'
+                    infra.internal.${PublicHostedZone} openshift_public_hostname=infra.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-infra'
+                    node01.internal.${PublicHostedZone} openshift_public_hostname=node01.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
+                    node02.internal.${PublicHostedZone} openshift_public_hostname=node02.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
+                    node03.internal.${PublicHostedZone} openshift_public_hostname=node03.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
 
                     #scaleup_[new_nodes]
-                    #scaleup_node04.internal.${PublicHostedZone} openshift_node_group_name='node-config-compute' openshift_hostname=node04.internal.${PublicHostedZone} openshift_public_hostname=node04.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
-                    #scaleup_node05.internal.${PublicHostedZone} openshift_node_group_name='node-config-compute' openshift_hostname=node05.internal.${PublicHostedZone} openshift_public_hostname=node05.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
-                    #scaleup_node06.internal.${PublicHostedZone} openshift_node_group_name='node-config-compute' openshift_hostname=node06.internal.${PublicHostedZone} openshift_public_hostname=node06.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
+                    #scaleup_node04.internal.${PublicHostedZone} openshift_node_group_name='node-config-compute' openshift_public_hostname=node04.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
+                    #scaleup_node05.internal.${PublicHostedZone} openshift_node_group_name='node-config-compute' openshift_public_hostname=node05.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
+                    #scaleup_node06.internal.${PublicHostedZone} openshift_node_group_name='node-config-compute' openshift_public_hostname=node06.${AWS::AccountId}.${PublicHostedZone} openshift_node_group_name='node-config-compute'
 
                     [glusterfs]
                     node01.internal.${PublicHostedZone} glusterfs_ip=${WorkerNode1.PrivateIp} glusterfs_zone=1 glusterfs_devices='[ "/dev/xvdd" ]'

@@ -260,7 +260,7 @@ This handy command will replace the default configuration (a blank entry of
 
 [source,bash,role="copypaste"]
 ----
-sed -i "s/projectRequestTemplate: ''/projectRequestTemplate: 'default\/project-request'/" /etc/origin/master/master-config.yaml
+sudo sed -i "s/projectRequestTemplate: ''/projectRequestTemplate: 'default\/project-request'/" /etc/origin/master/master-config.yaml
 ----
 
 #### Restart the Master

@@ -1,52 +1,18 @@
-OpenShift Container## Environment Overview
+## Environment Overview
 
-You will be interacting with an OpenShift 3.11 cluster that is running on {{
-ENVIRONMENT }}. During the lab you will also install OpenShift Container Storage
-3.11. The complete environment consists of the following systems:
+You will be interacting with an OpenShift 4 cluster that is running on {{ ENVIRONMENT }}. During the lab you will also install OpenShift Container
+Storage, based on Rook/Ceph.
 
-* 1 master node
-* 1 infrastructure node
-* 6 "application" nodes
-** 3 will run workload and the initial Container Native Storage instances
-** 3 will be added to the cluster later
-* 1 server running Red Hat Identity Management (IdM, for LDAP authentication)
+The basics of the OpenShift 4 installation have been completed in advanced.
+The OpenShift cluster is essentially set to all defaults and looks like the
+following:
 
-.Lab Environment Overview
-[options="header"]
-|==============================================
-| Role     | Internal FQDN
-| Master Node       | {{MASTER_INTERNAL_FQDN}}
-| Infrastructure Node        | {{INFRA_INTERNAL_FQDN}}
-| Application Node #1        | {{NODE1_INTERNAL_FQDN}}
-| Application Node #2        | {{NODE2_INTERNAL_FQDN}}
-| Application Node #3        | {{NODE3_INTERNAL_FQDN}}
-| Application Node #4        | {{NODE4_INTERNAL_FQDN}}
-| Application Node #5        | {{NODE5_INTERNAL_FQDN}}
-| Application Node #6        | {{NODE6_INTERNAL_FQDN}}
-| IdM Server     |    {{IDM_INTERNAL_FQDN}}
-|==============================================
+* 3 master nodes
+* 3 worker nodes
 
-All addresses are internal to the lab environment. The only system you
-publicly access via SSH and the browser is the OpenShift Master node:
-
-.Public Lab Access
-[options="header"]
-|==============================================
-| Role     | Public FQDN
-| Master Node       | {{MASTER_EXTERNAL_FQDN}}
-|==============================================
-
-You will be installing OpenShift Container Platform v3.11 using the advanced
-installation method, which involves executing various Ansible playbooks. You
-will also install Container Native Storage v3.11.
-
-Note that references to product documentation will be specifically pointing
-to the 3.11 versions, but newer software and documentation versions may be
-available.
-
-## How to get support
-
-In case of technical or functional problems please reach out to mailto:openshift-ops-testdrive@redhat.com[openshift-ops-testdrive@redhat.com]. This is a ticket based system where you will be able to reach the authors and supporters of this Test Drive Experience.
+Additionally, this lab guide is being hosted on an EC2 instance that you will
+now SSH into in order to access the environment and complete the rest of the
+exercises.
 
 ## Conventions
 You will see various code and command blocks throughout these exercises. Some of
@@ -59,28 +25,26 @@ of the command before execution. If you see a command block with a red border
 some command to modify
 ----
 
-Most command blocks support auto highlighting with a click. If you hover over the command block above and click, it should automatically highlight all the text to make for easier copying.
+Most command blocks support auto highlighting with a click. If you hover over
+the command block above and left-click, it should automatically highlight all the
+text to make for easier copying.
 
 ### Logging in
-Most of the exercises in this lab will be facilitated using the OpenShift command line client on the master node. For convenient access to the master's command line we provide a web-based SSH console: {{ SSH_CONSOLE_URL }}
-
-Use the user name `cloud-user` and the password `{{ KEYNAME }}` when prompted.
-
-.SSH Console Login
-image::webssh_login.png[]
-
-If you prefer to use an SSH client on your system you can do that too, using the same credentials:
+The bastion host on which this lab guide is running is currently configured
+with an SSH key that is also present on the machine where you are sitting.
+You can simply SSH to the bastion host like so:
 
 [source,bash,role="copypaste"]
 ----
-ssh -l cloud-user {{MASTER_EXTERNAL_FQDN}}
+ssh -l lab-user {{ MASTER_EXTERNAL_FQDN }}
 ----
 
-Once you are logged in you end up on the OpenShift Master Node:
+The `lab-user` account has password-less sudo privileges. You'll notice that
+there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This
+string is your `GUID`. Since you will often use GUID, it makes sense to
+export it as an environment variable:
 
+[source,bash,role="copypaste"]
 ----
-[cloud-user@master ~]$
+export GUID=`hostname | cut -d. -f2`
 ----
-
-The `cloud-user` account has password-less sudo privileges and SSH login on
-all systems using internal addressing from the table above.

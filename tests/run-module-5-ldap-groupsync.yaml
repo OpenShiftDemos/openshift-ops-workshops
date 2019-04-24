@@ -10,6 +10,23 @@
       - name: Login as system:admin
         command: oc login -u system:admin
 
+      - name: Cleanup secret if it was already created
+        command: oc delete secret -n openshift-config ldap-secret
+        ignore_errors: true
+
+      - name: Cleanup ConfigMap if it was already created
+        command: oc delete configmap -n openshift-config ca-config-map
+        ignore_errors: true
+
+      - name: Create LDAP bindPassword Secret
+        command: oc create secret generic ldap-secret --from-literal=bindPassword=bindingpassword -n openshift-config
+
+      - name: Create ca.crt ConfigMap
+        command: oc create configmap ca-config-map --from-file=/opt/lab/support/ca.crt -n openshift-config
+
+      - name: Apply OAuth for LDAP identityProvider
+        command: oc apply -f /opt/lab/support/oauth-cluster.yaml
+
       - name: Sync all of the LDAP groups
         command: oc adm groups sync --sync-config=/opt/lab/support/groupsync.yaml --confirm
 

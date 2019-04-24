@@ -1,0 +1,23 @@
+kind: LDAPSyncConfig
+apiVersion: v1
+url: ldap://idm.openshiftworkshop.com
+ca: /opt/lab/support/ca.crt
+bindDN: uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=openshiftworkshop,dc=com
+bindPassword: bindingpassword
+rfc2307:
+  groupsQuery:
+    baseDN: cn=groups,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com
+    derefAliases: never
+    filter: '(|(cn=ose-*))'
+  groupUIDAttribute: dn
+  groupNameAttributes:
+  - cn
+  groupMembershipAttributes:
+  - member
+  usersQuery:
+    baseDN: cn=users,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com
+    derefAliases: never
+  userUIDAttribute: dn
+  userNameAttributes:
+  - uid
+

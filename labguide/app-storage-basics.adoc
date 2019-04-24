@@ -1,0 +1,257 @@
+## Application Storage Basics
+If a pod in OpenShift needs reliable storage, for example, to host a database,
+we would need to supply a **persistent** volume to the pod. This type of
+storage outlives the container, i.e. it persists when the pod dies. It
+typically comes from an external storage system.
+
+[WARNING]
+====
+Doing these exercises requires that you already have deployed the application
+featured in the Application Management Basics exercises. You should do those
+exercises now before continuing.
+====
+
+The `mapit` application currently doesn't leverage any persistent storage. If
+the pod dies, so does all the content inside the container.
+
+We will talk about this concept in more detail later. But let's imagine for a
+moment, the `mapit` application needs persistent storage available under the
+`/app-storage` directory inside the container.
+
+[NOTE]
+====
+The directories that make up the container's internal filesystem are a blend
+of the read-only layers of the container image and the top-most writable
+layer that is added as soon as a container instance is started from the
+image. The writable layer is disposed of once the container is deleted which
+can happen regularly in a dynamic container orchestration environment.
+====
+
+### Adding Persistent Volume Claims
+Here's how you would instruct OpenShift to create a `PersistentVolume`
+object, which represents external, persistent storage, and have it *mounted*
+inside the container's filesystem:
+
+[source,bash,role="copypaste"]
+----
+oc set volume dc/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteOnce --claim-size=1Gi --claim-name=mapit-storage --mount-path=/app-storage
+----
+
+The output looks like this:
+
+----
+deploymentconfig.apps.openshift.io/mapit volume updated
+----
+
+In the first step a *PersistentVolumeClaim* was created. This object
+represents a request for storage of a certain kind, with a certain capacity
+from the user to OpenShift.
+
+Next the `DeploymentConfig` of `mapit` is updated to reference this storage
+and make it available under the `/app-storage` directory inside the pod.
+
+You can see the new `DeploymentConfig` like this:
+
+[source,bash,role="copypaste"]
+----
+oc get dc mapit
+----
+
+The output will show that a new revision was created as part of the update with storage.
+
+----
+NAME      REVISION   DESIRED   CURRENT   TRIGGERED BY
+mapit     4          1         1         config,image(mapit:latest)
+----
+
+Likely, depending when you ran the command you may or may not see that the new pod is still being spawned:
+
+[source,bash,role="copypaste"]
+----
+oc get pod
+----
+
+----
+NAME             READY     STATUS              RESTARTS   AGE
+mapit-3-ntd9w    1/1       Running             0          9m
+mapit-4-d872b    0/1       ContainerCreating   0          5s
+mapit-4-deploy   1/1       Running             0          10s
+----
+
+Take a look at the `DeploymentConfig` now:
+
+[source,bash,role="copypaste"]
+----
+oc describe dc mapit
+----
+
+You will see there is now both `Mounts` and `Volumes` details about the new storage:
+
+----
+...
+    Mounts:
+      /app-storage from mapit-storage (rw)
+  Volumes:
+   mapit-storage:
+    Type:	PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:	mapit-storage
+    ReadOnly:	false
+....
+----
+
+But what is happening under the covers?
+
+### Storage Classes
+When OpenShift 4 was first installed, a dynamic storage provider for AWS EBS
+was configured. You can see this `StorageClass` with the following:
+
+[source,bash,role="copypaste"]
+----
+oc get storageclass
+----
+
+And you will see something like:
+
+----
+NAME            PROVISIONER             AGE
+gp2 (default)   kubernetes.io/aws-ebs   4d4h
+----
+
+Any time a request for a volume is made (`PersistentVolumeClaim`) that
+doesn't specify a `StorageClass`, the default will be used. In this case, the
+default is an EBS provisioner that will create an EBS GP2 volume of the
+requested size (in our example, 1Gi).
+
+### Persistent Volume (Claims)
+The command you ran earlier referenced a `claim`. Storage in a Kubernetes
+environment uses a system of volume claims and volumes. A user makes a
+`PersistentVolumeClaim` and Kubernetes tries to find a `PersistentVolume`
+that matches. In the case where a volume does not already exist, if there is
+a dynamic provisioner that satisfies the claim, a `PersistentVolume` is
+created.
+
+Execute the following:
+
+[source,bash,role="copypaste"]
+----
+oc get persistentvolume
+----
+
+You will see something like the following:
+
+----
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                          STORAGECLASS   REASON   AGE
+pvc-9ac61701-5d56-11e9-9fbd-0a1014b36356   1Gi        RWO            Delete           Bound    app-management/mapit-storage   gp2                     114s
+----
+This is the volume that was created as a result of your earlier claim. Note
+that the volume is *bound* to the claim that exists in the `app-management`
+project.
+
+Now, execute:
+
+[source,bash,role="copypaste"]
+----
+oc get persistentvolumeclaim -n app-management
+----
+
+You will see something like:
+
+----
+NAME            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+mapit-storage   Bound    pvc-9ac61701-5d56-11e9-9fbd-0a1014b36356   1Gi        RWO            gp2            32m
+----
+
+### Testing Persistent Storage
+
+Get the name of your pod using `oc get pods` and then log on to the pod using
+the remote-shell capability of the `oc` client:
+
+[source,none,role="copypaste copypaste-warning"]
+----
+oc rsh mapit-4-d872b
+----
+
+*Being in the container's shell session*, list the content of the root
+directory from the perspective of the container's namespace:
+
+[source,bash,role="copypaste"]
+----
+ls -ahl /
+----
+
+You will see a directory there called `/app-storage`:
+
+----
+total 20K
+drwxr-xr-x.   1 root  root         81 Apr 12 19:11 .
+drwxr-xr-x.   1 root  root         81 Apr 12 19:11 ..
+-rw-r--r--.   1 root  root        16K Dec 14  2016 anaconda-post.log
+drwxrwsr-x.   3 root  1000570000 4.0K Apr 12 19:10 app-storage <1>
+lrwxrwxrwx.   1 root  root          7 Dec 14  2016 bin -> usr/bin
+drwxrwxrwx.   1 jboss root         45 Aug  4  2017 deployments
+drwxr-xr-x.   5 root  root        360 Apr 12 19:11 dev
+drwxr-xr-x.   1 root  root         93 Jan 18  2017 etc
+drwxr-xr-x.   2 root  root          6 Nov  5  2016 home
+lrwxrwxrwx.   1 root  root          7 Dec 14  2016 lib -> usr/lib
+lrwxrwxrwx.   1 root  root          9 Dec 14  2016 lib64 -> usr/lib64
+drwx------.   2 root  root          6 Dec 14  2016 lost+found
+drwxr-xr-x.   2 root  root          6 Nov  5  2016 media
+drwxr-xr-x.   2 root  root          6 Nov  5  2016 mnt
+drwxr-xr-x.   1 root  root         19 Jan 18  2017 opt
+dr-xr-xr-x. 183 root  root          0 Apr 12 19:11 proc
+dr-xr-x---.   2 root  root        114 Dec 14  2016 root
+drwxr-xr-x.   1 root  root         21 Apr 12 19:11 run
+lrwxrwxrwx.   1 root  root          8 Dec 14  2016 sbin -> usr/sbin
+drwxr-xr-x.   2 root  root          6 Nov  5  2016 srv
+dr-xr-xr-x.  13 root  root          0 Apr 10 14:34 sys
+drwxrwxrwt.   1 root  root         92 Apr 12 19:11 tmp
+drwxr-xr-x.   1 root  root         69 Dec 16  2016 usr
+drwxr-xr-x.   1 root  root         41 Dec 14  2016 var
+----
+<1> This is where the persistent storage appears inside the container
+
+Amazon EBS volumes are read-write-once. In other words, because they are
+block storage, they may only be attached to one EC2 instance at a time, which
+means that only one container can use an EBS-based `PersistentVolume` at a
+time. In other words: read-write-once.
+
+Execute the following inside the remote shell session:
+
+[source,bash,role="copypaste"]
+----
+echo "Hello World from OpenShift" > /app-storage/hello.txt
+exit
+----
+
+Then, make sure your file is present:
+
+[source,bash,role="copypaste copypaste-warning"]
+----
+oc rsh mapit-4-t4mnv cat /app-storage/hello.txt
+----
+
+Now, to verify that persistent storage really works, delete your pod:
+
+[source,bash,role="copypaste copypaste-warning"]
+----
+oc delete pod mapit-4-t4mnv && oc get pod
+----
+
+After some time, your new pod will be ready and running. Find its name, and
+again check the file:
+
+[source,bash,role="copypaste copypaste-warning"]
+----
+oc rsh mapit-4-lpqd5 cat /app-storage/hello.txt
+----
+
+It's still there. In fact, the new pod may not even be running on the same
+node as the old pod, which means that, under the covers, Kubernetes and
+OpenShift automatically attached the real, external storage to the right
+place at the right time.
+
+If you needed read-write-many storage, file-based storage solutions can
+provide it. OpenShift Container Storage is a hyperconverged storage solution
+that can run inside OpenShift and provide file, block and even object storage
+by turning locally attached storage devices into storage pools and then
+creating volumes out of them.

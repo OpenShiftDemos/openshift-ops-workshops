@@ -1022,7 +1022,78 @@ failed to open stream: No space left on device in /opt/app-root/src/upload.php o
 [...]
 ----
 
-Fortunately that is easy to fix for the user or owner of the app, even without administrator intervention.
+First the `StorageClass` glusterfs-storage needs to be modified to include `allowVolumeExpansion: true`. To add this new parameter the following process is used.
+
+[WARNING]
+====
+It is required that the feature-gates: (below) is added to the /etc/origin/master/master-config.yaml and the master services restarted before modifying the `StorageClass` glusterfs-storage.
+
+	kubernetesMasterConfig:
+	  apiServerArguments:
+	    feature-gates:
+	    - ExpandPersistentVolumes=true
+====
+
+----
+oc get sc glusterfs-storage -o yaml > glusterfs-storage.yaml
+----
+
+And then add the new parameter to the glusterfs-storage-new.yaml file.
+
+----
+sed '/volumeBindingMode: Immediate/a allowVolumeExpansion: true' glusterfs-storage.yaml > glusterfs-storage-new.yaml
+----
+
+Now to modify this `StorageClass` the current glusterfs-storage needs to be deleted and the new glusterfs-storage-new.yaml used to create glusterfs-storage that containes the necessary parameter `allowVolumeExpansion: true`.
+
+----
+oc delete sc glusterfs-storage
+oc create -f glusterfs-storage-new.yaml
+----
+
+Now do the following to validate the `StorageClass` is modified.
+
+----
+oc get sc glusterfs-storage -o yaml
+----
+
+You will see something like below.
+
+----
+allowVolumeExpansion: true
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+  creationTimestamp: 2019-04-22T19:33:05Z
+  name: glusterfs-storage
+
+...
+----
+
+Also verify using this command:
+
+----
+oc describe sc glusterfs-storage
+----
+
+You can see `AllowVolumeExpansion:  True` in this output as well.
+
+----
+Name:                  glusterfs-storage
+IsDefaultClass:        Yes
+Annotations:           storageclass.kubernetes.io/is-default-class=true
+Provisioner:           kubernetes.io/glusterfs
+Parameters:            resturl=http://heketi-storage.storage.svc:8080,restuser=admin,secretName=heketi-storage-admin-secret,secretNamespace=storage
+AllowVolumeExpansion:  True
+MountOptions:          <none>
+ReclaimPolicy:         Delete
+VolumeBindingMode:     Immediate
+Events:                <none>
+----
+
+After the `StorageClass` is modified to allow `PersistentVolume` expansion, the volume size can be increased by the user or owner of the app, even without administrator intervention.
 
 [WARNING]
 ====

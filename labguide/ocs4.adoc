@@ -13,6 +13,12 @@ This hands-on workshop is for both system administrators and application develop
 * Upgrade Ceph version from Mimic to Nautilus using the Rook operator
 * Add more storage to the Ceph cluster
 
+.Rook and Kubernetes Architecture 
+image::images/rook_diagram_1.png[]
+
+.Ceph deployed on OpenShift using Rook
+image::images/rook_diagram_2.png[]
+
 == Lab Environment
 
 TBD
@@ -23,7 +29,7 @@ TBD
 
 === Scale OCP cluster and add 3 new nodes
 
-In this section, you will validate the OCP environment has 3 master and 3 worker nodes before increasing the cluster size by 3 worker nodes. Your OCP nodes will have different `NAME`.
+In this section, you will validate the OCP environment has 3 master and 3 worker nodes before increasing the cluster size by 3 worker nodes. Your OCP nodes will have different `NAME` than shown below.
 
 ----
 oc get nodes
@@ -43,7 +49,7 @@ oc project openshift-machine-api
 oc get machinesets
 ----
 
-This will show you the existing machinesets used to create the 3 worker nodes in the cluster already. There is a machineset for each AWS AZ (us-east-2a, us-east-2b, us-east-2a). Your machineset `NAME` will be different. 
+This will show you the existing machinesets used to create the 3 worker nodes in the cluster already. There is a machineset for each AWS AZ (us-east-2a, us-east-2b, us-east-2a). Your machinesets `NAME` will be different. 
 
 ----
 NAME                                   DESIRED   CURRENT   READY   AVAILABLE   AGE
@@ -114,7 +120,7 @@ Check that you have new machines created.
 oc get machines
 ----
 
-They may be in pending for sometime so repeat command above until they are in a `running` `STATE`.
+They may be in `pending` for sometime so repeat command above until they are in a `running` STATE.
 
 ----
 NAME                                            INSTANCE              STATE     TYPE         REGION      ZONE         AGE
@@ -162,26 +168,19 @@ ip-10-0-164-65.us-east-2.compute.internal    Ready    worker   3m30s   v1.12.4+3
 
 === Download Rook deployment files and install Ceph
 
-In this section you will be using the new workerocs OCP nodes and Rook.io files will be downloaded using the `curl -O` command.
+In this section you will be using the new workerocs OCP nodes and Rook.io files. You will download Rook.io common.yaml, operator-openshift.yaml and cluster.yaml to create OCP resources as shown in Figure 1 and Figure 2 above. 
 
-Validate that the new workerocs nodes are labeled with role=storage-node
+First, validate that the new workerocs nodes are labeled with role=storage-node
 
 ----
 oc get nodes --show-labels | grep storage-node
 ----
 
-Next you will download Rook.io common.yaml, operator-openshift.yaml and cluster.yaml to create OCP resources. After downloading each on view the file using the `cat` command before creating the resources using `oc create`.
+The first step to deploy Rook is to create the common resources. The configuration for these resources will be the same for most deployments. The common.yaml sets these resources up.
 
 ----
-curl -O https://raw.githubusercontent.com/red-hat-storage/ocs-training/master/ocp3rook/scc.yaml
-oc create -f scc.yaml
-----
-
-Validate that rook-ceph has been added to securitycontextconstraints.security.openshift.io.
-
-----
-oc get scc rook-ceph
-oc export scc rook-ceph
+curl -O https://raw.githubusercontent.com/netzzer/openshift-cns-testdrive/ocs-support/support/common.yaml
+oc create -f common.yaml
 ----
 
 Install the Rook operator next.

@@ -128,7 +128,7 @@ Remove the `#scaleup_` comment prefix by running the below `sed` command:
 
 [source,bash,role="copypaste"]
 ----
-sed -i 's/#scaleup_//g' /etc/ansible/hosts
+sudo sed -i 's/#scaleup_//g' /etc/ansible/hosts
 ----
 
 When finished, your inventory file should look like the following:
@@ -234,13 +234,13 @@ new_nodes
 Remove [new_nodes] to add new nodes to the [nodes] section in the inventory file. 
 
 ----
-sed -i '/^\[new_nodes/d' /etc/ansible/hosts
+sudo sed -i '/^\[new_nodes/d' /etc/ansible/hosts
 ----
 
 Remove new_nodes from [osev3:children] section of the inventory file.
 
 ----
-sed -i '/^new_nodes/d' /etc/ansible/hosts
+sudo sed -i '/^new_nodes/d' /etc/ansible/hosts
 ----
 
 Your modified inventory file should now look like this:
@@ -290,7 +290,7 @@ Remove the `#ocsinfra_` comment prefix by running the below `sed` command:
 
 [source,bash,role="copypaste"]
 ----
-sed -i 's/#ocsinfra_//g' /etc/ansible/hosts
+sudo sed -i 's/#ocsinfra_//g' /etc/ansible/hosts
 ----
 
 When finished, your inventory file should look like the following:
@@ -303,7 +303,6 @@ masters
 nodes
 etcd
 glusterfs
-new_nodes
 glusterfs_registry
 
 ...
@@ -420,7 +419,7 @@ Remove the `#metrics_` comment prefix by running the below `sed` command:
 
 [source,bash,role="copypaste"]
 ----
-sed -i 's/#metrics_//g' /etc/ansible/hosts
+sudo sed -i 's/#metrics_//g' /etc/ansible/hosts
 ----
 
 The OpenShift installer variable `openshift_metrics_install_metrics=false` tells the
@@ -429,7 +428,7 @@ running the below `sed` command:
 
 [source,bash,role="copypaste"]
 ----
-sed -i '/openshift_metrics_install_metrics=false/d' /etc/ansible/hosts
+sudo sed -i '/openshift_metrics_install_metrics=false/d' /etc/ansible/hosts
 ----
 
 When finished, your inventory file should look like the following:
@@ -574,7 +573,7 @@ Remove the `#logging_` comment prefix by running the below `sed` command:
 
 [source,bash,role="copypaste"]
 ----
-sed -i 's/#logging_//g' /etc/ansible/hosts
+sudo sed -i 's/#logging_//g' /etc/ansible/hosts
 ----
 
 The OpenShift installer variable `openshift_logging_install_logging=false` tells the
@@ -583,7 +582,7 @@ running the below `sed` command:
 
 [source,bash,role="copypaste"]
 ----
-sed -i '/openshift_logging_install_logging=false/d' /etc/ansible/hosts
+sudo sed -i '/openshift_logging_install_logging=false/d' /etc/ansible/hosts
 ----
 
 When finished, your inventory file should look like the following:

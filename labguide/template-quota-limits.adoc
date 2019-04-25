@@ -270,7 +270,7 @@ project-request                 5 (5 blank)   7
 ----
 
 #### Setting the Default ProjectRequestTemplate
-The default *projectRequestTemplate* is configured in the Openshift API Server configuration. This is stored in a *ConfigMap* in the `openshift-apiserver` project.  You can view the API Server configuration with the following command:
+The default *projectRequestTemplate* is configured in the OpenShift API Server configuration. This is stored in a *ConfigMap* in the `openshift-apiserver` project.  You can view the API Server configuration with the following command:
 
 [source,bash,role="copypaste"]
 ----
@@ -278,7 +278,7 @@ oc get cm config -n openshift-apiserver  -o go-template='{{index .data "config.y
 ----
 
 
-This configuration is configured via an Openshift operator.  To add the default project request tempalate configuration, a *CustomResource* (CR) needs to be created.  The *CustomResource* will look like:
+This configuration is configured via an OpenShift operator.  To add the default project request tempalate configuration, a *CustomResource* (CR) needs to be created.  The *CustomResource* will look like:
 
 [source,yaml]
 ----
@@ -295,14 +295,14 @@ spec:
 
 Notice the *projectRequestTemplate* name matches the name of the template we created earlier in the `openshift-config` project.
 
-The next step is to create this *CustomResource*.  Once this *CR* is created, the Openshift operator will notice the *CR*, and apply the configuration changes.  To create the *CustomResource*, issue this command:
+The next step is to create this *CustomResource*.  Once this *CR* is created, the OpenShift operator will notice the *CR*, and apply the configuration changes.  To create the *CustomResource*, issue this command:
 
 [source,bash,role="copypaste"]
 ----
 oc create -f /opt/lab/support/cr_project_request.yaml -n openshift-config
 ----
 
-Once this command is run, the Openshift API Server configurations will be updated.  This can be verified by viewing the configuration:
+Once this command is run, the OpenShift API Server configurations will be updated.  This can be verified by viewing the configuration:
 
 [source,bash,role="copypaste"]
 ----
@@ -403,7 +403,7 @@ NAME                   CREATED AT
 template-test-limits   2018-10-24T19:19:40Z
 ----
 
-NOTE: Please make sure that the `project-request` template is created in the `openshift-config` project. Defining it in the Openshift API server configurion without having the template in place will cause new projects to fail to create.
+NOTE: Please make sure that the `project-request` template is created in the `openshift-config` project. Defining it in the OpenShift API server configurion without having the template in place will cause new projects to fail to create.
 
 ### Clean Up
 If you wish, you can deploy the application from the Application Management

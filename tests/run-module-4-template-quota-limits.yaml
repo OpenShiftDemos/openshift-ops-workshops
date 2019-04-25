@@ -10,7 +10,7 @@
     tags:
     - quota-deploy
 
-  - name: Create the CR that will configure the Openshift API Server to use a the specified project-request template in the namespace 'openshift-config'
+  - name: Create the CR that will configure the OpenShift API Server to use a the specified project-request template in the namespace 'openshift-config'
     k8s:
       state: present
       namespace: openshift-config

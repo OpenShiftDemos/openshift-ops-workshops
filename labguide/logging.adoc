@@ -1,5 +1,5 @@
 ## OpenShift Logging
-In this lab you will explore the logging aggregation capabilities of Openshift. 
+In this lab you will explore the logging aggregation capabilities of OpenShift.
 
 An extremely important function of OpenShift is collecting and aggregating logs from
 the environments and the application pods it is running. OpenShift ships with an
@@ -21,7 +21,7 @@ More information may be found on the official OpenShift documentation site found
 ====
 
 
-### Deploying Openshift Logging
+### Deploying OpenShift Logging
 
 OpenShift Container Platform cluster logging is designed to be used with the default configuration, which is tuned for small to medium sized OpenShift Container Platform clusters.
 
@@ -34,7 +34,7 @@ If you want to customize your deployment, make changes to the sample CR as neede
 
 #### Create the `openshift-logging` namespace
 
-OpenShift Logging will be run from within it's own namespace `openshift-logging`.  This namespace does not exist by default, and needs to be created.  The namespace is represented in yaml format as:
+OpenShift Logging will be run from within it's own namespace `openshift-logging`.  This namespace does not exist by default, and needs to be created before logging may be installed.  The namespace is represented in yaml format as:
 
 [source,yaml]
 .openshift_logging_namespace.yaml
@@ -62,12 +62,12 @@ oc create -f /opt/lab/support/openshift_logging_namespace.yaml
 
 In order to install and configure the `EFK` stack into the cluster, additional operators need to be installed.  These can be installed from the `Operator Hub` from within the cluster via the GUI.  
 
-When using operators in OpenShift, it is important to understand the basics of some of the underlying pieces that make up the Operators.  `CustomResourceDefinion (CRD)` and `CustomResource (CR)` are two pieces we will briefly describe.`CRDs` are generic Kubernetes object's that define a structure of data.  In terms of programming, `CRDs` can be thought of like a class.  `CustomResource (CR)` is an actual implementations of `CRD`.  Again, in programming terms, this would be an instansiated object from the class.
+When using operators in OpenShift, it is important to understand the basics of some of the underlying principles that make up the Operators.  `CustomResourceDefinion (CRD)` and `CustomResource (CR)` are two Kubernetes objects that we will briefly describe.`CRDs` are generic pre-defined structures of data. The operator understand how to apply the data that is defined by the `CRD`.  In terms of programming, `CRDs` can be thought as being similar to a class.  `CustomResource (CR)` is an actual implementations of the `CRD`, where the structured data has actual values.  These values are what the operator will use when configuring it's service.  Again, in programming terms, `CRs` would be similar to an instantiated object of the class.
 
 
 The general pattern for using Operators is first, install the Operator, which will create the necessary `CRDs`.  After the `CRDs` have been created, we can create the `CR` which will tell the operator how to act, what to install, and/or what to configure.  For installing `openshift-logging`, we will follow this pattern.
 
-To begin, log into the Openshift Cluster's GUI.  Then follow the following steps:
+To begin, log into the OpenShift Cluster's GUI.  Then follow the following steps:
 
 1. Install the Elasticsearch Operator:
 
@@ -79,9 +79,15 @@ This makes the Operator available to all users and projects that use this OpenSh
 
 2. Install the Cluster Logging Operator:
 
+[NOTE]
+====
+The `Cluster Logging` operator needs to be installed in the `openshift-logging` namespace.  Please ensure that the `openshift-logging` namespace was created from the previous steps
+
+====
+
   a. In the OpenShift console, click `Catalog` → `OperatorHub`.
   b. Choose `Cluster Logging` from the list of available Operators, and click `Install`.
-  c. On the `Create Operator Subscription` page, select `All namespaces on the cluster` under `Installation Mode`. Then, click `Subscribe`.
+  c. On the `Create Operator Subscription` page, Under ensure `Installation Mode` that `A specific namespace on the cluster namespaces on the cluster` is selected, and choose `openshift-logging`. Then, click `Subscribe`.
 
 3. Verify the operator installations:
 
@@ -103,106 +109,96 @@ If either operator does not appear as installed, to troubleshoot further:
 * Switch to the Workloads → Pods page and check the logs in any Pods in the openshift-logging and openshift-operators projects that are reporting issues.
 
 
-#### Create the Loggging `CustomResource (CR)`
+#### Create the Loggging `CustomResource (CR)` instance
 
 Now that we have the operators installed, along with the `CRDs`, we can now kick off the logging install by creating a Logging `CR`.  This will define how we want to install and configure logging.
 
 
+1. In the OpenShift Console, switch to the the `Administration` → `Custom Resource Definitions` page.
 
-#### Configuring the Inventory
-The lines to configure OpenShift Logging are already configured in the inventory file but commented out with a `#logging_` prefix.
+2. On the `Custom Resource Definitions` page, click `ClusterLogging`.
 
-To see the lines run:
+3. On the `Custom Resource Definition Overview` page, select `View Instances` from the `Actions` menu.
 
-[source,bash,role="copypaste"]
+4. On the `Cluster Loggings` page, click `Create Cluster Logging`.
+
+  You might have to refresh the page to load the data.
+
+5. In the `YAML`, replace the code with the following:
+
+[source,yaml]
+.openshift_logging_cr.yaml
 ----
-grep '#logging_' /etc/ansible/hosts
-----
-
-Remove the `#logging_` comment prefix by running the below `sed` command:
-
-[source,bash,role="copypaste"]
-----
-sed -i 's/#logging_//g' /etc/ansible/hosts
-----
-
-The OpenShift installer variable `openshift_logging_install_logging=false` tells the
-installer to *not* install the logging solution when it runs. Remove that line by
-running the below `sed` command:
-
-[source,bash,role="copypaste"]
-----
-sed -i '/openshift_logging_install_logging=false/d' /etc/ansible/hosts
-----
-
-When finished, your inventory file should look like the following:
-
-[source,ini]
-./etc/ansible/hosts
-----
-
-...
-
-[OSEv3:vars]
-...
-openshift_logging_install_logging=true <1>
-openshift_logging_es_pvc_dynamic=true <2>
-openshift_logging_es_pvc_size=10Gi <3>
-openshift_logging_es_pvc_storage_class_name={{ CNS_BLOCK_STORAGECLASS }} <4>
-openshift_logging_es_memory_limit=2G <5>
-openshift_logging_kibana_hostname=kibana.{{ OCP_ROUTING_SUFFIX }} <6>
-openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra": "true"}
-openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra": "true"}
-openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra": "true"}
-...
-----
-
-<1> Trigger the installation of the Logging service
-<2> `ElasticSearch`, part of the Logging service, will request persistent storage for Logging via a claim toward `StorageClass`
-<3> The resulting PersistentVolumeClaim will be of `10Gi` in size
-<4> The name of the StorageClass to use for the PersistentVolumeClaim
-<5> Limit the required memory for the `ElasticSearch` pods to 2GB (refer to the link:https://docs.openshift.com/container-platform/3.11/install_config/aggregate_logging_sizing.html[official docs] for guidance in production environment)
-<6> The FQDN under which the Logging frontend UI (Kibana) will be available
-
-#### Install Logging
-With these settings in place execute the `openshift-logging` Ansible playbook
-that ships as part of the `openshift-ansible` installer:
-
-[source,bash,role="copypaste"]
-----
-ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/openshift-logging/config.yml
+apiVersion: "logging.openshift.io/v1"
+kind: "ClusterLogging"
+metadata:
+  name: "instance"
+  namespace: "openshift-logging"
+spec:
+  managementState: "Managed"
+  logStore:
+    type: "elasticsearch"
+    elasticsearch:
+      nodeCount: 3
+      storage: {}
+      redundancyPolicy: "SingleRedundancy"
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      resources:
+        request:
+          memory: 4G
+  visualization:
+    type: "kibana"
+    kibana:
+      replicas: 1
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+  curation:
+    type: "curator"
+    curator:
+      schedule: "30 3 * * *"
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+  collection:
+    logs:
+      type: "fluentd"
+      fluentd: {}
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
 ----
 
-Once the installation finishes (roughly 4 minutes), log in as the cluster administrator, using the
-`openshift-logging` *Project*:
 
-[source,bash,role="copypaste"]
-----
-oc login -u system:admin -n openshift-logging
+#### Verify the Loggging install
+
+Now that Logging has been created, let's verify that things are working.
+
+1. Switch to the `Workloads` → `Pods` page.
+
+2. Select the `openshift-logging` project.
+
+You should see pods for cluster logging, Elasticsearch, and Fluentd, as shown in the following CLI output:
+
+Alternatively, you can verify from the command line by using the following command:
+
+[source,yaml]
 ----
 
-Verify the logging stack components are up and running:
+# oc get pods -n openshift-logging
 
-[source,bash,role="copypaste"]
-----
-oc get pods -o wide
+NAME                                            READY   STATUS    RESTARTS   AGE
+cluster-logging-operator-cb795f8dc-xkckc        1/1     Running   0          32m
+elasticsearch-cdm-b3nqzchd-1-5c6797-67kfz       2/2     Running   0          14m
+elasticsearch-cdm-b3nqzchd-2-6657f4-wtprv       2/2     Running   0          14m
+elasticsearch-cdm-b3nqzchd-3-588c65-clg7g       2/2     Running   0          14m
+fluentd-2c7dg                                   1/1     Running   0          14m
+fluentd-9z7kk                                   1/1     Running   0          14m
+fluentd-br7r2                                   1/1     Running   0          14m
+fluentd-fn2sb                                   1/1     Running   0          14m
+fluentd-pb2f8                                   1/1     Running   0          14m
+fluentd-zqgqx                                   1/1     Running   0          14m
+kibana-7fb4fd4cc9-bvt4p                         2/2     Running   0          14m
 ----
 
-You will see something like:
-
-----
-NAME                                      READY     STATUS    RESTARTS   AGE       IP            NODE                                          NOMINATED NODE
-logging-es-data-master-55lp74ix-1-jms4g   2/2       Running   0          1m        10.129.0.24   {{ INFRA_INTERNAL_FQDN }}    <none>
-logging-fluentd-2pc7j                     1/1       Running   0          1m        10.128.2.4    {{ NODE2_INTERNAL_FQDN }}   <none>
-logging-fluentd-6pl9r                     1/1       Running   0          1m        10.131.2.4    {{ NODE5_INTERNAL_FQDN }}   <none>
-logging-fluentd-7nd2l                     1/1       Running   0          1m        10.131.0.4    {{ NODE1_INTERNAL_FQDN }}   <none>
-logging-fluentd-gvkbv                     1/1       Running   0          1m        10.130.0.6    {{ NODE3_INTERNAL_FQDN }}   <none>
-logging-fluentd-ptqvs                     1/1       Running   0          1m        10.129.2.5    {{ NODE4_INTERNAL_FQDN }}   <none>
-logging-fluentd-qb42p                     1/1       Running   0          1m        10.130.2.6    {{ NODE6_INTERNAL_FQDN }}   <none>
-logging-fluentd-tdczj                     1/1       Running   0          1m        10.128.0.6    {{ MASTER_INTERNAL_FQDN }}   <none>
-logging-fluentd-tn9ww                     1/1       Running   0          1m        10.129.0.22   {{ INFRA_INTERNAL_FQDN }}    <none>
-logging-kibana-1-b54pv                    2/2       Running   0          2m        10.129.0.21   {{ INFRA_INTERNAL_FQDN }}    <none>
-----
 
 The _Fluentd_ *Pods* are deployed as part of a *DaemonSet*, which is a mechanism
 to ensure that specific *Pods* run on specific *Nodes* in the cluster at all
@@ -210,32 +206,20 @@ times:
 
 [source,bash,role="copypaste"]
 ----
-oc get daemonset
+oc get daemonset -n openshift-logging
 ----
 
 You will see something like:
 
 ----
-NAME              DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE SELECTOR                AGE
-logging-fluentd   8         8         8         8            8           logging-infra-fluentd=true   3m
+NAME      DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+fluentd   8         8         8         8            8           <none>          15m
 ----
 
 You will also see the storage for ElasticSearch being automatically
 provisioned from the OCS block storage service if you query the
 PersistentVolumeClaim objects in this project
 
-[source,bash,role="copypaste"]
-----
-oc get pvc
-----
-
-And you will see something like:
-
-[source,bash,role="copypaste"]
-----
-NAME           STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS               AGE
-logging-es-0   Bound     pvc-8188d8dd-6af7-11e8-af61-02cea7838d26   10Gi       RWO            {{ CNS_BLOCK_STORAGECLASS }}   3m
-----
 
 [NOTE]
 ====
@@ -246,12 +230,28 @@ ensures FluentD runs on *all* nodes. Otherwise we would not capture all of
 the container logs.
 ====
 
-To reach the _Kibana_ user interface, first determine its public access URL by
-querying the *Route* that got set up to expose Kibana's *Service*:
+#### Accessing _Kibana_
+
+As mentioned before, _Kibana_ is the front end and the way that users and admins may access the OpenShift Logging stack.  To reach the _Kibana_ user interface, first determine its public access URL by querying the *Route* that got set up to expose Kibana's *Service*:
+
+To access the _Kibana_ route:
+
+1. In the OpenShift console, click on the `Networking` → `Routes` page.
+
+2. Select the `openshift-logging` project.
+
+3. Click on the `Kibana` route.
+
+4. In the `Location` field, click on the URL presented.
+
+5. Click through and accept the SSL certificates
+
+
+Alternatively, this can be obtained from the command line:
 
 [source,bash,role="copypaste"]
 ----
-oc get route/logging-kibana
+oc get route -n openshift-logging
 ----
 
 You will see something like:
@@ -264,521 +264,47 @@ logging-kibana   kibana.apps.{{ OCP_ROUTING_SUFFIX }}             logging-kibana
 You can click the link ( https://kibana.{{ OCP_ROUTING_SUFFIX }} ) to open the
 Kibana interface. There is a special authentication proxy that is configured as
 part of the EFK installation that results in Kibana requiring OpenShift
-credentials for access. You should login to Kibana as the `fancyuser1` user with password
+credentials for access.
+
+////
+ You should login to Kibana as the `fancyuser1` user with password
 `openshift` to be able to see all of the cluster's logs. Kibana utilizes the same RBAC
 underpinning OpenShift to ensure that users can only see the logs they should
 have access to.
+////
 
-[IMPORTANT]
-====
-The block-storage service of OCS (also referred to as `gluster-block`, introduced in the next chapter) is **only** supported for Logging and Metrics as of this release. This is about to change in the near future as we qualify more workloads.
-====
 
-### OpenShift Network Policy Based SDN
-OpenShift has a software defined network (SDN) inside the platform that is based
-on Open vSwitch. This SDN is used to provide connectivity between application
-components inside of the OpenShift environment. It comes with default network
-ranges pre-configured, although you can make changes to these should they
-conflict with your existing infrastructure, or for whatever other reason you may
-have.
 
-The OpenShift Network Policy SDN plug-in allows projects to truly isolate their
-network infrastructure inside OpenShift’s software defined network. While you
-have seen projects isolate resources through OpenShift’s RBAC, the network policy
-SDN plugin is able to isolate pods in projects using pod and namespace label selectors.
+#### Queries with _Kibana_
 
-The network policy SDN plugin was introduced in OpenShift 3.7, and more
-information about it and its configuration can be found in the
-link:https://docs.openshift.com/container-platform/3.11/architecture/networking/sdn.html[networking
-documentation^]. Additionally, other vendors are working with the upstream
-Kubernetes community to implement their own SDN plugins, and several of these
-are supported by the vendors for use with OpenShift. These plugin
-implementations make use of appc/CNI, which is outside the scope of this lab.
+Once the _Kibana_ web interface is up, we are now able to do queries.  _Kibana_ offers a the user a powerful interface to query all logs that come from the cluster.  
 
-#### Execute the Creation Script
-Only users with project or cluster administration privileges can manipulate *Project*
-networks. First, make sure you are logged in as the cluster administrator:
+By default, _Kibana_ will show all logs that have been received within the the last 15 minutes.  This time interval may be changed in the upper right hand corner.  The log messages are shown in the middle of the page. All log messages that are received are indexed based on the log message content.  Each message will have fields associated that are associated to that log message. To see the fields that make up an individual message, click on the arrow on the side of each message located in the center of the page.  This will show the message fields that are contained.
 
-[source,bash,role="copypaste"]
-----
-oc login -u system:admin
-----
+First, set the default index pattern to `.all`.   On the left hand side towards the top, in the drop down menu select the `.all` index pattern.
 
-Then, execute a script that we have prepared for you. It will create two
-*Projects* and then deploy a *DeploymentConfig* with a *Pod* for you:
+To select fields to show for messages, look on left hand side fore the `Available Fields` label.  Below this are fields that can be selected and shown in the middle of the screen.  Find the `hostname` field below the `Available Fields` and click `add`.  Notice now, in the message pain, each message's hostname is displayed.  More fields may be added.
 
-[source,bash,role="copypaste"]
-----
-bash /opt/lab/support/create-net-projects.sh
-----
+To create a query for logs, the `Add a filter +` link right below the search box may be used.  This will allow us to build queries using the fields of the messages.  For example, if we wanted to see all log messages from the `openshift-logging` namespace, we can do the following:
 
-#### Examine the created infrastructure
-Two *Projects* were created for you, `netproj-a` and `netproj-b`. Execute the
-following command to see the created resources
+1. Click on `Add a filter +`.  
 
-[source,bash,role="copypaste"]
-----
-oc get pods -n netproj-a
-----
+2. In the `Fields` input box, start typing `kubernetes.namespace_name`.  Notice all of the available fields that we can use to build the query
 
-You will see something like the following:
+3. Next, select `is`.
 
-[source]
-----
-NAME           READY   STATUS              RESTARTS   AGE
-ose-1-66dz2    0/1     ContainerCreating   0          7s
-ose-1-deploy   1/1     Running             0          16s
-----
+4. In the `Value` field, type in `openshift-logging`
 
-[source,bash,role="copypaste"]
-----
-oc get pods -n netproj-b
-----
+Now, in the center of the screen you will see all of the logs from the `openshift-logging` namespace.
 
-You will see something like the following:
+Of course, you may add more filters to refine the query.
 
-[source]
-----
-NAME           READY   STATUS      RESTARTS   AGE
-ose-1-deploy   0/1     Completed   0          38s
-ose-1-vj2gn    1/1     Running     0          30s
-----
+One other neat option that Kibana allows you to do is save queries to use for later.  To save a query do the following:
 
-We will run commands in the pod in the `netproj-a` *Project* that will connect to TCP port 5000 of the pod in the `netproj-b` *Project*.
+1. click on `Save` at the top of the screen.
 
+2. Type in the name you would like to save it as.  In this case, let's type in `openshift-logging Namespace`
 
-#### Test Connectivity (should work)
-Now that you have some projects and pods, let's test the connectivity between
-the pod in the `netproj-a` *Project* and the pod in the `netproj-b` *Project*.
+Once this has been saved, it can be used at a later time by hitting the `Open` button and selecting this query.
 
-To test connectivity between the two pods, run:
-
-[source,bash,role="copypaste"]
-----
-bash /opt/lab/support/test-connectivity.sh
-----
-
-
-You will see something like the following:
-
-[source]
-----
-Getting Pod B's IP... 10.129.0.180
-Getting Pod A's Name... ose-1-66dz2
-Checking connectivity between Pod A and Pod B... worked
-----
-
-Note that the last line says `worked`. This means that the pod in the `netproj-a` *Project* was able to connect to the pod in the `netproj-b` *Project*.
-
-This worked because by default with the network policy SDN, all pods in all projects can connect to eachother.
-
-#### Restricting Access
-With the Network Policy based SDN, it's possible to restrict access in a project by creating a `NetworkPolicy` custom resource (CR).
-
-For example, the following restricts all access to all pods in a *Project* where this `NetworkPolicy` CR is applied. This is the equivalent of `DenyAll` default rule on a firewall.
-
-[source,yaml]
-----
----
-kind: NetworkPolicy
-apiVersion: networking.k8s.io/v1
-metadata:
-  name: deny-by-default
-spec:
-  podSelector:
-  ingress: []
-----
-
-Note that the `podSelector` is empty which means apply to all pods in this *Project*. Also note that the `ingress` list is empty, which means that there are no allowed `ingress` rules defined by this `NetworkPolicy` CR.
-
-
-To restrict access to the pod in the `netproj-b` *Project* simply apply the above NetworkPolicy CR with:
-
-[source,bash,role="copypaste"]
-----
-oc create -n netproj-b -f /opt/lab/support/network-policy-block-all.yaml
-----
-
-
-#### Test Connectivity #2 (should fail)
-Since the "block all by default" `NetworkPolicy` CR has been applied, connectivity between the pod in the `netproj-a` *Project* and the pod in the `netproj-b` *Project* should now be blocked.
-
-Test by running:
-
-[source,bash,role="copypaste"]
-----
-bash /opt/lab/support/test-connectivity.sh
-----
-
-
-You will see something like the following:
-
-[source]
-----
-Getting Pod B's IP... 10.129.0.180
-Getting Pod A's Name... ose-1-66dz2
-Checking connectivity between Pod A and Pod B............ FAILED!
-----
-
-Note the last line that says `FAILED!`. This means that the pod in the `netproj-a` *Project* was unable to connect to the pod in the `netproj-b` *Project* (as expected).
-
-
-#### Allow Access
-With the Network Policy based SDN, it's possible to allow access to individual or groups of pods in a project by creating a multiple `NetworkPolicy` CRs.
-
-The following allows access to port 5000 on TCP for all pods in the project with the label `run: ose`. The pod in the `netproj-b` project has this label.
-
-The ingress section specifically allows this access from all projects that have the label `name: netproj-a`.
-
-[source,yaml]
-----
-# allow access to TCP port 5000 for pods with the label "run: ose" specifically
-# from projects with the label "name: netproj-a".
----
-kind: NetworkPolicy
-apiVersion: networking.k8s.io/v1
-metadata:
-  name: allow-tcp-5000-from-netproj-a-namespace
-spec:
-  podSelector:
-    matchLabels:
-      run: ose
-  ingress:
-  - ports:
-    - protocol: TCP
-      port: 5000
-    from:
-    - namespaceSelector:
-        matchLabels:
-          name: netproj-a
-----
-
-Note that the `podSelector` is where the local project's pods are matched using a specific label selector.
-
-All `NetworkPolicy` CRs in a project are combined to create the allowed ingress access for the pods in the project. In this specific case the "deny all" policy is combined with the "allow TCP 5000" policy.
-
-To allow access to the pod in the `netproj-b` *Project* from all pods in the `netproj-a` *Project*, simply apply the above NetworkPolicy CR with:
-
-[source,bash,role="copypaste"]
-----
-oc create -n netproj-b -f /opt/lab/support/network-policy-allow-all-from-netproj-a.yaml
-----
-
-
-#### Test Connectivity #3 (should work again)
-Since the "allow access from `netproj-a` " NetworkPolicy has been applied, connectivity between the pod in the `netproj-a` *Project* and the pod in the `netproj-b` *Project* should be allowed again.
-
-Test by running:
-
-[source,bash,role="copypaste"]
-----
-bash /opt/lab/support/test-connectivity.sh
-----
-
-
-You will see something like the following:
-
-[source]
-----
-Getting Pod B's IP... 10.129.0.180
-Getting Pod A's Name... ose-1-66dz2
-Checking connectivity between Pod A and Pod B... worked
-----
-
-Note the last line that says `worked`. This means that the pod in the `netproj-a` *Project* was able to connect to the pod in the `netproj-b` *Project* (as expected).
-
-
-
-
-### Node Maintenance
-
-It is possible to put any node of the OpenShift environment into maintenance by
-marking it as non-schedulable followed by a _drain_ of all pods on the node.
-
-These operations require elevated privileges. Ensure you are logged in as
-cluster admin:
-
-[source,bash,role="copypaste"]
-----
-oc login -u system:admin
-----
-
-You will see by now that there are pods running on almost all of your nodes:
-
-[source,bash,role="copypaste"]
-----
-oc get pods --all-namespaces -o wide
-----
-
-Sometimes you might need to perform maintenance on a host. Let's take a look
-at the *Pods* that are on `node02`:
-
-[source,bash,role="copypaste"]
-----
-oc adm manage-node --list-pods {{ NODE2_INTERNAL_FQDN }}
-----
-
-Firstly, we probably want to ensure that no new workload can be put on this
-host. Mark node `{{ NODE2_INTERNAL_FQDN }}` as non-schedulable to prevent the
-schedulers in the system to place any new workloads on it:
-
-[source,bash,role="copypaste"]
-----
-oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=false
-----
-
-The output of the command will show that the node is now not schedulable:
-
-----
-NAME                                          STATUS                     ROLES     AGE       VERSION
-{{ NODE2_INTERNAL_FQDN }}   Ready,SchedulingDisabled   compute   1h        v1.11.0+d4cacc0
-----
-
-Marking the node as non-schedulable did not impact the pods it is running. List those
-pods:
-
-[source,bash,role="copypaste"]
-----
-oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
-----
-
-Other than a *Pod* for Container Native Storage and a Fluentd instance (there is
-one on every node), there may or may not be other *Pods* running on this node.
-
-The next step is to drain the *Pods* to other nodes in the cluster.
-
-[IMPORTANT]
-====
-*Pods* running on the node as part of a `DaemonSet` like those associated to
-Logging or OCS will *not* be drained. They will not be accessible anymore
-through OpenShift, but will continue to run as containers on the nodes until the
-local OpenShift services are stopped and/or the node is shutdown. This is not a
-problem since software like OCS or the OpenShift Metrics stack is designed to
-handle such situations transparently.
-====
-
-Start the drain process like this:
-
-[source,bash,role="copypaste"]
-----
-oc adm drain {{ NODE2_INTERNAL_FQDN }} --ignore-daemonsets
-----
-
-After a few moments, all of the *Pods*, except those for Fluentd, Container
-Native Storage, and Prometheus previously running on `{{ NODE2_INTERNAL_FQDN
-}}` should have terminated and been launched elsewhere.
-
-[source,bash,role="copypaste"]
-----
-oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
-----
-
-The node `{{ NODE2_INTERNAL_FQDN }}` is now ready for an administrator to
-start maintenance operations. If those include a reboot of the system or
-upgrading OpenShift components, the *Pods* associated with
-OCS and logging will come back up automatically.
-
-Now that our maintenance is complete, the node is still non-schedulable. Let's
-fix that:
-
-[source,bash,role="copypaste"]
-----
-oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=true
-----
-
-Now the node will be able to have workload scheduled on it again:
-
-----
-NAME                                          STATUS    ROLES     AGE       VERSION
-{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1h        v1.11.0+d4cacc0
-----
-
-### Running the OpenShift Registry with OCS
-
-The Registry in OpenShift is a critical component. As it is the default
-destination for all container builds in the cluster, and is the source for
-deploying applications built inside the cluster, being unavailable is a big
-problem.
-
-The internal registry runs as one or more *Pods* inside the OpenShift
-environment. By default the registry uses local ephemeral storage in its *Pod*.
-This means that any restarts or re-deployments or outages would cause all of the
-built/pushed container images to be lost. Also, only having one registry
-instance and/or one infrastructure node could cause temporary outages. So,
-adding storage and scaling up the registry is a good idea.
-
-[IMPORTANT]
-====
-Your cluster only has one infrastructure node. In practice, you would want a
-minimum of three to achieve high-availability for all infrastructure services.
-====
-
-#### Adding OCS to the Registry
-Adding storage to the registry is as easy as it was for our file-uploader
-application. Simply make the registry *Pods* use a PVC in access mode *RWX*
-based on OCS. This way, a highly-available scale-out registry can be provided
-without external dependencies on NFS or Cloud Provider storage.
-
-[IMPORTANT]
-====
-The following method will be disruptive. All data stored in the registry so far
-will be lost (the Rails and PHP app images). Migration scenarios exist but are
-beyond the scope of this lab, but normally you would configure persistent
-storage for the registry before starting to really use your cluster.
-====
-
-Make sure you are logged in as `system:admin` in the `default` namespace:
-
-[source,bash,role="copypaste"]
-----
-oc login -u system:admin -n default
-----
-
-Just like with the file uploader example, you can simply add a volume (and have
-its *PersistentVolumeClaim* created automatically) with the `oc set volume` command.
-Execute the following:
-
-[source,bash,role="copypaste"]
-----
-oc set volume dc/docker-registry --add --name=registry-storage -t pvc \
---claim-mode=ReadWriteMany --claim-size=5Gi \
---claim-name=registry-storage --claim-class={{ CNS_INFRA_STORAGECLASS }} --overwrite
-----
-
-The registry will now redeploy.
-
-[NOTE]
-====
-The registry is preconfigured with a volume called `registry-storage` that is
-using the `emptyDir` storage type. The above command will `--overwrite` the existing
-volume with our new PVC. More information can be found in the
-link:https://docs.openshift.com/container-platform/3.11/dev_guide/volumes.html[volumes
-documentation^].
-====
-
-[TIP]
-====
-It is also possible to use `openshift-ansible` to deploy the registry
-====
-
-After a couple of seconds a new deployment of the registry should be available.
-Verify a new version of the registry's *DeploymentConfig* is running:
-
-[source,bash,role="copypaste"]
-----
-oc get dc/docker-registry
-----
-
-Wait until you see the following state:
-
-----
-NAME              REVISION   DESIRED   CURRENT   TRIGGERED BY
-docker-registry   2          1         1         config
-----
-
-Now your OpenShift Registry is using persistent storage provided by OCS.  Since
-this is shared storage this also allows you to scale out the registry pods.
-
-You can scale the registry like this:
-
-[source,bash,role="copypaste"]
-----
-oc scale dc/docker-registry --replicas=3
-----
-
-After a short while you should see 3 healthy registry pods in the default
-*Project*:
-
-[source,bash,role="copypaste"]
-----
-oc get pods
-----
-
-And you should see something like:
-
-----
-NAME                       READY     STATUS    RESTARTS   AGE
-docker-registry-2-5rszg    1/1       Running   0          1m
-docker-registry-2-7s3tm    1/1       Running   0          14s
-docker-registry-2-g3l70    1/1       Running   0          14s
-registry-console-1-b47jt   1/1       Running   0          6h
-router-1-hs9wp             1/1       Running   0          6h
-----
-
-Check the registry's `DeploymentConfig` to verify it indeeds mounts a `PersistentVolume` to the `/registry` directory which is where the registry stores all container images:
-
-[source,bash,role="copypaste"]
-----
-oc describe dc docker-registry
-----
-
-This should show:
-
-----
-Name:		docker-registry
-Namespace:	default
-Created:	2 hours ago
-Labels:		docker-registry=default
-Annotations:	<none>
-Latest Version:	2
-Selector:	docker-registry=default
-Replicas:	3
-Triggers:	Config
-Strategy:	Rolling
-Template:
-Pod Template:
-  Labels:		docker-registry=default
-  Service Account:	registry
-  Containers:
-   registry:
-    Image:	support.internal.aws.testdrive.openshift.com:5000/openshift3/ose-docker-registry:v3.11.16
-    Port:	5000/TCP
-    Requests:
-      cpu:	100m
-      memory:	256Mi
-    Liveness:	http-get https://:5000/healthz delay=10s timeout=5s period=10s #success=1 #failure=3
-    Readiness:	http-get https://:5000/healthz delay=0s timeout=5s period=10s #success=1 #failure=3
-    Environment:
-      REGISTRY_HTTP_ADDR:					:5000
-      REGISTRY_HTTP_NET:					tcp
-      REGISTRY_HTTP_SECRET:					g4fMc23QUZLFhRmtu7m7mCah5bhefi3h2sBPbjgJvdw=
-      REGISTRY_MIDDLEWARE_REPOSITORY_OPENSHIFT_ENFORCEQUOTA:	false
-      REGISTRY_OPENSHIFT_SERVER_ADDR:				docker-registry.default.svc:5000
-      REGISTRY_HTTP_TLS_KEY:					/etc/secrets/registry.key
-      REGISTRY_HTTP_TLS_CERTIFICATE:				/etc/secrets/registry.crt
-    Mounts:
-      /etc/secrets from registry-certificates (rw)
-      /registry from registry-storage (rw) <1>
-  Volumes:
-   registry-certificates:
-    Type:	Secret (a volume populated by a Secret)
-    SecretName:	registry-certificates
-    Optional:	false
-   registry-storage: <2>
-    Type:	PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace) <3>
-    ClaimName:	registry-storage <4>
-    ReadOnly:	false
-
-Deployment #2 (latest):
-	Name:		docker-registry-2
-	Created:	48 seconds ago
-	Status:		Complete
-	Replicas:	3 current / 3 desired
-	Selector:	deployment=docker-registry-2,deploymentconfig=docker-registry,docker-registry=default
-	Labels:		docker-registry=default,openshift.io/deployment-config.name=docker-registry
-	Pods Status:	3 Running / 0 Waiting / 0 Succeeded / 0 Failed
-Deployment #1:
-	Created:	2 hours ago
-	Status:		Complete
-	Replicas:	0 current / 0 desired
-
-Events:
-  Type		Reason				Age	From				Message
-  ----		------				----	----				-------
-  Normal	DeploymentCreated		48s	deploymentconfig-controller	Created new replication controller "docker-registry-2" for version 2
-  Normal	ReplicationControllerScaled	29s	deploymentconfig-controller	Scaled replication controller "docker-registry-2" from 1 to 3
-----
-<1> The `/registry` directory in the pod namespace will be a mountpoint for a `PersistentVolume` called `registry-storage`
-<2> The definition for the volume `registry-storage`
-<3> The volume will be of the type `PersistentVolume` which is referenced to a `PersistentVolumeClaim`
-<4> The name of the `PersistentVolumeClaim` which this volume references
+Please take time to explore the _Kibana_ page and get experience by adding and doing more queries.  This will be helpful when using a production cluster, you will be able to get the exact logs that you are looking for in a single place.

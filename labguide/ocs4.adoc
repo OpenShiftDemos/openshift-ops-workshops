@@ -21,7 +21,7 @@ image::images/rook_diagram_2.png[]
 
 == Lab Environment
 
-TBD
+This lab assumes that you have created an OpenShift Container Platform (OCP) 4.x IPI cluster on AWS. You can do this by going to http://try.openshift.com (Developer Preview - OpenShift 4) and following instructions to create a cluster or you have a RHPDS account (https://rhpds.redhat.com) and have ordered Catalog item `OCP 4 Preview`. You also will need to be an openshift user with cluster-admin privileges. 
 
 [[labexercises]]
 :numbered:
@@ -168,7 +168,7 @@ ip-10-0-164-65.us-east-2.compute.internal    Ready    worker   3m30s   v1.12.4+3
 
 === Download Rook deployment files and install Ceph
 
-In this section you will be using the new workerocs OCP nodes and Rook.io files. You will download Rook.io common.yaml, operator-openshift.yaml and cluster.yaml to create OCP resources as shown in Figure 1 and Figure 2 above. 
+In this section you will be using the new workerocs OCP nodes and Rook files. You will download Rook common.yaml, operator-openshift.yaml and cluster.yaml to create Rook and Ceph resources as shown in Figure 1 and Figure 2 above. 
 
 First, validate that the new workerocs nodes are labeled with role=storage-node
 
@@ -183,37 +183,37 @@ curl -O https://raw.githubusercontent.com/netzzer/openshift-cns-testdrive/ocs-su
 oc create -f common.yaml
 ----
 
-Install the Rook operator next.
+After the common resources are created, the next step is to create the Operator deployment. 
 
 ----
-curl -O https://raw.githubusercontent.com/red-hat-storage/ocs-training/master/ocp3rook/operator.yaml
-oc create -f operator.yaml
-oc project rook-ceph-system
+curl -O https://raw.githubusercontent.com/netzzer/openshift-cns-testdrive/ocs-support/support/operator-openshift.yaml
+oc create -f operator-openshift.yaml
+oc project rook-ceph
 watch oc get pods -o wide
 ----
 
-Wait for all rook-ceph-agent, rook-discover and rook-ceph-operator pods to be in a Running state. The log for the rook-ceph-operator pod should show that the operator is looking for a cluster. Look for `the server could not find the requested resource (get clusters.ceph.rook.io)` at the end of the log file. Replace `xxxxxxxxx-xxxxx` below with your rook-ceph-operator pod name.
+Wait for all rook-ceph-agent, rook-discover and rook-ceph-operator pods to be in a `Running` STATUS. The log for the rook-ceph-operator pod should show that the operator is looking for a cluster. Look for `the server could not find the requested resource (get clusters.ceph.rook.io)` at the end of the rook-ceph-operator log file. This means the operator is looking for a Ceph cluster. 
 
 ----
-oc get pod -l app=rook-ceph-operator
-oc logs rook-ceph-operator-xxxxxxxxx-xxxxx
+operator=$(oc get pod -l app=rook-ceph-operator -n rook-ceph -o jsonpath='{.items[0].metadata.name}')
+echo $operator
+oc logs $operator
 ----
 
-Next step is to download and install the cluster CRD to create Ceph MON, MGR and OSD pods.
+Now that your operator is running, let’s create your Ceph storage cluster. This cluster.yaml file contains common settings for a production Ceph storage cluster. Requires at least three nodes. These will be the 3 new OCP nodes using the AWS m5d.large instance type each with a 75GB NVMe SSD.
 
 ----
-oc new-project rook-ceph
-oc adm pod-network make-projects-global rook-ceph
-curl -O https://raw.githubusercontent.com/red-hat-storage/ocs-training/master/ocp3rook/cluster.yaml
+curl -O https://raw.githubusercontent.com/netzzer/openshift-cns-testdrive/ocs-support/support/cluster.yaml
 ----
 
 Take a look at the cluster.yaml file. It specifies the version of Ceph, the label used for the rook resources (role=storage-node) added at the start of this section, and the nodes and storage devices used for OSDs.
 
 ----
 cat cluster.yaml
-...omitted...
-    image: ceph/ceph:v12.2.11-20190201
-...omitted...
+...
+    image: ceph/ceph:v13
+...
+
   placement:
     all:
       nodeAffinity:
@@ -224,21 +224,15 @@ cat cluster.yaml
               operator: In
               values:
               - storage-node
-...omitted...
+...
+
   storage: # cluster level storage configuration and selection
-    useAllNodes: false
-    useAllDevices: false
-    nodes:
-    # Each node's 'name' field should match their 'kubernetes.io/hostname' label.
-    - name: "node04.internal.aws.testdrive.openshift.com"
-      devices:
-      - name: "xvdd"
-    - name: "node05.internal.aws.testdrive.openshift.com"
-      devices:
-      - name: "xvdd"
-    - name: "node06.internal.aws.testdrive.openshift.com"
-      devices:
-      - name: "xvdd"
+    useAllNodes: true
+    useAllDevices: true
+    deviceFilter:
+    location:
+    config:	
+...	
 ----
 
 Now create the MONs, MGR and OSD pods.

@@ -188,8 +188,7 @@ After the common resources are created, the next step is to create the Operator 
 ----
 curl -O https://raw.githubusercontent.com/netzzer/openshift-cns-testdrive/ocs-support/support/operator-openshift.yaml
 oc create -f operator-openshift.yaml
-oc project rook-ceph
-watch oc get pods -o wide
+watch oc get pods -n rook-ceph
 ----
 
 Wait for all rook-ceph-agent, rook-discover and rook-ceph-operator pods to be in a `Running` STATUS. The log for the rook-ceph-operator pod should show that the operator is looking for a cluster. Look for `the server could not find the requested resource (get clusters.ceph.rook.io)` at the end of the rook-ceph-operator log file. This means the operator is looking for a Ceph cluster. 
@@ -206,7 +205,7 @@ Now that your operator is running, let’s create your Ceph storage cluster. Thi
 curl -O https://raw.githubusercontent.com/netzzer/openshift-cns-testdrive/ocs-support/support/cluster.yaml
 ----
 
-Take a look at the cluster.yaml file. It specifies the version of Ceph, the label used for the rook resources (role=storage-node) added at the start of this section, and the nodes and storage devices used for OSDs.
+Take a look at the cluster.yaml file. It specifies the version of Ceph and the label used for the rook resources. This label, `role=storage-node` was validated as being on our new OCP nodes. Also `useAllNodes=true` and `useAllDevices=true` means that if a OCP node has label `role=storage-node` then all storage devices will be used for the Ceph cluster on this node.
 
 ----
 cat cluster.yaml
@@ -233,6 +232,7 @@ cat cluster.yaml
     location:
     config:	
 ...	
+
 ----
 
 Now create the MONs, MGR and OSD pods.
@@ -241,29 +241,35 @@ Now create the MONs, MGR and OSD pods.
 oc create -f cluster.yaml
 ----
 
-Disregard this message “Error from server (AlreadyExists): error when creating "cluster.yaml": namespaces "rook-ceph" already exists”
-
+It may take more than 5 minutes to create all of the new MONs, MGR and OSD pods. Your pod names will have a different NAME. 
 ----
-oc project rook-ceph
-watch oc get pods
-NAME                                        READY     STATUS      RESTARTS   AGE
-rook-ceph-mgr-a-5887d4d48b-pz52j            1/1       Running     0          2m
-rook-ceph-mon-a-5df5865956-gnsvs            1/1       Running     0          3m
-rook-ceph-mon-b-66d74f475d-5n4jt            1/1       Running     0          2m
-rook-ceph-mon-c-86bc6b98b7-5xfhf            1/1       Running     0          2m
-rook-ceph-osd-0-96c9b769-qclw9              1/1	      Running     0          1m
-rook-ceph-osd-1-7747889669-fcvsj            1/1	      Running     0          1m
-rook-ceph-osd-2-7cc7bdf44d-ncqbr            1/1	      Running     0          1m
+watch oc get pods -n rook-ceph
+NAME                                        READY    STATUS     RESTARTS    AGE
+...
+
+rook-ceph-mgr-a-86b5b58769-xngqm             1/1     Running     0          110s
+rook-ceph-mon-a-f95bc46-2jffm                1/1     Running     0          3m13s
+rook-ceph-mon-b-54588c7d68-prm8f             1/1     Running     0          2m45s
+rook-ceph-mon-c-5567868987-t72zz             1/1     Running     0          2m24s
+rook-ceph-operator-9bb6f7745-r7rft           1/1     Running     0          53m
+rook-ceph-osd-0-88d4c654-lsz2m               1/1     Running     0          66s
+rook-ceph-osd-1-55b49d48df-lvnlv             1/1     Running     0          66s
+rook-ceph-osd-2-745b7669d7-gkhl5             1/1     Running     0          66s
+rook-ceph-osd-prepare-ip-10-0-135-6-p8rsz    0/2     Completed   0          91s
+rook-ceph-osd-prepare-ip-10-0-156-83-tjft2   0/2     Completed   0          91s
+rook-ceph-osd-prepare-ip-10-0-164-65-9wq67   0/2     Completed   0          90s
+...
+
 ----
 
 Once all pods are in a Running state it is time to verify that Ceph is operating correctly. Download toolbox.yaml to run Ceph commands.
 
 ----
-curl -O https://raw.githubusercontent.com/red-hat-storage/ocs-training/master/ocp3rook/toolbox.yaml 
+curl -O https://raw.githubusercontent.com/netzzer/openshift-cns-testdrive/ocs-support/support/toolbox.yaml 
 oc create -f toolbox.yaml
 ----
 
-Login to toolbox pod to run Ceph commands.
+Now you can login to toolbox pod to run Ceph commands.
 
 ----
 oc -n rook-ceph exec -it $(oc -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}') bash
@@ -275,14 +281,14 @@ rados df
 exit
 ----
 
-Disregard the ‘health: HEALTH_WARN mons a,b,c are low on available space’ message when viewing results of `ceph status` command.
+Disregard the `health: HEALTH_WARN noscrub,nodeep-scrub flag(s) set` message when viewing results of `ceph status` command.
 
 === Create Rook storageclass for creating CephRBD block volumes
 
 In this section you will download storageclass.yaml and then create the OCP storageclass `rook-ceph-block` that will be used by applications to dynamically claim persistent storage (PVCs). The Ceph pool `replicapool` is created when the storageclass is created.
 
 ----
-curl -O https://raw.githubusercontent.com/red-hat-storage/ocs-training/master/ocp3rook/storageclass.yaml
+curl -O https://raw.githubusercontent.com/netzzer/openshift-cns-testdrive/ocs-support/support/storageclass.yaml
 cat  storageclass.yaml
 ----
 

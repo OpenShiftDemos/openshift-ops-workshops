@@ -7,8 +7,8 @@ This hands-on workshop is for both system administrators and application develop
 === In this lab you will learn how to
 
 * Configure and deploy containerized Ceph using Rook’s cluster CustomResourceDefinitions (CRD)
-* Validate deployment of Ceph Luminous containerized using OpenShift CLI
-* Deploy the Rook toolbox to run common ceph and rados commands
+* Validate deployment of Ceph Mimic containerized using OpenShift CLI
+* Deploy the Rook toolbox to run cn ceph and rados commands
 * Create a Persistent Volume (PV) on the Ceph cluster using a Rook OCP `StorageClass` for deployment of Rails application using a PostgreSQL database.
 * Upgrade Ceph version from Mimic to Nautilus using the Rook operator
 * Add more storage to the Ceph cluster

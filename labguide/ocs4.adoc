@@ -2,7 +2,7 @@
 
 == Lab Overview
 
-This hands-on workshop is for both system administrators and application developers interested in learning how to deploy and manage OpenShift Container Storage (OCS). In this lab you will be using OpenShift Container Platform 3.11 (OCP) and Rook.io v0.9 to deploy Ceph as a persistent storage solution for OCP workloads.
+This hands-on workshop is for both system administrators and application developers interested in learning how to deploy and manage OpenShift Container Storage (OCS). In this lab you will be using OpenShift Container Platform (OCP) 4.x and Rook.io v1.0 to deploy Ceph as a persistent storage solution for OCP workloads.
 
 === In this lab you will learn how to
 

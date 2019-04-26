@@ -765,7 +765,11 @@ mapit-3-deploy   0/1     Completed   0          75s
 mapit-3-kkwxq    1/1     Running     0          66s
 ----
 
-Notice that there are 3 `-deploy` pods? And that the name of the current `mapit` pod has the number 3 in it? This is because each change to the *DeploymentConfig* counted as a _configuration_ change, which _triggered_ a new _deployment_. The `-deploy` pod is responsible for ensuring the new deployment happens.
+Notice that there are 3 `-deploy` pods? And that the name of the current
+`mapit` pod has the number 3 in it? This is because each change to the
+*DeploymentConfig* counted as a _configuration_ change, which _triggered_ a
+new _deployment_. The `-deploy` pod is responsible for ensuring the new
+deployment happens.
 
 Execute the following:
 

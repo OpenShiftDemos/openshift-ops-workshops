@@ -14,7 +14,7 @@ This hands-on workshop is for both system administrators and application develop
 * Add more storage to the Ceph cluster
 
 .Rook and Kubernetes Architecture 
-image::images/rook_diagram_1.png[]
+image::images/rook_diagram_3.png[]
 
 .Ceph deployed on OpenShift using Rook
 image::images/rook_diagram_2.png[]

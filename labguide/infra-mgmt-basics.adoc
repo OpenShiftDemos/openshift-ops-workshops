@@ -256,15 +256,15 @@ glusterfs
 ...
 
 [nodes]
-master.internal.aws.testdrive.openshift.com openshift_public_hostname=master.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-master'
-infra.internal.aws.testdrive.openshift.com openshift_public_hostname=infra.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-infra'
-node01.internal.aws.testdrive.openshift.com openshift_public_hostname=node01.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute'
-node02.internal.aws.testdrive.openshift.com openshift_public_hostname=node02.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute'
-node03.internal.aws.testdrive.openshift.com openshift_public_hostname=node03.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute'
+{{ MASTER_INTERNAL_FQDN }} openshift_node_group_name='node-config-master' openshift_hostname={{ MASTER_INTERNAL_FQDN }} openshift_public_hostname={ MASTER_EXTERNAL_FQDN }}
+{{ INFRA_INTERNAL_FQDN }} openshift_node_group_name='node-config-infra' openshift_hostname={{ INFRA_INTERNAL_FQDN }} openshift_public_hostname={{INFRA_EXTERNAL_FQDN }}
+{{ NODE1_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE1_INTERNAL_FQDN }} openshift_public_hostname={{ NODE1_EXTERNAL_FQDN }}
+{{ NODE2_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE2_INTERNAL_FQDN }} openshift_public_hostname={{ NODE2_EXTERNAL_FQDN }}
+{{ NODE3_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE3_INTERNAL_FQDN }} openshift_public_hostname={{ NODE3_EXTERNAL_FQDN }}
 
-node04.internal.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute' openshift_public_hostname=node04.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute'
-node05.internal.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute' openshift_public_hostname=node05.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute'
-node06.internal.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute' openshift_public_hostname=node06.604368013992.aws.testdrive.openshift.com openshift_node_group_name='node-config-compute'
+{{ NODE4_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE4_INTERNAL_FQDN }} openshift_public_hostname={{ NODE4_EXTERNAL_FQDN }}
+{{ NODE5_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE5_INTERNAL_FQDN }} openshift_public_hostname={{ NODE5_EXTERNAL_FQDN }}
+{{ NODE6_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE6_INTERNAL_FQDN }} openshift_public_hostname={{ NODE6_EXTERNAL_FQDN }}
 
 ...
 ----

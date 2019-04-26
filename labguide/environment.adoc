@@ -36,7 +36,7 @@ You can simply SSH to the bastion host like so:
 
 [source,bash,role="copypaste"]
 ----
-ssh -l lab-user {{ MASTER_EXTERNAL_FQDN }}
+ssh -l lab-user@{{ BASTION_FQDN }}
 ----
 
 The `lab-user` account has password-less sudo privileges. You'll notice that

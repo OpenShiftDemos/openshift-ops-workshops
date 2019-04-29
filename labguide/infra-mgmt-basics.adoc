@@ -256,8 +256,8 @@ glusterfs
 ...
 
 [nodes]
-{{ MASTER_INTERNAL_FQDN }} openshift_node_group_name='node-config-master' openshift_hostname={{ MASTER_INTERNAL_FQDN }} openshift_public_hostname={ MASTER_EXTERNAL_FQDN }}
-{{ INFRA_INTERNAL_FQDN }} openshift_node_group_name='node-config-infra' openshift_hostname={{ INFRA_INTERNAL_FQDN }} openshift_public_hostname={{INFRA_EXTERNAL_FQDN }}
+{{ MASTER_INTERNAL_FQDN }} openshift_node_group_name='node-config-master' openshift_hostname={{ MASTER_INTERNAL_FQDN }} openshift_public_hostname={{ MASTER_EXTERNAL_FQDN }}
+{{ INFRA_INTERNAL_FQDN }} openshift_node_group_name='node-config-infra' openshift_hostname={{ INFRA_INTERNAL_FQDN }}
 {{ NODE1_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE1_INTERNAL_FQDN }} openshift_public_hostname={{ NODE1_EXTERNAL_FQDN }}
 {{ NODE2_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE2_INTERNAL_FQDN }} openshift_public_hostname={{ NODE2_EXTERNAL_FQDN }}
 {{ NODE3_INTERNAL_FQDN }} openshift_node_group_name='node-config-compute' openshift_hostname={{ NODE3_INTERNAL_FQDN }} openshift_public_hostname={{ NODE3_EXTERNAL_FQDN }}

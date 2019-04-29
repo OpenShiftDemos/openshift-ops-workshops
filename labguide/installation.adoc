@@ -89,13 +89,6 @@ Let's do some basic tests with your installation. As an administrator, most
 of your interaction with OpenShift will be from the command line. The `oc`
 program is a command line interface that talks to the OpenShift API.
 
-As the `lab-user`:
-
-[source,bash,role="copypaste"]
-----
-sudo su - ec2-user
-----
-
 #### Login to OpenShift
 When the installation completed, the installer left some artifacts that
 contain the various URLs and passwords required to access the environment.
@@ -149,7 +142,7 @@ has fortunately also given you a convenient `export` command to run:
 
 [source,bash,role="copypaste"]
 ----
-export KUBECONFIG=/home/ec2-user/cluster-$GUID/auth/kubeconfig
+export KUBECONFIG=~/cluster-$GUID/auth/kubeconfig
 ----
 
 The `oc` tool should already be in your path and be executable.
@@ -166,8 +159,8 @@ oc get clusterversion
 And you will see some output like:
 
 ```
-NAME      VERSION     AVAILABLE   PROGRESSING   SINCE   STATUS
-version   4.0.0-0.9   True        False         173m    Cluster version is 4.0.0-0.9
+NAME      VERSION      AVAILABLE   PROGRESSING   SINCE   STATUS
+version   4.1.0-rc.0   True        False         130m    Cluster version is 4.1.0-rc.0
 ```
 
 For more details, you can use `oc describe clusterversion`:
@@ -181,7 +174,9 @@ API Version:  config.openshift.io/v1
 Kind:         ClusterVersion
 Metadata:
 ...
-    Version:            4.0.0-0.9
+  Desired:
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:345ec9351ecc1d78c16cf0853fe0ef2d9f48dd493da5fdffc18fa18f45707867
+    Version:  4.1.0-rc.0
   Observed Generation:  1
   Version Hash:         -XUey1xSiwE=
 Events:                 <none>
@@ -199,14 +194,13 @@ oc get nodes
 The output should look something like the following:
 
 ----
-NAME                           STATUS   ROLES          AGE    VERSION
-ip-10-0-129-33.ec2.internal    Ready    master         3h5m   v1.12.4+509916ce1
-ip-10-0-139-97.ec2.internal    Ready    worker         178m   v1.12.4+509916ce1
-ip-10-0-144-15.ec2.internal    Ready    master         3h5m   v1.12.4+509916ce1
-ip-10-0-157-196.ec2.internal   Ready    worker         177m   v1.12.4+509916ce1
-ip-10-0-164-163.ec2.internal   Ready    master         3h5m   v1.12.4+509916ce1
-ip-10-0-175-100.ec2.internal   Ready    worker         178m   v1.12.4+509916ce1
-
+NAME                                         STATUS   ROLES    AGE    VERSION
+ip-10-0-135-172.us-east-2.compute.internal   Ready    master   141m   v1.13.4+da48e8391
+ip-10-0-143-247.us-east-2.compute.internal   Ready    worker   135m   v1.13.4+da48e8391
+ip-10-0-144-209.us-east-2.compute.internal   Ready    master   141m   v1.13.4+da48e8391
+ip-10-0-158-20.us-east-2.compute.internal    Ready    worker   135m   v1.13.4+da48e8391
+ip-10-0-164-111.us-east-2.compute.internal   Ready    worker   135m   v1.13.4+da48e8391
+ip-10-0-173-137.us-east-2.compute.internal   Ready    master   141m   v1.13.4+da48e8391
 ----
 
 You have 3 masters and 3 workers. The OpenShift *Master* is also a *Node*

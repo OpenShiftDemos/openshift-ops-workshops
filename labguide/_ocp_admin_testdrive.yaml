@@ -1,18 +1,22 @@
 ---
-id: ocp-admin-testdrive
-name: OpenShift for Ops Test Drive
-
+id: ocp-for-admins
+name: OpenShift for Administrators
 
 vars:
   ENVIRONMENT: "Amazon Web Services"
+  API_URL: 
+  MASTER_URL:
+  KUBEADMIN_PASSWORD:
+  BASTION_FQDN:
 
 modules:
   activate:
   - environment
   - installation
   - app-mgmt-basics
-  - template-quota-limits
+  - app-storage-basics
+  - machinesets
+  - infra-nodes
   - ldap-groupsync
-  - infra-mgmt-basics
-  - cns
-  - skipping-ahead
+  - template-quota-limits
+  - ocs4

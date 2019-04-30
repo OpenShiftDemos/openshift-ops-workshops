@@ -19,3 +19,4 @@ modules:
   - infra-nodes
   - ldap-groupsync
   - template-quota-limits
+  - ocs4

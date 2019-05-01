@@ -97,8 +97,7 @@ need to get to it.
 
 [source,bash,role="copypaste"]
 ----
-cd ~/cluster-$GUID
-ls -al
+ls -al ~/cluster-$GUID
 ----
 
 You'll see something like the following:
@@ -124,7 +123,7 @@ contain the relevant output to figure out how to access your environment:
 
 [source,bash,role="copypaste"]
 ----
-tail -n5 .openshift_install.log
+tail -n5 ~/cluster-$GUID/.openshift_install.log
 ----
 
 You will see something like the following::
@@ -137,13 +136,18 @@ time="2019-04-08T14:49:34Z" level=info msg="Access the OpenShift web-console her
 time="2019-04-08T14:49:34Z" level=info msg="Login to the console with user: kubeadmin, password: SxUr2-tQ2py-c6jq2-YtjW3"
 ----
 
-Take note of your web console URL and the `kubeadmin` password. The installer
-has fortunately also given you a convenient `export` command to run:
+The installation was run as a different system user, and the artifacts folder
+is read-only mounted into your `lab-user` folder. While the installer has
+fortunately given you a convenient `export` command to run, you don't have
+write permissions to the path that it shows. The `oc` command will try to
+write to the `KUBECONFIG` file, which it can't, so you'll get errors later if you try it.
+
+Our installation process has actually already copied the config you need to `~/.kube/config`, so you are already logged in. Try the following:
 
 [source,bash,role="copypaste"]
-----
-export KUBECONFIG=~/cluster-$GUID/auth/kubeconfig
-----
+---
+oc whoami
+---
 
 The `oc` tool should already be in your path and be executable.
 

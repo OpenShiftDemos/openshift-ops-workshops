@@ -365,34 +365,59 @@ have access to.
 
 #### Queries with _Kibana_
 
-Once the _Kibana_ web interface is up, we are now able to do queries.  _Kibana_ offers a the user a powerful interface to query all logs that come from the cluster.  
+Once the _Kibana_ web interface is up, we are now able to do queries.
+_Kibana_ offers a the user a powerful interface to query all logs that come
+from the cluster.
 
-By default, _Kibana_ will show all logs that have been received within the the last 15 minutes.  This time interval may be changed in the upper right hand corner.  The log messages are shown in the middle of the page. All log messages that are received are indexed based on the log message content.  Each message will have fields associated that are associated to that log message. To see the fields that make up an individual message, click on the arrow on the side of each message located in the center of the page.  This will show the message fields that are contained.
+By default, _Kibana_ will show all logs that have been received within the
+the last 15 minutes. This time interval may be changed in the upper right
+hand corner. The log messages are shown in the middle of the page. All log
+messages that are received are indexed based on the log message content. Each
+message will have fields associated that are associated to that log message.
+To see the fields that make up an individual message, click on the arrow on
+the side of each message located in the center of the page. This will show
+the message fields that are contained.
 
-First, set the default index pattern to `.all`.   On the left hand side towards the top, in the drop down menu select the `.all` index pattern.
+First, set the default index pattern to `.all`. On the left hand side towards
+the top, in the drop down menu select the `.all` index pattern.
 
-To select fields to show for messages, look on left hand side fore the `Available Fields` label.  Below this are fields that can be selected and shown in the middle of the screen.  Find the `hostname` field below the `Available Fields` and click `add`.  Notice now, in the message pain, each message's hostname is displayed.  More fields may be added.
+To select fields to show for messages, look on left hand side fore the
+`Available Fields` label. Below this are fields that can be selected and
+shown in the middle of the screen. Find the `hostname` field below the
+`Available Fields` and click `add`. Notice now, in the message pain, each
+message's hostname is displayed. More fields may be added.
 
-To create a query for logs, the `Add a filter +` link right below the search box may be used.  This will allow us to build queries using the fields of the messages.  For example, if we wanted to see all log messages from the `openshift-logging` namespace, we can do the following:
+To create a query for logs, the `Add a filter +` link right below the search
+box may be used. This will allow us to build queries using the fields of the
+messages. For example, if we wanted to see all log messages from the
+`openshift-logging` namespace, we can do the following:
 
 1. Click on `Add a filter +`.  
 
-2. In the `Fields` input box, start typing `kubernetes.namespace_name`.  Notice all of the available fields that we can use to build the query
+2. In the `Fields` input box, start typing `kubernetes.namespace_name`.
+Notice all of the available fields that we can use to build the query
 
 3. Next, select `is`.
 
 4. In the `Value` field, type in `openshift-logging`
 
-Now, in the center of the screen you will see all of the logs from the `openshift-logging` namespace.
+Now, in the center of the screen you will see all of the logs from the
+`openshift-logging` namespace.
 
 Of course, you may add more filters to refine the query.
 
-One other neat option that Kibana allows you to do is save queries to use for later.  To save a query do the following:
+One other neat option that Kibana allows you to do is save queries to use for
+later. To save a query do the following:
 
 1. click on `Save` at the top of the screen.
 
-2. Type in the name you would like to save it as.  In this case, let's type in `openshift-logging Namespace`
+2. Type in the name you would like to save it as. In this case, let's type in
+`openshift-logging Namespace`
 
-Once this has been saved, it can be used at a later time by hitting the `Open` button and selecting this query.
+Once this has been saved, it can be used at a later time by hitting the
+`Open` button and selecting this query.
 
-Please take time to explore the _Kibana_ page and get experience by adding and doing more queries.  This will be helpful when using a production cluster, you will be able to get the exact logs that you are looking for in a single place.
+Please take time to explore the _Kibana_ page and get experience by adding
+and doing more queries. This will be helpful when using a production cluster,
+you will be able to get the exact logs that you are looking for in a single
+place.

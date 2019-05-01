@@ -145,9 +145,9 @@ write to the `KUBECONFIG` file, which it can't, so you'll get errors later if yo
 Our installation process has actually already copied the config you need to `~/.kube/config`, so you are already logged in. Try the following:
 
 [source,bash,role="copypaste"]
----
+----
 oc whoami
----
+----
 
 The `oc` tool should already be in your path and be executable.
 

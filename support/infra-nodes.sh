@@ -1,5 +1,5 @@
 #!/bin/bash
-export REGION=us-east-1e
+export REGION=us-east-2c
 export NAME="infra-$REGION"
 oc get machineset -n openshift-machine-api -o json\
 | jq '.items[0]'\

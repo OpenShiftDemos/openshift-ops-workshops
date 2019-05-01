@@ -32,9 +32,6 @@ NAME                                   DESIRED   CURRENT   READY   AVAILABLE   A
 cluster-f4a3-lpxbs-worker-us-east-1a   1         1         1       1           47h
 cluster-f4a3-lpxbs-worker-us-east-1b   1         1         1       1           47h
 cluster-f4a3-lpxbs-worker-us-east-1c   1         1         1       1           47h
-cluster-f4a3-lpxbs-worker-us-east-1d   0         0                             47h
-cluster-f4a3-lpxbs-worker-us-east-1e   0         0                             47h
-cluster-f4a3-lpxbs-worker-us-east-1f   0         0                             47h
 ----
 
 When OpenShift was installed, the installer interrogated the cloud provider
@@ -119,7 +116,7 @@ scale of zero. Now, let's scale it to have one instance:
 
 [source,bash,role="copypaste copypaste-warning"]
 ----
-oc scale machineset cluster-f4a3-lpxbs-worker-us-east-1d -n openshift-machine-api --replicas=1
+oc scale machineset cluster-f4a3-lpxbs-worker-us-east-1c -n openshift-machine-api --replicas=2
 ----
 
 Take special note because your `MachineSet` name is likely different from the
@@ -131,14 +128,17 @@ successfully scaled. Now, look at the list of `Machines`:
 oc get machines -n openshift-machine-api
 ----
 
-You probably already have a new entry for a `Machine`. After a few moments,
-it will have a corresponding EC2 instance ID and will look something like:
+You probably already have a new entry for a `Machine` with a `STATE` of
+`Pending`. After a few moments, it will have a corresponding EC2 instance ID
+and will look something like:
 
 ----
-cluster-f4a3-lpxbs-worker-us-east-1d-h7gdt   i-0b9208ec47f0e206b   running   m4.large     us-east-1   us-east-1d   47s
+cluster-f4a3-lpxbs-worker-us-east-1d-h7gdt   i-0b9208ec47f0e206b   running   m4.large     us-east-1   us-east-1c   47s
 ----
 
-At this point, in the background, the bootstrap process is happening automatically. After several minutes (up to five or so), take a look at the output of:
+At this point, in the background, the bootstrap process is happening
+automatically. After several minutes (up to five or so), take a look at the
+output of:
 
 [source,bash,role="copypaste"]
 ----

@@ -7,17 +7,26 @@ OpenShift Container Platform includes a pre-configured, pre-installed, and self-
 
 #### Connect to the OpenShift Monitoring Alertmanager UI
 
-1. Login to the OpenShift Console using the URL found previously in the "Installation and Verification" lab.
+1. Login to the OpenShift Web Console with the kubeadmin credentials.  {{ MASTER_URL }}
++
+[source,role="copypaste"]
+----
+kubeadmin
+----
++
+[source,role="copypaste"]
+----
+{{ KUBEADMIN_PASSWORD }}
+----
 +
 [WARNING]
 ====
 You will receive a self-signed certificate error in your browser when you
-first visit the Dashboards UI console. When OpenShift is installed, by default, a CA
+first visit the OpenShift Web console. When OpenShift is installed, by default, a CA
 and SSL certificates are generated for all inter-component communication
 within OpenShift, including the web console.
 ====
 +
-1. Login to the OpenShift Web Console with the kubeadmin credentials also found previously in the "Installation and Verification" lab.
 1. On the left hand side, click on the "Monitoring" drop down.
 1. Click on "Alerts". This page is the "Alertmanager UI".
 
@@ -40,12 +49,12 @@ image::openshift_console_monitoring.png[]
 ##### Metrics UI (Prometheus Console)
 In addition to the Alertmanager UI, OpenShift monitoring provides the "Mertics" UI (aka the "Prometheus Console") which allows for real time queries of current metrics. This is useful when inspecting an alert as it allows queries for the alert's metric values over time.
 
-1. Click the link under the "Monitoring" section on the left hand side of the OpenShift Console is a link for "Metrics".
+1. On the left hand side of the OpenShift Console, under the "Monitoring" section, click the link  for "Metrics".
 +
 [WARNING]
 ====
 You will receive a self-signed certificate error in your browser when you
-first visit the Dashboards UI console. When OpenShift is installed, by default, a CA
+first visit the Alertmanager UI console. When OpenShift is installed, by default, a CA
 and SSL certificates are generated for all inter-component communication
 within OpenShift, including the Prometheus web console.
 ====
@@ -59,28 +68,28 @@ image::prometheus_console.png[]
 
 
 ##### Running Prometheus Queries
-Let's run a query to see the amount of memory limit resources all pod definitions have defined.
+Let's run a query to see the resources memory limit all pod definitions have defined.
 
-1. Copy and paste the following query:
+1. Copy and paste the following query into the query text box:
 +
 ====
 sum(kube_pod_container_resource_limits_memory_bytes)/(1024^3)
 ====
 +
 1. Click the "Execute" button
-1. You should now see a value. This value is the latest gathered value for this query.
+1. You should now see a timeseries with a value in the list. This value is the latest gathered value for the timeseries as defined by this query.
 
 
 Now let's run a query to see the cpu usage for the entire cluster. 
 
-1. Copy and paste the following query:
+1. Copy and paste the following query into the query text box:
 +
 ====
 cluster:cpu_usage_cores:sum
 ====
 +
 1. Click the "Execute" button
-1. You should now see a value. This value is the latest gathered value for this query.
+1. You should now see a timeseries with a value in the list. This value is the latest gathered value for the timeseries as defined by this query.
 1. Click the "Graph" tab to see a graph of these values over time.
 
 

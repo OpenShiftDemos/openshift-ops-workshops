@@ -41,8 +41,8 @@ ssh -l lab-user {{ BASTION_FQDN }}
 
 The `lab-user` account has password-less sudo privileges. You'll notice that
 there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This
-string is your `GUID`. Since you will often use GUID, it makes sense to
-export it as an environment variable:
+string is your `GUID`. Since you will often use `GUID`, it makes sense to
+export it as an environment variable. You will also need the `DOMAIN` of the cluster:
 
 [source,bash,role="copypaste"]
 ----

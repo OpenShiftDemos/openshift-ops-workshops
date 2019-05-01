@@ -618,7 +618,7 @@ You will see something like:
 
 ----
 NAME    HOST/PORT                                                           PATH   SERVICES   PORT       TERMINATION   WILDCARD
-mapit   mapit-app-management.apps.cluster-GUID.GUID.openshiftworkshop.com          mapit      8080-tcp
+mapit   mapit-app-management.{{ ROUTE_SUBDOMAIN }}              mapit      8080-tcp
 ----
 
 If you take a look at the `HOST/PORT` column, you'll see a familiar looking
@@ -698,7 +698,7 @@ test it using `curl`:
 
 [source,bash,role="copypaste"]
 ----
-curl mapit-app-management.apps.cluster-$GUID.$GUID.openshiftworkshop.com/health
+curl mapit-app-management.{{ ROUTE_SUBDOMAIN }}/health
 ----
 
 You will get some JSON as a response:

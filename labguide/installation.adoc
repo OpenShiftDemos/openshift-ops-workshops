@@ -222,9 +222,17 @@ be performed simply using the web console.
 
 The web console actually runs as an application inside the OpenShift
 environment and is exposed via the OpenShift Router. You will learn more
-about the router in a subsequent exercise. For now, you can simply click the
-link in the `tail` output above and then login to the web console with the
-`kubeadmin` user and the supplied password.
+about the router in a subsequent exercise. For now, you can simply
+control+click the link:
+
+{{ MASTER_URL }}
+
+Don't forget your `kubeadmin` user and the password:
+
+[source,role="copypaste"]
+----
+{{ KUBEADMIN_PASSWORD }}
+----
 
 [WARNING]
 ====

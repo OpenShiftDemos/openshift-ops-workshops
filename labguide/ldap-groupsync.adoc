@@ -169,9 +169,9 @@ As the `system:admin` user apply the OAuth configuration with `oc`.
 [source,bash,role="copypaste"]
 ----
 oc create secret generic ldap-secret --from-literal=bindPassword=bindingpassword -n openshift-config
-wget http://idm.openshiftworkshop.com/pub/ca.crt -O /tmp/ca.crt
-oc create configmap ca-config-map --from-file=/tmp/ca.crt -n openshift-config
-oc apply -f https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/support/oauth-cluster.yaml
+wget http://idm.openshiftworkshop.com/pub/ca.crt -O ~/content/support/ca.crt
+oc create configmap ca-config-map --from-file=/home/lab-user/content/support/ca.crt -n openshift-config
+oc apply -f ~/content/support/oauth-cluster.yaml
 ----
 
 [NOTE]
@@ -232,8 +232,7 @@ Execute the `groupsync`:
 
 [source,bash,role="copypaste"]
 ----
-wget https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/support/groupsync.yaml -O /tmp/groupsync.yaml
-oc adm groups sync --sync-config=/tmp/groupsync.yaml --confirm
+oc adm groups sync --sync-config=/home/lab-user/content/support/groupsync.yaml --confirm
 ----
 
 You will see output like the following:

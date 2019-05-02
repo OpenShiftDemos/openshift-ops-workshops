@@ -19,9 +19,9 @@ modules:
   - app-storage-basics
   - machinesets
   - infra-nodes
+  - ocs4
   - logging
   - ldap-groupsync
   - monitoring-basics
   - template-quota-limits
   - networking
-  - ocs4

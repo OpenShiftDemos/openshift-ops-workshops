@@ -33,43 +33,43 @@ Then, execute a script that we have prepared for you. It will create two
 
 [source,bash,role="copypaste"]
 ----
-bash /opt/lab/support/create-net-projects.sh
+bash ~/content/support/create-net-projects.sh
 ----
 
 ### Examine the created infrastructure
 Two *Projects* were created for you, `netproj-a` and `netproj-b`. Execute the
-following command to see the created resources
+following command to see the created resources:
 
 [source,bash,role="copypaste"]
 ----
 oc get pods -n netproj-a
 ----
 
-You will see something like the following:
+After a while you will see something like the following:
 
-[source]
-----
+```
 NAME           READY   STATUS              RESTARTS   AGE
 ose-1-66dz2    0/1     ContainerCreating   0          7s
 ose-1-deploy   1/1     Running             0          16s
-----
+```
+
+Similarly:
 
 [source,bash,role="copypaste"]
 ----
 oc get pods -n netproj-b
 ----
 
-You will see something like the following:
+After a while you will see something like the following:
 
-[source]
-----
+```
 NAME           READY   STATUS      RESTARTS   AGE
 ose-1-deploy   0/1     Completed   0          38s
 ose-1-vj2gn    1/1     Running     0          30s
-----
+```
 
-We will run commands in the pod in the `netproj-a` *Project* that will connect to TCP port 5000 of the pod in the `netproj-b` *Project*.
-
+We will run commands inside the pod in the `netproj-a` *Project* that will
+connect to TCP port 5000 of the pod in the `netproj-b` *Project*.
 
 ### Test Connectivity (should work)
 Now that you have some projects and pods, let's test the connectivity between
@@ -79,9 +79,8 @@ To test connectivity between the two pods, run:
 
 [source,bash,role="copypaste"]
 ----
-bash /opt/lab/support/test-connectivity.sh
+bash ~/content/support/test-connectivity.sh
 ----
-
 
 You will see something like the following:
 
@@ -92,14 +91,20 @@ Getting Pod A's Name... ose-1-66dz2
 Checking connectivity between Pod A and Pod B... worked
 ----
 
-Note that the last line says `worked`. This means that the pod in the `netproj-a` *Project* was able to connect to the pod in the `netproj-b` *Project*.
+Note that the last line says `worked`. This means that the pod in the
+`netproj-a` *Project* was able to connect to the pod in the `netproj-b`
+*Project*.
 
-This worked because by default with the network policy SDN, all pods in all projects can connect to eachother.
+This worked because, by default, with the network policy SDN, all pods in all
+projects can connect to eachother.
 
 ### Restricting Access
-With the Network Policy based SDN, it's possible to restrict access in a project by creating a `NetworkPolicy` custom resource (CR).
+With the Network Policy based SDN, it's possible to restrict access in a
+project by creating a `NetworkPolicy` custom resource (CR).
 
-For example, the following restricts all access to all pods in a *Project* where this `NetworkPolicy` CR is applied. This is the equivalent of `DenyAll` default rule on a firewall.
+For example, the following restricts all access to all pods in a *Project*
+where this `NetworkPolicy` CR is applied. This is the equivalent of `DenyAll`
+default rule on a firewall:
 
 [source,yaml]
 ----
@@ -113,27 +118,29 @@ spec:
   ingress: []
 ----
 
-Note that the `podSelector` is empty which means apply to all pods in this *Project*. Also note that the `ingress` list is empty, which means that there are no allowed `ingress` rules defined by this `NetworkPolicy` CR.
+Note that the `podSelector` is empty which means apply to all pods in this
+*Project*. Also note that the `ingress` list is empty, which means that there
+are no allowed `ingress` rules defined by this `NetworkPolicy` CR.
 
-
-To restrict access to the pod in the `netproj-b` *Project* simply apply the above NetworkPolicy CR with:
+To restrict access to the pod in the `netproj-b` *Project* simply apply the
+above NetworkPolicy CR with:
 
 [source,bash,role="copypaste"]
 ----
-oc create -n netproj-b -f /opt/lab/support/network-policy-block-all.yaml
+oc create -n netproj-b -f ~/content/support/network-policy-block-all.yaml
 ----
 
-
 ### Test Connectivity #2 (should fail)
-Since the "block all by default" `NetworkPolicy` CR has been applied, connectivity between the pod in the `netproj-a` *Project* and the pod in the `netproj-b` *Project* should now be blocked.
+Since the "block all by default" `NetworkPolicy` CR has been applied,
+connectivity between the pod in the `netproj-a` *Project* and the pod in the
+`netproj-b` *Project* should now be blocked.
 
 Test by running:
 
 [source,bash,role="copypaste"]
 ----
-bash /opt/lab/support/test-connectivity.sh
+bash ~/content/support/test-connectivity.sh
 ----
-
 
 You will see something like the following:
 
@@ -144,15 +151,20 @@ Getting Pod A's Name... ose-1-66dz2
 Checking connectivity between Pod A and Pod B............ FAILED!
 ----
 
-Note the last line that says `FAILED!`. This means that the pod in the `netproj-a` *Project* was unable to connect to the pod in the `netproj-b` *Project* (as expected).
-
+Note the last line that says `FAILED!`. This means that the pod in the
+`netproj-a` *Project* was unable to connect to the pod in the `netproj-b`
+*Project* (as expected).
 
 ### Allow Access
-With the Network Policy based SDN, it's possible to allow access to individual or groups of pods in a project by creating a multiple `NetworkPolicy` CRs.
+With the Network Policy based SDN, it's possible to allow access to
+individual or groups of pods in a project by creating a multiple
+`NetworkPolicy` CRs.
 
-The following allows access to port 5000 on TCP for all pods in the project with the label `run: ose`. The pod in the `netproj-b` project has this label.
+The following allows access to port 5000 on TCP for all pods in the project
+with the label `run: ose`. The pod in the `netproj-b` project has this label.
 
-The ingress section specifically allows this access from all projects that have the label `name: netproj-a`.
+The ingress section specifically allows this access from all projects that
+have the label `name: netproj-a`.
 
 [source,yaml]
 ----
@@ -177,28 +189,32 @@ spec:
           name: netproj-a
 ----
 
-Note that the `podSelector` is where the local project's pods are matched using a specific label selector.
+Note that the `podSelector` is where the local project's pods are matched
+using a specific label selector.
 
-All `NetworkPolicy` CRs in a project are combined to create the allowed ingress access for the pods in the project. In this specific case the "deny all" policy is combined with the "allow TCP 5000" policy.
+All `NetworkPolicy` CRs in a project are combined to create the allowed
+ingress access for the pods in the project. In this specific case the "deny
+all" policy is combined with the "allow TCP 5000" policy.
 
-To allow access to the pod in the `netproj-b` *Project* from all pods in the `netproj-a` *Project*, simply apply the above NetworkPolicy CR with:
+To allow access to the pod in the `netproj-b` *Project* from all pods in the
+`netproj-a` *Project*, simply apply the above NetworkPolicy CR with:
 
 [source,bash,role="copypaste"]
 ----
-oc create -n netproj-b -f /opt/lab/support/network-policy-allow-all-from-netproj-a.yaml
+oc create -n netproj-b -f ~/content/support/network-policy-allow-all-from-netproj-a.yaml
 ----
 
-
 ### Test Connectivity #3 (should work again)
-Since the "allow access from `netproj-a` " NetworkPolicy has been applied, connectivity between the pod in the `netproj-a` *Project* and the pod in the `netproj-b` *Project* should be allowed again.
+Since the "allow access from `netproj-a` " NetworkPolicy has been applied,
+connectivity between the pod in the `netproj-a` *Project* and the pod in the
+`netproj-b` *Project* should be allowed again.
 
 Test by running:
 
 [source,bash,role="copypaste"]
 ----
-bash /opt/lab/support/test-connectivity.sh
+bash ~/content/support/test-connectivity.sh
 ----
-
 
 You will see something like the following:
 
@@ -209,4 +225,6 @@ Getting Pod A's Name... ose-1-66dz2
 Checking connectivity between Pod A and Pod B... worked
 ----
 
-Note the last line that says `worked`. This means that the pod in the `netproj-a` *Project* was able to connect to the pod in the `netproj-b` *Project* (as expected).
+Note the last line that says `worked`. This means that the pod in the
+`netproj-a` *Project* was able to connect to the pod in the `netproj-b`
+*Project* (as expected).

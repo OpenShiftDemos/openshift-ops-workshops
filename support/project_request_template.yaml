@@ -27,8 +27,6 @@ objects:
       resourcequotas: 1
       requests.storage: 50Gi
       persistentvolumeclaims: 5
-      glusterfs-storage.storageclass.storage.k8s.io/requests.storage: 25Gi
-      glusterfs-registry-block.storageclass.storage.k8s.io/persistentvolumeclaims: 0
 - apiVersion: v1
   kind: LimitRange
   metadata:

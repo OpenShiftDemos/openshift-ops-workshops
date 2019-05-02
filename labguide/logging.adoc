@@ -83,7 +83,7 @@ To create the namespace, run the following command:
 
 [source,bash,role="copypaste"]
 ----
-oc create -f https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/support/openshift_logging_namespace.yaml
+oc create -f /home/lab-user/content/support/openshift_logging_namespace.yaml
 ----
 
 

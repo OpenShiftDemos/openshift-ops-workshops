@@ -75,9 +75,9 @@ message by running `oc new-app -h`.
 .OpenShift Pods
 image::openshift_pod.png[]
 
-Pods are one or more containers deployed together on host. A pod is the
-smallest compute unit you can define, deploy and manage. Each pod is allocated
-its own internal IP address on the SDN and will own the entire port range. The
+Pods are one or more containers deployed together on a host. A pod is the
+smallest compute unit you can define, deploy and manage in OpenShift. Each pod is allocated
+its own internal IP address on the SDN and owns the entire port range. The
 containers within pods can share local storage space and networking resources.
 
 Pods are treated as **static** objects by OpenShift, i.e., one cannot change the
@@ -332,7 +332,7 @@ Under the `metadata` section you should see the following:
   name: mapit-1-5qmgw
 ----
 
-* The *Service* has `selector` stanza that refers to `app: mapit` and
+* The *Service* has a `selector` stanza that refers to `app: mapit` and
   `deploymentconfig: mapit`.
 * The *Pod* has multiple *Labels*:
 ** `deploymentconfig: mapit`
@@ -530,7 +530,7 @@ them into the *Pods*.
 ### Application "Self Healing"
 
 Because OpenShift's *RCs* are constantly monitoring to see that the desired number
-of *Pods* actually is running, you might also expect that OpenShift will "fix" the
+of *Pods* are actually running, you might also expect that OpenShift will "fix" the
 situation if it is ever not right. You would be correct!
 
 Since we have two *Pods* running right now, let's see what happens if we
@@ -767,7 +767,7 @@ mapit-3-kkwxq    1/1     Running     0          66s
 
 Notice that there are 3 `-deploy` pods? And that the name of the current
 `mapit` pod has the number 3 in it? This is because each change to the
-*DeploymentConfig* counted as a _configuration_ change, which _triggered_ a
+*DeploymentConfig* is counted as a _configuration_ change, which _triggered_ a
 new _deployment_. The `-deploy` pod is responsible for ensuring the new
 deployment happens.
 

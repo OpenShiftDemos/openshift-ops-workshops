@@ -1,18 +1,19 @@
 ## Environment Overview
 
-You will be interacting with an OpenShift 4 cluster that is running on {{ ENVIRONMENT }}. During the lab you will also install OpenShift Container
+You will be interacting with an OpenShift 4 cluster that is running on {{
+ENVIRONMENT }}. During the lab you will also install OpenShift Container
 Storage, based on Rook/Ceph.
 
-The basics of the OpenShift 4 installation have been completed in advanced.
+The basics of the OpenShift 4 installation have been completed in advance.
 The OpenShift cluster is essentially set to all defaults and looks like the
 following:
 
 * 3 master nodes
 * 3 worker nodes
+* 1 bastion host
 
-Additionally, this lab guide is being hosted on an EC2 instance that you will
-now SSH into in order to access the environment and complete the rest of the
-exercises.
+You will now SSH into the bastion host in order to access the environment and
+complete the rest of the exercises.
 
 ## Conventions
 You will see various code and command blocks throughout these exercises. Some of
@@ -42,9 +43,22 @@ ssh -l lab-user {{ BASTION_FQDN }}
 The `lab-user` account has password-less sudo privileges. You'll notice that
 there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This
 string is your `GUID`. Since you will often use `GUID`, it makes sense to
-export it as an environment variable. You will also need the `DOMAIN` of the cluster:
+export it as an environment variable:
 
 [source,bash,role="copypaste"]
 ----
 export GUID=`hostname | cut -d. -f2`
 ----
+
+### Cloning content
+We have prepared various YAML files and other artifacts that you will use for
+the exercises in advance. You will need to clone these artifacts onto your
+bastion host now. Please execute the following:
+
+[source,bash,role="copypaste"]
+----
+cd
+git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-prod content
+----
+
+Future exercises will refer to `~/content/support`.

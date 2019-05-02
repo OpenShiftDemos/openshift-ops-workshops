@@ -16,7 +16,7 @@ aggregated data. Administrators can see and search through all logs.
 Application owners and developers can allow access to logs that belong to
 their projects. The EFK stack runs on top of OpenShift.
 
-[NOTE]
+[WARNING]
 ====
 This lab requires that you have completed the infra-nodes lab. The logging
 stack will be installed on the `infra` nodes that were created in that lab.
@@ -83,7 +83,7 @@ To create the namespace, run the following command:
 
 [source,bash,role="copypaste"]
 ----
-oc create -f https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/support/openshift_logging_namespace.yaml
+oc create -f /home/lab-user/content/support/openshift_logging_namespace.yaml
 ----
 
 

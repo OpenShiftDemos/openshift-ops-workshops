@@ -157,7 +157,7 @@ You can execute that script by doing the following:
 
 [source,bash,role="copypaste"]
 ----
-curl https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/tree/ocp4-prod/support/infra-nodes.sh | bash
+bash /home/lab-user/content/support/infra-nodes.sh
 ----
 
 Then go ahead and `oc get machineset -n openshift-machine-api` and you should
@@ -472,7 +472,7 @@ You can create the new monitoring config with the following command:
 
 [source,bash,role="copypaste"]
 ----
-oc create -f https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/tree/ocp4-prod/support/cluster-monitoring-configmap.yaml
+oc create -f /home/lab-user/content/support/cluster-monitoring-configmap.yaml
 ----
 
 Then, you can do something like `watch 'oc get pod -n openshift-monitoring'`

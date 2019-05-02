@@ -23,4 +23,5 @@ modules:
   - ldap-groupsync
   - monitoring-basics
   - template-quota-limits
+  - networking
   - ocs4

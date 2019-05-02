@@ -21,5 +21,7 @@ modules:
     name: OpenShift Monitoring with Prometheus
   template-quota-limits:
     name: Project Template, Quota, and Limits
+  networking:
+    name: OpenShift Networking and NetworkPolicy
   ocs4:
     name: Deploying and Managing OpenShift Container Storage

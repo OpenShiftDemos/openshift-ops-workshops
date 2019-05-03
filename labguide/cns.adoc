@@ -20,7 +20,7 @@ storage project:
 
 [source,bash,role="copypaste"]
 ----
-oc project -n {{ CNS_NAMESPACE }}
+oc project {{ CNS_NAMESPACE }}
 ----
 
 Then, take a look at the storage *Pods*:

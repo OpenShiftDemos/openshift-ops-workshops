@@ -212,19 +212,27 @@ because it needs to participate in the software defined network (SDN). If you
 need additional nodes for additional purposes, you can create them very
 easily when using IPI and leveraging the cloud provider operators. You will
 create nodes to run OpenShift infrastructure components (registry, router,
-etc.) in one of the exercises.
+etc.) in a subsequent exercise.
 
 #### Check the Web Console
 OpenShift provides a web console for users, developers, application
 operators, and administrators to interact with the environment. Many of the
 cluster administration functions, including upgrading the cluster itself, can
-be performed simply using the web console.
+be performed simply by using the web console.
 
 The web console actually runs as an application inside the OpenShift
 environment and is exposed via the OpenShift Router. You will learn more
-about the router in a subsequent exercise. For now, you can simply click the
-link in the `tail` output above and then login to the web console with the
-`kubeadmin` user and the supplied password.
+about the router in a subsequent exercise. For now, you can simply
+control+click the link:
+
+{{ MASTER_URL }}
+
+Don't forget your `kubeadmin` user and the password:
+
+[source,role="copypaste"]
+----
+{{ KUBEADMIN_PASSWORD }}
+----
 
 [WARNING]
 ====

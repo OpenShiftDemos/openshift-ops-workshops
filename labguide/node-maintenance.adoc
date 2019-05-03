@@ -1,0 +1,101 @@
+### Node Maintenance
+
+It is possible to put any node of the OpenShift environment into maintenance by
+marking it as non-schedulable followed by a _drain_ of all pods on the node.
+
+These operations require elevated privileges. Ensure you are logged in as
+cluster admin:
+
+[source,bash,role="copypaste"]
+----
+oc login -u system:admin
+----
+
+You will see by now that there are pods running on almost all of your nodes:
+
+[source,bash,role="copypaste"]
+----
+oc get pods --all-namespaces -o wide
+----
+
+Sometimes you might need to perform maintenance on a host. Let's take a look
+at the *Pods* that are on `node02`:
+
+[source,bash,role="copypaste"]
+----
+oc adm manage-node --list-pods {{ NODE2_INTERNAL_FQDN }}
+----
+
+Firstly, we probably want to ensure that no new workload can be put on this
+host. Mark node `{{ NODE2_INTERNAL_FQDN }}` as non-schedulable to prevent the
+schedulers in the system to place any new workloads on it:
+
+[source,bash,role="copypaste"]
+----
+oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=false
+----
+
+The output of the command will show that the node is now not schedulable:
+
+----
+NAME                                          STATUS                     ROLES     AGE       VERSION
+{{ NODE2_INTERNAL_FQDN }}   Ready,SchedulingDisabled   compute   1h        v1.11.0+d4cacc0
+----
+
+Marking the node as non-schedulable did not impact the pods it is running. List those
+pods:
+
+[source,bash,role="copypaste"]
+----
+oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
+----
+
+Other than a *Pod* for Container Native Storage and a Fluentd instance (there is
+one on every node), there may or may not be other *Pods* running on this node.
+
+The next step is to drain the *Pods* to other nodes in the cluster.
+
+[IMPORTANT]
+====
+*Pods* running on the node as part of a `DaemonSet` like those associated to
+Logging or OCS will *not* be drained. They will not be accessible anymore
+through OpenShift, but will continue to run as containers on the nodes until the
+local OpenShift services are stopped and/or the node is shutdown. This is not a
+problem since software like OCS is designed to handle such situations transparently.
+====
+
+Start the drain process like this:
+
+[source,bash,role="copypaste"]
+----
+oc adm drain {{ NODE2_INTERNAL_FQDN }} --ignore-daemonsets
+----
+
+After a few moments, all of the *Pods*, except those for Fluentd, Container
+Native Storage, and Prometheus previously running on `{{ NODE2_INTERNAL_FQDN
+}}` should have terminated and been launched elsewhere.
+
+[source,bash,role="copypaste"]
+----
+oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
+----
+
+The node `{{ NODE2_INTERNAL_FQDN }}` is now ready for an administrator to
+start maintenance operations. If those include a reboot of the system or
+upgrading OpenShift components, the *Pods* associated with
+OCS and logging will come back up automatically.
+
+Now that our maintenance is complete, the node is still non-schedulable. Let's
+fix that:
+
+[source,bash,role="copypaste"]
+----
+oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=true
+----
+
+Now the node will be able to have workload scheduled on it again:
+
+----
+NAME                                          STATUS    ROLES     AGE       VERSION
+{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1h        v1.11.0+d4cacc0
+----

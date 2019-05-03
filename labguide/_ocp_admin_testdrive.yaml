@@ -8,6 +8,8 @@ vars:
   MASTER_URL:
   KUBEADMIN_PASSWORD:
   BASTION_FQDN:
+  GUID:
+  ROUTE_SUBDOMAIN:
 
 modules:
   activate:
@@ -17,6 +19,9 @@ modules:
   - app-storage-basics
   - machinesets
   - infra-nodes
-  - ldap-groupsync
-  - template-quota-limits
   - ocs4
+  - logging
+  - ldap-groupsync
+  - monitoring-basics
+  - template-quota-limits
+  - networking

@@ -20,10 +20,13 @@ oc login -u system:admin
 
 
 ### Background: Project Request Template
-When users invoke the `oc new-project` command, a new project request flow is initiated. During part of this this workflow, a default project *Template* is processed to create the newly requested project.
+When users invoke the `oc new-project` command, a new project request flow is
+initiated. During part of this this workflow, a default project *Template* is
+processed to create the newly requested project.
 
 #### View the Default Project Request Template
-To view the built-in default *Project Request Template*, execute the following command:
+To view the built-in default *Project Request Template*, execute the
+following command:
 
 [source,bash,role="copypaste"]
 ----
@@ -53,7 +56,9 @@ parameters:
 oc new-project -h
 ----
 
-Notice there is a `--display-name` directive on `oc new-project`? This option corresponds to the `PROJECT_DISPLAYNAME` parameter we saw in the output of the default *Template*.
+Notice there is a `--display-name` directive on `oc new-project`? This option
+corresponds to the `PROJECT_DISPLAYNAME` parameter we saw in the output of
+the default *Template*.
 
 The `new-project` workflow involves the user providing information to fulfill the
 project request. OpenShift decides if this request should be allowed (for
@@ -81,7 +86,7 @@ for you already. Use `cat`, `less`, or your favorite editor to view the modified
 
 [source,bash,role="copypaste"]
 ----
-cat /opt/lab/support/project_request_template.yaml
+cat ~/content/support/project_request_template.yaml
 ----
 
 Please take note that there are two new sections added: *ResourceQuota* and
@@ -251,11 +256,12 @@ Go ahead and execute the following:
 
 [source,bash,role="copypaste"]
 ----
-oc create -f /opt/lab/support/project_request_template.yaml -n openshift-config
+oc create -f ~/content/support/project_request_template.yaml -n openshift-config
 ----
 
-This will create the *Template* object in the `openshift-config` *Project*. You can now
-see the *Templates* in the `openshift-config` project with the following:
+This will create the *Template* object in the `openshift-config` *Project*.
+You can now see the *Templates* in the `openshift-config` project with the
+following:
 
 [source,bash,role="copypaste"]
 ----
@@ -270,15 +276,25 @@ project-request                 5 (5 blank)   7
 ----
 
 #### Setting the Default ProjectRequestTemplate
-The default *projectRequestTemplate* is configured in the OpenShift API Server configuration. This is stored in a *ConfigMap* in the `openshift-apiserver` project.  You can view the API Server configuration with the following command:
+The default *projectRequestTemplate* is part of the OpenShift API Server
+configuration. This configuration is ultimately stored in a *ConfigMap* in
+the `openshift-apiserver` project. You can view the API Server configuration
+with the following command:
 
 [source,bash,role="copypaste"]
 ----
 oc get cm config -n openshift-apiserver  -o go-template='{{index .data "config.yaml"}}' | jq
 ----
 
-
-This configuration is configured via an OpenShift operator.  To add the default project request tempalate configuration, a *CustomResource* (CR) needs to be created.  The *CustomResource* will look like:
+There is an OpenShift operator that looks at various *CustomResource* (CR)
+instances and ensures that the configurations they define are implemented in
+the cluster. In other words, the operator is ultimately responsible for
+creating/modifying the *ConfigMap*. You can see in the `jq` output that there
+is a `projectRequestMessage` but no `projectRequestTemplate` defined. There
+is currently no CR specifying anything, so the operator has configured the
+cluster with the "stock" settings. To add the default project request
+tempalate configuration, a CR needs to be created. The
+*CustomResource* will look like:
 
 [source,yaml]
 ----
@@ -293,16 +309,21 @@ spec:
     name: "project-request"
 ----
 
-Notice the *projectRequestTemplate* name matches the name of the template we created earlier in the `openshift-config` project.
+Notice the *projectRequestTemplate* name matches the name of the template we
+created earlier in the `openshift-config` project.
 
-The next step is to create this *CustomResource*.  Once this *CR* is created, the OpenShift operator will notice the *CR*, and apply the configuration changes.  To create the *CustomResource*, issue this command:
+The next step is to create this *CustomResource*. Once this *CR* is created,
+the OpenShift operator will notice the *CR*, and apply the configuration
+changes. To create the *CustomResource*, issue this command:
 
 [source,bash,role="copypaste"]
 ----
-oc create -f /opt/lab/support/cr_project_request.yaml -n openshift-config
+oc apply -f ~/content/support/cr_project_request.yaml -n openshift-config
 ----
 
-Once this command is run, the OpenShift API Server configurations will be updated.  This can be verified by viewing the configuration:
+Once this command is run, the OpenShift API Server configurations will be
+updated by the operator. This can be verified by viewing the implemented
+configuration:
 
 [source,bash,role="copypaste"]
 ----
@@ -311,7 +332,7 @@ oc get cm config -n openshift-apiserver  -o go-template='{{index .data "config.y
 
 Notice the new *projectConfig* section:
 
-[source,yaml]
+[source,json]
 ----
 ...
   "kind": "OpenShiftAPIServerConfig",
@@ -358,8 +379,6 @@ Quota:
 	Name:										template-test-quota
 	Resource									Used	Hard
 	--------									----	----
-	glusterfs-registry-block.storageclass.storage.k8s.io/persistentvolumeclaims	0	0
-	glusterfs-storage.storageclass.storage.k8s.io/requests.storage			0	25Gi
 	persistentvolumeclaims								0	5
 	pods										0	10
 	requests.cpu									0	4
@@ -403,7 +422,10 @@ NAME                   CREATED AT
 template-test-limits   2018-10-24T19:19:40Z
 ----
 
-NOTE: Please make sure that the `project-request` template is created in the `openshift-config` project. Defining it in the OpenShift API server configurion without having the template in place will cause new projects to fail to create.
+NOTE: Please make sure that the `project-request` template is created in the
+`openshift-config` project. Defining it in the OpenShift API server
+configurion without having the template in place will cause new projects to
+fail to create.
 
 ### Clean Up
 If you wish, you can deploy the application from the Application Management

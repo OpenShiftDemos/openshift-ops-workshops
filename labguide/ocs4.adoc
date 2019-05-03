@@ -551,7 +551,7 @@ Verify your `cluster-api-cluster` again by using the command below.
 echo $CLUSTERID
 ----
 
-We can easily create a new *machine* and OCP worker node in AWS AZ us-east-2a by just increasing the `replicas` count in one of the machinesets. Edit your machineset for us-east-2a to increase from `replicas: 1` to `replicas: 2`. Make sure to save your changes before exiting `:wq!`.
+You can easily create a new *machine* and OCP worker node in AWS AZ us-east-2a by just increasing the `replicas` count in one of the machinesets. Edit your machineset for us-east-2a to increase from `replicas: 1` to `replicas: 2`. Make sure to save your changes before exiting `:wq!`.
 
 ----
 oc edit machineset $CLUSTERID-workerocs-us-east-2a -n openshift-machine-api
@@ -615,7 +615,7 @@ rook-ceph-osd-3-56b6c4f459-q7mhz              1/1     Running     0          114
 
 ----
 
-Now you can validate that Ceph is healthy and has the additional storage. We again login to the *toolbox* pod.
+Now you can validate that Ceph is healthy and has the additional storage. You again login to the *toolbox* pod.
 
 ----
 oc -n rook-ceph rsh $toolbox

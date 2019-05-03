@@ -1047,6 +1047,7 @@ sed '/volumeBindingMode: Immediate/a allowVolumeExpansion: true' glusterfs-stora
 Now to modify this `StorageClass` the current glusterfs-storage needs to be deleted and the new glusterfs-storage-new.yaml used to create glusterfs-storage that containes the necessary parameter `allowVolumeExpansion: true`.
 
 ----
+oc login -u system:admin
 oc delete sc glusterfs-storage
 oc create -f glusterfs-storage-new.yaml
 ----

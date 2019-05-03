@@ -29,9 +29,9 @@ You will see something like:
 
 ----
 NAME                                   DESIRED   CURRENT   READY   AVAILABLE   AGE
-cluster-f4a3-lpxbs-worker-us-east-1a   1         1         1       1           47h
-cluster-f4a3-lpxbs-worker-us-east-1b   1         1         1       1           47h
-cluster-f4a3-lpxbs-worker-us-east-1c   1         1         1       1           47h
+cluster-f4a3-lpxbs-worker-us-east-2a   1         1         1       1           47h
+cluster-f4a3-lpxbs-worker-us-east-2b   1         1         1       1           47h
+cluster-f4a3-lpxbs-worker-us-east-2c   1         1         1       1           47h
 ----
 
 When OpenShift was installed, the installer interrogated the cloud provider
@@ -50,12 +50,12 @@ You will see something like:
 
 ----
 NAME                                         INSTANCE              STATE     TYPE         REGION      ZONE         AGE
-cluster-f4a3-lpxbs-master-0                  i-04280885cafad3130   running   m4.xlarge    us-east-1   us-east-1a   47h
-cluster-f4a3-lpxbs-master-1                  i-0def910edcae51d11   running   m4.xlarge    us-east-1   us-east-1b   47h
-cluster-f4a3-lpxbs-master-2                  i-0beb5e40214d706fc   running   m4.xlarge    us-east-1   us-east-1c   47h
-cluster-f4a3-lpxbs-worker-us-east-1a-b94pr   i-0a922c0fe765caa3c   running   m4.large     us-east-1   us-east-1a   47h
-cluster-f4a3-lpxbs-worker-us-east-1b-m8gbx   i-0fb8d960b8a3a3343   running   m4.large     us-east-1   us-east-1b   47h
-cluster-f4a3-lpxbs-worker-us-east-1c-5tmg7   i-0151c72cd85f85038   running   m4.large     us-east-1   us-east-1c   47h
+cluster-f4a3-lpxbs-master-0                  i-04280885cafad3130   running   m4.xlarge    us-east-2   us-east-2a   47h
+cluster-f4a3-lpxbs-master-1                  i-0def910edcae51d11   running   m4.xlarge    us-east-2   us-east-2b   47h
+cluster-f4a3-lpxbs-master-2                  i-0beb5e40214d706fc   running   m4.xlarge    us-east-2   us-east-2c   47h
+cluster-f4a3-lpxbs-worker-us-east-2a-b94pr   i-0a922c0fe765caa3c   running   m4.large     us-east-2   us-east-2a   47h
+cluster-f4a3-lpxbs-worker-us-east-2b-m8gbx   i-0fb8d960b8a3a3343   running   m4.large     us-east-2   us-east-2b   47h
+cluster-f4a3-lpxbs-worker-us-east-2c-5tmg7   i-0151c72cd85f85038   running   m4.large     us-east-2   us-east-2c   47h
 ----
 
 Each `Machine` has a corresponding `INSTANCE`. Do those IDs look familiar?
@@ -111,12 +111,12 @@ Look at the list of `MachineSets` again:
 oc get machineset -n openshift-machine-api
 ----
 
-Within that list, find the `MachineSet` that ends in `-1d`. It should have a
-scale of zero. Now, let's scale it to have one instance:
+Within that list, find the `MachineSet` that ends in `-2c`. It should have a
+scale of one. Now, let's scale it to have two instances:
 
 [source,bash,role="copypaste copypaste-warning"]
 ----
-oc scale machineset cluster-f4a3-lpxbs-worker-us-east-1c -n openshift-machine-api --replicas=2
+oc scale machineset cluster-5fa6-hx2ml-worker-us-east-2c -n openshift-machine-api --replicas=2
 ----
 
 Take special note because your `MachineSet` name is likely different from the
@@ -133,7 +133,7 @@ You probably already have a new entry for a `Machine` with a `STATE` of
 and will look something like:
 
 ----
-cluster-f4a3-lpxbs-worker-us-east-1d-h7gdt   i-0b9208ec47f0e206b   running   m4.large     us-east-1   us-east-1c   47s
+cluster-f4a3-lpxbs-worker-us-east-2c-h7gdt   i-0b9208ec47f0e206b   running   m4.large     us-east-2   us-east-2c   47s
 ----
 
 At this point, in the background, the bootstrap process is happening

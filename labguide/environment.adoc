@@ -61,4 +61,4 @@ cd
 git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-prod content
 ----
 
-Future exercises will refer to `~/content/support`.
+Future exercises will refer to `/home/lab-user/content/support`.

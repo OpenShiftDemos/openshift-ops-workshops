@@ -169,9 +169,9 @@ As the `system:admin` user apply the OAuth configuration with `oc`.
 [source,bash,role="copypaste"]
 ----
 oc create secret generic ldap-secret --from-literal=bindPassword=bindingpassword -n openshift-config
-wget http://idm.openshiftworkshop.com/pub/ca.crt -O /home/ec2-user/content/support/ca.crt
+wget http://idm.openshiftworkshop.com/pub/ca.crt -O /home/lab-user/content/support/ca.crt
 oc create configmap ca-config-map --from-file=/home/lab-user/content/support/ca.crt -n openshift-config
-oc apply -f /home/ec2-user/content/support/oauth-cluster.yaml
+oc apply -f /home/lab-user/content/support/oauth-cluster.yaml
 ----
 
 [NOTE]
@@ -196,7 +196,7 @@ We have provided a `groupsync` configuration file for you:
 kind: LDAPSyncConfig
 apiVersion: v1
 url: ldap://idm.openshiftworkshop.com
-ca: /opt/lab/support/ca.crt
+ca: /home/lab-user/content/support/ca.crt
 bindDN: uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=openshiftworkshop,dc=com
 bindPassword: bindingpassword
 rfc2307:

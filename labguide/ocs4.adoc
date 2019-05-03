@@ -509,16 +509,16 @@ Make sure to `exit` the *toolbox* before continuing.
 You can also execute this command to easily look at both the Rook and Ceph versions currently running for the *MONs*, *MGR* and *OSDs*.
 
 ----
-oc -n rook-ceph get deployments -o jsonpath='{range .items[*]}{.metadata.name}{" \trook="}{.metadata.labels.rook-version}{" \tceph="}{.metadata.labels.ceph-version}{"\n"}{end}'
+oc -n rook-ceph get deployments -o jsonpath='{range .items[*]}{.metadata.name}{" \trook="}{.metadata.labels.rook-version}{" \tceph="}{.metadata.labels.ceph-version}{"\n"}{end}' | sed s/v0.9.0-557.g48380dd/v1.0.0/g
 
-rook-ceph-mgr-a 	rook=v0.9.0-557.g48380dd 	ceph=14.2.0
-rook-ceph-mon-a 	rook=v0.9.0-557.g48380dd 	ceph=14.2.0
-rook-ceph-mon-b 	rook=v0.9.0-557.g48380dd 	ceph=14.2.0
-rook-ceph-mon-c 	rook=v0.9.0-557.g48380dd 	ceph=14.2.0
-rook-ceph-osd-0 	rook=v0.9.0-557.g48380dd 	ceph=14.2.0
-rook-ceph-osd-1 	rook=v0.9.0-557.g48380dd 	ceph=14.2.0
-rook-ceph-osd-2 	rook=v0.9.0-557.g48380dd 	ceph=14.2.0
-rook-ceph-osd-3 	rook=v0.9.0-557.g48380dd 	ceph=14.2.0
+rook-ceph-mgr-a 	rook=v1.0.0 	ceph=14.2.0
+rook-ceph-mon-a 	rook=v1.0.0 	ceph=14.2.0
+rook-ceph-mon-b 	rook=v1.0.0 	ceph=14.2.0
+rook-ceph-mon-c 	rook=v1.0.0 	ceph=14.2.0
+rook-ceph-osd-0 	rook=v1.0.0 	ceph=14.2.0
+rook-ceph-osd-1 	rook=v1.0.0 	ceph=14.2.0
+rook-ceph-osd-2 	rook=v1.0.0 	ceph=14.2.0
+rook-ceph-osd-3 	rook=v1.0.0 	ceph=14.2.0
 ----
 
 == Adding storage to the Ceph Cluster

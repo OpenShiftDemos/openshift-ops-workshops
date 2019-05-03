@@ -92,8 +92,7 @@ program is a command line interface that talks to the OpenShift API.
 #### Login to OpenShift
 When the installation completed, the installer left some artifacts that
 contain the various URLs and passwords required to access the environment.
-The installation program was run under the `ec2-user` account, so, first, you
-need to get to it. 
+The installation program was run under the `ec2-user` account. 
 
 [source,bash,role="copypaste"]
 ----
@@ -103,17 +102,17 @@ ls -al ~/cluster-$GUID
 You'll see something like the following:
 
 ----
-total 3544
-drwxrwxr-x. 4 ec2-user ec2-user     199 Apr  8 14:43 .
-drwx------. 7 ec2-user ec2-user     205 Apr  8 15:10 ..
-drwxr-xr-x. 2 ec2-user ec2-user      50 Apr  8 14:30 auth
--rw-r--r--. 1 ec2-user ec2-user     271 Apr  8 14:24 metadata.json
--rw-rw-r--. 1 ec2-user ec2-user  625865 Apr  8 14:49 .openshift_install.log
--rw-r--r--. 1 ec2-user ec2-user 2460298 Apr  8 14:30 .openshift_install_state.json
--rw-r--r--. 1 ec2-user ec2-user     676 Apr  8 14:24 terraform.aws.auto.tfvars
--rw-rw-r--. 1 ec2-user ec2-user  208531 Apr  8 14:43 terraform.tfstate
--rw-r--r--. 1 ec2-user ec2-user  322023 Apr  8 14:24 terraform.tfvars
-drwxr-xr-x. 2 ec2-user ec2-user      62 Apr  8 14:24 tls
+total 3348
+drwxrwxr-x. 4 ec2-user ec2-user     199 May  3 08:13 .
+drwx------. 7 lab-user users        134 May  3 13:46 ..
+drwxr-xr-x. 2 ec2-user ec2-user      50 May  3 08:00 auth
+-rw-r--r--. 1 ec2-user ec2-user     271 May  3 07:54 metadata.json
+-rw-rw-r--. 1 ec2-user ec2-user  576663 May  3 08:18 .openshift_install.log
+-rw-r--r--. 1 ec2-user ec2-user 2351869 May  3 08:00 .openshift_install_state.json
+-rw-r--r--. 1 ec2-user ec2-user     623 May  3 07:54 terraform.aws.auto.tfvars
+-rw-rw-r--. 1 ec2-user ec2-user  170852 May  3 08:13 terraform.tfstate
+-rw-r--r--. 1 ec2-user ec2-user  312196 May  3 07:54 terraform.tfvars
+drwxr-xr-x. 2 ec2-user ec2-user      62 May  3 07:54 tls
 ----
 
 The OpenShift 4 IPI installation embeds Terraform in order to create some of
@@ -142,7 +141,8 @@ fortunately given you a convenient `export` command to run, you don't have
 write permissions to the path that it shows. The `oc` command will try to
 write to the `KUBECONFIG` file, which it can't, so you'll get errors later if you try it.
 
-Our installation process has actually already copied the config you need to `~/.kube/config`, so you are already logged in. Try the following:
+Our installation process has actually already copied the config you need to
+`~/.kube/config`, so you are already logged in. Try the following:
 
 [source,bash,role="copypaste"]
 ----

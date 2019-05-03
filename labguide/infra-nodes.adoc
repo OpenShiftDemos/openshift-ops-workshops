@@ -135,7 +135,7 @@ rules for creating one, at least for a simple change like we're making:
 
 This sounds complicated, so we created a little scriptlet that will do it for
 you. The following scriptlet assumes you have an AWS AZ (availability zone) called
-`us-east-1e` and will build and create an infra `MachineSet` for you with 3
+`us-east-2c` and will build and create an infra `MachineSet` for you with 3
 replicas. It requires the `jq` program be installed.
 
 [source,bash,role="copypaste"]
@@ -391,9 +391,9 @@ spec:
       maxWaitInQueue: 0s
   storage:
     s3:
-      bucket: image-registry-us-east-1-69d6726b9f6d4d98a8f2c471e83edd82-0e71
+      bucket: image-registry-us-east-2-69d6726b9f6d4d98a8f2c471e83edd82-0e71
       encrypt: true
-      region: us-east-1
+      region: us-east-2
 status:
 ...
 ```

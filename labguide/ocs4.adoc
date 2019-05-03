@@ -223,6 +223,7 @@ cat /home/lab-user/content/support/cluster.yaml
 
 Take a look at the *cluster.yaml* file. It specifies the version of Ceph and the label used for the rook resources. This label, `role=storage-node` was validated as being on our new OCP nodes at the beginning of this section. Also `useAllNodes=true` and `useAllDevices=true` means that if a OCP node has label `role=storage-node` then all available storage devices on this node will be used for the Ceph cluster.
 
+[source,bash,role="copypaste"]
 ----
 ...
     image: ceph/ceph:v13.2.5-20190410
@@ -330,7 +331,10 @@ Login to *toolbox* pod to run Ceph commands. Compare results for `ceph df` and `
 [source,bash,role="copypaste"]
 ----
 oc -n rook-ceph rsh $toolbox
+----
 
+[source,bash,role="copypaste"]
+----
 ceph df
 rados df
 rados -p replicapool ls
@@ -717,7 +721,7 @@ This step could take 5 minutes or more for the forth *OSD* pod to be in a `Runni
 watch oc get pods -n rook-ceph
 ----
 
-Eventually your will see a new *OSD* pod, `rook-ceph-osd-3`, that has just been created.  
+Eventually you will see a new *OSD* pod, `rook-ceph-osd-3`, that has just been created.  
 
 ----
 NAME                                          READY   STATUS      RESTARTS   AGE

@@ -37,9 +37,16 @@ workload until full taint/toleration support is implemented in all operators.
 The use of taints/tolerations is not covered in any of these exercises.
 ====
 
-To accomplish this, you will create additional `MachineSets`. If you use `oc
-get -o yaml` on a specific `MachineSet` you can follow along with some of the
-following discussion.
+To accomplish this, you will create additional `MachineSets`.
+
+In order to understand how `MachineSets` work, run the following.
+
+This will allow you to follow along with some of the following discussion.
+
+[source,bash,role="copypaste copypaste-warning"]
+----
+oc get machineset -n openshift-machine-api -o yaml cluster-5fa6-hx2ml-worker-us-east-2c
+----
 
 #### Metadata
 The `metadata` on the `MachineSet` itself includes information like the name
@@ -99,7 +106,7 @@ make sure that things match here when we make changes:
 ```
 
 #### Template Spec
-The `template` needs to specify how the `Machine`/node should be created.
+The `template` needs to specify how the `Machine`/`Node` should be created.
 You will notice that the `spec` and, more specifically, the `providerSpec`
 contains all of the important AWS data to help get the `Machine` created
 correctly and bootstrapped.
@@ -160,9 +167,13 @@ You can execute that script by doing the following:
 bash /home/lab-user/content/support/infra-nodes.sh
 ----
 
-Then go ahead and `oc get machineset -n openshift-machine-api` and you should
-see the new infra set listed:
+Then go ahead and run:
+[source,bash,role="copypaste"]
+----
+oc get machineset -n openshift-machine-api
+----
 
+You should see the new infra set listed:
 ```
 ...
 infra-us-east-2c                       3         3                             53s

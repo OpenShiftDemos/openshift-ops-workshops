@@ -96,19 +96,18 @@ Note that the last line says `worked`. This means that the pod in the
 *Project*.
 
 This worked because, by default, with the network policy SDN, all pods in all
-projects can connect to eachother.
+projects can connect to each other.
 
 ### Restricting Access
 With the Network Policy based SDN, it's possible to restrict access in a
 project by creating a `NetworkPolicy` custom resource (CR).
 
 For example, the following restricts all access to all pods in a *Project*
-where this `NetworkPolicy` CR is applied. This is the equivalent of `DenyAll`
+where this `NetworkPolicy` CR is applied. This is the equivalent of a `DenyAll`
 default rule on a firewall:
 
 [source,yaml]
 ----
----
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
@@ -118,9 +117,10 @@ spec:
   ingress: []
 ----
 
-Note that the `podSelector` is empty which means apply to all pods in this
-*Project*. Also note that the `ingress` list is empty, which means that there
-are no allowed `ingress` rules defined by this `NetworkPolicy` CR.
+Note that the `podSelector` is empty, which means that this will apply to all
+pods in this *Project*. Also note that the `ingress` list is empty, which
+means that there are no allowed `ingress` rules defined by this
+`NetworkPolicy` CR.
 
 To restrict access to the pod in the `netproj-b` *Project* simply apply the
 above NetworkPolicy CR with:
@@ -157,7 +157,7 @@ Note the last line that says `FAILED!`. This means that the pod in the
 
 ### Allow Access
 With the Network Policy based SDN, it's possible to allow access to
-individual or groups of pods in a project by creating a multiple
+individual or groups of pods in a project by creating multiple
 `NetworkPolicy` CRs.
 
 The following allows access to port 5000 on TCP for all pods in the project
@@ -170,7 +170,6 @@ have the label `name: netproj-a`.
 ----
 # allow access to TCP port 5000 for pods with the label "run: ose" specifically
 # from projects with the label "name: netproj-a".
----
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
@@ -205,7 +204,7 @@ oc create -n netproj-b -f /home/lab-user/content/support/network-policy-allow-al
 ----
 
 ### Test Connectivity #3 (should work again)
-Since the "allow access from `netproj-a` " NetworkPolicy has been applied,
+Since the "allow access from `netproj-a` on port 5000" NetworkPolicy has been applied,
 connectivity between the pod in the `netproj-a` *Project* and the pod in the
 `netproj-b` *Project* should be allowed again.
 

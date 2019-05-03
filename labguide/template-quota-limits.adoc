@@ -283,7 +283,7 @@ with the following command:
 
 [source,bash,role="copypaste"]
 ----
-oc get cm config -n openshift-apiserver  -o go-template='{{index .data "config.yaml"}}' | jq
+oc get cm config -n openshift-apiserver -o jsonpath --template="{.data.config\.yaml}" | jq
 ----
 
 There is an OpenShift operator that looks at various *CustomResource* (CR)
@@ -327,7 +327,7 @@ configuration:
 
 [source,bash,role="copypaste"]
 ----
-oc get cm config -n openshift-apiserver  -o go-template='{{index .data "config.yaml"}}' | jq
+oc get cm config -n openshift-apiserver -o jsonpath --template="{.data.config\.yaml}" | jq
 ----
 
 Notice the new *projectConfig* section:
@@ -393,6 +393,15 @@ Resource limits:
 	Container	cpu		10m	4	4	4	-
 
 ----
+
+[NOTE]
+====
+If you don't see the Quota and Resource limits sections, you may have been
+too quick. Remember that the operator takes a moment to do everything it
+needs to, so it's possible you created your project before the masters picked
+up the new configs. Go ahead and `oc delete project template-test` and then
+re-create it after a few moments.
+====
 
 You can also see that the *Quota* and *LimitRange* objects were created:
 

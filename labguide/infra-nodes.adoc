@@ -173,7 +173,32 @@ We don't yet have any ready or available machines in the set because the
 instances are still coming up and bootstrapping. You can check `oc get
 machine -n openshift-machine-api` to see when the instance finally starts
 running. Then, you can use `oc get node` to see when the actual node is
-joined and ready. If you're having trouble figuring out which node is the new
+joined and ready.
+
+[NOTE]
+====
+It can take several minutes for a `Machine` to be prepared and added as a `Node`.
+====
+
+[source,bash,role="copypaste"]
+----
+oc get nodes
+----
+
+```
+NAME                                         STATUS   ROLES          AGE    VERSION
+ip-10-0-132-151.us-east-2.compute.internal   Ready    infra,worker   107s   v1.12.4+509916ce1
+ip-10-0-137-86.us-east-2.compute.internal    Ready    infra,worker   110s   v1.12.4+509916ce1
+ip-10-0-138-38.us-east-2.compute.internal    Ready    worker         9h     v1.12.4+509916ce1
+ip-10-0-139-204.us-east-2.compute.internal   Ready    infra,worker   82s    v1.12.4+509916ce1
+ip-10-0-139-249.us-east-2.compute.internal   Ready    master         9h     v1.12.4+509916ce1
+ip-10-0-144-70.us-east-2.compute.internal    Ready    worker         9h     v1.12.4+509916ce1
+ip-10-0-145-199.us-east-2.compute.internal   Ready    master         9h     v1.12.4+509916ce1
+ip-10-0-162-32.us-east-2.compute.internal    Ready    master         9h     v1.12.4+509916ce1
+ip-10-0-173-37.us-east-2.compute.internal    Ready    worker         16m    v1.12.4+509916ce1
+```
+
+If you're having trouble figuring out which node is the new
 one, take a look at the `AGE` column. It will be the youngest! Also, in the
 `ROLES` column you will notice that the new node has both a `worker` and an
 `infra` role.
@@ -209,7 +234,7 @@ using are purposefully small.
 
 ### Extra Credit
 In the `openshift-machine-api` project are several `Pods`. One of them has a
-name of ` clusterapi-manager-controllers-....`. If you use `oc logs` on the
+name like `clusterapi-manager-controllers-cc46df86c-2vrbp`. If you use `oc logs` on the
 various containers in that `Pod`, you will see the various operator bits that
 actually make the nodes come into existence.
 
@@ -217,15 +242,15 @@ actually make the nodes come into existence.
 Operators are just `Pods`. But they are special `Pods`. They are software
 that understands how to deploy and manage applications in a Kubernetes
 environment. The power of Operators relies on a recent Kubernetes feature
-called Custom Resource Definitions (`CRD`). A CRD is exactly what it sounds
+called `CustomResourceDefinitions` (`CRD`). A `CRD` is exactly what it sounds
 like. They are a way to define a custom resource which is essentially
 extending the Kubernetes API with new objects.
 
 If you wanted to be able to create/read/update/delete `Foo` objects in
-Kubernetes, you would create a CRD that defines what a `Foo` is and how it
-works. You can then create Custom Resources (`CRs`) -- instances of your CRD.
+Kubernetes, you would create a `CRD` that defines what a `Foo` resource is and how it
+works. You can then create `CustomResources` (`CRs`) -- instances of your `CRD`.
 
-With Operators, the general pattern is that an Operator looks at CRs for its
+With Operators, the general pattern is that an Operator looks at `CRs` for its
 configuration, and then it _operates_ on the Kubernetes environment to do
 whatever the configuration specifies. Now you will take a look at how some of
 the infrastructure operators in OpenShift do their thing.
@@ -244,23 +269,36 @@ The OpenShift router is managed by an `Operator` called
 oc get pod -n openshift-ingress-operator
 ----
 
-The actual default router instance lives in the `openshift-ingress` project:
+The actual default router instance lives in the `openshift-ingress` project.  Take a look at the `Pods`.
 
 [source,bash,role="copypaste"]
 ----
-oc get pod -n openshift-ingress -o wide
+oc get pods -n openshift-ingress -o wide
 ----
 
-Take a look at the `Node` that is listed. You may see something like:
+And you will see something like:
 
 ```
-NAME                              READY   STATUS    RESTARTS   AGE    IP            NODE                           NOMINATED NODE
-router-default-587884bb98-qk6sf   1/1     Running   0          2d4h   10.128.2.6    ip-10-0-175-100.ec2.internal   <none>
-router-default-587884bb98-sbsm2   1/1     Running   0          19m    10.129.4.10   ip-10-0-194-62.ec2.internal    <none>
+NAME                              READY   STATUS    RESTARTS   AGE   IP           NODE                                        NOMINATED NODE
+router-default-7bc4c9c5cd-clwqt   1/1     Running   0          9h    10.128.2.7   ip-10-0-144-70.us-east-2.compute.internal   <none>
+router-default-7bc4c9c5cd-fq7m2   1/1     Running   0          9h    10.131.0.7   ip-10-0-138-38.us-east-2.compute.internal   <none>
 ```
 
-If you execute `oc get node <your_displayed_node>` you will see that it has
-the role of `worker`. The default configuration of the router operator is to
+Review a `Node` on which a router is running:
+
+[source,bash,role="copypaste copypaste-warning"]
+----
+oc get node ip-10-0-144-70.us-east-2.compute.internal
+----
+
+You will see that it has the role of `worker`.
+
+```
+NAME                                        STATUS   ROLES    AGE   VERSION
+ip-10-0-144-70.us-east-2.compute.internal   Ready    worker   9h    v1.12.4+509916ce1
+```
+
+The default configuration of the router operator is to
 pick nodes with the role of `worker`. But, now that we have created dedicated
 infrastructure nodes, we want to tell the operator to put the router
 instances on nodes with the role of `infra`.
@@ -288,7 +326,7 @@ metadata:
   selfLink: /apis/config.openshift.io/v1/ingresses/cluster
   uid: e1ec463c-5a0b-11e9-93e8-028b0fb1636c
 spec:
-  domain: apps.cluster-GUID.GUID.openshiftworkshop.com
+  domain: {{ ROUTE_SUBDOMAIN }}
 status: {}
 ```
 
@@ -346,7 +384,7 @@ Run:
 
 [source,bash,role="copypaste"]
 ----
-oc get pod -n openshift-ingress
+oc get pod -n openshift-ingress -o wide
 ----
 
 If you're quick enough, you might catch either `Terminating` or
@@ -360,9 +398,10 @@ deploys the actual registry pods. That CRD is
 `configs.imageregistry.operator.openshift.io`. You will edit the `cluster` CR
 object in order to add the `nodeSelector`. First, take a look at it:
 
-```sh
+[source,bash,role="copypaste"]
+----
 oc get configs.imageregistry.operator.openshift.io/cluster -o yaml
-```
+----
 
 You will see something like:
 
@@ -435,7 +474,7 @@ or other reasons.
 If you look at the node on which the registry landed (see the section on the
 router), you'll note that it is now running on an infra worker.
 
-Lastly, notice that the CRD for the image registry's configuration is not
+Lastly, notice that the `CRD` for the image registry's configuration is not
 namespaced -- it is cluster scoped. There is only one internal/integrated
 registry per OpenShift cluster.
 
@@ -446,19 +485,53 @@ installed by default during the initial cluster installation. Its operator
 uses a `ConfigMap` in the `openshift-monitoring` project to set various
 tunables and settings for the behavior of the monitoring stack.
 
-Take a look at the following file:
+The following `ConfigMap` definition will configure the monitoring
+solution to be redeployed onto infrastructure nodes.
 
-https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/tree/ocp4-prod/support/cluster-monitoring-configmap.yaml
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |+
+    alertmanagerMain:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    prometheusK8s:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    prometheusOperator:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    grafana:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    k8sPrometheusAdapter:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    kubeStateMetrics:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    telemeterClient:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+```
 
-It contains the definition for a `ConfigMap` that will cause the monitoring
-solution to be redeployed onto infrastructure nodes. There is no `ConfigMap`
-created as part of the installation. Without one, the operator will assume
-default settings:
+There is no `ConfigMap` created as part of the installation. Without one, the operator will assume
+default settings. Verify the `ConfigMap` is not defined in your cluster:
 
 [source,bash,role="copypaste"]
 ----
 oc get configmap cluster-monitoring-config -n openshift-monitoring
 ----
+
+You should see:
+
+```
+Error from server (NotFound): configmaps "cluster-monitoring-config" not found
+```
 
 The operator will, in turn, create several `ConfigMap` objects for the
 various monitoring stack components, and you can see them, too:
@@ -475,9 +548,19 @@ You can create the new monitoring config with the following command:
 oc create -f /home/lab-user/content/support/cluster-monitoring-configmap.yaml
 ----
 
-Then, you can do something like `watch 'oc get pod -n openshift-monitoring'`
-or `oc get pod -w -n openshift-monitoring` to watch the operator cause the
-various pods to be redeployed.
+Watch the monitoring pods move from `worker` to `infra` `Nodes` with:
+
+[source,bash,role="copypaste"]
+----
+watch 'oc get pod -n openshift-monitoring'
+----
+
+or:
+
+[source,bash,role="copypaste"]
+----
+oc get pod -w -n openshift-monitoring
+----
 
 ## Logging
 OpenShift's log aggregation solution is not installed by default. There is a

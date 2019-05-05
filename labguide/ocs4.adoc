@@ -17,7 +17,7 @@ This hands-on workshop is for both system administrators and application develop
 image::rook_diagram_3.png[]
 
 .Ceph deployed on OpenShift using Rook
-image::rook_diagram_2.png[]
+image::rook_diagram_4.png[]
 
 [[labexercises]]
 :numbered:

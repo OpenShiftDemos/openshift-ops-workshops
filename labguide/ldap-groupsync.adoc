@@ -181,6 +181,8 @@ We use `apply` because there is an existing `OAuth` object. If you used
 still get a warning, but that's OK.
 ====
 
+In the above commands, we're downloading the ca.crt file because the IDM server intends to be the CA for all corporate certificates.
+
 #### Syncing LDAP Groups to OpenShift Groups
 In OpenShift, groups can be used to manage users and control permissions for
 multiple users at once. There is a section in the documentation on how to

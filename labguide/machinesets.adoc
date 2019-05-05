@@ -53,9 +53,9 @@ NAME                                         INSTANCE              STATE     TYP
 cluster-f4a3-lpxbs-master-0                  i-04280885cafad3130   running   m4.xlarge    us-east-2   us-east-2a   47h
 cluster-f4a3-lpxbs-master-1                  i-0def910edcae51d11   running   m4.xlarge    us-east-2   us-east-2b   47h
 cluster-f4a3-lpxbs-master-2                  i-0beb5e40214d706fc   running   m4.xlarge    us-east-2   us-east-2c   47h
-cluster-f4a3-lpxbs-worker-us-east-2a-b94pr   i-0a922c0fe765caa3c   running   m4.large     us-east-2   us-east-2a   47h
-cluster-f4a3-lpxbs-worker-us-east-2b-m8gbx   i-0fb8d960b8a3a3343   running   m4.large     us-east-2   us-east-2b   47h
-cluster-f4a3-lpxbs-worker-us-east-2c-5tmg7   i-0151c72cd85f85038   running   m4.large     us-east-2   us-east-2c   47h
+cluster-f4a3-lpxbs-worker-us-east-2a-b94pr   i-0a922c0fe765caa3c   running   m4.2xlarge   us-east-2   us-east-2a   47h
+cluster-f4a3-lpxbs-worker-us-east-2b-m8gbx   i-0fb8d960b8a3a3343   running   m4.2xlarge   us-east-2   us-east-2b   47h
+cluster-f4a3-lpxbs-worker-us-east-2c-5tmg7   i-0151c72cd85f85038   running   m4.2xlarge   us-east-2   us-east-2c   47h
 ----
 
 Each `Machine` has a corresponding `INSTANCE`. Do those IDs look familiar?
@@ -133,7 +133,7 @@ You probably already have a new entry for a `Machine` with a `STATE` of
 and will look something like:
 
 ----
-cluster-f4a3-lpxbs-worker-us-east-2c-h7gdt   i-0b9208ec47f0e206b   running   m4.large     us-east-2   us-east-2c   47s
+cluster-f4a3-lpxbs-worker-us-east-2c-h7gdt   i-0b9208ec47f0e206b   running   m4.2xlarge     us-east-2   us-east-2c   47s
 ----
 
 At this point, in the background, the bootstrap process is happening
@@ -151,4 +151,14 @@ You should see your fresh and happy new node as the one with a very young age:
 ip-10-0-194-62.ec2.internal    Ready    worker         1m   v1.12.4+509916ce1
 ----
 
-Scale the `MachineSet` from one back down to zero before continuing.
+[NOTE]
+====
+It can take several minutes for a `Machine` to be prepared and added as a `Node`.
+====
+
+Scale the `MachineSet` from one back down to one before continuing.
+
+[source,bash,role="copypaste copypaste-warning"]
+----
+oc scale machineset cluster-5fa6-hx2ml-worker-us-east-2c -n openshift-machine-api --replicas=1
+----

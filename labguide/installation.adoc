@@ -135,6 +135,8 @@ time="2019-04-08T14:49:34Z" level=info msg="Access the OpenShift web-console her
 time="2019-04-08T14:49:34Z" level=info msg="Login to the console with user: kubeadmin, password: SxUr2-tQ2py-c6jq2-YtjW3"
 ----
 
+NOTE: Record the password as it will be used in future steps.
+
 The installation was run as a different system user, and the artifacts folder
 is read-only mounted into your `lab-user` folder. While the installer has
 fortunately given you a convenient `export` command to run, you don't have
@@ -225,13 +227,16 @@ environment and is exposed via the OpenShift Router. You will learn more
 about the router in a subsequent exercise. For now, you can simply
 control+click the link:
 
+To login define the username as `kubeadmin` and the password you recorded earlier.
+
 {{ MASTER_URL }}
 
-Don't forget your `kubeadmin` user and the password:
+If you do not have the password readily avilable the command to acquire it is:
 
-[source,role="copypaste"]
+
+[source,bash,role="copypaste"]
 ----
-{{ KUBEADMIN_PASSWORD }}
+tail -n5 ~/cluster-$GUID/.openshift_install.log
 ----
 
 [WARNING]

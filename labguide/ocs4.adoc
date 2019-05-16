@@ -65,7 +65,12 @@ To create the 3 new worker nodes with available storage you update 3 *machineset
 ll /home/lab-user/content/support/cluster-workerocs-*.yaml
 ----
 
-The files do not have the correct `cluster-api-cluster` label for your lab because every environment is unique. This command will find the correct value.
+The machineset files do not have the correct `cluster-api-cluster` label for your lab because every environment is unique. Commands below will find the correct value for your environment. 
+
+[NOTE]
+====
+*Make sure to execute next step for creating CLUSTERID environment variable*
+====
 
 [source,bash,role="copypaste"]
 ----

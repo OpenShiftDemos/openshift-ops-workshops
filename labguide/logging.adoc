@@ -97,7 +97,7 @@ When using operators in OpenShift, it is important to understand the basics
 of some of the underlying principles that make up the Operators.
 `CustomResourceDefinion (CRD)` and `CustomResource (CR)` are two Kubernetes
 objects that we will briefly describe.`CRDs` are generic pre-defined
-structures of data. The operator understand how to apply the data that is
+structures of data. The operator understands how to apply the data that is
 defined by the `CRD`. In terms of programming, `CRDs` can be thought as being
 similar to a class. `CustomResource (CR)` is an actual implementations of the
 `CRD`, where the structured data has actual values. These values are what the
@@ -190,8 +190,6 @@ we want to install and configure logging.
 2. On the `Custom Resource Definitions` page, click `ClusterLogging`.
 
 3. On the `Custom Resource Definition Overview` page, select `View Instances` from the `Actions` menu.
-
-4. On the `Cluster Loggings` page, click `Create Cluster Logging`.
 +
 [NOTE]
 ====
@@ -200,6 +198,8 @@ succeeded, the operator itself has not finished installing and the
 `CustomResourceDefinition` may not have been created yet. Wait a few moments
 and then refresh the page.
 ====
++
+4. On the `Cluster Loggings` page, click `Create Cluster Logging`.
 
 5. In the `YAML` editor, replace the code with the following:
 
@@ -400,6 +400,8 @@ Notice all of the available fields that we can use to build the query
 3. Next, select `is`.
 
 4. In the `Value` field, type in `openshift-logging`
+
+5. Click the "Save" button
 
 Now, in the center of the screen you will see all of the logs from the
 `openshift-logging` namespace.

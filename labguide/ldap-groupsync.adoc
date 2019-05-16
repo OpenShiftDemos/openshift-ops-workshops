@@ -45,15 +45,15 @@ You will see something like:
 apiVersion: config.openshift.io/v1
 kind: OAuth
 metadata:
-  annotations:
-    release.openshift.io/create-only: "true"
-  creationTimestamp: "2019-04-29T17:30:15Z"
+  creationTimestamp: 2019-05-03T08:16:00Z
   generation: 1
   name: cluster
-  resourceVersion: "1436"
+  resourceVersion: "8336"
   selfLink: /apis/config.openshift.io/v1/oauths/cluster
-  uid: 7325df68-6aa4-11e9-9959-02774c6d6b2e
-spec: {}
+  uid: afc6e10d-6d7b-11e9-aa4e-061f775e74c4
+spec:
+  tokenConfig:
+    accessTokenMaxAgeSeconds: 86400
 ```
 
 There are a few things to note here. Firstly, there's basically nothing here!
@@ -180,6 +180,8 @@ We use `apply` because there is an existing `OAuth` object. If you used
 `create` you would get an outright error that the object already exists. You
 still get a warning, but that's OK.
 ====
+
+In the above commands, we're downloading the ca.crt file because the IDM server intends to be the CA for all corporate certificates.
 
 #### Syncing LDAP Groups to OpenShift Groups
 In OpenShift, groups can be used to manage users and control permissions for

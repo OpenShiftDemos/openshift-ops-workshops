@@ -135,7 +135,11 @@ time="2019-04-08T14:49:34Z" level=info msg="Access the OpenShift web-console her
 time="2019-04-08T14:49:34Z" level=info msg="Login to the console with user: kubeadmin, password: SxUr2-tQ2py-c6jq2-YtjW3"
 ----
 
-NOTE: Record the password as it will be used in future steps.
+
+[NOTE]
+====
+Record the password as it will be used in future steps.
+====
 
 The installation was run as a different system user, and the artifacts folder
 is read-only mounted into your `lab-user` folder. While the installer has

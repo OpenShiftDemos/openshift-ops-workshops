@@ -92,8 +92,11 @@ oc create -f /home/lab-user/content/support/cluster-workerocs-us-east-2b.yaml
 oc create -f /home/lab-user/content/support/cluster-workerocs-us-east-2c.yaml
 ----
 
-WARNING: If errors are presented while running the `oc create` command run `git reset --hard` in the `/home/lab-user/content/support` directory
+[WARNING]
+====
+If errors are presented while running the `oc create` command run `git reset --hard` in the `/home/lab-user/content/support` directory
 and ensure the value of `CLUSTERID` is defined.
+====
 
 Check that you have new *machines* created. 
 

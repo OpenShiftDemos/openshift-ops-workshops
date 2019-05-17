@@ -20,7 +20,7 @@ storage project:
 
 [source,bash,role="copypaste"]
 ----
-oc project -n {{ CNS_NAMESPACE }}
+oc project {{ CNS_NAMESPACE }}
 ----
 
 Then, take a look at the storage *Pods*:
@@ -1047,6 +1047,7 @@ sed '/volumeBindingMode: Immediate/a allowVolumeExpansion: true' glusterfs-stora
 Now to modify this `StorageClass` the current glusterfs-storage needs to be deleted and the new glusterfs-storage-new.yaml used to create glusterfs-storage that containes the necessary parameter `allowVolumeExpansion: true`.
 
 ----
+oc login -u system:admin
 oc delete sc glusterfs-storage
 oc create -f glusterfs-storage-new.yaml
 ----
@@ -1352,9 +1353,9 @@ place for Logging and Metrics and provisioning is handled automatically.
 
 At some point the overall OCS cluster capacity may need to be expanded. There are a couple of ways to increase the storage capacity offered by OCS.
 
-1. add a second, independent OCS cluster with its own management stack (`heketi`) (like you did in the _Infrastructure Management_ module )
-2. add a second, independent OCS cluster to the existing management stack (as described in the link:https://access.redhat.com/documentation/en-us/container-native_storage/3.9/html-single/container-native_storage_for_openshift_container_platform/#idm140292314514720[documentation^])
-3. add additional nodes to an existing OCS cluster (as described in the link:https://access.redhat.com/documentation/en-us/container-native_storage/3.9/html-single/container-native_storage_for_openshift_container_platform/#idm140292314767904[documentation^])
+1. add a second, separate OCS cluster with its own management stack (`heketi`) (like you did in the _Infrastructure Management_ module )
+2. add a second, separate OCS cluster with its own management stack (as described in the link:https://access.redhat.com/documentation/en-us/red_hat_openshift_container_storage/3.11/html-single/operations_guide/index#idm140385886778944[documentation^])
+3. add additional nodes to an existing OCS cluster (as described in the link:https://access.redhat.com/documentation/en-us/red_hat_openshift_container_storage/3.11/html-single/operations_guide/index#sect_Adding_New_Nodes[documentation^])
 4. add additional devices to existing nodes
 
 Option 1) is automated using `openshift-ansible`

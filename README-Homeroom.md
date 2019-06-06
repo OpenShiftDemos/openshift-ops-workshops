@@ -83,8 +83,9 @@ BASTION_FQDN=$BASTION_FQDN \
 GUID=$GUID \
 ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN
 #Wait until pods is running
-watch "oc get routes admin && oc get pods #navigate to route when pods are running, good luck! \
+watch "oc get routes admin && oc get pods && echo "kubeadmin password is" $KUBEADMIN_PASSWORD #navigate to route when pods are running, good luck! \
 #navigate to route when pods are running and login with kubeadmin credentials"
+
 ```
 
 

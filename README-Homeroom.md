@@ -69,7 +69,7 @@ as `kubeadmin` and on a system with the `oc` client installed:
 
 ```bash
 oc new-app https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/homeroom-template.json
-oc set env dc/dashboard --all \
+oc set env dc/admin --all \
 WORKSHOPS_URLS='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml' \
 CONTENT_URL_PREFIX='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/' \
 API_URL=$API_URL \
@@ -85,7 +85,7 @@ ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN
 Your lab guide should deploy in a few moments. To find its url, execute:
 
 ```bash
-oc get route dashboard
+oc get route admin
 ```
 
 You should be able to visit that URL and see the lab guide. From here you can

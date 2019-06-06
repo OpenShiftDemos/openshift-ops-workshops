@@ -64,11 +64,15 @@ Most of the information can be found in the output of the installer.
 
 ### Deploy the Lab Guide
 Now that you have exported the various required variables, you can deploy the
-lab guide into your cluster. The following assumes you are logged in already
+lab guide into your cluster. The following will log you in
 as `kubeadmin` and on a system with the `oc` client installed:
-
 ```bash
-oc new-app https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/homeroom-template.json
+#logging in as kubeadmin
+oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
+#Creating new project
+oc new-project homeroom
+oc new-app https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/homeroom-template.json
+oc expose service admin
 oc set env dc/admin --all \
 WORKSHOPS_URLS='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml' \
 CONTENT_URL_PREFIX='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/' \
@@ -78,8 +82,11 @@ KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD \
 BASTION_FQDN=$BASTION_FQDN \
 GUID=$GUID \
 ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN
- 
+#Wait until pods is running
+watch "oc get routes admin && oc get pods #navigate to route when pods are running, good luck! \
+#navigate to route when pods are running and login with kubeadmin credentials"
 ```
+
 
 ## Doing the Labs
 Your lab guide should deploy in a few moments. To find its url, execute:

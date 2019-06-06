@@ -71,7 +71,7 @@ as `kubeadmin` and on a system with the `oc` client installed:
 oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
 #Creating new project
 oc new-project homeroom
-oc new-app https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/homeroom-template.json
+oc new-app https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/homeroom-template.json
 oc expose service admin
 oc set env dc/admin --all \
 WORKSHOPS_URLS='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml' \

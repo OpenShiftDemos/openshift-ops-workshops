@@ -68,7 +68,7 @@ lab guide into your cluster. The following assumes you are logged in already
 as `kubeadmin` and on a system with the `oc` client installed:
 
 ```bash
-oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-dashboard/master/templates/production.json
+oc new-app https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/homeroom-template.json
 oc set env dc/dashboard --all \
 WORKSHOPS_URLS='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml' \
 CONTENT_URL_PREFIX='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/' \

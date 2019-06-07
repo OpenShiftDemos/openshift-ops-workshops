@@ -30,6 +30,10 @@ Most command blocks support auto highlighting with a click. If you hover over
 the command block above and left-click, it should automatically highlight all the
 text to make for easier copying.
 
+[NOTE]
+====
+Logging in is required in order to continue the following exercises
+====
 ### Logging in
 The bastion host on which this lab guide is running is currently configured
 with an SSH key that is also present on the machine where you are sitting.

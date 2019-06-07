@@ -1,4 +1,3 @@
-##### [DO NOT WORK IN HOMEROOM] - do not have directory cluster-$GUID
 ## Installation and Verification
 
 The scope of the new installer-provisioned infrastructure (IPI) OpenShift 4

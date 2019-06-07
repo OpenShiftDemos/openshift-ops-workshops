@@ -53,6 +53,13 @@ automatically displayed in the guide.
 ### Required Information
 Most of the information can be found in the output of the installer.
 
+  - Example API_URL `https://api.cluster-gu1d.sandbox105.opentlc.com:6443`
+  - Example MASTER_URL `http://console-openshift-console.apps.cluster-gu1d.sandbox105.opentlc.com`
+  - Example KUBEADMIN_PASSWORD `aRtoD-bnps6-GkahK-Uj6YG`
+  - Example ROUTE_SUBDOMAIN `apps.cluster-gu1d.sandbox105.opentlc.com:6443`
+  - Example GUID `gu1d`
+  - Example BASTION_FQDN `bastion.gu1d.sandbox105.opentlc.com`
+
 1. Export the API URL endpoint to an environment variable:
 
     ```bash
@@ -76,6 +83,7 @@ Most of the information can be found in the output of the installer.
     ```bash
     export ROUTE_SUBDOMAIN=apps.mycluster.company.com
     ```
+    
 5. This lab guide was built for an internal Red Hat system, so there are two
    additional things you will need to export. Please export them exactly as
    follows:
@@ -106,7 +114,7 @@ BASTION_FQDN=$BASTION_FQDN \
 GUID=$GUID \
 ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN
 #Wait until pods is running
-watch "oc get routes admin && oc get pods && echo kubeadmin password is $KUBEADMIN_PASSWORD"
+watch "oc get route admin && oc get pods && echo kubeadmin password is $KUBEADMIN_PASSWORD"
 
 ```
 

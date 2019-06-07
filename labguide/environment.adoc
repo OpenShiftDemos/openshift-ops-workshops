@@ -16,31 +16,19 @@ You will now SSH into the bastion host in order to access the environment and
 complete the rest of the exercises.
 
 ## Environment Variable Check
-The following blocks should be populated if you exported all the variables correctly
+The following blocks should be populated if you exported all the variables correctly, if not, please delete homeroom project, export those variables, and start again.
 
 Your API_URL `{{ API_URL }}`
 
-  - Example API_URL `https://api.cluster-gu1d.sandbox105.opentlc.com:6443`
-
 Your MASTER_URL `{{ MASTER_URL }}`
-
-  - Example MASTER_URL `http://console-openshift-console.apps.cluster-gu1d.sandbox105.opentlc.com`
 
 Your KUBEADMIN_PASSWORD `{{ KUBEADMIN_PASSWORD }}`
 
-  - Example KUBEADMIN_PASSWORD `aRtoD-bnps6-GkahK-Uj6YG`
-
 Your ROUTE_SUBDOMAIN `{{ ROUTE_SUBDOMAIN }}`
-
-  - Example ROUTE_SUBDOMAIN `apps.cluster-gu1d.sandbox105.opentlc.com:6443`
 
 Your GUID `{{ GUID }}`
 
-  - Example GUID `gu1d`
-
 Your BASTION_FQDN `{{ BASTION_FQDN }}`
-
-  - Example BASTION_FQDN `bastion.gu1d.sandbox105.opentlc.com`
 
 ## Conventions
 You will see various code and command blocks throughout these exercises. Some of
@@ -57,7 +45,7 @@ Most command blocks support auto highlighting with a click. If you hover over
 the command block above and left-click, it should automatically highlight all the
 text to make for easier copying.
 
-[NOTE]
+[WARNING]
 ====
 Logging in is required in order to continue the following exercises
 ====

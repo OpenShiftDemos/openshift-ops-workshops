@@ -13,11 +13,8 @@
 
 Changes from ocd4-prod branch to accomodate Homeroom
 - replaced in _LABGUIDE_
-  - `/home/lab-user` with `/opt/app-root/src`
   - for `codeblock` in .adoc,  'copypaste' role is replaced with 'execute', 'execute-1', 'execute-2' where appropriate to initiate execution upon click
     - The copypaste warning blocks are left as is since we want user to modify before execution
-- [-- TODO --]
-  - Create custom workshop image with scripts to login to kubeadmin after web terminal launches
 
 References
 - https://github.com/openshift-labs/workshop-dashboard

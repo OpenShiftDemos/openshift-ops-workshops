@@ -1,4 +1,27 @@
-# OpenShift and Container Storage for Administrators
+##### -- Note for collaborators - Remove when preparing for pull request to github.com/openshift/openshift-cns-testdrive/ocp4-dev/
+replace
+```
+oc new-app https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/homeroom-template.json
+```
+with
+```
+oc new-app https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/homeroom-template.json
+```
+
+Changes from ocd4-prod branch to accomodate Homeroom
+- replaced in _LABGUIDE_
+  - `/home/lab-user` with `/opt/app-root/src`
+  - for `codeblock` in .adoc,  'copypaste' role is replaced with 'execute', 'execute-1', 'execute-2' where appropriate to initiate execution upon click
+    - The copypaste warning blocks are left as is since we want user to modify before execution
+- [-- TODO --]
+  - Create custom workshop image with scripts to login to kubeadmin after web terminal launches
+
+References
+- https://github.com/openshift-labs/workshop-dashboard
+- https://github.com/openshift-labs/workshop-terminal
+- https://github.com/openshift-labs/workshop-spawner
+##### -- End note --
+# OpenShift and Container Storage for Administrators - Homeroom Developement Edition
 This repository contains lab instructions and related supporting content for
 an administrative-focused workshop that deals with OpenShift and OpenShift
 Container Storage.
@@ -21,7 +44,7 @@ At this time an OpenShift 4 cluster can be obtained by visiting
 https://try.openshift.com -- a free "subscription" to / membership in the
 developer program is required.
 
-## Deploying the Lab Guide
+## Deploying the Lab Guide to Homeroom
 Deploying the lab guide will take two steps. First, you will need to get
 information about your cluster. Second, you will deploy the lab guide using
 the information you found so that proper URLs and references are
@@ -64,27 +87,35 @@ Most of the information can be found in the output of the installer.
 
 ### Deploy the Lab Guide
 Now that you have exported the various required variables, you can deploy the
-lab guide into your cluster. The following assumes you are logged in already
+lab guide into your cluster. The following will log you in
 as `kubeadmin` and on a system with the `oc` client installed:
-
 ```bash
-oc new-project labguide
-oc new-app -n labguide --name admin \
-quay.io/osevg/workshopper -e CONTENT_URL_PREFIX="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/" \
--e WORKSHOPS_URLS="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml" \
--e API_URL=$API_URL \
--e MASTER_URL=$MASTER_URL \
--e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD \
--e BASTION_FQDN=$BASTION_FQDN \
--e GUID=$GUID \
--e ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN
+#logging in as kubeadmin
+oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
+#Creating new project
+oc new-project homeroom
+oc new-app https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/homeroom-template.json
 oc expose service admin
+oc set env dc/admin --all \
+WORKSHOPS_URLS='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml' \
+CONTENT_URL_PREFIX='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/' \
+API_URL=$API_URL \
+MASTER_URL=$MASTER_URL \
+KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD \
+BASTION_FQDN=$BASTION_FQDN \
+GUID=$GUID \
+ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN
+#Wait until pods is running
+watch "oc get routes admin && oc get pods && echo "kubeadmin password is" $KUBEADMIN_PASSWORD #navigate to route when pods are running and login with kubeadmin credentials"
+
 ```
+
+
 ## Doing the Labs
 Your lab guide should deploy in a few moments. To find its url, execute:
 
 ```bash
-oc get route admin -n labguide
+oc get route admin
 ```
 
 You should be able to visit that URL and see the lab guide. From here you can

@@ -24,7 +24,7 @@ user doesn't affect any of the created resources.
 
 For this exercise, first create a *Project* to hold some resources:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc new-project app-management
 ----
@@ -38,7 +38,7 @@ instantiate templates, and so on.
 
 You will now launch a specific image that exists on Dockerhub
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc new-app quay.io/thoraxe/mapit
 ----
@@ -85,7 +85,7 @@ pod definition while running.
 
 You can get a list of pods:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pods
 ----
@@ -106,7 +106,7 @@ NOTE: The `-deploy` pod is related to the `DeploymentConfig` which will be discu
 The `describe` command will give you more information on the details of a pod.
 In the case of the pod name above:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="execute execute-warning"]
 ----
 oc describe pod mapit-1-5qmgw
 ----
@@ -213,7 +213,7 @@ including the YAML format to make one by hand, in the official documentation.
 
 You can see the current list of services in a project with:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get services
 ----
@@ -232,7 +232,7 @@ the service is deleted. Your service IP will likely be different.
 Just like with pods, you can `describe` services, too. In fact, you can
 `describe` most objects in OpenShift:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc describe service mapit
 ----
@@ -266,7 +266,7 @@ this data can be represented as serializable data objects (JSON, YAML).
 
 Take a look at the YAML output for the service:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get service mapit -o yaml
 ----
@@ -317,7 +317,7 @@ It is also of interest to view the YAML of the *Pod* to understand how OpenShift
 wires components together. Go back and find the name of your `mapit` *Pod*, and
 then execute the following:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="execute execute-warning"]
 ----
 oc get pod mapit-1-5qmgw -o yaml
 ----
@@ -385,7 +385,7 @@ Now that we know the background of what a *ReplicatonController* and
 look at the *DeploymentConfig* (DC) that was created for you when you told
 OpenShift to stand up the `mapit` image:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get dc
 ----
@@ -402,7 +402,7 @@ To get more details, we can look into the *ReplicationController* (*RC*).
 Take a look at the *ReplicationController* (RC) that was created for you when
 you told OpenShift to stand up the `mapit` image:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get rc
 ----
@@ -423,14 +423,14 @@ the desired number, we can tell OpenShift that we want more or less *Pods*.
 Let's scale our mapit "application" up to 2 instances. We can do this with
 the `scale` command.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc scale --replicas=2 dc/mapit
 ----
 
 To verify that we changed the number of replicas, issue the following command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get rc
 ----
@@ -445,7 +445,7 @@ mapit-1      2         2         1         4h
 You can see that we now have 2 replicas. Let's verify the number of pods with
 the `oc get pods` command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pods
 ----
@@ -461,7 +461,7 @@ mapit-1-rq6t6   1/1       Running   0          1m
 And lastly, let's verify that the *Service* that we learned about in the
 previous lab accurately reflects two endpoints:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc describe svc mapit
 ----
@@ -492,7 +492,7 @@ Events:            <none>
 
 Another way to look at a *Service*'s endpoints is with the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get endpoints mapit
 ----
@@ -537,7 +537,7 @@ Since we have two *Pods* running right now, let's see what happens if we
 "accidentally" kill one. Run the `oc get pods` command again, and choose a *Pod*
 name. Then, do the following:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="execute execute-warning"]
 ----
 oc delete pod mapit-1-6lczv && oc get pods
 ----
@@ -579,7 +579,7 @@ installation deployed an Operator for the router, and the operator created a
 router for you! The router lives in the `openshift-ingress`
 *Project*, and you can see information about it with the following command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc describe deployment router-default -n openshift-ingress
 ----
@@ -596,7 +596,7 @@ the *Service* via the command line. If you remember from earlier, your *Service*
 name is `mapit`. With the *Service* name, creating a *Route* is a simple
 one-command task:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc expose service mapit
 ----
@@ -609,7 +609,7 @@ route.route.openshift.io/mapit exposed
 
 Verify the *Route* was created with the following command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get route
 ----
@@ -658,7 +658,7 @@ oc expose service mapit
 Before we continue, go ahead and scale your application down to a single
 instance:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc scale --replicas=1 dc/mapit
 ----
@@ -696,7 +696,7 @@ which is creating and/or modifying probes. The `mapit` application exposes an
 endpoint which we can check to see if it is alive and ready to respond. You can
 test it using `curl`:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 curl mapit-app-management.{{ ROUTE_SUBDOMAIN }}/health
 ----
@@ -711,14 +711,14 @@ You will get some JSON as a response:
 We can ask OpenShift to probe this endpoint for liveness with the following
 command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc set probe dc/mapit --liveness --get-url=http://:8080/health --initial-delay-seconds=30
 ----
 
 You can then see that this probe is defined in the `oc describe` output:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc describe dc mapit
 ----
@@ -741,7 +741,7 @@ You will see a section like:
 
 Similarly, you can set a readiness probe in the same manner:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30
 ----
@@ -750,7 +750,7 @@ oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-
 
 Execute the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pods
 ----
@@ -773,7 +773,7 @@ deployment happens.
 
 Execute the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get deploymentconfigs
 ----
@@ -790,7 +790,7 @@ thus you are now on the third revision of the *DeploymentConfiguration*.
 
 Execute the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get replicationcontrollers
 ----

@@ -86,7 +86,7 @@ for you already. Use `cat`, `less`, or your favorite editor to view the modified
 
 [source,bash,role="execute"]
 ----
-cat /opt/app-root/src/content/support/project_request_template.yaml
+cat /home/lab-user/content/support/project_request_template.yaml
 ----
 
 Please take note that there are two new sections added: *ResourceQuota* and
@@ -256,7 +256,7 @@ Go ahead and execute the following:
 
 [source,bash,role="execute"]
 ----
-oc create -f /opt/app-root/src/content/support/project_request_template.yaml -n openshift-config
+oc create -f /home/lab-user/content/support/project_request_template.yaml -n openshift-config
 ----
 
 This will create the *Template* object in the `openshift-config` *Project*.
@@ -318,7 +318,7 @@ changes. To create the *CustomResource*, issue this command:
 
 [source,bash,role="execute"]
 ----
-oc apply -f /opt/app-root/src/content/support/cr_project_request.yaml -n openshift-config
+oc apply -f /home/lab-user/content/support/cr_project_request.yaml -n openshift-config
 ----
 
 Once this command is run, the OpenShift API Server configurations will be

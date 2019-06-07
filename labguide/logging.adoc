@@ -83,7 +83,7 @@ To create the namespace, run the following command:
 
 [source,bash,role="execute"]
 ----
-oc create -f /opt/app-root/src/content/support/openshift_logging_namespace.yaml
+oc create -f /home/lab-user/content/support/openshift_logging_namespace.yaml
 ----
 
 

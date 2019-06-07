@@ -106,7 +106,7 @@ NOTE: The `-deploy` pod is related to the `DeploymentConfig` which will be discu
 The `describe` command will give you more information on the details of a pod.
 In the case of the pod name above:
 
-[source,bash,role="execute execute-warning"]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 oc describe pod mapit-1-5qmgw
 ----
@@ -317,7 +317,7 @@ It is also of interest to view the YAML of the *Pod* to understand how OpenShift
 wires components together. Go back and find the name of your `mapit` *Pod*, and
 then execute the following:
 
-[source,bash,role="execute execute-warning"]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 oc get pod mapit-1-5qmgw -o yaml
 ----
@@ -537,7 +537,7 @@ Since we have two *Pods* running right now, let's see what happens if we
 "accidentally" kill one. Run the `oc get pods` command again, and choose a *Pod*
 name. Then, do the following:
 
-[source,bash,role="execute execute-warning"]
+[source,bash,role="copypaste copypaste-warning"]
 ----
 oc delete pod mapit-1-6lczv && oc get pods
 ----

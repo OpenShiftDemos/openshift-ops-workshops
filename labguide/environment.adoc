@@ -68,7 +68,7 @@ You can simply SSH to the bastion host like so:
 
 [source,bash,role="execute"]
 ----
-ssh -l lab-user {{ BASTION_FQDN }} -o ConnectTimeout=14400
+ssh -l lab-user {{ BASTION_FQDN }} -o ServerAliveInterval=120
 ----
 
 The `lab-user` account has password-less sudo privileges. You'll notice that

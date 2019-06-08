@@ -94,7 +94,7 @@ When the installation completed, the installer left some artifacts that
 contain the various URLs and passwords required to access the environment.
 The installation program was run under the `ec2-user` account. 
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 ls -al ~/cluster-$GUID
 ----
@@ -120,7 +120,7 @@ the cloud provider resources. You can see some of its outputs here. The
 important file right now is the `.openshift_install.log`. Its last few lines
 contain the relevant output to figure out how to access your environment:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 tail -n5 ~/cluster-$GUID/.openshift_install.log
 ----
@@ -144,7 +144,7 @@ write to the `KUBECONFIG` file, which it can't, so you'll get errors later if yo
 Our installation process has actually already copied the config you need to
 `~/.kube/config`, so you are already logged in. Try the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc whoami
 ----
@@ -155,7 +155,7 @@ The `oc` tool should already be in your path and be executable.
 First, you can check the current version of your OpenShift cluster by
 executing the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get clusterversion
 ----
@@ -190,7 +190,7 @@ Events:                 <none>
 Execute the following command to see a list of the *Nodes* that OpenShift knows
 about:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get nodes
 ----
@@ -229,7 +229,7 @@ control+click the link:
 
 Don't forget your `kubeadmin` user and the password:
 
-[source,role="copypaste"]
+[source,role="execute"]
 ----
 {{ KUBEADMIN_PASSWORD }}
 ----

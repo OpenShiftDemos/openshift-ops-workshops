@@ -81,7 +81,7 @@ metadata:
 
 To create the namespace, run the following command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc create -f /home/lab-user/content/support/openshift_logging_namespace.yaml
 ----
@@ -258,7 +258,7 @@ You should see pods for cluster logging, Elasticsearch, and Fluentd, as shown in
 
 Alternatively, you can verify from the command line by using the following command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pods -n openshift-logging
 ----
@@ -284,7 +284,7 @@ The _Fluentd_ *Pods* are deployed as part of a *DaemonSet*, which is a mechanism
 to ensure that specific *Pods* run on specific *Nodes* in the cluster at all
 times:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get daemonset -n openshift-logging
 ----
@@ -334,7 +334,7 @@ To find and access the _Kibana_ route:
 
 Alternatively, this can be obtained from the command line:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get route -n openshift-logging
 ----

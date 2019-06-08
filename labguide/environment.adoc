@@ -15,6 +15,21 @@ following:
 You will now SSH into the bastion host in order to access the environment and
 complete the rest of the exercises.
 
+## Environment Variable Check
+The following blocks should be populated if you exported all the variables correctly, if not, please delete homeroom project, export those variables, and start again.
+
+Your API_URL `{{ API_URL }}`
+
+Your MASTER_URL `{{ MASTER_URL }}`
+
+Your KUBEADMIN_PASSWORD `{{ KUBEADMIN_PASSWORD }}`
+
+Your ROUTE_SUBDOMAIN `{{ ROUTE_SUBDOMAIN }}`
+
+Your GUID `{{ GUID }}`
+
+Your BASTION_FQDN `{{ BASTION_FQDN }}`
+
 ## Conventions
 You will see various code and command blocks throughout these exercises. Some of
 the command blocks can be copy/pasted directly. Others will require modification
@@ -30,14 +45,18 @@ Most command blocks support auto highlighting with a click. If you hover over
 the command block above and left-click, it should automatically highlight all the
 text to make for easier copying.
 
+[WARNING]
+====
+Logging in is required in order to continue the following exercises
+====
 ### Logging in
 The bastion host on which this lab guide is running is currently configured
 with an SSH key that is also present on the machine where you are sitting.
 You can simply SSH to the bastion host like so:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-ssh -l lab-user {{ BASTION_FQDN }}
+ssh -l lab-user {{ BASTION_FQDN }} -o ServerAliveInterval=120
 ----
 
 The `lab-user` account has password-less sudo privileges. You'll notice that
@@ -45,7 +64,7 @@ there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This
 string is your `GUID`. Since you will often use `GUID`, it makes sense to
 export it as an environment variable:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 export GUID=`hostname | cut -d. -f2`
 ----
@@ -55,7 +74,7 @@ We have prepared various YAML files and other artifacts that you will use for
 the exercises in advance. You will need to clone these artifacts onto your
 bastion host now. Please execute the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 cd
 git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-prod content

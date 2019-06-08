@@ -6,14 +6,14 @@ marking it as non-schedulable followed by a _drain_ of all pods on the node.
 These operations require elevated privileges. Ensure you are logged in as
 cluster admin:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc login -u system:admin
 ----
 
 You will see by now that there are pods running on almost all of your nodes:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pods --all-namespaces -o wide
 ----
@@ -21,7 +21,7 @@ oc get pods --all-namespaces -o wide
 Sometimes you might need to perform maintenance on a host. Let's take a look
 at the *Pods* that are on `node02`:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc adm manage-node --list-pods {{ NODE2_INTERNAL_FQDN }}
 ----
@@ -30,7 +30,7 @@ Firstly, we probably want to ensure that no new workload can be put on this
 host. Mark node `{{ NODE2_INTERNAL_FQDN }}` as non-schedulable to prevent the
 schedulers in the system to place any new workloads on it:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=false
 ----
@@ -45,7 +45,7 @@ NAME                                          STATUS                     ROLES  
 Marking the node as non-schedulable did not impact the pods it is running. List those
 pods:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
 ----
@@ -66,7 +66,7 @@ problem since software like OCS is designed to handle such situations transparen
 
 Start the drain process like this:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc adm drain {{ NODE2_INTERNAL_FQDN }} --ignore-daemonsets
 ----
@@ -75,7 +75,7 @@ After a few moments, all of the *Pods*, except those for Fluentd, Container
 Native Storage, and Prometheus previously running on `{{ NODE2_INTERNAL_FQDN
 }}` should have terminated and been launched elsewhere.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
 ----
@@ -88,7 +88,7 @@ OCS and logging will come back up automatically.
 Now that our maintenance is complete, the node is still non-schedulable. Let's
 fix that:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=true
 ----

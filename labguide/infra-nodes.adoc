@@ -145,7 +145,7 @@ you. The following scriptlet assumes you have an AWS AZ (availability zone) call
 `us-east-2c` and will build and create an infra `MachineSet` for you with 3
 replicas. It requires the `jq` program be installed.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 export AWS_AZ=us-east-2c
 export NAME="infra-$AWS_AZ"
@@ -162,13 +162,13 @@ oc get machineset -n openshift-machine-api -o json\
 
 You can execute that script by doing the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 bash /home/lab-user/content/support/infra-nodes.sh
 ----
 
 Then go ahead and run:
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get machineset -n openshift-machine-api
 ----
@@ -191,7 +191,7 @@ joined and ready.
 It can take several minutes for a `Machine` to be prepared and added as a `Node`.
 ====
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get nodes
 ----
@@ -275,14 +275,14 @@ The OpenShift router is managed by an `Operator` called
 `openshift-ingress-operator`. Its `Pod` lives in the
 `openshift-ingress-operator` project:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pod -n openshift-ingress-operator
 ----
 
 The actual default router instance lives in the `openshift-ingress` project.  Take a look at the `Pods`.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pods -n openshift-ingress -o wide
 ----
@@ -318,7 +318,7 @@ The OpenShift router operator uses a custom resource definition (`CRD`)
 called `ingresses.config.openshift.io` to define the default routing
 subdomain for the cluster:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get ingresses.config.openshift.io cluster -o yaml
 ----
@@ -345,7 +345,7 @@ Individual router deployments are managed via the
 `ingresscontrollers.operator.openshift.io` CRD. There is a default one
 created in the `openshift-ingress-operator` namespace:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get ingresscontrollers.operator.openshift.io default -n openshift-ingress-operator -o yaml
 ----
@@ -385,7 +385,7 @@ status:
 Notice that the default placement is `node-role.kubernetes.io/worker`. We
 want to change that to `infra`. You can do that with the following command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc patch ingresscontrollers.operator.openshift.io default -n openshift-ingress-operator -p '{"spec":{"nodePlacement":{"nodeSelector":{"matchLabels":{"node-role.kubernetes.io/infra":""}}}}}' --type=merge
 ----
@@ -393,7 +393,7 @@ oc patch ingresscontrollers.operator.openshift.io default -n openshift-ingress-o
 
 Run:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pod -n openshift-ingress -o wide
 ----
@@ -409,7 +409,7 @@ deploys the actual registry pods. That CRD is
 `configs.imageregistry.operator.openshift.io`. You will edit the `cluster` CR
 object in order to add the `nodeSelector`. First, take a look at it:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get configs.imageregistry.operator.openshift.io/cluster -o yaml
 ----
@@ -450,7 +450,7 @@ status:
 
 If you run the following command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc patch configs.imageregistry.operator.openshift.io/cluster -p '{"spec":{"nodeSelector":{"node-role.kubernetes.io/infra": ""}}}' --type=merge
 ----
@@ -468,7 +468,7 @@ After you run the patch command you should see the registry pod being moved to t
 infra node. The registry is in the `openshift-image-registry` project. If you
 execute the following quickly enough:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pod -n openshift-image-registry
 ----
@@ -533,7 +533,7 @@ data:
 There is no `ConfigMap` created as part of the installation. Without one, the operator will assume
 default settings. Verify the `ConfigMap` is not defined in your cluster:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get configmap cluster-monitoring-config -n openshift-monitoring
 ----
@@ -547,28 +547,28 @@ Error from server (NotFound): configmaps "cluster-monitoring-config" not found
 The operator will, in turn, create several `ConfigMap` objects for the
 various monitoring stack components, and you can see them, too:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get configmap -n openshift-monitoring
 ----
 
 You can create the new monitoring config with the following command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc create -f /home/lab-user/content/support/cluster-monitoring-configmap.yaml
 ----
 
 Watch the monitoring pods move from `worker` to `infra` `Nodes` with:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 watch 'oc get pod -n openshift-monitoring'
 ----
 
 or:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pod -w -n openshift-monitoring
 ----

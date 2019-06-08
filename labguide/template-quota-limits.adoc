@@ -13,7 +13,7 @@ for a little restraint.
 Before continuing, make sure you are logged in with the built-in system administrator account in OpenShift.
 =====
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc login -u system:admin
 ----
@@ -28,7 +28,7 @@ processed to create the newly requested project.
 To view the built-in default *Project Request Template*, execute the
 following command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc adm create-bootstrap-project-template -o yaml
 ----
@@ -36,7 +36,7 @@ oc adm create-bootstrap-project-template -o yaml
 Inspecting the the YAML output of this command, you will notice that there are
 various parameters associated with this *Template* displayed towards the bottom.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 ...
 parameters:
@@ -51,7 +51,7 @@ parameters:
 
  Next, let's take a look at the help output for the `oc new-project` command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc new-project -h
 ----
@@ -84,7 +84,7 @@ You won't actually have to make template changes in this lab -- we've made them
 for you already. Use `cat`, `less`, or your favorite editor to view the modified
 *Project Request Template*:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 cat /home/lab-user/content/support/project_request_template.yaml
 ----
@@ -254,7 +254,7 @@ and simply instantiate the objects provided.
 
 Go ahead and execute the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc create -f /home/lab-user/content/support/project_request_template.yaml -n openshift-config
 ----
@@ -263,7 +263,7 @@ This will create the *Template* object in the `openshift-config` *Project*.
 You can now see the *Templates* in the `openshift-config` project with the
 following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get template -n openshift-config
 ----
@@ -281,7 +281,7 @@ configuration. This configuration is ultimately stored in a *ConfigMap* in
 the `openshift-apiserver` project. You can view the API Server configuration
 with the following command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get cm config -n openshift-apiserver -o jsonpath --template="{.data.config\.yaml}" | jq
 ----
@@ -316,7 +316,7 @@ The next step is to create this *CustomResource*. Once this *CR* is created,
 the OpenShift operator will notice the *CR*, and apply the configuration
 changes. To create the *CustomResource*, issue this command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc apply -f /home/lab-user/content/support/cr_project_request.yaml -n openshift-config
 ----
@@ -325,7 +325,7 @@ Once this command is run, the OpenShift API Server configurations will be
 updated by the operator. This can be verified by viewing the implemented
 configuration:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get cm config -n openshift-apiserver -o jsonpath --template="{.data.config\.yaml}" | jq
 ----
@@ -347,14 +347,14 @@ Notice the new *projectConfig* section:
 When creating a new project, you should see that a *Quota* and a *LimitRange*
 are created with it. First, create a new project called `template-test`:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc new-project template-test
 ----
 
 Then, use `describe` to look at some of this *Project's* details:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc describe project template-test
 ----
@@ -405,7 +405,7 @@ re-create it after a few moments.
 
 You can also see that the *Quota* and *LimitRange* objects were created:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get quota -n template-test
 ----
@@ -419,7 +419,7 @@ template-test-quota   2019-03-30T14:26:43Z
 
 And:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get limitrange -n template-test
 ----
@@ -444,7 +444,7 @@ and *LimitRange* are applied. If you do, be sure to look at the JSON/YAML output
 
 Before you continue, you may wish to delete the *Project* you just created:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc delete project template-test
 ----

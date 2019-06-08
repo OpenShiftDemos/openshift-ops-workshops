@@ -1,26 +1,3 @@
-##### -- Note for collaborators - Remove when preparing for pull request to github.com/openshift/openshift-cns-testdrive/ocp4-dev/
-- replace
-  - ```
-    oc new-app https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/homeroom-template.json
-    ```
-    with
-    ```
-    oc new-app https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/homeroom-template.json
-    ```
-  - https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/labguide/
-  with 
-  https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/labguide/
-
-Changes from ocd4-prod branch to accomodate Homeroom
-- replaced in _LABGUIDE_
-  - for `codeblock` in .adoc,  'copypaste' role is replaced with 'execute', 'execute-1', 'execute-2' where appropriate to initiate execution upon click
-    - The copypaste warning blocks are left as is since we want user to modify before execution
-
-References
-- https://github.com/openshift-labs/workshop-dashboard
-- https://github.com/openshift-labs/workshop-terminal
-- https://github.com/openshift-labs/workshop-spawner
-##### -- End note --
 # OpenShift and Container Storage for Administrators - Homeroom Developement Edition
 This repository contains lab instructions and related supporting content for
 an administrative-focused workshop that deals with OpenShift and OpenShift
@@ -102,11 +79,11 @@ as `kubeadmin` and on a system with the `oc` client installed:
 oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
 #Creating new project
 oc new-project homeroom
-oc new-app https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/homeroom-template.json
+oc new-app https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/homeroom-template.json
 oc expose service admin
 oc set env dc/admin --all \
 WORKSHOPS_URLS='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml' \
-CONTENT_URL_PREFIX='https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/labguide/' \
+CONTENT_URL_PREFIX='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/labguide/' \
 API_URL=$API_URL \
 MASTER_URL=$MASTER_URL \
 KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD \

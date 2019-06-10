@@ -3,6 +3,11 @@ This repository contains lab instructions and related supporting content for
 an administrative-focused workshop that deals with OpenShift and OpenShift
 Container Storage.
 
+#### Changes from ocd4-prod branch to accomodate Homeroom
+- replaced in _LABGUIDE_
+  - for `codeblock` in .adoc,  'copypaste' role is replaced with 'execute', 'execute-1', 'execute-2' where appropriate to initiate execution upon click
+    - The copypaste warning blocks are left as is since we want user to modify before execution
+
 ## Requirements / Prerequisites
 Doing these labs on your own requires a few things.
 
@@ -30,41 +35,26 @@ automatically displayed in the guide.
 ### Required Information
 Most of the information can be found in the output of the installer.
 
-  - Example API_URL `https://api.cluster-gu1d.sandbox105.opentlc.com:6443`
-  - Example MASTER_URL `http://console-openshift-console.apps.cluster-gu1d.sandbox105.opentlc.com`
-  - Example KUBEADMIN_PASSWORD `aRtoD-bnps6-GkahK-Uj6YG`
-  - Example ROUTE_SUBDOMAIN `apps.cluster-gu1d.sandbox105.opentlc.com:6443`
-  - Example GUID `gu1d`
-  - Example BASTION_FQDN `bastion.gu1d.sandbox105.opentlc.com`
-
 1. Export the API URL endpoint to an environment variable:
-
-    ```bash
-    export API_URL=https://api......:6443
-    ```
-
+     - Example API_URL `https://api.cluster-gu1d.sandbox105.opentlc.com:6443`
 2. Export the master/console URL to an environment variable:
-
-    ```bash
-    export MASTER_URL=https://console-openshift-console.....
-    ```
-
+    - Example MASTER_URL `http://console-openshift-console.apps.cluster-gu1d.sandbox105.opentlc.com`
 3. Export the `kubeadmin` password as an environment variable:
-
-    ```bash
-    export KUBEADMIN_PASSWORD=xxx
-    ```
-
+    - Example KUBEADMIN_PASSWORD `aRtoD-bnps6-GkahK-Uj6YG`
 4. Export the routing subdomain as an environment variable. When you installed your cluster you specified a domain to use, and OpenShift built a routing subdomain that looks like `apps.clusterID.domain`. For example, `apps.mycluster.company.com`. Export this:
-
-    ```bash
-    export ROUTE_SUBDOMAIN=apps.mycluster.company.com
-    ```
-    
+    - Example ROUTE_SUBDOMAIN `apps.cluster-gu1d.sandbox105.opentlc.com:6443`
 5. This lab guide was built for an internal Red Hat system, so there are two
    additional things you will need to export. Please export them exactly as
    follows:
+    - Example GUID `gu1d`
+    - Example BASTION_FQDN `bastion.gu1d.sandbox105.opentlc.com`
 
+    ```bash
+    export API_URL=https://api......:6443
+    export MASTER_URL=https://console-openshift-console.....
+    export KUBEADMIN_PASSWORD=xxx
+    export ROUTE_SUBDOMAIN=apps.mycluster.company.com
+    ```
     ```bash
     export GUID=xxxx
     export BASTION_FQDN=foo.bar.com
@@ -122,3 +112,8 @@ looks mostly different than the lab guide.
 Also note that the first lab where you SSH into the bastion host is not
 relevant to you -- you are likely already doing the exercises on the host
 where you installed OpenShift from.
+
+## References
+- https://github.com/openshift-labs/workshop-dashboard
+- https://github.com/openshift-labs/workshop-terminal
+- https://github.com/openshift-labs/workshop-spawner

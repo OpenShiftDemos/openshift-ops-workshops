@@ -86,6 +86,8 @@ watch "oc get route admin && oc get pods && echo kubeadmin password is $KUBEADMI
 ```
 There can only be one instance of kubeadmin logged-in to homeroom. If you are seeing errors, you probably logged-in more than once. Delete the homeroom project and repeat above steps again.
 
+If you are getting _too many redirects_ error then clearing cookies specific to the URL should help 
+
 ## Doing the Labs
 Your lab guide should deploy in a few moments. To find its url, execute:
 

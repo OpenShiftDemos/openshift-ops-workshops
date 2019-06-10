@@ -81,9 +81,15 @@ metadata:
 
 To create the namespace, run the following command:
 
+##### Make sure you are logged-in as kubeadmin
+[source,role="execute"]
+----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+----
+
 [source,bash,role="execute"]
 ----
-oc create -f /content/support/openshift_logging_namespace.yaml
+oc create -f content/support/openshift_logging_namespace.yaml
 ----
 
 

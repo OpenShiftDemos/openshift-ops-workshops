@@ -45,30 +45,6 @@ Most command blocks support auto highlighting with a click. If you hover over
 the command block above and left-click, it should automatically highlight all the
 text to make for easier copying.
 
-[WARNING]
-====
-Logging in is required in order to continue the following exercises
-====
-### Logging in
-The bastion host on which this lab guide is running is currently configured
-with an SSH key that is also present on the machine where you are sitting.
-You can simply SSH to the bastion host like so:
-
-[source,bash,role="execute"]
-----
-ssh -l lab-user {{ BASTION_FQDN }} -o ServerAliveInterval=120
-----
-
-The `lab-user` account has password-less sudo privileges. You'll notice that
-there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This
-string is your `GUID`. Since you will often use `GUID`, it makes sense to
-export it as an environment variable:
-
-[source,bash,role="execute"]
-----
-export GUID=`hostname | cut -d. -f2`
-----
-
 ### Cloning content
 We have prepared various YAML files and other artifacts that you will use for
 the exercises in advance. You will need to clone these artifacts onto your
@@ -80,4 +56,14 @@ cd
 git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-prod content
 ----
 
-Future exercises will refer to `/content/support`.
+[WARNING]
+====
+kubeadmin is required in the majority of following exercises
+====
+##### Log-in as kubeadmin for future exercises
+[source,role="execute"]
+----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+----
+
+Future exercises will refer to `content/support`.

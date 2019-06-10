@@ -84,7 +84,7 @@ ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN
 watch "oc get route admin && oc get pods && echo kubeadmin password is $KUBEADMIN_PASSWORD"
 
 ```
-
+There can only be one instance of kubeadmin logged-in to homeroom. If you are seeing errors, you probably logged-in more than once. Delete the homeroom project and repeat above steps again.
 
 ## Doing the Labs
 Your lab guide should deploy in a few moments. To find its url, execute:

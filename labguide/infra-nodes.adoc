@@ -164,7 +164,7 @@ You can execute that script by doing the following:
 
 [source,bash,role="execute"]
 ----
-bash /home/lab-user/content/support/infra-nodes.sh
+bash /content/support/infra-nodes.sh
 ----
 
 Then go ahead and run:
@@ -556,7 +556,7 @@ You can create the new monitoring config with the following command:
 
 [source,bash,role="execute"]
 ----
-oc create -f /home/lab-user/content/support/cluster-monitoring-configmap.yaml
+oc create -f /content/support/cluster-monitoring-configmap.yaml
 ----
 
 Watch the monitoring pods move from `worker` to `infra` `Nodes` with:

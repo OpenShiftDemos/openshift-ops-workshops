@@ -52,7 +52,6 @@ bastion host now. Please execute the following:
 
 [source,bash,role="execute"]
 ----
-cd
 git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-prod content
 ----
 

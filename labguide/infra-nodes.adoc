@@ -39,6 +39,25 @@ The use of taints/tolerations is not covered in any of these exercises.
 
 To accomplish this, you will create additional `MachineSets`.
 
+[WARNING]
+====
+SSH into bastion is required in the following exercise
+====
+You can simply SSH to the bastion host like so:
+[source,bash,role="execute"]
+----
+ssh -l lab-user {{ BASTION_FQDN }} -o ServerAliveInterval=120
+----
+[NOTE]
+====
+The password here should be the ssh password you received
+====
+You will also want to clone the content folder if the bastion doesn't have it already
+[source,bash,role="execute"]
+----
+git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-prod content
+----
+
 In order to understand how `MachineSets` work, run the following.
 
 This will allow you to follow along with some of the following discussion.
@@ -577,3 +596,9 @@ oc get pod -w -n openshift-monitoring
 OpenShift's log aggregation solution is not installed by default. There is a
 dedicated lab exercise that goes through the configuration and deployment of
 logging.
+
+## Exit SSH
+[source,bash,role="execute"]
+----
+exit
+----

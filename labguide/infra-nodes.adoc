@@ -145,8 +145,7 @@ you. The following scriptlet assumes you have an AWS AZ (availability zone) call
 `us-east-2c` and will build and create an infra `MachineSet` for you with 3
 replicas. It requires the `jq` program be installed.
 
-[source,bash,role="execute"]
-----
+```
 export AWS_AZ=us-east-2c
 export NAME="infra-$AWS_AZ"
 oc get machineset -n openshift-machine-api -o json\
@@ -158,7 +157,7 @@ oc get machineset -n openshift-machine-api -o json\
 | jq 'del (.metadata.annotations)'\
 | jq '.spec.replicas=3'\
 | oc create -f -
-----
+```
 
 You can execute that script by doing the following:
 

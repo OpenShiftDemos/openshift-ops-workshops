@@ -15,7 +15,7 @@
         },
         {
             "name": "TERMINAL_IMAGE",
-            "value": "quay.io/openshiftlabs/workshop-dashboard:2.12.0",
+            "value": "quay.io/passawit_kaovilai/workshop-terminal-image-open-cns-testdrive:ocp-cns-testdrive",
             "required": true
         },
         {

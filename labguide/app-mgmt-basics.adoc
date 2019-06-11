@@ -3,11 +3,6 @@ In this module, you will deploy a sample application using the `oc` tool and
 learn about some of the core concepts, fundamental objects, and basics of
 application management on OpenShift Container Platform.
 
-[NOTE]
-====
-You will still want to have an SSH session opened for these lab exercises.
-====
-
 ### Core OpenShift Concepts
 As a future administrator of OpenShift, it is important to understand several
 core building blocks as it relates to applications. Understanding these building

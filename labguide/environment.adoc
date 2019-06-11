@@ -12,9 +12,6 @@ following:
 * 3 worker nodes
 * 1 bastion host
 
-You will now SSH into the bastion host in order to access the environment and
-complete the rest of the exercises.
-
 ## Environment Variable Check
 The following blocks should be populated if you exported all the variables correctly, if not, please delete homeroom project, export those variables, and start again.
 

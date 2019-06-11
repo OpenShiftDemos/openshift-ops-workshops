@@ -33,7 +33,7 @@ Then, execute a script that we have prepared for you. It will create two
 
 [source,bash,role="execute"]
 ----
-bash /content/support/create-net-projects.sh
+bash content/support/create-net-projects.sh
 ----
 
 ### Examine the created infrastructure
@@ -79,7 +79,7 @@ To test connectivity between the two pods, run:
 
 [source,bash,role="execute"]
 ----
-bash /content/support/test-connectivity.sh
+bash content/support/test-connectivity.sh
 ----
 
 You will see something like the following:
@@ -127,7 +127,7 @@ above NetworkPolicy CR with:
 
 [source,bash,role="execute"]
 ----
-oc create -n netproj-b -f /content/support/network-policy-block-all.yaml
+oc create -n netproj-b -f content/support/network-policy-block-all.yaml
 ----
 
 ### Test Connectivity #2 (should fail)
@@ -139,7 +139,7 @@ Test by running:
 
 [source,bash,role="execute"]
 ----
-bash /content/support/test-connectivity.sh
+bash content/support/test-connectivity.sh
 ----
 
 You will see something like the following:
@@ -200,7 +200,7 @@ To allow access to the pod in the `netproj-b` *Project* from all pods in the
 
 [source,bash,role="execute"]
 ----
-oc create -n netproj-b -f /content/support/network-policy-allow-all-from-netproj-a.yaml
+oc create -n netproj-b -f content/support/network-policy-allow-all-from-netproj-a.yaml
 ----
 
 ### Test Connectivity #3 (should work again)
@@ -212,7 +212,7 @@ Test by running:
 
 [source,bash,role="execute"]
 ----
-bash /content/support/test-connectivity.sh
+bash content/support/test-connectivity.sh
 ----
 
 You will see something like the following:

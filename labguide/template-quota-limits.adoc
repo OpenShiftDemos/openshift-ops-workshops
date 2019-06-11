@@ -15,7 +15,7 @@ Before continuing, make sure you are logged in with the built-in system administ
 
 [source,bash,role="execute"]
 ----
-oc login -u system:admin
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
 
 

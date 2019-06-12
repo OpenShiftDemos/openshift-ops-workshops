@@ -116,8 +116,10 @@ create the `CR` which will tell the operator how to act, what to install,
 and/or what to configure. For installing `openshift-logging`, we will follow
 this pattern.
 
-To begin, log into the OpenShift Cluster's GUI. Then follow the following
-steps:
+To begin, log-in to the OpenShift Cluster's GUI. 
+`{{ MASTER_URL }}`
+
+Then follow the following steps:
 
 1. Install the Elasticsearch Operator:
   a. In the OpenShift console, click `Catalog` → `OperatorHub`.

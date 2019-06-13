@@ -27,10 +27,10 @@ information about your cluster. Second, you will deploy the lab guide using
 the information you found so that proper URLs and references are
 automatically displayed in the guide.
 
-### Required Information
+### Required Environment Variables
 Most of the information can be found in the output of the installer.
 
-Explaination and example of export values
+#### Explaination and examples
 - `API_URL` - URL to access API of the cluster
     - `https://api.cluster-gu1d.sandbox101.opentlc.com:6443`
 - `MASTER_URL` - Master Console URL
@@ -91,17 +91,14 @@ oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-dashboard/2
 
 # Wait for deployment to finish.
 
-oc rollout status dc/admin
+oc rollout status dc/admin -n labguide
 ```
-There can only be one instance of kubeadmin logged-in to homeroom. If you are seeing errors, you probably logged-in more than once. Delete the homeroom project and repeat above steps again.
-
-If you are getting _too many redirects_ error then clearing cookies specific to the URL should help 
 
 ## Doing the Labs
 Your lab guide should deploy in a few moments. To find its url, execute:
 
 ```bash
-oc get route admin
+oc get route admin -n labguide
 ```
 
 You should be able to visit that URL and see the lab guide. From here you can
@@ -124,7 +121,11 @@ Also note that the first lab where you SSH into the bastion host is not
 relevant to you -- you are likely already doing the exercises on the host
 where you installed OpenShift from.
 
+## Troubleshooting
+Make sure you are logged-in as kubeadmin when creating the project
+
+If you are getting _too many redirects_ error then clearing cookies and re-login as kubeadmin
+
 ## References
+This workshop is based on the following project
 - https://github.com/openshift-labs/workshop-dashboard
-- https://github.com/openshift-labs/workshop-terminal
-- https://github.com/openshift-labs/workshop-spawner

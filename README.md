@@ -30,19 +30,24 @@ automatically displayed in the guide.
 ### Required Information
 Most of the information can be found in the output of the installer.
 
-1. Export the API URL endpoint to an environment variable:
-     - Example API_URL `https://api.cluster-gu1d.sandbox105.opentlc.com:6443`
-2. Export the master/console URL to an environment variable:
-    - Example MASTER_URL `http://console-openshift-console.apps.cluster-gu1d.sandbox105.opentlc.com`
-3. Export the `kubeadmin` password as an environment variable:
-    - Example KUBEADMIN_PASSWORD `aRtoD-bnps6-GkahK-Uj6YG`
-4. Export the routing subdomain as an environment variable. When you installed your cluster you specified a domain to use, and OpenShift built a routing subdomain that looks like `apps.clusterID.domain`. For example, `apps.mycluster.company.com`. Export this:
-    - Example ROUTE_SUBDOMAIN `apps.cluster-gu1d.sandbox105.opentlc.com:6443`
-5. This lab guide was built for an internal Red Hat system, so there are two
-   additional things you will need to export. Please export them exactly as
-   follows:
-    - Example GUID `gu1d`
-    - Example BASTION_FQDN `bastion.gu1d.sandbox105.opentlc.com`
+Explaination and example of export values
+- `API_URL` - URL to access API of the cluster
+    - `https://api.cluster-gu1d.sandbox101.opentlc.com:6443`
+- `MASTER_URL` - Master Console URL
+    - `http://
+- `KUBEADMIN_PASSWORD` - Password for `kubeadmin`
+    - `aRtoD-bnps6-GkahK-Uj6YG`
+- `ROUTE_SUBDOMAIN` - Subdomain that apps will reside on
+    - `apps.cluster-gu1d.sandbox101.opentlc.com:6443`
+    - `apps.mycluster.company.com`
+
+Specific to Red Hat internal systems
+- `GUID` - GUID
+    - `gu1d`
+- `BASTION_FQDN` - Bastion Domain Name
+    - `bastion.gu1d.sandbox101.opentlc.com`
+
+Edit the following to your values and run
 
     ```bash
     export API_URL=https://api......:6443

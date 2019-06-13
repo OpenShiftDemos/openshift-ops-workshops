@@ -26,7 +26,7 @@ At this time an OpenShift 4 cluster can be obtained by visiting
 https://try.openshift.com -- a free "subscription" to / membership in the
 developer program is required.
 
-## Deploying the Lab Guide to Homeroom
+## Deploying the Lab Guide
 Deploying the lab guide will take two steps. First, you will need to get
 information about your cluster. Second, you will deploy the lab guide using
 the information you found so that proper URLs and references are

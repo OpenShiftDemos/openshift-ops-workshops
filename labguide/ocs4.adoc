@@ -324,7 +324,7 @@ Now you can login to *rook-ceph-tools* pod to run Ceph commands. This pod is com
 
 [source,bash,role="execute"]
 ----
-toolbox=$(oc -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}')
+export toolbox=$(oc -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}')
 oc -n rook-ceph rsh $toolbox
 ----
 

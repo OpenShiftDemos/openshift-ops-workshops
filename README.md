@@ -54,8 +54,6 @@ Most of the information can be found in the output of the installer.
     export MASTER_URL=https://console-openshift-console.....
     export KUBEADMIN_PASSWORD=xxx
     export ROUTE_SUBDOMAIN=apps.mycluster.company.com
-    ```
-    ```bash
     export GUID=xxxx
     export BASTION_FQDN=foo.bar.com
     ```
@@ -65,26 +63,35 @@ Now that you have exported the various required variables, you can deploy the
 lab guide into your cluster. The following will log you in
 as `kubeadmin` and on a system with the `oc` client installed:
 ```bash
-#logging in as kubeadmin
 oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
-#Creating new project
-oc new-project homeroom
-oc new-app https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/homeroom-template.json
-oc expose service admin
-oc set env dc/admin --all \
-WORKSHOPS_URLS='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml' \
-CONTENT_URL_PREFIX='https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/labguide/' \
-API_URL=$API_URL \
-MASTER_URL=$MASTER_URL \
-KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD \
-BASTION_FQDN=$BASTION_FQDN \
-GUID=$GUID \
-ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN \
-OPENSHIFT_USERNAME=kubeadmin \
-OPENSHIFT_PASSWORD=$KUBEADMIN_PASSWORD
-#Wait until pods is running
-watch "oc get route admin && oc get pods && echo kubeadmin password is $KUBEADMIN_PASSWORD"
 
+oc new-project labguide
+
+# Create file with environment variables.
+
+cat > /tmp/dashboard.envvars <<EOF
+WORKSHOPS_URLS='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml'
+CONTENT_URL_PREFIX='https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/labguide/'
+API_URL=$API_URL
+MASTER_URL=$MASTER_URL
+KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD
+BASTION_FQDN=$BASTION_FQDN
+GUID=$GUID
+ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN
+EOF
+
+# Create deployment.
+
+oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-dashboard/2.13.1/templates/production.json \
+   --param APPLICATION_NAME=admin \
+   --param OPENSHIFT_USERNAME=kubeadmin \
+   --param OPENSHIFT_PASSWORD=$KUBEADMIN_PASSWORD \
+   --param GATEWAY_ENVVARS="`cat /tmp/dashboard.envvars`" \
+   --param WORKSHOP_ENVVARS="`cat /tmp/dashboard.envvars`"
+
+# Wait for deployment to finish.
+
+oc rollout status dc/admin
 ```
 There can only be one instance of kubeadmin logged-in to homeroom. If you are seeing errors, you probably logged-in more than once. Delete the homeroom project and repeat above steps again.
 

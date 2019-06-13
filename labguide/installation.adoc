@@ -253,13 +253,6 @@ control+click the link:
 exit
 ----
 
-Don't forget your `kubeadmin` user and the password:
-
-[source,role="copypaste"]
-----
-{{ KUBEADMIN_PASSWORD }}
-----
-
 [WARNING]
 ====
 You will receive a self-signed certificate error in your browser when you

@@ -11,10 +11,6 @@ particular platform.
 This IPI installation has already been performed for you, and the cluster is
 in its basic, default state.
 
-[WARNING]
-====
-SSH into bastion is required in order inspect installation artifacts in the following exercise
-====
 ### Logging in
 The bastion host on which this lab guide is running is currently configured
 with an SSH key that is also present on the machine where you are sitting.

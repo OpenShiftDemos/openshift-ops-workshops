@@ -34,9 +34,9 @@ Most of the information can be found in the output of the installer.
 - `API_URL` - URL to access API of the cluster
     - `https://api.cluster-gu1d.sandbox101.opentlc.com:6443`
 - `MASTER_URL` - Master Console URL
-    - `http://
+    - `http://console-openshift-console.apps.cluster-gu1d.sandbox101.opentlc.com`
 - `KUBEADMIN_PASSWORD` - Password for `kubeadmin`
-    - `aRtoD-bnps6-GkahK-Uj6YG`
+- `SSH_PASSWORD` - password for ssh into bastion
 - `ROUTE_SUBDOMAIN` - Subdomain that apps will reside on
     - `apps.cluster-gu1d.sandbox101.opentlc.com:6443`
     - `apps.mycluster.company.com`
@@ -53,6 +53,7 @@ Edit the following to your values and run
     export API_URL=https://api......:6443
     export MASTER_URL=https://console-openshift-console.....
     export KUBEADMIN_PASSWORD=xxx
+    export SSH_PASSWORD=xxx
     export ROUTE_SUBDOMAIN=apps.mycluster.company.com
     export GUID=xxxx
     export BASTION_FQDN=foo.bar.com
@@ -75,6 +76,7 @@ CONTENT_URL_PREFIX='https://raw.githubusercontent.com/kaovilai/openshift-cns-tes
 API_URL=$API_URL
 MASTER_URL=$MASTER_URL
 KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD
+SSH_PASSWORD=$SSH_PASSWORD
 BASTION_FQDN=$BASTION_FQDN
 GUID=$GUID
 ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN

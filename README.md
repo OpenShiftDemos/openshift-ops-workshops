@@ -3,11 +3,6 @@ This repository contains lab instructions and related supporting content for
 an administrative-focused workshop that deals with OpenShift and OpenShift
 Container Storage.
 
-#### Changes from ocd4-prod branch to accomodate Homeroom
-- replaced in _LABGUIDE_
-  - for `codeblock` in .adoc,  'copypaste' role is replaced with 'execute', 'execute-1', 'execute-2' where appropriate to initiate execution upon click
-    - The copypaste warning blocks are left as is since we want user to modify before execution
-
 ## Requirements / Prerequisites
 Doing these labs on your own requires a few things.
 

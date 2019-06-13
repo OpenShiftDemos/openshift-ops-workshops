@@ -8,7 +8,7 @@ cluster admin:
 
 [source,bash,role="execute"]
 ----
-oc login -u system:admin
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
 
 You will see by now that there are pods running on almost all of your nodes:

@@ -12,21 +12,6 @@ following:
 * 3 worker nodes
 * 1 bastion host
 
-## Environment Variable Check
-The following blocks should be populated if you exported all the variables correctly, if not, please delete homeroom project, export those variables, and start again.
-
-Your API_URL `{{ API_URL }}`
-
-Your MASTER_URL `{{ MASTER_URL }}`
-
-Your KUBEADMIN_PASSWORD `{{ KUBEADMIN_PASSWORD }}`
-
-Your ROUTE_SUBDOMAIN `{{ ROUTE_SUBDOMAIN }}`
-
-Your GUID `{{ GUID }}`
-
-Your BASTION_FQDN `{{ BASTION_FQDN }}`
-
 ## Conventions
 You will see various code and command blocks throughout these exercises. Some of
 the command blocks can be copy/pasted directly. Others will require modification
@@ -62,4 +47,4 @@ kubeadmin is required in the majority of following exercises
 oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
 
-Future exercises will refer to `content/support`.
+Future exercises will refer to `/opt/app-root/src/content/support`.

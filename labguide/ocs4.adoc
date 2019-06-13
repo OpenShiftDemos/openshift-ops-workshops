@@ -62,7 +62,7 @@ To create the 3 new worker nodes with available storage you update 3 *machineset
 
 [source,bash,role="execute"]
 ----
-ll content/support/cluster-workerocs-*.yaml
+ll /opt/app-root/src/content/support/cluster-workerocs-*.yaml
 ----
 
 The machineset files do not have the correct `cluster-api-cluster` label for your lab because every environment is unique. Commands below will find the correct value for your environment. 
@@ -82,14 +82,14 @@ Using this correct `cluster-api-cluster` label for your lab environment modify e
 
 [source,bash,role="execute"]
 ----
-sed -i "s/cluster-28cf-t22gs/$CLUSTERID/g" content/support/cluster-workerocs-*.yaml
+sed -i "s/cluster-28cf-t22gs/$CLUSTERID/g" /opt/app-root/src/content/support/cluster-workerocs-*.yaml
 ----
 
 Check that `cluster-api-cluster` label has been changed to `$CLUSTERID`.
 
 [source,bash,role="execute"]
 ----
-grep cluster-api-cluster content/support/cluster-workerocs-*
+grep cluster-api-cluster /opt/app-root/src/content/support/cluster-workerocs-*
 ----
 
 The label for `cluster-api-cluster` should now match the results of `echo $CLUSTERID` from above for all occurrences.
@@ -98,9 +98,9 @@ Now you are ready to create your 3 new OCP worker nodes using these modified *ma
 
 [source,bash,role="execute"]
 ----
-oc create -f content/support/cluster-workerocs-us-east-2a.yaml
-oc create -f content/support/cluster-workerocs-us-east-2b.yaml
-oc create -f content/support/cluster-workerocs-us-east-2c.yaml
+oc create -f /opt/app-root/src/content/support/cluster-workerocs-us-east-2a.yaml
+oc create -f /opt/app-root/src/content/support/cluster-workerocs-us-east-2b.yaml
+oc create -f /opt/app-root/src/content/support/cluster-workerocs-us-east-2c.yaml
 ----
 
 Check that you have new *machines* created. 
@@ -187,14 +187,14 @@ configuration for these resources will be the same for most deployments. The
 
 [source,bash,role="execute"]
 ----
-oc create -f content/support/common.yaml
+oc create -f /opt/app-root/src/content/support/common.yaml
 ----
 
 After the common resources are created, the next step is to create the Operator deployment using *operator-openshift.yaml*.  
 
 [source,bash,role="execute"]
 ----
-oc create -f content/support/operator-openshift.yaml
+oc create -f /opt/app-root/src/content/support/operator-openshift.yaml
 watch oc get pods -n rook-ceph
 ----
 
@@ -244,7 +244,7 @@ AWS EC2 `m5d.large` instance type each with an available 75GB NVMe SSD.
 
 [source,bash,role="execute"]
 ----
-cat content/support/cluster.yaml
+cat /opt/app-root/src/content/support/cluster.yaml
 ----
 
 Take a look at the *cluster.yaml* file. It specifies the version of Ceph and
@@ -286,7 +286,7 @@ Now create the Ceph resources.
 
 [source,bash,role="execute"]
 ----
-oc create -f content/support/cluster.yaml
+oc create -f /opt/app-root/src/content/support/cluster.yaml
 ----
 
 It may take more than 5 minutes to create all of the new *MONs*, *MGR* and *OSD* pods.
@@ -317,7 +317,7 @@ Once all pods are in a Running state it is time to verify that Ceph is operating
 
 [source,bash,role="execute"]
 ----
-oc create -f content/support/toolbox.yaml
+oc create -f /opt/app-root/src/content/support/toolbox.yaml
 ----
 
 Now you can login to *rook-ceph-tools* pod to run Ceph commands. This pod is commonly called the *toolbox*.
@@ -347,14 +347,14 @@ In this section you will download *storageclass.yaml* and then create the OCP *s
 
 [source,bash,role="execute"]
 ----
-cat content/support/storageclass.yaml
+cat /opt/app-root/src/content/support/storageclass.yaml
 ----
 
 Notice the `provisioner: ceph.rook.io/block` and that `replicated: size=2` which is a good practice when there are only 3 OSDs. This is because if one *OSD* is down OCP volumes can continue to be created and used. 
 
 [source,bash,role="execute"]
 ----
-oc create -f content/support/storageclass.yaml
+oc create -f /opt/app-root/src/content/support/storageclass.yaml
 ----
 
 Login to *toolbox* pod to run Ceph commands. Compare results for `ceph df`
@@ -703,7 +703,7 @@ machine because of `replicas: 1` in the configuration file. Your
 
 [source,bash,role="execute"]
 ----
-cat machineset content/support/cluster-workerocs-us-east-2a.yaml | more
+cat machineset /opt/app-root/src/content/support/cluster-workerocs-us-east-2a.yaml | more
 ----
 
 

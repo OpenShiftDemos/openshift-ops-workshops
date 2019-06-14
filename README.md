@@ -49,7 +49,7 @@ Specific to Red Hat internal systems
 
 Edit the following to your values and run.
 
-:warning: For `SSH_PASSWORD` ensure special characters are escaped (ie. use `\!` in place of `!`).
+:warning: For `export` ensure [special characters](http://mywiki.wooledge.org/BashGuide/SpecialCharacters) are escaped (ie. use `\!` in place of `!`).
 ```bash
 export API_URL=https://api......:6443
 export MASTER_URL=https://console-openshift-console.....

@@ -52,7 +52,7 @@ Edit the following to your values and run
 export API_URL=https://api......:6443
 export MASTER_URL=https://console-openshift-console.....
 export KUBEADMIN_PASSWORD=xxx
-export SSH_PASSWORD=xxx
+export SSH_PASSWORD=xxxx
 export ROUTE_SUBDOMAIN=apps.mycluster.company.com
 export GUID=xxxx
 export BASTION_FQDN=foo.bar.com

@@ -25,7 +25,7 @@ Here is your ssh password
 
 [source,bash,role="copypaste"]
 ----
-{{ PASSWORD_SSH }}
+{{ SSH_PASSWORD }}
 ----
 
 You'll notice that there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This

@@ -23,9 +23,9 @@ of the command before execution. If you see a command block with a red border
 some command to modify
 ----
 
-Most command blocks support auto highlighting with a click. If you hover over
+Most command blocks support auto highlighting or executing with a click. If you hover over
 the command block above and left-click, it should automatically highlight all the
-text to make for easier copying.
+text to make for easier copying. Look at the symbol next to the block to see if it will copy or execute.
 
 ### Cloning content
 We have prepared various YAML files and other artifacts that you will use for

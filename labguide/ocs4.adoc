@@ -78,10 +78,13 @@ CLUSTERID=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].m
 echo $CLUSTERID
 ----
 
-Using this correct `cluster-api-cluster` label for your lab environment modify each of the 3 *machinesets* downloaded earlier using the variable `$CLUSTERID`.
+Using this correct `cluster-api-cluster` label for your lab environment modify each of the 3 *machinesets* downloaded earlier using the variable `$CLUSTERID`. It is a good idea to backup yaml files when executing `sed`.
 
 [source,bash,role="execute"]
 ----
+mkdir /opt/app-root/src/content/support/backup/
+cp /opt/app-root/src/content/support/cluster-workerocs-*.yaml --target-directory=/opt/app-root/src/content/support/backup/
+
 sed -i "s/cluster-28cf-t22gs/$CLUSTERID/g" /opt/app-root/src/content/support/cluster-workerocs-*.yaml
 ----
 

@@ -48,17 +48,15 @@ Specific to Red Hat internal systems
     - `bastion.gu1d.sandbox101.opentlc.com`
 
 Edit the following to your values and run
-
-    ```bash
-    export API_URL=https://api......:6443
-    export MASTER_URL=https://console-openshift-console.....
-    export KUBEADMIN_PASSWORD=xxx
-    export SSH_PASSWORD=xxx
-    export ROUTE_SUBDOMAIN=apps.mycluster.company.com
-    export GUID=xxxx
-    export BASTION_FQDN=foo.bar.com
-    ```
-
+```
+export API_URL=https://api......:6443
+export MASTER_URL=https://console-openshift-console.....
+export KUBEADMIN_PASSWORD=xxx
+export SSH_PASSWORD=xxx
+export ROUTE_SUBDOMAIN=apps.mycluster.company.com
+export GUID=xxxx
+export BASTION_FQDN=foo.bar.com
+```
 ### Deploy the Lab Guide
 Now that you have exported the various required variables, you can deploy the
 lab guide into your cluster. The following will log you in

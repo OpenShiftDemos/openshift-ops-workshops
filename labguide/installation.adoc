@@ -22,6 +22,16 @@ Here is your ssh password:
 {{ SSH_PASSWORD }}
 ----
 
+[source,bash,role="copypaste"]
+----
+{{ SSNOTH_PASSWORD }}
+----
+
+[source,bash,role="copypaste"]
+----
+{{ SSNOTH2_PASSWORD }}
+----
+
 You can simply SSH to the bastion host like so:
 
 [source,bash,role="execute"]

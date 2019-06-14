@@ -20,10 +20,12 @@ You can simply SSH to the bastion host like so:
 ----
 ssh -l lab-user {{ BASTION_FQDN }} -o ServerAliveInterval=120
 ----
+
 Here is your ssh password
+
 [source,bash,role="copypaste"]
 ----
-{{ SSH_PASSWORD }} {{ SSH_PASSWORD2 }}
+{{ PASSWORD_SSH }}
 ----
 
 You'll notice that there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This

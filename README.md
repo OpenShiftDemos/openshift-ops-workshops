@@ -52,7 +52,7 @@ Edit the following to your values and run
 export API_URL=https://api......:6443
 export MASTER_URL=https://console-openshift-console.....
 export KUBEADMIN_PASSWORD=xxx
-export SSH_PASSWORD=xxx
+export PASSWORD_SSH=xxx
 export ROUTE_SUBDOMAIN=apps.mycluster.company.com
 export GUID=xxxx
 export BASTION_FQDN=foo.bar.com
@@ -74,7 +74,7 @@ CONTENT_URL_PREFIX='https://raw.githubusercontent.com/kaovilai/openshift-cns-tes
 API_URL=$API_URL
 MASTER_URL=$MASTER_URL
 KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD
-SSH_PASSWORD=$SSH_PASSWORD
+PASSWORD_SSH=$PASSWORD_SSH
 BASTION_FQDN=$BASTION_FQDN
 GUID=$GUID
 ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN

@@ -15,43 +15,6 @@ in its basic, default state.
 The bastion host on which this lab guide is running is currently configured
 with an SSH key that is also present on the machine where you are sitting.
 
-Here is your ssh password:
-
-[source,bash,role="copypaste"]
-----
-{{ SSH_PASSWORD }}
-----
-
-[source,bash,role="copypaste"]
-----
-{{ NOTSSH_PASSWORD }}
-----
-
-[source,bash,role="copypaste"]
-----
-{{ SSNOTH_PASSWORD }}
-----
-
-[source,bash,role="copypaste"]
-----
-{{ SSNOTH2_PASSWORD }}
-----
-
-[source,bash,role="copypaste copypaste-warning"]
-----
-oc delete pod mapit-1-6lczv && oc get pods
-----
-
-[source,bash,role="copypaste"]
-----
-oc delete pod mapit-1-6lczv && oc get pods
-----
-
-[source,bash,role="copypaste"]
-----
-{{ SSH_PASSWORD }}
-----
-
 You can simply SSH to the bastion host like so:
 
 [source,bash,role="execute"]

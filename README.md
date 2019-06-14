@@ -72,7 +72,7 @@ oc new-project labguide
 
 cat > /tmp/dashboard.envvars <<EOF
 WORKSHOPS_URLS='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml'
-CONTENT_URL_PREFIX='https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/labguide/'
+CONTENT_URL_PREFIX='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/labguide/'
 API_URL=$API_URL
 MASTER_URL=$MASTER_URL
 KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD

@@ -69,7 +69,7 @@ oc new-project labguide
 # Create file with environment variables.
 
 cat > /tmp/dashboard.envvars <<EOF
-WORKSHOPS_URLS='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml'
+WORKSHOPS_URLS='https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml'
 CONTENT_URL_PREFIX='https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/labguide/'
 API_URL=$API_URL
 MASTER_URL=$MASTER_URL

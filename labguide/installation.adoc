@@ -14,6 +14,14 @@ in its basic, default state.
 ### Logging in
 The bastion host on which this lab guide is running is currently configured
 with an SSH key that is also present on the machine where you are sitting.
+
+Here is your ssh password:
+
+[source,bash,role="copypaste"]
+----
+{{ SSH_PASSWORD }}
+----
+
 You can simply SSH to the bastion host like so:
 
 [source,bash,role="execute"]
@@ -21,7 +29,7 @@ You can simply SSH to the bastion host like so:
 ssh -l lab-user {{ BASTION_FQDN }} -o ServerAliveInterval=120
 ----
 
-Here is your ssh password
+Here is your ssh password:
 
 [source,bash,role="copypaste"]
 ----

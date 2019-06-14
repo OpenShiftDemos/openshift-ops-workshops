@@ -47,8 +47,10 @@ Specific to Red Hat internal systems
 - `BASTION_FQDN` - Bastion Domain Name
     - `bastion.gu1d.sandbox101.opentlc.com`
 
-Edit the following to your values and run. For `SSH_PASSWORD` ensure special characters are escaped (ie. use `\!` in place of `!`).
-```
+Edit the following to your values and run.
+
+:warning: For `SSH_PASSWORD` ensure special characters are escaped (ie. use `\!` in place of `!`).
+```bash
 export API_URL=https://api......:6443
 export MASTER_URL=https://console-openshift-console.....
 export KUBEADMIN_PASSWORD=xxx

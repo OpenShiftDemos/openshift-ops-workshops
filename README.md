@@ -62,7 +62,7 @@ export BASTION_FQDN=foo.bar.com
 ### Deploy the Lab Guide
 Now that you have exported the various required variables, you can deploy the
 lab guide into your cluster. The following will log you in
-as `kubeadmin` and on a system with the `oc` client installed:
+as `kubeadmin` on systems with `oc` client installed:
 ```bash
 oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
 

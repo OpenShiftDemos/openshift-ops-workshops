@@ -11,6 +11,7 @@ vars:
   GUID:
   ROUTE_SUBDOMAIN:
   SSH_PASSWORD:
+  HOME_PATH:
 
 modules:
   activate:

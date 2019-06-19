@@ -58,6 +58,7 @@ export SSH_PASSWORD=xxxx
 export ROUTE_SUBDOMAIN=apps.mycluster.company.com
 export GUID=xxxx
 export BASTION_FQDN=foo.bar.com
+export HOME_PATH=/opt/app-root/src
 ```
 ### Deploy the Lab Guide
 Now that you have exported the various required variables, you can deploy the
@@ -81,7 +82,8 @@ KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD \
 SSH_PASSWORD=$SSH_PASSWORD \
 BASTION_FQDN=$BASTION_FQDN \
 GUID=$GUID \
-ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN"
+ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN \
+HOME_PATH=$HOME_PATH"
 
 # Wait for deployment to finish.
 

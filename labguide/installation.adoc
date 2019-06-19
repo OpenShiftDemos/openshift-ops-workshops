@@ -12,10 +12,7 @@ This IPI installation has already been performed for you, and the cluster is
 in its basic, default state.
 
 ### Logging in
-The bastion host on which this lab guide is running is currently configured
-with an SSH key that is also present on the machine where you are sitting.
-
-You can simply SSH to the bastion host like so:
+To inspect the cluster installation, you can simply SSH to the bastion host where it was installed on like so:
 
 [source,bash,role="execute"]
 ----

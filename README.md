@@ -125,5 +125,5 @@ If you are getting _too many redirects_ error then clearing cookies and re-login
 ## Cleaning up
 To delete deployment run
 ```
-oc delete all,serviceaccount,rolebinding,configmap -l app=admin
+oc delete all,serviceaccount,rolebinding,configmap -l app=admin -n labguide
 ```

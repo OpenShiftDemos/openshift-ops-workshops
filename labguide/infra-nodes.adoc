@@ -141,23 +141,15 @@ rules for creating one, at least for a simple change like we're making:
 6. Even though you're changing `MachineSet` `name` references, be sure not to change the `subnet`.
 
 This sounds complicated, so we created a little scriptlet that will do it for
-you. The following scriptlet assumes you have an AWS AZ (availability zone) called
+you called `infra-nodes.sh`. The following scriptlet assumes you have an AWS AZ (availability zone) called
 `us-east-2c` and will build and create an infra `MachineSet` for you with 3
 replicas. It requires the `jq` program be installed.
 
-```bash
-export AWS_AZ=us-east-2c
-export NAME="infra-$AWS_AZ"
-oc get machineset -n openshift-machine-api -o json\
-| jq '.items[0]'\
-| jq '.metadata.name=env["NAME"]'\
-| jq '.spec.selector.matchLabels."machine.openshift.io/cluster-api-machineset"=env["NAME"]'\
-| jq '.spec.template.metadata.labels."machine.openshift.io/cluster-api-machineset"=env["NAME"]'\
-| jq '.spec.template.spec.metadata.labels."node-role.kubernetes.io/infra"=""'\
-| jq 'del (.metadata.annotations)'\
-| jq '.spec.replicas=3'\
-| oc create -f -
-```
+View its content
+[source,bash,role="execute"]
+----
+cat /opt/app-root/src/content/support/infra-nodes.sh
+----
 
 You can execute that script by doing the following:
 

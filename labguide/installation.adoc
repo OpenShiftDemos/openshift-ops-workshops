@@ -11,10 +11,29 @@ particular platform.
 This IPI installation has already been performed for you, and the cluster is
 in its basic, default state.
 
-[NOTE]
-====
-At this point you should be logged in as `lab-user` on the bastion via SSH.
-====
+### Logging in
+To inspect the cluster installation, you can simply SSH to the bastion host where it was installed on like so:
+
+[source,bash,role="execute"]
+----
+ssh -l lab-user {{ BASTION_FQDN }} -o ServerAliveInterval=120
+----
+
+Here is your ssh password:
+
+[source,bash,role="copypaste"]
+----
+{{ SSH_PASSWORD }}
+----
+
+You'll notice that there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This
+string is your `GUID`. Since you will often use `GUID`, it makes sense to
+export it as an environment variable:
+
+[source,bash,role="execute"]
+----
+export GUID=`hostname | cut -d. -f2`
+----
 
 ### Master Components
 
@@ -94,7 +113,7 @@ When the installation completed, the installer left some artifacts that
 contain the various URLs and passwords required to access the environment.
 The installation program was run under the `ec2-user` account. 
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 ls -al ~/cluster-$GUID
 ----
@@ -120,7 +139,7 @@ the cloud provider resources. You can see some of its outputs here. The
 important file right now is the `.openshift_install.log`. Its last few lines
 contain the relevant output to figure out how to access your environment:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 tail -n5 ~/cluster-$GUID/.openshift_install.log
 ----
@@ -144,7 +163,7 @@ write to the `KUBECONFIG` file, which it can't, so you'll get errors later if yo
 Our installation process has actually already copied the config you need to
 `~/.kube/config`, so you are already logged in. Try the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc whoami
 ----
@@ -155,7 +174,7 @@ The `oc` tool should already be in your path and be executable.
 First, you can check the current version of your OpenShift cluster by
 executing the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get clusterversion
 ----
@@ -190,7 +209,7 @@ Events:                 <none>
 Execute the following command to see a list of the *Nodes* that OpenShift knows
 about:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get nodes
 ----
@@ -227,12 +246,12 @@ control+click the link:
 
 {{ MASTER_URL }}
 
-Don't forget your `kubeadmin` user and the password:
-
-[source,role="copypaste"]
+#### You will now exit the ssh session
+[source,role="execute"]
 ----
-{{ KUBEADMIN_PASSWORD }}
+exit
 ----
+If you accidentally hit exit more than once and connection to the console closed, refresh the webpage to reconnect.
 
 [WARNING]
 ====

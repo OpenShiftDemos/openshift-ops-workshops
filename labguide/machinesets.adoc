@@ -20,7 +20,7 @@ finally, that every `Machine` becomes a `Node`.
 
 Execute the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get machineset -n openshift-machine-api
 ----
@@ -41,7 +41,7 @@ until it reached the desired number of `Machines`. Since the default
 installation has 3 workers, the first 3 AZs got one worker each. The rest got
 zero.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get machine -n openshift-machine-api
 ----
@@ -73,7 +73,7 @@ your cluster. It is repairable, but it is not fun.
 
 Lastly, execute:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get nodes
 ----
@@ -106,7 +106,7 @@ extremely trivial.
 
 Look at the list of `MachineSets` again:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get machineset -n openshift-machine-api
 ----
@@ -123,7 +123,7 @@ Take special note because your `MachineSet` name is likely different from the
 one in the lab guide. You should see a note that the `MachineSet` was
 successfully scaled. Now, look at the list of `Machines`:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get machines -n openshift-machine-api
 ----
@@ -140,7 +140,7 @@ At this point, in the background, the bootstrap process is happening
 automatically. After several minutes (up to five or so), take a look at the
 output of:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get nodes
 ----

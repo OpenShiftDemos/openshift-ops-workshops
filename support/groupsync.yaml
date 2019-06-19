@@ -1,7 +1,7 @@
 kind: LDAPSyncConfig
 apiVersion: v1
 url: ldap://idm.openshiftworkshop.com
-ca: /home/lab-user/content/support/ca.crt
+ca: /opt/app-root/src/content/support/ca.crt
 bindDN: uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=openshiftworkshop,dc=com
 bindPassword: bindingpassword
 rfc2307:

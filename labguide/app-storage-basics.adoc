@@ -32,7 +32,7 @@ Here's how you would instruct OpenShift to create a `PersistentVolume`
 object, which represents external, persistent storage, and have it *mounted*
 inside the container's filesystem:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc set volume dc/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteOnce --claim-size=1Gi --claim-name=mapit-storage --mount-path=/app-storage
 ----
@@ -52,7 +52,7 @@ and make it available under the `/app-storage` directory inside the pod.
 
 You can see the new `DeploymentConfig` like this:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get dc mapit
 ----
@@ -66,7 +66,7 @@ mapit     4          1         1         config,image(mapit:latest)
 
 Likely, depending when you ran the command you may or may not see that the new pod is still being spawned:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pod
 ----
@@ -80,7 +80,7 @@ mapit-4-deploy   1/1       Running             0          10s
 
 Take a look at the `DeploymentConfig` now:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc describe dc mapit
 ----
@@ -105,7 +105,7 @@ But what is happening under the covers?
 When OpenShift 4 was first installed, a dynamic storage provider for AWS EBS
 was configured. You can see this `StorageClass` with the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get storageclass
 ----
@@ -132,7 +132,7 @@ created.
 
 Execute the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get persistentvolume
 ----
@@ -149,7 +149,7 @@ project.
 
 Now, execute:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get persistentvolumeclaim -n app-management
 ----
@@ -174,7 +174,7 @@ oc rsh mapit-4-d872b
 *Being in the container's shell session*, list the content of the root
 directory from the perspective of the container's namespace:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 ls -ahl /
 ----
@@ -217,7 +217,7 @@ time. In other words: read-write-once.
 
 Execute the following inside the remote shell session:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 echo "Hello World from OpenShift" > /app-storage/hello.txt
 exit

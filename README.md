@@ -68,28 +68,20 @@ oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
 
 oc new-project labguide
 
-# Create file with environment variables.
-
-cat > /tmp/dashboard.envvars <<EOF
-WORKSHOPS_URLS='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/labguide/_ocp_admin_testdrive.yaml'
-CONTENT_URL_PREFIX='https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/labguide/'
-API_URL="$API_URL"
-MASTER_URL="$MASTER_URL"
-KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD"
-SSH_PASSWORD="$SSH_PASSWORD"
-BASTION_FQDN="$BASTION_FQDN"
-GUID="$GUID"
-ROUTE_SUBDOMAIN="$ROUTE_SUBDOMAIN"
-EOF
-
 # Create deployment.
-
-oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-dashboard/2.13.1/templates/production.json \
+oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-dashboard/2.14.0/templates/production.json -n labguide \
    --param APPLICATION_NAME=admin \
+   --param WORKSHOPPER_URLS=https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/labguide/_ocp_admin_testdrive.yaml \
    --param OPENSHIFT_USERNAME=kubeadmin \
    --param OPENSHIFT_PASSWORD=$KUBEADMIN_PASSWORD \
-   --param GATEWAY_ENVVARS="`cat /tmp/dashboard.envvars`" \
-   --param WORKSHOP_ENVVARS="`cat /tmp/dashboard.envvars`"
+   --param WORKSHOP_ENVVARS="
+API_URL=$API_URL \
+MASTER_URL=$MASTER_URL \
+KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD \
+SSH_PASSWORD=$SSH_PASSWORD \
+BASTION_FQDN=$BASTION_FQDN \
+GUID=$GUID \
+ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN"
 
 # Wait for deployment to finish.
 
@@ -128,6 +120,8 @@ Make sure you are logged-in as kubeadmin when creating the project
 
 If you are getting _too many redirects_ error then clearing cookies and re-login as kubeadmin
 
-## References
-This workshop is based on the following project
-- https://github.com/openshift-labs/workshop-dashboard
+## Cleaning up
+To delete deployment run
+```
+oc delete all,serviceaccount,rolebinding,configmap -l app=admin
+```

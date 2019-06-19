@@ -47,4 +47,4 @@ kubeadmin is required in the majority of following exercises
 oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
 
-Future exercises will refer to `/opt/app-root/src/content/support`.
+Future exercises will refer to `$HOME/content/support`.

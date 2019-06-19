@@ -169,9 +169,9 @@ As the `system:admin` user apply the OAuth configuration with `oc`.
 [source,bash,role="execute"]
 ----
 oc create secret generic ldap-secret --from-literal=bindPassword=bindingpassword -n openshift-config
-wget http://idm.openshiftworkshop.com/pub/ca.crt -O /opt/app-root/src/content/support/ca.crt
-oc create configmap ca-config-map --from-file=content/support/ca.crt -n openshift-config
-oc apply -f /opt/app-root/src/content/support/oauth-cluster.yaml
+wget http://idm.openshiftworkshop.com/pub/ca.crt -O $HOME/content/support/ca.crt
+oc create configmap ca-config-map --from-file=$HOME/content/support/ca.crt -n openshift-config
+oc apply -f $HOME/content/support/oauth-cluster.yaml
 ----
 
 [NOTE]
@@ -194,30 +194,11 @@ the various groups.
 
 We have provided a `groupsync` configuration file for you:
 
-```YAML
-kind: LDAPSyncConfig
-apiVersion: v1
-url: ldap://idm.openshiftworkshop.com
-ca: /opt/app-root/src/content/support/ca.crt
-bindDN: uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=openshiftworkshop,dc=com
-bindPassword: bindingpassword
-rfc2307:
-  groupsQuery:
-    baseDN: cn=groups,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com
-    derefAliases: never
-    filter: '(|(cn=ose-*))'
-  groupUIDAttribute: dn
-  groupNameAttributes:
-  - cn
-  groupMembershipAttributes:
-  - member
-  usersQuery:
-    baseDN: cn=users,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com
-    derefAliases: never
-  userUIDAttribute: dn
-  userNameAttributes:
-  - uid
-```
+View configuration file
+[source,bash,role="execute"]
+----
+cat $HOME/content/support/groupsync.yaml
+----
 
 Without going into too much detail (you can look at the documentation), the
 `groupsync` config file does the following:
@@ -234,7 +215,7 @@ Execute the `groupsync`:
 
 [source,bash,role="execute"]
 ----
-oc adm groups sync --sync-config=content/support/groupsync.yaml --confirm
+oc adm groups sync --sync-config=$HOME/content/support/groupsync.yaml --confirm
 ----
 
 You will see output like the following:

@@ -12,15 +12,25 @@ following:
 * 3 worker nodes
 * 1 bastion host
 
+link:https://github.com/openshift-labs/workshop-dashboard[Homeroom] is a solution that provides an integrated lab guide, terminal, and console environment. It is running inside the cluster that you will be interacting with.
+
 ## Conventions
 You will see various code and command blocks throughout these exercises. Some of
-the command blocks can be copy/pasted directly. Others will require modification
+the command blocks can be executed directly. Others will require modification
 of the command before execution. If you see a command block with a red border
-(see below), the command will require slight modification.
+(see below), the command will copy to clipboard for slight required modification.
 
+The icon beside the command blocks should tell you if the commands will be executed or copied.
+
+- This command block will be copied to your clipboard for modification.
 [source,none,role="copypaste copypaste-warning"]
 ----
 some command to modify
+----
+- This will execute in the console
+[source,none,role="execute"]
+----
+echo Hello World\!
 ----
 
 Most command blocks support auto highlighting or executing with a click. If you hover over

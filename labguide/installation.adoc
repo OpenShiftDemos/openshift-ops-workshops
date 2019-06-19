@@ -254,6 +254,7 @@ control+click the link:
 ----
 exit
 ----
+If you accidentally hit exit more than once and connection to the console closed, refresh the webpage to reconnect.
 
 [WARNING]
 ====

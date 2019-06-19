@@ -89,7 +89,7 @@ oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 
 [source,bash,role="execute"]
 ----
-oc create -f $HOME/content/support/openshift_logging_namespace.yaml
+oc create -f {{ HOME_PATH }}/content/support/openshift_logging_namespace.yaml
 ----
 
 

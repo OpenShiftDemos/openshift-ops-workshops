@@ -54,6 +54,7 @@ Edit the following to your values and run.
 export API_URL=https://api......:6443
 export MASTER_URL=https://console-openshift-console.....
 export KUBEADMIN_PASSWORD=xxx
+export SSH_USERNAME=lab-user
 export SSH_PASSWORD=xxxx
 export ROUTE_SUBDOMAIN=apps.mycluster.company.com
 export GUID=xxxx
@@ -70,15 +71,16 @@ oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
 oc new-project labguide
 
 # Create deployment.
-oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-dashboard/2.14.0/templates/production.json -n labguide \
+oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-dashboard/3.1.0/templates/production-cluster-admin.json -n labguide \
    --param APPLICATION_NAME=admin \
-   --param WORKSHOPPER_URLS=https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/labguide/_ocp_admin_testdrive.yaml \
-   --param OPENSHIFT_USERNAME=kubeadmin \
-   --param OPENSHIFT_PASSWORD=$KUBEADMIN_PASSWORD \
+   --param PROJECT_NAME=labguide \
+   --param WORKSHOPPER_URLS=https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml \
+   --param PROJECT_NAME=labguide \
    --param WORKSHOP_ENVVARS="
 API_URL=$API_URL \
 MASTER_URL=$MASTER_URL \
 KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD \
+SSH_USERNAME=$SSH_USERNAME \
 SSH_PASSWORD=$SSH_PASSWORD \
 BASTION_FQDN=$BASTION_FQDN \
 GUID=$GUID \

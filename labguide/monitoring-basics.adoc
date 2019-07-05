@@ -17,14 +17,14 @@ Container Platform clusters.
 
 #### Connect to the OpenShift Monitoring Alertmanager UI
 
-1. Login to the OpenShift Web Console with the kubeadmin credentials.  {{ MASTER_URL }}
+1. Login to the link:{{ MASTER_URL }}[OpenShift Web Console] with the kubeadmin credentials.
 +
-[source,role="execute"]
+[source,role="copypaste"]
 ----
 kubeadmin
 ----
 +
-[source,role="execute"]
+[source,role="copypaste"]
 ----
 {{ KUBEADMIN_PASSWORD }}
 ----

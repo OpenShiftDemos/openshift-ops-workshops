@@ -3,7 +3,7 @@
 - name: install CNS deployment tools
   yum: name={{ item }} state=present
   with_items:
-    - heketi-client-8.0.0-12.el7rhgs.x86_64
+    - heketi-client-6.0.0-7.4.el7rhgs
 
 - name: copy pv-resize post-deploy playbook
   copy:

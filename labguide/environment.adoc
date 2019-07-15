@@ -28,6 +28,14 @@ The icon beside the command blocks should tell you if the commands will be execu
 ----
 some command to modify
 ----
+[NOTE]
+====
+To paste the copied command try the following
+
+- Cmd + V _tested to work in Chrome on macOS_
+- Ctrl + Shift + V _tested to work in Chrome and Firefox on Windows 10_
+- Right click in the terminal window _tested to work on Edge on Windows 10_
+====
 - This will execute in the console
 
 [source,none,role="execute"]

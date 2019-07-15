@@ -71,10 +71,10 @@ oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
 oc new-project labguide
 
 # Create deployment.
-oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-dashboard/3.1.0/templates/production-cluster-admin.json -n labguide \
+oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-dashboard/3.5.0/templates/production-cluster-admin.json -n labguide \
    --param APPLICATION_NAME=admin \
    --param PROJECT_NAME=labguide \
-   --param WORKSHOPPER_URLS=https://raw.githubusercontent.com/kaovilai/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml \
+   --param WORKSHOPPER_URLS=https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/labguide/_ocp_admin_testdrive.yaml \
    --param PROJECT_NAME=labguide \
    --param WORKSHOP_ENVVARS="
 API_URL=$API_URL \

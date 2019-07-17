@@ -23,11 +23,21 @@ of the command before execution. If you see a command block with a red border
 The icon beside the command blocks should tell you if the commands will be executed or copied.
 
 - This command block will be copied to your clipboard for modification.
+
 [source,none,role="copypaste copypaste-warning"]
 ----
 some command to modify
 ----
+[NOTE]
+====
+To paste the copied command try the following
+
+- Cmd + V _tested to work in Chrome on macOS_
+- Ctrl + Shift + V _tested to work in Chrome and Firefox on Windows 10_
+- Right click in the terminal window _tested to work on Edge on Windows 10_
+====
 - This will execute in the console
+
 [source,none,role="execute"]
 ----
 echo Hello World\!
@@ -52,6 +62,7 @@ git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-dev c
 kubeadmin is required in the majority of following exercises
 ====
 ##### Log-in as kubeadmin for future exercises
+
 [source,role="execute"]
 ----
 oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}

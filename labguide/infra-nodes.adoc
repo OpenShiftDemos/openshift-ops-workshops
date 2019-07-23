@@ -236,7 +236,7 @@ using are purposefully small.
 
 ### Extra Credit
 In the `openshift-machine-api` project are several `Pods`. One of them has a
-name like `clusterapi-manager-controllers-cc46df86c-2vrbp`. If you use `oc logs` on the
+name like `machine-api-controllers-56bdc6874f-86jnb`. If you use `oc logs` on the
 various containers in that `Pod`, you will see the various operator bits that
 actually make the nodes come into existence.
 
@@ -388,6 +388,11 @@ Run:
 ----
 oc get pod -n openshift-ingress -o wide
 ----
+
+[NOTE]
+====
+Your session may timeout during the router move. Please refresh the page to get your session back. You will not lose your terminal session but may have to navigate back to this page manually.
+====
 
 If you're quick enough, you might catch either `Terminating` or
 `ContainerCreating` pods. The `Terminating` pod was running on one of the

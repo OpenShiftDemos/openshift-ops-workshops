@@ -407,27 +407,25 @@ rook-ceph-block   ceph.rook.io/block      8m27s
 
 Now you want to change which *storageclass* is default. 
 
-[source,bash,role="execute"]
-----
-oc edit sc gp2
-----
-
-Remove this portion shown below from *storageclass* `gp2`. Make sure to note
-*EXACTLY* where this annotations is located in the *storageclass* (copying
-this portion to clipboard would be a good idea). The editing tool is `vi`
-when using *oc edit*. Make sure to save your changes before exiting `:wq!`.
+We will be removing the following annotation from gp2 and add it to rook-ceph-block
 
 [source,yaml]
 ----
   annotations:
     storageclass.kubernetes.io/is-default-class: "true"
 ----
+This should remove the annotation from gp2
+[source,bash,role="execute"]
+----
+oc annotate sc gp2 storageclass.kubernetes.io/is-default-class="false" --overwrite
+----
 
-Add the removed portion to `rook-ceph-block` in same place in the file so it will become the `default` *storageclass*. Make sure to save your changes before exiting `:wq!`. 
+
+The following will annotate rook-ceph-block so it will become the `default` *storageclass*.
 
 [source,bash,role="execute"]
 ----
-oc edit sc rook-ceph-block
+oc annotate sc rook-ceph-block storageclass.kubernetes.io/is-default-class="true"
 ----
 
 After editing *storageclass* `rook-ceph-block` the result should be similar
@@ -514,8 +512,7 @@ rails-pgsql-persistent   rails-pgsql-persistent-my-database-app.{{ ROUTE_SUBDOMA
 Copy the route path above to a browser window to create articles. You will
 need to append `/articles` to the end.
 
-*Select + Click this link:* http://rails-pgsql-persistent-my-database-app.{{
-*ROUTE_SUBDOMAIN }}/articles
+*Select + Click this link:* http://rails-pgsql-persistent-my-database-app.{{ ROUTE_SUBDOMAIN }}/articles
 
 Select the "New Article" link. Enter the `username` and `password` below to
 create articles and comments. The articles and comments are saved in a
@@ -805,6 +802,12 @@ ip-10-0-146-50.us-east-2.compute.internal    Ready    worker   2d2h    v1.13.4+d
 ip-10-0-156-83.us-east-2.compute.internal    Ready    worker   2d      v1.13.4+da48e8391
 ip-10-0-160-232.us-east-2.compute.internal   Ready    worker   2d2h    v1.13.4+da48e8391
 ip-10-0-164-65.us-east-2.compute.internal    Ready    worker   2d      v1.13.4+da48e8391
+----
+
+Until Openshift Container Platform 4.2 rolls out, we will need to restart (delete) the operator pod to see OSD pod added.
+[source,bash,role="execute"]
+----
+oc delete pod -l app=rook-ceph-operator -n rook-ceph
 ----
 
 This step could take 5 minutes or more for the forth *OSD* pod to be in a `Running` STATUS.

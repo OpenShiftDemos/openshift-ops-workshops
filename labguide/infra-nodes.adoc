@@ -60,10 +60,10 @@ metadata:
     sigs.k8s.io/cluster-api-cluster: 190125-3
     sigs.k8s.io/cluster-api-machine-role: worker
     sigs.k8s.io/cluster-api-machine-type: worker
-  name: 190125-3-worker-us-west-1b
+  name: 190125-3-worker-us-east-1b
   namespace: openshift-machine-api
   resourceVersion: "9027"
-  selfLink: /apis/cluster.k8s.io/v1alpha1/namespaces/openshift-machine-api/machinesets/190125-3-worker-us-west-1b
+  selfLink: /apis/cluster.k8s.io/v1alpha1/namespaces/openshift-machine-api/machinesets/190125-3-worker-us-east-1b
   uid: 591b4d06-20ba-11e9-a880-068acb199400
 ```
 
@@ -83,7 +83,7 @@ spec:
   selector:
     matchLabels:
       sigs.k8s.io/cluster-api-cluster: 190125-3
-      sigs.k8s.io/cluster-api-machineset: 190125-3-worker-us-west-1b
+      sigs.k8s.io/cluster-api-machineset: 190125-3-worker-us-east-1b
 ```
 
 In this case, the cluster name is `190125-3` and there is an additional
@@ -102,7 +102,7 @@ make sure that things match here when we make changes:
         sigs.k8s.io/cluster-api-cluster: 190125-3
         sigs.k8s.io/cluster-api-machine-role: worker
         sigs.k8s.io/cluster-api-machine-type: worker
-        sigs.k8s.io/cluster-api-machineset: 190125-3-worker-us-west-1b
+        sigs.k8s.io/cluster-api-machineset: 190125-3-worker-us-east-1b
 ```
 
 #### Template Spec
@@ -207,17 +207,17 @@ one, take a look at the `AGE` column. It will be the youngest! Also, in the
 
 ### Check the Labels
 In our case, the youngest node was named
-`ip-10-0-128-138.us-west-1.compute.internal`, so we can ask what its labels
+`ip-10-0-128-138.us-east-1.compute.internal`, so we can ask what its labels
 are:
 
 [source,bash,role="copypaste copypaste-warning"]
 ----
-oc get node ip-10-0-128-138.us-west-1.compute.internal --show-labels
+oc get node ip-10-0-128-138.us-east-1.compute.internal --show-labels
 ----
 
 And, in the `LABELS` column we see:
 
-    beta.kubernetes.io/arch=amd64,beta.kubernetes.io/instance-type=m4.large,beta.kubernetes.io/os=linux,failure-domain.beta.kubernetes.io/region=us-west-1,failure-domain.beta.kubernetes.io/zone=us-west-1b,kubernetes.io/hostname=ip-10-0-128-138,node-role.kubernetes.io/infra=,node-role.kubernetes.io/worker=
+    beta.kubernetes.io/arch=amd64,beta.kubernetes.io/instance-type=m4.large,beta.kubernetes.io/os=linux,failure-domain.beta.kubernetes.io/region=us-east-1,failure-domain.beta.kubernetes.io/zone=us-east-1b,kubernetes.io/hostname=ip-10-0-128-138,node-role.kubernetes.io/infra=,node-role.kubernetes.io/worker=
 
 It's hard to see, but our `node-role.kubernetes.io/infra` label is there.
 

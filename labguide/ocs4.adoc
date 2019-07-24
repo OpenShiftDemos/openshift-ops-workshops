@@ -164,7 +164,12 @@ ip-10-0-146-50.us-east-2.compute.internal    Ready    worker   175m    v1.12.4+3
 ip-10-0-156-83.us-east-2.compute.internal    Ready    worker   3m7s    v1.12.4+30e6a0f55
 ip-10-0-160-232.us-east-2.compute.internal   Ready    worker   176m    v1.12.4+30e6a0f55
 ip-10-0-164-65.us-east-2.compute.internal    Ready    worker   3m30s   v1.12.4+30e6a0f55
+...
 ----
+[NOTE]
+====
+You may have more nodes than shown if you have completed a different lab such as the infrastructure node lab.
+====
 
 === Download Rook deployment files and install Ceph
 

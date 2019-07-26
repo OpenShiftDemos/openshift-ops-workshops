@@ -10,6 +10,9 @@ vars:
   BASTION_FQDN:
   GUID:
   ROUTE_SUBDOMAIN:
+  SSH_USERNAME:
+  SSH_PASSWORD:
+  HOME_PATH:
 
 modules:
   activate:

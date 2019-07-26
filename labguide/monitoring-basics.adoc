@@ -1,4 +1,4 @@
-## OpenShift Monitoring
+  ## OpenShift Monitoring
 In this lab you will explore various aspects of the builtin OpenShift
 Monitoring. This includes an overview of the OpenShift Alertmanager UI,
 accessing the Prometheus web console, running PromQL (Prometheuses Query
@@ -17,7 +17,7 @@ Container Platform clusters.
 
 #### Connect to the OpenShift Monitoring Alertmanager UI
 
-1. Login to the OpenShift Web Console with the kubeadmin credentials.  {{ MASTER_URL }}
+1. Login to the link:{{ MASTER_URL }}[OpenShift Web Console] with the kubeadmin credentials.
 +
 [source,role="copypaste"]
 ----
@@ -88,7 +88,7 @@ Let's run a query to see the resources memory limit all pod definitions have def
 
 1. Copy and paste the following query into the query text box:
 +
-[source,role="copypaste"]
+[source,role="execute"]
 ----
 sum(kube_pod_container_resource_limits_memory_bytes)/(1024^3)
 ----
@@ -101,7 +101,7 @@ Now let's run a query to see the cpu usage for the entire cluster.
 
 1. Copy and paste the following query into the query text box:
 +
-[source,role="copypaste"]
+[source,role="execute"]
 ----
 cluster:cpu_usage_cores:sum
 ----

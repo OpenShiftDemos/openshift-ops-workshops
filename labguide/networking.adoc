@@ -23,24 +23,24 @@ implementations make use of appc/CNI, which is outside the scope of this lab.
 Only users with project or cluster administration privileges can manipulate *Project*
 networks. First, make sure you are logged in as the cluster administrator:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-oc login -u system:admin
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
 
 Then, execute a script that we have prepared for you. It will create two
 *Projects* and then deploy a *DeploymentConfig* with a *Pod* for you:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-bash /home/lab-user/content/support/create-net-projects.sh
+bash {{ HOME_PATH }}/content/support/create-net-projects.sh
 ----
 
 ### Examine the created infrastructure
 Two *Projects* were created for you, `netproj-a` and `netproj-b`. Execute the
 following command to see the created resources:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pods -n netproj-a
 ----
@@ -55,7 +55,7 @@ ose-1-deploy   1/1     Running             0          16s
 
 Similarly:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pods -n netproj-b
 ----
@@ -77,9 +77,9 @@ the pod in the `netproj-a` *Project* and the pod in the `netproj-b` *Project*.
 
 To test connectivity between the two pods, run:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-bash /home/lab-user/content/support/test-connectivity.sh
+bash {{ HOME_PATH }}/content/support/test-connectivity.sh
 ----
 
 You will see something like the following:
@@ -125,9 +125,9 @@ means that there are no allowed `ingress` rules defined by this
 To restrict access to the pod in the `netproj-b` *Project* simply apply the
 above NetworkPolicy CR with:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-oc create -n netproj-b -f /home/lab-user/content/support/network-policy-block-all.yaml
+oc create -n netproj-b -f {{ HOME_PATH }}/content/support/network-policy-block-all.yaml
 ----
 
 ### Test Connectivity #2 (should fail)
@@ -137,9 +137,9 @@ connectivity between the pod in the `netproj-a` *Project* and the pod in the
 
 Test by running:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-bash /home/lab-user/content/support/test-connectivity.sh
+bash {{ HOME_PATH }}/content/support/test-connectivity.sh
 ----
 
 You will see something like the following:
@@ -198,9 +198,9 @@ all" policy is combined with the "allow TCP 5000" policy.
 To allow access to the pod in the `netproj-b` *Project* from all pods in the
 `netproj-a` *Project*, simply apply the above NetworkPolicy CR with:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-oc create -n netproj-b -f /home/lab-user/content/support/network-policy-allow-all-from-netproj-a.yaml
+oc create -n netproj-b -f {{ HOME_PATH }}/content/support/network-policy-allow-all-from-netproj-a.yaml
 ----
 
 ### Test Connectivity #3 (should work again)
@@ -210,9 +210,9 @@ connectivity between the pod in the `netproj-a` *Project* and the pod in the
 
 Test by running:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-bash /home/lab-user/content/support/test-connectivity.sh
+bash {{ HOME_PATH }}/content/support/test-connectivity.sh
 ----
 
 You will see something like the following:

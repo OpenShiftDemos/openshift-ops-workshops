@@ -27,59 +27,71 @@ information about your cluster. Second, you will deploy the lab guide using
 the information you found so that proper URLs and references are
 automatically displayed in the guide.
 
-### Required Information
+### Required Environment Variables
 Most of the information can be found in the output of the installer.
 
-1. Export the API URL endpoint to an environment variable:
+#### Explaination and examples
+- `API_URL` - URL to access API of the cluster
+    - `https://api.cluster-gu1d.sandbox101.opentlc.com:6443`
+- `MASTER_URL` - Master Console URL
+    - `http://console-openshift-console.apps.cluster-gu1d.sandbox101.opentlc.com`
+- `KUBEADMIN_PASSWORD` - Password for `kubeadmin`
+- `SSH_PASSWORD` - password for ssh into bastion
+- `ROUTE_SUBDOMAIN` - Subdomain that apps will reside on
+    - `apps.cluster-gu1d.sandbox101.opentlc.com:6443`
+    - `apps.mycluster.company.com`
 
-    ```bash
-    export API_URL=https://api......:6443
-    ```
+Specific to Red Hat internal systems
+- `GUID` - GUID
+    - `gu1d`
+- `BASTION_FQDN` - Bastion Domain Name
+    - `bastion.gu1d.sandbox101.opentlc.com`
 
-2. Export the master/console URL to an environment variable:
+Edit the following to your values and run.
 
-    ```bash
-    export MASTER_URL=https://console-openshift-console.....
-    ```
-
-3. Export the `kubeadmin` password as an environment variable:
-
-    ```bash
-    export KUBEADMIN_PASSWORD=xxx
-    ```
-
-4. Export the routing subdomain as an environment variable. When you installed your cluster you specified a domain to use, and OpenShift built a routing subdomain that looks like `apps.clusterID.domain`. For example, `apps.mycluster.company.com`. Export this:
-
-    ```bash
-    export ROUTE_SUBDOMAIN=apps.mycluster.company.com
-    ```
-5. This lab guide was built for an internal Red Hat system, so there are two
-   additional things you will need to export. Please export them exactly as
-   follows:
-
-    ```bash
-    export GUID=xxxx
-    export BASTION_FQDN=foo.bar.com
-    ```
-
+:warning: For `export` ensure [special characters](http://mywiki.wooledge.org/BashGuide/SpecialCharacters) are escaped (ie. use `\!` in place of `!`).
+```bash
+export API_URL=https://api......:6443
+export MASTER_URL=https://console-openshift-console.....
+export KUBEADMIN_PASSWORD=xxx
+export SSH_USERNAME=lab-user
+export SSH_PASSWORD=xxxx
+export ROUTE_SUBDOMAIN=apps.mycluster.company.com
+export GUID=xxxx
+export BASTION_FQDN=foo.bar.com
+export HOME_PATH=/opt/app-root/src
+```
 ### Deploy the Lab Guide
 Now that you have exported the various required variables, you can deploy the
-lab guide into your cluster. The following assumes you are logged in already
-as `kubeadmin` and on a system with the `oc` client installed:
-
+lab guide into your cluster. The following will log you in
+as `kubeadmin` on systems with `oc` client installed:
 ```bash
+oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
+
 oc new-project labguide
-oc new-app -n labguide --name admin \
-quay.io/osevg/workshopper -e CONTENT_URL_PREFIX="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/" \
--e WORKSHOPS_URLS="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-prod/labguide/_ocp_admin_testdrive.yaml" \
--e API_URL=$API_URL \
--e MASTER_URL=$MASTER_URL \
--e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD \
--e BASTION_FQDN=$BASTION_FQDN \
--e GUID=$GUID \
--e ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN
-oc expose service admin
+
+# Create deployment.
+oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-dashboard/3.5.0/templates/production-cluster-admin.json -n labguide \
+   --param APPLICATION_NAME=admin \
+   --param PROJECT_NAME=labguide \
+   --param WORKSHOPPER_URLS=https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/labguide/_ocp_admin_testdrive.yaml \
+   --param PROJECT_NAME=labguide \
+   --param WORKSHOP_ENVVARS="
+API_URL=$API_URL \
+MASTER_URL=$MASTER_URL \
+KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD \
+SSH_USERNAME=$SSH_USERNAME \
+SSH_PASSWORD=$SSH_PASSWORD \
+BASTION_FQDN=$BASTION_FQDN \
+GUID=$GUID \
+ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN \
+HOME_PATH=$HOME_PATH"
+
+# Wait for deployment to finish.
+
+oc rollout status dc/admin -n labguide
 ```
+
 ## Doing the Labs
 Your lab guide should deploy in a few moments. To find its url, execute:
 
@@ -106,3 +118,14 @@ looks mostly different than the lab guide.
 Also note that the first lab where you SSH into the bastion host is not
 relevant to you -- you are likely already doing the exercises on the host
 where you installed OpenShift from.
+
+## Troubleshooting
+Make sure you are logged-in as kubeadmin when creating the project
+
+If you are getting _too many redirects_ error then clearing cookies and re-login as kubeadmin
+
+## Cleaning up
+To delete deployment run
+```
+oc delete all,serviceaccount,rolebinding,configmap -l app=admin -n labguide
+```

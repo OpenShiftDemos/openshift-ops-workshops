@@ -12,53 +12,60 @@ following:
 * 3 worker nodes
 * 1 bastion host
 
-You will now SSH into the bastion host in order to access the environment and
-complete the rest of the exercises.
+link:https://github.com/openshift-labs/workshop-dashboard[Homeroom] is a solution that provides an integrated lab guide, terminal, and console environment. It is running inside the cluster that you will be interacting with.
 
 ## Conventions
 You will see various code and command blocks throughout these exercises. Some of
-the command blocks can be copy/pasted directly. Others will require modification
+the command blocks can be executed directly. Others will require modification
 of the command before execution. If you see a command block with a red border
-(see below), the command will require slight modification.
+(see below), the command will copy to clipboard for slight required modification.
+
+The icon beside the command blocks should tell you if the commands will be executed or copied.
+
+- This command block will be copied to your clipboard for modification.
 
 [source,none,role="copypaste copypaste-warning"]
 ----
 some command to modify
 ----
+[NOTE]
+====
+To paste the copied command try the following
 
-Most command blocks support auto highlighting with a click. If you hover over
+- Cmd + V _tested to work in Chrome on macOS_
+- Ctrl + Shift + V _tested to work in Chrome and Firefox on Windows 10_
+- Right click in the terminal window _tested to work on Edge on Windows 10_
+====
+- This will execute in the console
+
+[source,none,role="execute"]
+----
+echo Hello World\!
+----
+
+Most command blocks support auto highlighting or executing with a click. If you hover over
 the command block above and left-click, it should automatically highlight all the
-text to make for easier copying.
-
-### Logging in
-The bastion host on which this lab guide is running is currently configured
-with an SSH key that is also present on the machine where you are sitting.
-You can simply SSH to the bastion host like so:
-
-[source,bash,role="copypaste"]
-----
-ssh -l lab-user {{ BASTION_FQDN }}
-----
-
-The `lab-user` account has password-less sudo privileges. You'll notice that
-there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This
-string is your `GUID`. Since you will often use `GUID`, it makes sense to
-export it as an environment variable:
-
-[source,bash,role="copypaste"]
-----
-export GUID=`hostname | cut -d. -f2`
-----
+text to make for easier copying. Look at the symbol next to the block to see if it will copy or execute.
 
 ### Cloning content
 We have prepared various YAML files and other artifacts that you will use for
 the exercises in advance. You will need to clone these artifacts onto your
 bastion host now. Please execute the following:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-cd
-git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-prod content
+git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-dev content
 ----
 
-Future exercises will refer to `/home/lab-user/content/support`.
+[WARNING]
+====
+kubeadmin is required in the majority of following exercises
+====
+##### Log-in as kubeadmin for future exercises
+
+[source,role="execute"]
+----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+----
+
+Future exercises will refer to `{{ HOME_PATH }}/content/support`.

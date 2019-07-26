@@ -27,7 +27,7 @@ image::rook_diagram_4.png[]
 
 In this section, you will validate the OCP environment has 3 master and 3 worker nodes before increasing the cluster size by 3 worker nodes. The `NAME` of your OCP nodes will be different than shown below.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get nodes
 ----
@@ -44,7 +44,7 @@ ip-10-0-169-223.us-east-2.compute.internal   Ready    master   124m   v1.13.4+da
 
 Now you are going to add 3 more OCP compute nodes to cluster using *machinesets*.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get machinesets -n openshift-machine-api
 ----
@@ -60,9 +60,9 @@ cluster-a26e-rx8bk-worker-us-east-2c   1         1         1       1           1
 
 To create the 3 new worker nodes with available storage you update 3 *machineset* definition files:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-ll /home/lab-user/content/support/cluster-workerocs-*.yaml
+ll {{ HOME_PATH }}/content/support/cluster-workerocs-*.yaml
 ----
 
 The machineset files do not have the correct `cluster-api-cluster` label for your lab because every environment is unique. Commands below will find the correct value for your environment. 
@@ -72,40 +72,43 @@ The machineset files do not have the correct `cluster-api-cluster` label for you
 *Make sure to execute next step for creating CLUSTERID environment variable*
 ====
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 CLUSTERID=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].metadata.labels.machine\.openshift\.io/cluster-api-cluster}')
 echo $CLUSTERID
 ----
 
-Using this correct `cluster-api-cluster` label for your lab environment modify each of the 3 *machinesets* downloaded earlier using the variable `$CLUSTERID`.
+Using this correct `cluster-api-cluster` label for your lab environment modify each of the 3 *machinesets* downloaded earlier using the variable `$CLUSTERID`. It is a good idea to backup yaml files when executing `sed`.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-sed -i "s/cluster-28cf-t22gs/$CLUSTERID/g" /home/lab-user/content/support/cluster-workerocs-*.yaml
+mkdir {{ HOME_PATH }}/content/support/backup/
+cp {{ HOME_PATH }}/content/support/cluster-workerocs-*.yaml --target-directory={{ HOME_PATH }}/content/support/backup/
+
+sed -i "s/cluster-28cf-t22gs/$CLUSTERID/g" {{ HOME_PATH }}/content/support/cluster-workerocs-*.yaml
 ----
 
 Check that `cluster-api-cluster` label has been changed to `$CLUSTERID`.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-grep cluster-api-cluster /home/lab-user/content/support/cluster-workerocs-*
+grep cluster-api-cluster {{ HOME_PATH }}/content/support/cluster-workerocs-*
 ----
 
 The label for `cluster-api-cluster` should now match the results of `echo $CLUSTERID` from above for all occurrences.
 
 Now you are ready to create your 3 new OCP worker nodes using these modified *machinesets*.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-oc create -f /home/lab-user/content/support/cluster-workerocs-us-east-2a.yaml
-oc create -f /home/lab-user/content/support/cluster-workerocs-us-east-2b.yaml
-oc create -f /home/lab-user/content/support/cluster-workerocs-us-east-2c.yaml
+oc create -f {{ HOME_PATH }}/content/support/cluster-workerocs-us-east-2a.yaml
+oc create -f {{ HOME_PATH }}/content/support/cluster-workerocs-us-east-2b.yaml
+oc create -f {{ HOME_PATH }}/content/support/cluster-workerocs-us-east-2c.yaml
 ----
 
 Check that you have new *machines* created. 
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get machines -n openshift-machine-api
 ----
@@ -127,7 +130,7 @@ cluster-a26e-rx8bk-workerocs-us-east-2c-8456v   i-0e0d311e4590fa7e3   running   
 
 You can see that the workerocs *machines* are using a different AWS EC2 instance type `m5d.large`. This is because this EC2 instance type comes with a 75GB NVMe SSD that will be used for our storage cluster. Now you want to see if our new *machines* are added to the OCP cluster.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 watch oc get machinesets -n openshift-machine-api
 ----
@@ -146,7 +149,7 @@ cluster-a26e-rx8bk-workerocs-us-east-2c   1         1         1       1         
 
 Now check to see that you have 3 new OCP worker nodes.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get nodes -l node-role.kubernetes.io/worker
 ----
@@ -161,7 +164,12 @@ ip-10-0-146-50.us-east-2.compute.internal    Ready    worker   175m    v1.12.4+3
 ip-10-0-156-83.us-east-2.compute.internal    Ready    worker   3m7s    v1.12.4+30e6a0f55
 ip-10-0-160-232.us-east-2.compute.internal   Ready    worker   176m    v1.12.4+30e6a0f55
 ip-10-0-164-65.us-east-2.compute.internal    Ready    worker   3m30s   v1.12.4+30e6a0f55
+...
 ----
+[NOTE]
+====
+You may have more nodes than shown if you have completed a different lab such as the infrastructure node lab.
+====
 
 === Download Rook deployment files and install Ceph
 
@@ -176,7 +184,7 @@ role=storage-node. This label was configured in each of the *machinesets* you
 used in last section so there is no need to manually add this label used for
 selecting OCP nodes for Rook deployment.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get nodes --show-labels | grep storage-node
 ----
@@ -185,16 +193,16 @@ The first step to deploy Rook is to create the common resources. The
 configuration for these resources will be the same for most deployments. The
 *common.yaml* sets these resources up.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-oc create -f /home/lab-user/content/support/common.yaml
+oc create -f {{ HOME_PATH }}/content/support/common.yaml
 ----
 
 After the common resources are created, the next step is to create the Operator deployment using *operator-openshift.yaml*.  
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-oc create -f /home/lab-user/content/support/operator-openshift.yaml
+oc create -f {{ HOME_PATH }}/content/support/operator-openshift.yaml
 watch oc get pods -n rook-ceph
 ----
 
@@ -229,7 +237,7 @@ resource (get clusters.ceph.rook.io)` in the *rook-ceph-operator* log file.
 This means the operator is looking for a Ceph cluster that does not exist
 yet.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 OPERATOR=$(oc get pod -l app=rook-ceph-operator -n rook-ceph -o jsonpath='{.items[0].metadata.name}')
 echo $OPERATOR
@@ -242,9 +250,9 @@ production Ceph storage cluster. The minimum deployment requires at least 3
 OCP nodes. In this lab these will be the OCP nodes created earlier using the
 AWS EC2 `m5d.large` instance type each with an available 75GB NVMe SSD.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-cat /home/lab-user/content/support/cluster.yaml
+cat {{ HOME_PATH }}/content/support/cluster.yaml
 ----
 
 Take a look at the *cluster.yaml* file. It specifies the version of Ceph and
@@ -284,14 +292,14 @@ will be used for the Ceph cluster.
 
 Now create the Ceph resources.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-oc create -f /home/lab-user/content/support/cluster.yaml
+oc create -f {{ HOME_PATH }}/content/support/cluster.yaml
 ----
 
 It may take more than 5 minutes to create all of the new *MONs*, *MGR* and *OSD* pods.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 watch "oc get pods -n rook-ceph | egrep -v -e rook-discover -e rook-ceph-agent"
 ----
@@ -315,22 +323,22 @@ rook-ceph-osd-prepare-ip-10-0-164-65-9wq67   0/2     Completed   0          90s
 
 Once all pods are in a Running state it is time to verify that Ceph is operating correctly. Download *toolbox.yaml* to run Ceph commands.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-oc create -f /home/lab-user/content/support/toolbox.yaml
+oc create -f {{ HOME_PATH }}/content/support/toolbox.yaml
 ----
 
 Now you can login to *rook-ceph-tools* pod to run Ceph commands. This pod is commonly called the *toolbox*.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-toolbox=$(oc -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}')
+export toolbox=$(oc -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}')
 oc -n rook-ceph rsh $toolbox
 ----
 
 Once logged into the *toolbox* (you see a prompt `sh-4.2#`) use commands below to investigate the Ceph status and configuration. 
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 ceph status
 ceph osd status
@@ -345,16 +353,16 @@ Make sure to `exit` the *toolbox* before continuing.
 
 In this section you will download *storageclass.yaml* and then create the OCP *storageclass* `rook-ceph-block` that can be used by applications to dynamically claim persistent volumes (*PVCs*). The Ceph pool `replicapool` is created when the OCP *storageclass* is created.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-cat /home/lab-user/content/support/storageclass.yaml
+cat {{ HOME_PATH }}/content/support/storageclass.yaml
 ----
 
 Notice the `provisioner: ceph.rook.io/block` and that `replicated: size=2` which is a good practice when there are only 3 OSDs. This is because if one *OSD* is down OCP volumes can continue to be created and used. 
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-oc create -f /home/lab-user/content/support/storageclass.yaml
+oc create -f {{ HOME_PATH }}/content/support/storageclass.yaml
 ----
 
 Login to *toolbox* pod to run Ceph commands. Compare results for `ceph df`
@@ -363,12 +371,12 @@ created. You will see there is now a Ceph pool called `replicapool`. Also,
 the command `ceph osd pool ls detail` gives you information on how this pool
 is configured.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc -n rook-ceph rsh $toolbox
 ----
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 ceph df
 rados df
@@ -389,7 +397,7 @@ Because the Rails + PostgreSQL deployment uses the `default` *storageclass*
 you need to modify the current default, gp2, and then make `rook-ceph-block`
 the default *storageclass*.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get sc
 ----
@@ -404,33 +412,31 @@ rook-ceph-block   ceph.rook.io/block      8m27s
 
 Now you want to change which *storageclass* is default. 
 
-[source,bash,role="copypaste"]
-----
-oc edit sc gp2
-----
-
-Remove this portion shown below from *storageclass* `gp2`. Make sure to note
-*EXACTLY* where this annotations is located in the *storageclass* (copying
-this portion to clipboard would be a good idea). The editing tool is `vi`
-when using *oc edit*. Make sure to save your changes before exiting `:wq!`.
+We will be removing the following annotation from gp2 and add it to rook-ceph-block
 
 [source,yaml]
 ----
   annotations:
     storageclass.kubernetes.io/is-default-class: "true"
 ----
-
-Add the removed portion to `rook-ceph-block` in same place in the file so it will become the `default` *storageclass*. Make sure to save your changes before exiting `:wq!`. 
-
-[source,bash,role="copypaste"]
+This should remove the annotation from gp2
+[source,bash,role="execute"]
 ----
-oc edit sc rook-ceph-block
+oc annotate sc gp2 storageclass.kubernetes.io/is-default-class="false" --overwrite
+----
+
+
+The following will annotate rook-ceph-block so it will become the `default` *storageclass*.
+
+[source,bash,role="execute"]
+----
+oc annotate sc rook-ceph-block storageclass.kubernetes.io/is-default-class="true"
 ----
 
 After editing *storageclass* `rook-ceph-block` the result should be similar
 to below and `rook-ceph-block` should now be the `default` *storageclass*.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get sc rook-ceph-block -o yaml
 ----
@@ -451,7 +457,7 @@ metadata:
 
 Validate that `rook-ceph-block` is now the default *storageclass* before starting the OCP application deployment.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get sc
 ----
@@ -466,7 +472,7 @@ rook-ceph-block (default)   ceph.rook.io/block      10m32s
 
 Now you are ready to start the Rails + PostgreSQL deployment and monitor the deployment. 
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc new-project my-database-app
 oc new-app rails-pgsql-persistent -p VOLUME_CAPACITY=5Gi
@@ -474,7 +480,7 @@ oc new-app rails-pgsql-persistent -p VOLUME_CAPACITY=5Gi
 
 After the deployment is started you can monitor with these commands.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc status
 oc get pvc -n my-database-app
@@ -496,7 +502,7 @@ rails-pgsql-persistent-1-pjh6q      1/1     Running     0          3m14s
 Once the deployment is complete you can now test the application and the
 persistent storage on Ceph.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get route -n my-database-app
 ----
@@ -511,8 +517,7 @@ rails-pgsql-persistent   rails-pgsql-persistent-my-database-app.{{ ROUTE_SUBDOMA
 Copy the route path above to a browser window to create articles. You will
 need to append `/articles` to the end.
 
-*Select + Click this link:* http://rails-pgsql-persistent-my-database-app.{{
-*ROUTE_SUBDOMAIN }}/articles
+*Select + Click this link:* http://rails-pgsql-persistent-my-database-app.{{ ROUTE_SUBDOMAIN }}/articles
 
 Select the "New Article" link. Enter the `username` and `password` below to
 create articles and comments. The articles and comments are saved in a
@@ -528,14 +533,14 @@ password: secret
 Lets now take another look at the Ceph `replicapool` created by the
 `rook-ceph-block` *storageclass*. Log into the *toolbox* pod again.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc -n rook-ceph rsh $toolbox
 ----
 
 Run the same Ceph commands as before the application deployment and compare to results in prior section. Notice the number of objects in `replicapool` now.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 ceph df
 rados df
@@ -544,7 +549,7 @@ rados -p replicapool ls | grep pvc
 
 Make sure to `exit` the *toolbox*. Validate the OCP *PersistentVolume* (PV) name is the same name as the volume name in the Ceph `replicapool`.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pvc -n my-database-app
 ----
@@ -555,7 +560,7 @@ In this section you will upgrade the Ceph version from *Mimic* to *Nautilus*
 using the Rook operator. First verify the current version by logging into the
 *toolbox* pod.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc -n rook-ceph rsh $toolbox
 ceph version
@@ -571,7 +576,7 @@ ceph version 13.2.5 (cbff874f9007f1869bfd3821b7e33b2a6ffd4988) mimic (stable)
 
 The next thing you need to do is update the cluster CRD with a current *Nautilus* image name and version. 
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc edit cephcluster rook-ceph -n rook-ceph
 ----
@@ -603,7 +608,7 @@ is edited as shown above, the *MONs*, *MGR*, and *OSD* pods will be
 restarted. You can tell that they have been restarted when their `AGE` is
 seconds or just a few minutes.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 watch "oc get pods -n rook-ceph | egrep -e rook-ceph-mgr -e rook-ceph-mon -e rook-ceph-operator -e rook-ceph-osd"
 ----
@@ -626,7 +631,7 @@ rook-ceph-osd-2-5977cd8bff-9x85n             1/1     Running     0          98s
 Now let's check the version of Ceph to see if it is upgraded. First you need
 to login to the *toolbox* pod again.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc -n rook-ceph rsh $toolbox
 ----
@@ -638,7 +643,7 @@ upgrade from *Mimic* to *Nautilus*. You might even want to go back to the
 Rails + PostgreSQL application and save a few more articles to make sure Ceph
 storage is still working.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 ceph versions
 ----
@@ -668,7 +673,7 @@ Make sure to `exit` the *toolbox* before continuing.
 
 You can also execute this command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc -n rook-ceph get deployments -o jsonpath='{range .items[*]}{.metadata.name}{" \trook="}{.metadata.labels.rook-version}{" \tceph="}{.metadata.labels.ceph-version}{"\n"}{end}' | sed s/v0.9.0-557.g48380dd/v1.0.0/g
 ----
@@ -701,9 +706,9 @@ To increase the number of *machines* and the OCP nodes you will again use a
 machine because of `replicas: 1` in the configuration file. Your
 `cluster-api-cluster` and `name` is different than example shown below.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
-cat machineset /home/lab-user/content/support/cluster-workerocs-us-east-2a.yaml | more
+cat machineset {{ HOME_PATH }}/content/support/cluster-workerocs-us-east-2a.yaml | more
 ----
 
 
@@ -725,7 +730,7 @@ spec:
 
 Verify your `cluster-api-cluster` again by using the command below.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 echo $CLUSTERID
 ----
@@ -735,14 +740,14 @@ us-east-2a by just increasing the `replicas` count in one of the machinesets.
 Edit your machineset for us-east-2a to increase from `replicas: 1` to
 `replicas: 2`. Make sure to save your changes before exiting `:wq!`.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc edit machineset $CLUSTERID-workerocs-us-east-2a -n openshift-machine-api
 ----
 
 Verify you now have 4 workerocs *machines*.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get machines -n openshift-machine-api
 ----
@@ -768,7 +773,7 @@ in the prior step. The *machineset* for us-east-2a should have an integer, in
 this case `2`, filled out for the entire row before you proceed to the next
 step.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 watch oc get machinesets -n openshift-machine-api
 ----
@@ -785,7 +790,7 @@ cluster-a26e-rx8bk-workerocs-us-east-2c   1         1         1       1         
 
 Now verify that you have a new OCP worker node.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get nodes -l node-role.kubernetes.io/worker
 ----
@@ -804,9 +809,15 @@ ip-10-0-160-232.us-east-2.compute.internal   Ready    worker   2d2h    v1.13.4+d
 ip-10-0-164-65.us-east-2.compute.internal    Ready    worker   2d      v1.13.4+da48e8391
 ----
 
+Until Openshift Container Platform 4.2 rolls out, we will need to restart (delete) the operator pod to see OSD pod added.
+[source,bash,role="execute"]
+----
+oc delete pod -l app=rook-ceph-operator -n rook-ceph
+----
+
 This step could take 5 minutes or more for the forth *OSD* pod to be in a `Running` STATUS.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 watch oc get pods -n rook-ceph
 ----
@@ -826,14 +837,14 @@ rook-ceph-osd-3-56b6c4f459-q7mhz              1/1     Running     0          114
 
 Now you can validate that Ceph is healthy and has the additional storage. You again login to the *toolbox* pod.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc -n rook-ceph rsh $toolbox
 ----
 
 And run Ceph commands to see the new OSDs.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 ceph osd status
 ----
@@ -856,7 +867,7 @@ and `in`. You might even want to go back to the the Rails + PostgreSQL
 application and save a few more articles to make sure applications using Ceph
 storage are still working.
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 ceph status
 ----

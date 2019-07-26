@@ -81,9 +81,15 @@ metadata:
 
 To create the namespace, run the following command:
 
-[source,bash,role="copypaste"]
+##### Make sure you are logged-in as kubeadmin
+[source,role="execute"]
 ----
-oc create -f /home/lab-user/content/support/openshift_logging_namespace.yaml
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+----
+
+[source,bash,role="execute"]
+----
+oc create -f {{ HOME_PATH }}/content/support/openshift_logging_namespace.yaml
 ----
 
 
@@ -110,8 +116,10 @@ create the `CR` which will tell the operator how to act, what to install,
 and/or what to configure. For installing `openshift-logging`, we will follow
 this pattern.
 
-To begin, log into the OpenShift Cluster's GUI. Then follow the following
-steps:
+To begin, log-in to the OpenShift Cluster's GUI. 
+`{{ MASTER_URL }}`
+
+Then follow the following steps:
 
 1. Install the Elasticsearch Operator:
   a. In the OpenShift console, click `Catalog` → `OperatorHub`.
@@ -258,7 +266,7 @@ You should see pods for cluster logging, Elasticsearch, and Fluentd, as shown in
 
 Alternatively, you can verify from the command line by using the following command:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get pods -n openshift-logging
 ----
@@ -284,7 +292,7 @@ The _Fluentd_ *Pods* are deployed as part of a *DaemonSet*, which is a mechanism
 to ensure that specific *Pods* run on specific *Nodes* in the cluster at all
 times:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get daemonset -n openshift-logging
 ----
@@ -334,7 +342,7 @@ To find and access the _Kibana_ route:
 
 Alternatively, this can be obtained from the command line:
 
-[source,bash,role="copypaste"]
+[source,bash,role="execute"]
 ----
 oc get route -n openshift-logging
 ----

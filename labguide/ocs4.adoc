@@ -13,7 +13,7 @@ This hands-on workshop is for both system administrators and application develop
 * Upgrade Ceph version from Mimic to Nautilus using the Rook operator
 * Add more storage to the Ceph cluster
 
-.Rook and Kubernetes Architecture 
+.Rook and Kubernetes Architecture
 image::rook_diagram_3.png[]
 
 .Ceph deployed on OpenShift using Rook
@@ -49,7 +49,7 @@ Now you are going to add 3 more OCP compute nodes to cluster using *machinesets*
 oc get machinesets -n openshift-machine-api
 ----
 
-This will show you the existing *machinesets* used to create the 3 worker nodes in the cluster already. There is a *machineset* for each AWS AZ (us-east-2a, us-east-2b, us-east-2a). Your *machinesets* `NAME` will be different than below. 
+This will show you the existing *machinesets* used to create the 3 worker nodes in the cluster already. There is a *machineset* for each AWS AZ (us-east-2a, us-east-2b, us-east-2a). Your *machinesets* `NAME` will be different than below.
 
 ----
 NAME                                   DESIRED   CURRENT   READY   AVAILABLE   AGE
@@ -65,7 +65,7 @@ To create the 3 new worker nodes with available storage you update 3 *machineset
 ll {{ HOME_PATH }}/content/support/cluster-workerocs-*.yaml
 ----
 
-The machineset files do not have the correct `cluster-api-cluster` label for your lab because every environment is unique. Commands below will find the correct value for your environment. 
+The machineset files do not have the correct `cluster-api-cluster` label for your lab because every environment is unique. Commands below will find the correct value for your environment.
 
 [NOTE]
 ====
@@ -106,14 +106,14 @@ oc create -f {{ HOME_PATH }}/content/support/cluster-workerocs-us-east-2b.yaml
 oc create -f {{ HOME_PATH }}/content/support/cluster-workerocs-us-east-2c.yaml
 ----
 
-Check that you have new *machines* created. 
+Check that you have new *machines* created.
 
 [source,bash,role="execute"]
 ----
 oc get machines -n openshift-machine-api
 ----
 
-They may be in `pending` for sometime so repeat command above until they are in a `running` STATE. The `NAME` of your machines will be different than shown below. 
+They may be in `pending` for sometime so repeat command above until they are in a `running` STATE. The `NAME` of your machines will be different than shown below.
 
 ----
 NAME                                            INSTANCE              STATE     TYPE         REGION      ZONE         AGE
@@ -135,7 +135,7 @@ You can see that the workerocs *machines* are using a different AWS EC2 instance
 watch oc get machinesets -n openshift-machine-api
 ----
 
-This step could take more than 5 minutes. The result of this command needs to look like below before you proceed. All new workerocs *machinesets* should have an integer, in this case `1`, filled out for all rows and under columns `READY` and `AVAILABLE`. The `NAME` of your *machinesets* will be different than shown below. 
+This step could take more than 5 minutes. The result of this command needs to look like below before you proceed. All new workerocs *machinesets* should have an integer, in this case `1`, filled out for all rows and under columns `READY` and `AVAILABLE`. The `NAME` of your *machinesets* will be different than shown below.
 
 ----
 NAME                                      DESIRED   CURRENT   READY   AVAILABLE   AGE
@@ -198,7 +198,7 @@ configuration for these resources will be the same for most deployments. The
 oc create -f {{ HOME_PATH }}/content/support/common.yaml
 ----
 
-After the common resources are created, the next step is to create the Operator deployment using *operator-openshift.yaml*.  
+After the common resources are created, the next step is to create the Operator deployment using *operator-openshift.yaml*.
 
 [source,bash,role="execute"]
 ----
@@ -304,7 +304,7 @@ It may take more than 5 minutes to create all of the new *MONs*, *MGR* and *OSD*
 watch "oc get pods -n rook-ceph | egrep -v -e rook-discover -e rook-ceph-agent"
 ----
 
-The `NAME` of your pods will be different than shown below. 
+The `NAME` of your pods will be different than shown below.
 
 ----
 NAME                                        READY    STATUS     RESTARTS    AGE
@@ -336,7 +336,7 @@ export toolbox=$(oc -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{
 oc -n rook-ceph rsh $toolbox
 ----
 
-Once logged into the *toolbox* (you see a prompt `sh-4.2#`) use commands below to investigate the Ceph status and configuration. 
+Once logged into the *toolbox* (you see a prompt `sh-4.2#`) use commands below to investigate the Ceph status and configuration.
 
 [source,bash,role="execute"]
 ----
@@ -347,7 +347,7 @@ ceph df
 rados df
 ----
 
-Make sure to `exit` the *toolbox* before continuing. 
+Make sure to `exit` the *toolbox* before continuing.
 
 === Create Rook storageclass for creating Ceph RBD volumes
 
@@ -358,7 +358,7 @@ In this section you will download *storageclass.yaml* and then create the OCP *s
 cat {{ HOME_PATH }}/content/support/storageclass.yaml
 ----
 
-Notice the `provisioner: ceph.rook.io/block` and that `replicated: size=2` which is a good practice when there are only 3 OSDs. This is because if one *OSD* is down OCP volumes can continue to be created and used. 
+Notice the `provisioner: ceph.rook.io/block` and that `replicated: size=2` which is a good practice when there are only 3 OSDs. This is because if one *OSD* is down OCP volumes can continue to be created and used.
 
 [source,bash,role="execute"]
 ----
@@ -410,7 +410,7 @@ gp2 (default)     kubernetes.io/aws-ebs   2d
 rook-ceph-block   ceph.rook.io/block      8m27s
 ----
 
-Now you want to change which *storageclass* is default. 
+Now you want to change which *storageclass* is default.
 
 We will be removing the following annotation from gp2 and add it to rook-ceph-block
 
@@ -470,7 +470,7 @@ gp2                         kubernetes.io/aws-ebs   2d1h
 rook-ceph-block (default)   ceph.rook.io/block      10m32s
 ----
 
-Now you are ready to start the Rails + PostgreSQL deployment and monitor the deployment. 
+Now you are ready to start the Rails + PostgreSQL deployment and monitor the deployment.
 
 [source,bash,role="execute"]
 ----
@@ -487,7 +487,7 @@ oc get pvc -n my-database-app
 oc get pods -n my-database-app
 ----
 
-This step could take 5 or more minutes. Wait until there are 2 pods in `Running` STATUS and 4 pods in `Completed` STATUS as shown below. 
+This step could take 5 or more minutes. Wait until there are 2 pods in `Running` STATUS and 4 pods in `Completed` STATUS as shown below.
 
 ----
 NAME                                READY   STATUS      RESTARTS   AGE
@@ -574,14 +574,14 @@ The result should be:
 ceph version 13.2.5 (cbff874f9007f1869bfd3821b7e33b2a6ffd4988) mimic (stable)
 ----
 
-The next thing you need to do is update the cluster CRD with a current *Nautilus* image name and version. 
+The next thing you need to do is update the cluster CRD with a current *Nautilus* image name and version.
 
 [source,bash,role="execute"]
 ----
 oc edit cephcluster rook-ceph -n rook-ceph
 ----
 
-Modify the Ceph version in the cluster CRD. Using `oc edit` is the same as using editing tool `vi`. 
+Modify the Ceph version in the cluster CRD. Using `oc edit` is the same as using editing tool `vi`.
 
 From:
 
@@ -613,7 +613,7 @@ seconds or just a few minutes.
 watch "oc get pods -n rook-ceph | egrep -e rook-ceph-mgr -e rook-ceph-mon -e rook-ceph-operator -e rook-ceph-osd"
 ----
 
-The `NAME` of your pods will be different than shown below. 
+The `NAME` of your pods will be different than shown below.
 
 ----
 NAME                                        READY    STATUS     RESTARTS    AGE
@@ -778,7 +778,7 @@ step.
 watch oc get machinesets -n openshift-machine-api
 ----
 
-The `NAME` of your machinesets will be different than shown below. 
+The `NAME` of your machinesets will be different than shown below.
 
 ----
 NAME                                      DESIRED   CURRENT   READY   AVAILABLE   AGE
@@ -822,7 +822,7 @@ This step could take 5 minutes or more for the forth *OSD* pod to be in a `Runni
 watch oc get pods -n rook-ceph
 ----
 
-Eventually you will see a new *OSD* pod, `rook-ceph-osd-3`, that has just been created.  
+Eventually you will see a new *OSD* pod, `rook-ceph-osd-3`, that has just been created.
 
 ----
 NAME                                          READY   STATUS      RESTARTS   AGE
@@ -878,12 +878,12 @@ Verify status is `HEALTH_OK`:
   cluster:
     id:     90306026-6e42-4877-9d4e-26eca2ecf6ef
     health: HEALTH_OK
- 
+
   services:
     mon: 3 daemons, quorum b,a,c (age 59m)
     mgr: a(active, since 5m)
     osd: 4 osds: 4 up, 4 in
- 
+
   data:
     pools:   1 pools, 100 pgs
     objects: 36 objects, 73 MiB
@@ -891,4 +891,4 @@ Verify status is `HEALTH_OK`:
     pgs:     100 active+clean
 ----
 
-Make sure to `exit` the *toolbox*. 
+Make sure to `exit` the *toolbox*.

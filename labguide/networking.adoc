@@ -21,12 +21,7 @@ implementations make use of appc/CNI, which is outside the scope of this lab.
 
 ### Execute the Creation Script
 Only users with project or cluster administration privileges can manipulate *Project*
-networks. First, make sure you are logged in as the cluster administrator:
-
-[source,bash,role="execute"]
-----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
-----
+networks.
 
 Then, execute a script that we have prepared for you. It will create two
 *Projects* and then deploy a *DeploymentConfig* with a *Pod* for you:

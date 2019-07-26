@@ -2,9 +2,9 @@
 
 OpenShift supports a number of different authentication providers, and you can
 find the complete list in the
-link:https://docs.openshift.com/container-platform/4.0/authentication/understanding-identity-provider.html[understanding 
-identity provider configuration]. One of the most commonly used authentication 
-providers is LDAP, whether provided by Microsoft Active Directory or by other 
+link:https://docs.openshift.com/container-platform/4.0/authentication/understanding-identity-provider.html[understanding
+identity provider configuration]. One of the most commonly used authentication
+providers is LDAP, whether provided by Microsoft Active Directory or by other
 sources.
 
 OpenShift can perform user authentication against an LDAP server, and can also
@@ -101,26 +101,26 @@ metadata:
 spec:
   identityProviders:
   - name: idm <1>
-    challenge: false 
-    login: true 
+    challenge: false
+    login: true
     mappingMethod: claim <2>
     type: LDAP
     ldap:
       attributes: <3>
-        id: 
+        id:
         - dn
-        email: 
+        email:
         - mail
-        name: 
+        name:
         - cn
-        preferredUsername: 
+        preferredUsername:
         - uid
       bindDN: "uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=openshiftworkshop,dc=com" <4>
       bindPassword: <5>
         name: ldap-secret
       ca: <6>
         name: ca-config-map
-      insecure: false 
+      insecure: false
       url: "ldap://idm.openshiftworkshop.com/cn=users,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com)" <7>
   tokenConfig:
     accessTokenMaxAgeSeconds: 86400
@@ -148,7 +148,7 @@ the LDAP `cn`, and a username from the LDAP `uid`.
 
 <5> `bindPassword`: Reference to the Secret that has the password to use when binding for searching.
 
-<6> `ca`: Reference to the ConfigMap that contains the CA certificate to use for 
+<6> `ca`: Reference to the ConfigMap that contains the CA certificate to use for
 validating the SSL certificate of the LDAP server.
 
 <7> `url`: Identifies the LDAP server and the search to perform.
@@ -373,7 +373,7 @@ Make sure you login as the cluster administrator:
 
 [source,bash,role="execute"]
 ----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc login -u system:serviceaccount:labguide:admin-user
 ----
 
 Then, create several *Projects* for people to collaborate:

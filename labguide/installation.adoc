@@ -111,7 +111,7 @@ program is a command line interface that talks to the OpenShift API.
 #### Login to OpenShift
 When the installation completed, the installer left some artifacts that
 contain the various URLs and passwords required to access the environment.
-The installation program was run under the `ec2-user` account. 
+The installation program was run under the `ec2-user` account.
 
 [source,bash,role="execute"]
 ----
@@ -190,7 +190,7 @@ For more details, you can use `oc describe clusterversion`:
 
 ```
 Name:         version
-Namespace:    
+Namespace:
 Labels:       <none>
 Annotations:  <none>
 API Version:  config.openshift.io/v1

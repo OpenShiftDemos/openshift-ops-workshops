@@ -50,7 +50,7 @@ oc get machineset -n openshift-machine-api -o yaml cluster-5fa6-hx2ml-worker-us-
 
 #### Metadata
 The `metadata` on the `MachineSet` itself includes information like the name
-of the `MachineSet` and various labels. 
+of the `MachineSet` and various labels.
 
 ```YAML
 metadata:

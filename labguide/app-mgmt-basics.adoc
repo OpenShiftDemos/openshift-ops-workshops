@@ -54,7 +54,7 @@ The output will look like:
     service "mapit" created
 --> Success
     Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
-     'oc expose svc/mapit' 
+     'oc expose svc/mapit'
     Run 'oc status' to view your app.
 ----
 
@@ -152,10 +152,10 @@ Containers:
       /var/run/secrets/kubernetes.io/serviceaccount from default-token-nfwnb (ro)
 Conditions:
   Type              Status
-  Initialized       True 
-  Ready             True 
-  ContainersReady   True 
-  PodScheduled      True 
+  Initialized       True
+  Ready             True
+  ContainersReady   True
+  PodScheduled      True
 Volumes:
   default-token-nfwnb:
     Type:        Secret (a volume populated by a Secret)

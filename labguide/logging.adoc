@@ -73,19 +73,13 @@ kind: Namespace
 metadata:
   name: openshift-logging
   annotations:
-    openshift.io/node-selector: "" 
+    openshift.io/node-selector: ""
   labels:
     openshift.io/cluster-logging: "true"
     openshift.io/cluster-monitoring: "true"
 ----
 
 To create the namespace, run the following command:
-
-##### Make sure you are logged-in as kubeadmin
-[source,role="execute"]
-----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
-----
 
 [source,bash,role="execute"]
 ----
@@ -116,7 +110,7 @@ create the `CR` which will tell the operator how to act, what to install,
 and/or what to configure. For installing `openshift-logging`, we will follow
 this pattern.
 
-To begin, log-in to the OpenShift Cluster's GUI. 
+To begin, log-in to the OpenShift Cluster's GUI.
 `{{ MASTER_URL }}`
 
 Then follow the following steps:
@@ -400,7 +394,7 @@ box may be used. This will allow us to build queries using the fields of the
 messages. For example, if we wanted to see all log messages from the
 `openshift-logging` namespace, we can do the following:
 
-1. Click on `Add a filter +`.  
+1. Click on `Add a filter +`.
 
 2. In the `Fields` input box, start typing `kubernetes.namespace_name`.
 Notice all of the available fields that we can use to build the query

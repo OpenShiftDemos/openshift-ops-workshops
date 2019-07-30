@@ -644,7 +644,7 @@ commands you deployed an application, scaled it, and made it accessible to the
 outside world:
 
 ----
-oc new-app docker.io/siamaksade/mapit
+oc new-app quay.io/thoraxe/mapit
 oc scale --replicas=2 dc/mapit
 oc expose service mapit
 ----

@@ -708,7 +708,7 @@ machine because of `replicas: 1` in the configuration file. Your
 
 [source,bash,role="execute"]
 ----
-cat machineset {{ HOME_PATH }}/content/support/cluster-workerocs-us-east-2a.yaml | more
+cat {{ HOME_PATH }}/content/support/cluster-workerocs-us-east-2a.yaml | more
 ----
 
 

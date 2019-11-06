@@ -52,7 +52,7 @@ The OCS *Pods* use the host's network and block devices to run the
 software-defined storage system. See schematic below for a visualization.
 
 .GlusterFS pods in OCS in detail.
-image::cns_diagram_pod.png[]
+image::images/cns_diagram_pod.png[]
 
 `heketi` is a component that exposes an API to the storage system for
 OpenShift. This allows OpenShift to dynamically allocate storage from OCS in a
@@ -61,7 +61,7 @@ in our example heketi runs on the OpenShift application nodes, not on the
 infrastructure node.
 
 .heketi pod running in OCS
-image::cns_diagram_heketi.png[]
+image::images/cns_diagram_heketi.png[]
 
 #### Examine heketi
 To expose heketi's API outside of OpenShift for administrators (for
@@ -262,7 +262,7 @@ depicts the relationship of `PersistentVolumes`, `PersistentVolumeClaims` and
 `StorageClasses`:
 
 .OpenShift Persistent Volume Framework
-image::cns_diagram_pvc.png[]
+image::images/cns_diagram_pvc.png[]
 
 Let's try it out. The storage size parameter in the template is called
 `VOLUME_CAPACITY`. The `new-app` command will again handle processing and
@@ -817,7 +817,7 @@ nothing.
 Select an arbitrary file from your local machine and upload it to the app.
 
 .A simple PHP-based file upload tool
-image::uploader_screen_upload.png[]
+image::images/uploader_screen_upload.png[]
 
 Once done click *_List uploaded files_* to see the list of all currently
 uploaded files.
@@ -1189,7 +1189,7 @@ on an internal GlusterFS volume. This subsystem is called `gluster-block`.
 See below graphic for a representation:
 
 .gluster-block IO flow in OCS
-image::cns_diagram_gluster_block.png[]
+image::images/cns_diagram_gluster_block.png[]
 
 Why is this beneficial? Some applications, like OpenShift Logging and Metrics
 services facilitate operations which are cheap on a local filesystem like XFS

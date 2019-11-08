@@ -12,7 +12,10 @@ following:
 * 3 worker nodes
 * 1 bastion host
 
-link:https://github.com/openshift-labs/workshop-dashboard[Homeroom] is a solution that provides an integrated lab guide, terminal, and console environment. It is running inside the cluster that you will be interacting with.
+link:https://github.com/openshift-labs/workshop-dashboard[Homeroom] is a
+solution that provides an integrated lab guide, terminal, and console
+environment. It is running inside the cluster that you will be interacting
+with.
 
 ## Conventions
 You will see various code and command blocks throughout these exercises. Some of
@@ -54,13 +57,20 @@ bastion host now. Please execute the following:
 
 [source,bash,role="execute"]
 ----
-git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-dev content
+git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-prod content
 ----
 
 ### Cluster Admin Authentication
-The account you will be interacting with throughout the following exercises is a `ServiceAccount` with _cluster-admin_ `ClusterRole` binded to it to gives you privileges to access all kinds of resources on the cluster for this lab.
+The account you will be interacting with throughout the following exercises
+is a `ServiceAccount` with _cluster-admin_ `ClusterRole` binded to it to
+gives you privileges to access all kinds of resources on the cluster for this
+lab.
 
-Privileges in OpenShift are controlled through set of PolicyRules contained within a `Role` or `ClusterRole` which defines what resources can be access for a `User` or `ServiceAccount` with `RoleBinding` or `ClusterRoleBinding` defining which User or `ServiceAccount` belong to which `Role` or `ClusterRole`.
+Privileges in OpenShift are controlled through set of PolicyRules contained
+within a `Role` or `ClusterRole` which defines what resources can be access
+for a `User` or `ServiceAccount` with `RoleBinding` or `ClusterRoleBinding`
+defining which User or `ServiceAccount` belong to which `Role` or
+`ClusterRole`.
 
 You can execute the following to learn more about what a `Role` is
 [source,bash,role="execute"]
@@ -94,7 +104,9 @@ Let's look at PolicyRules defined in the `ClusterRole` cluster-admin
 oc get clusterrole cluster-admin -o yaml
 ----
 
-Notice how under rules, a User account with _cluster-admin_ role have a wildcard `*` access to all `resources` and `verbs` of an apiGroup and all `verbs` in `nonResourceURLs`.
+Notice how under rules, a User account with _cluster-admin_ role have a
+wildcard `*` access to all `resources` and `verbs` of an apiGroup and all
+`verbs` in `nonResourceURLs`.
 
 `verbs` are action that you do to resources. Things like `delete` and `get` are `verbs` in OpenShift.
 
@@ -118,8 +130,10 @@ Let's inspect _admin-cluster-admin_ `ClusterRoleBinding` that gave our `ServiceA
 oc get clusterrolebinding admin-cluster-admin -o yaml
 ----
 
-Notice that our `ServiceAccount` is a subject in this `ClusterRoleBinding` with a role referenced being the _cluster-admin_ `ClusterRole`
+Notice that our `ServiceAccount` is a subject in this `ClusterRoleBinding`
+with a role referenced being the _cluster-admin_ `ClusterRole`
 
-As a cluster-admin throughout the exercises, you will be able to do anything with the cluster as you have noted earlier, so follow instructions carefully.
+As a cluster-admin throughout the exercises, you will be able to do anything
+with the cluster as you have noted earlier, so follow instructions carefully.
 
 Future exercises will refer to `{{ HOME_PATH }}/content/support`.

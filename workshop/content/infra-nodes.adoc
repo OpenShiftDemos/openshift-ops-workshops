@@ -50,7 +50,7 @@ oc get machineset -n openshift-machine-api -o yaml cluster-5fa6-hx2ml-worker-us-
 
 #### Metadata
 The `metadata` on the `MachineSet` itself includes information like the name
-of the `MachineSet` and various labels. 
+of the `MachineSet` and various labels.
 
 ```YAML
 metadata:
@@ -356,11 +356,7 @@ metadata:
   resourceVersion: "2056085"
   selfLink: /apis/operator.openshift.io/v1/namespaces/openshift-ingress-operator/ingresscontrollers/default
   uid: 0fac160d-5a0d-11e9-a3bb-02d64e703494
-spec:
-  nodePlacement:
-    nodeSelector:
-      matchLabels:
-        node-role.kubernetes.io/worker: ""
+spec: {}
 status:
   availableReplicas: 2
   conditions:
@@ -378,7 +374,7 @@ want to change that to `infra`. You can do that with the following command:
 
 [source,bash,role="execute"]
 ----
-oc patch ingresscontrollers.operator.openshift.io default -n openshift-ingress-operator -p '{"spec":{"nodePlacement":{"nodeSelector":{"matchLabels":{"node-role.kubernetes.io/infra":""}}}}}' --type=merge
+oc apply -f {{ HOME_PATH }}/content/support/ingresscontroller.yaml
 ----
 
 
@@ -416,30 +412,41 @@ You will see something like:
 apiVersion: imageregistry.operator.openshift.io/v1
 kind: Config
 metadata:
-  creationTimestamp: 2019-04-08T14:46:13Z
+  creationTimestamp: "2019-08-06T13:57:22Z"
   finalizers:
   - imageregistry.operator.openshift.io/finalizer
   generation: 2
   name: cluster
-  resourceVersion: "1952442"
+  resourceVersion: "13218"
   selfLink: /apis/imageregistry.operator.openshift.io/v1/configs/cluster
-  uid: 0e67a534-5a0d-11e9-a3bb-02d64e703494
+  uid: 1cb6272a-b852-11e9-9a54-02fdf1f6ca7a
 spec:
-  httpSecret: c8270926c490516faeea7767d760ae5d288486697ecf2836e72f45413610a7b174db7c6ca96022526311c9e2d3a488b6f7532ffea2194f0a26bf6ca557c52755
+  defaultRoute: false
+  httpSecret: fff8bb0952d32e0aa56adf0ac6f6cf5267e0627f7b42e35c508050b5be426f8fd5e5108bea314f4291eeacc0b95a2ea9f842b54d7eb61522238f2a2dc471f131
   logging: 2
   managementState: Managed
-  proxy: {}
+  proxy:
+    http: ""
+    https: ""
+    noProxy: ""
+  readOnly: false
   replicas: 1
   requests:
     read:
+      maxInQueue: 0
+      maxRunning: 0
       maxWaitInQueue: 0s
     write:
+      maxInQueue: 0
+      maxRunning: 0
       maxWaitInQueue: 0s
   storage:
     s3:
-      bucket: image-registry-us-east-2-69d6726b9f6d4d98a8f2c471e83edd82-0e71
+      bucket: image-registry-us-east-2-0a598598fc1649d8b96ed91a902b982c-1cbd
       encrypt: true
+      keyID: ""
       region: us-east-2
+      regionEndpoint: ""
 status:
 ...
 ```

@@ -8,17 +8,6 @@ users may create an unlimited number of *Projects*. In a world with no
 constraints, or in a POC-type environment, that would be fine. But reality calls
 for a little restraint.
 
-[WARNING]
-=====
-Before continuing, make sure you are logged in with the built-in system administrator account in OpenShift.
-=====
-
-[source,bash,role="execute"]
-----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
-----
-
-
 ### Background: Project Request Template
 When users invoke the `oc new-project` command, a new project request flow is
 initiated. During part of this this workflow, a default project *Template* is
@@ -300,12 +289,12 @@ tempalate configuration, a CR needs to be created. The
 ----
 apiVersion: "config.openshift.io/v1"
 kind: "Project"
-metadata: 
+metadata:
   name: "cluster"
   namespace: ""
-spec: 
+spec:
   projectRequestMessage: "You requested a new project with Limits & Quotas!"
-  projectRequestTemplate: 
+  projectRequestTemplate:
     name: "project-request"
 ----
 

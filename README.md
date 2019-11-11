@@ -129,3 +129,7 @@ To delete deployment run
 ```
 oc delete all,serviceaccount,rolebinding,configmap -l app=admin -n labguide
 ```
+
+# License
+This repository and everything within it are licensed under the [GNU General
+Public License (GPL) v3.0](LICENSE)

@@ -111,7 +111,7 @@ program is a command line interface that talks to the OpenShift API.
 #### Login to OpenShift
 When the installation completed, the installer left some artifacts that
 contain the various URLs and passwords required to access the environment.
-The installation program was run under the `ec2-user` account. 
+The installation program was run under the `ec2-user` account.
 
 [source,bash,role="execute"]
 ----
@@ -182,27 +182,44 @@ oc get clusterversion
 And you will see some output like:
 
 ```
-NAME      VERSION     AVAILABLE   PROGRESSING   SINCE   STATUS
-version   4.0.0-0.9   True        False         10h     Cluster version is 4.0.0-0.9
+NAME      VERSION   AVAILABLE   PROGRESSING   SINCE   STATUS
+version   4.1.3     True        False         17m     Cluster version is 4.1.3
 ```
 
-For more details, you can use `oc describe clusterversion`:
+For more details, you can execute the following command:
 
+[source,bash,role="execute"]
+----
+oc describe clusterversion
+----
+
+Which will give you additional details, such as available updates:
 ```
 Name:         version
-Namespace:    
+Namespace:
 Labels:       <none>
 Annotations:  <none>
 API Version:  config.openshift.io/v1
 Kind:         ClusterVersion
 Metadata:
 ...
+Spec:
+  Channel:     stable-4.1
+  Cluster ID:  31fe51a5-12ab-4aa8-9ecc-ace4ff215d92
+  Upstream:    https://api.openshift.com/api/upgrades_info/v1/graph
+Status:
+  Available Updates:
+    Force:    false
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:a6c177eb007d20bb00bfd8
+f829e99bd40137167480112bd5ae1c25e40a4a163a
+    Version:  4.1.4
+...
   Desired:
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:345ec9351ecc1d78c16cf0853fe0ef2d9f48dd493da5fdffc18fa18f45707867
-    Version:  4.1.0-rc.0
-  Observed Generation:  1
-  Version Hash:         -XUey1xSiwE=
-Events:                 <none>
+    Force:    false
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:f852f9d8c2e81a633e874e
+57a7d9bdd52588002a9b32fc037dba12b67cf1f8b0
+    Version:  4.1.3
+...
 ```
 
 #### Look at the Nodes

@@ -1,0 +1,41 @@
+modules:
+  environment:
+    name: Environment Overview
+  installation:
+    name: Installation and Verification
+  app-mgmt-basics:
+    name: Application Management Basics
+  app-storage-basics:
+    name: Application Storage Basics
+    requires:
+      - app-mgmt-basics
+  machinesets:
+    name: MachineSets, Machines, and Nodes
+  infra-nodes:
+    name: Infrastructure Nodes and Operators
+  logging:
+    name: OpenShift Log Aggregation
+  ldap-groupsync:
+    name: External (LDAP) Authentication Providers, Users, and Groups
+  monitoring-basics:
+    name: OpenShift Monitoring with Prometheus
+  template-quota-limits:
+    name: Project Template, Quota, and Limits
+  networking:
+    name: OpenShift Networking and NetworkPolicy
+  ocs4:
+    name: Deploying and Managing OpenShift Container Storage
+config:
+    template_engine: liquid.js  
+    vars:
+      - name: SSH_PASSWORD
+      - name: SSH_USERNAME
+      - name: ENVIRONMENT
+        value: "Amazon Web Services"
+      - name: API_URL
+      - name: MASTER_URL
+      - name: KUBEADMIN_PASSWORD
+      - name: BASTION_FQDN
+      - name: GUID
+      - name: ROUTE_SUBDOMAIN
+      - name: HOME_PATH

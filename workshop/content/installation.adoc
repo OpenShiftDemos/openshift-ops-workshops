@@ -1,0 +1,262 @@
+## Installation and Verification
+
+The scope of the new installer-provisioned infrastructure (IPI) OpenShift 4
+installation is purposefully narrow. It is designed for simplicity and
+ensured success. Many of the items and configurations that were previously
+handled by the installer are now expected to be "Day 2" operations, performed
+just after the installation of the control plane and basic workers completes.
+The installer provides a guided experience for provisioning the cluster on a
+particular platform.
+
+This IPI installation has already been performed for you, and the cluster is
+in its basic, default state.
+
+### Logging in
+To inspect the cluster installation, you can simply SSH to the bastion host where it was installed on like so:
+
+[source,bash,role="execute"]
+----
+ssh -l {{ SSH_USERNAME }} {{ BASTION_FQDN }} -o ServerAliveInterval=120
+----
+
+Here is your ssh password:
+
+[source,bash,role="copypaste"]
+----
+{{ SSH_PASSWORD }}
+----
+
+You'll notice that there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This
+string is your `GUID`. Since you will often use `GUID`, it makes sense to
+export it as an environment variable:
+
+[source,bash,role="execute"]
+----
+export GUID=`hostname | cut -d. -f2`
+----
+
+### Master Components
+
+.OpenShift Master's 4 main responsibilities.
+image::images/openshift_master_4_responsibilities.png[]
+
+
+#### API/Authentication
+The Kubernetes API server validates and configures the resources that make up a Kubernetes cluster.
+
+Common things that interact with the Kubernetes API server are:
+
+* OpenShift Web Console
+* OpenShift `oc` command line tool
+* OpenShift Node
+* Kubernetes Controllers
+
+All interactions with the API server are secured using TLS. In addition, all
+API calls must be authenticated (the user is who they say they are) and
+authorized (the user has rights to make the requested API calls).
+
+
+#### Data Store
+The OpenShift Data Store (etcd) stores the persistent master state while
+other components watch etcd for changes to bring themselves into the desired
+state. etcd can be optionally configured for high availability, typically
+deployed with 2n+1 peer services.
+
+[NOTE]
+====
+etcd stores the cluster's state. It is not used to store user application data.
+====
+
+#### Scheduler
+The pod scheduler is responsible for determining placement of new pods onto
+nodes within the cluster.
+
+The scheduler is very flexible and can take the physical topology of the
+cluster into account (racks, datacenters, etc).
+
+#### Health / Scaling
+Each pod can register both liveness and readiness probes.
+
+Liveness probes tell the system if the pod is healthy or not. If the pod is
+not healthy, it can be restarted automatically.
+
+Readiness probes tell the system when the pod is ready to take traffic. This,
+for example, can be used by the cluster to know when to put a pod into the
+load balancer.
+
+For more information on the OpenShift Master's areas of responsibility, please refer to
+the
+link:https://docs.openshift.com/container-platform/3.11/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
+
+### Examining the installation artifacts
+OpenShift 4 installs with two effective superusers:
+
+* `kubeadmin` (technically an alias for `kube:admin`)
+* `system:admin`
+
+Why two? Because `system:admin` is a user that uses a certificate to login
+and has no password. Therefore this superuser cannot log-in to the web
+console (which requires a password).
+
+If you want additional users to be able to authenticate to and use the
+cluster, you need to configure your desired authentication mechanisms using
+CustomResources and Operators as previously discussed. LDAP-based
+authentication will be configured as one of the lab exercises.
+
+### Verifying the Installation
+Let's do some basic tests with your installation. As an administrator, most
+of your interaction with OpenShift will be from the command line. The `oc`
+program is a command line interface that talks to the OpenShift API.
+
+#### Login to OpenShift
+When the installation completed, the installer left some artifacts that
+contain the various URLs and passwords required to access the environment.
+The installation program was run under the `ec2-user` account. 
+
+[source,bash,role="execute"]
+----
+ls -al ~/cluster-$GUID
+----
+
+You'll see something like the following:
+
+----
+total 3348
+drwxrwxr-x. 4 ec2-user ec2-user     199 May  3 08:13 .
+drwx------. 7 lab-user users        134 May  3 13:46 ..
+drwxr-xr-x. 2 ec2-user ec2-user      50 May  3 08:00 auth
+-rw-r--r--. 1 ec2-user ec2-user     271 May  3 07:54 metadata.json
+-rw-rw-r--. 1 ec2-user ec2-user  576663 May  3 08:18 .openshift_install.log
+-rw-r--r--. 1 ec2-user ec2-user 2351869 May  3 08:00 .openshift_install_state.json
+-rw-r--r--. 1 ec2-user ec2-user     623 May  3 07:54 terraform.aws.auto.tfvars
+-rw-rw-r--. 1 ec2-user ec2-user  170852 May  3 08:13 terraform.tfstate
+-rw-r--r--. 1 ec2-user ec2-user  312196 May  3 07:54 terraform.tfvars
+drwxr-xr-x. 2 ec2-user ec2-user      62 May  3 07:54 tls
+----
+
+The OpenShift 4 IPI installation embeds Terraform in order to create some of
+the cloud provider resources. You can see some of its outputs here. The
+important file right now is the `.openshift_install.log`. Its last few lines
+contain the relevant output to figure out how to access your environment:
+
+[source,bash,role="execute"]
+----
+tail -n5 ~/cluster-$GUID/.openshift_install.log
+----
+
+You will see something like the following::
+
+----
+time="2019-04-08T14:49:34Z" level=info msg="Install complete!"
+time="2019-04-08T14:49:34Z" level=info msg="Run 'export KUBECONFIG=/home/ec2-user/cluster-f4a3/auth/kubeconfig' to manage the cluster with 'oc', the OpenShift CLI."
+time="2019-04-08T14:49:34Z" level=info msg="The cluster is ready when 'oc login -u kubeadmin -p SxUr2-tQ2py-c6jq2-YtjW3' succeeds (wait a few minutes)."
+time="2019-04-08T14:49:34Z" level=info msg="Access the OpenShift web-console here: https://console-openshift-console.apps.cluster-f4a3.f4a3.openshiftworkshop.com"
+time="2019-04-08T14:49:34Z" level=info msg="Login to the console with user: kubeadmin, password: SxUr2-tQ2py-c6jq2-YtjW3"
+----
+
+The installation was run as a different system user, and the artifacts folder
+is read-only mounted into your `lab-user` folder. While the installer has
+fortunately given you a convenient `export` command to run, you don't have
+write permissions to the path that it shows. The `oc` command will try to
+write to the `KUBECONFIG` file, which it can't, so you'll get errors later if you try it.
+
+Our installation process has actually already copied the config you need to
+`~/.kube/config`, so you are already logged in. Try the following:
+
+[source,bash,role="execute"]
+----
+oc whoami
+----
+
+The `oc` tool should already be in your path and be executable.
+
+#### Examine the Cluster Version
+First, you can check the current version of your OpenShift cluster by
+executing the following:
+
+[source,bash,role="execute"]
+----
+oc get clusterversion
+----
+
+And you will see some output like:
+
+```
+NAME      VERSION     AVAILABLE   PROGRESSING   SINCE   STATUS
+version   4.0.0-0.9   True        False         10h     Cluster version is 4.0.0-0.9
+```
+
+For more details, you can use `oc describe clusterversion`:
+
+```
+Name:         version
+Namespace:    
+Labels:       <none>
+Annotations:  <none>
+API Version:  config.openshift.io/v1
+Kind:         ClusterVersion
+Metadata:
+...
+  Desired:
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:345ec9351ecc1d78c16cf0853fe0ef2d9f48dd493da5fdffc18fa18f45707867
+    Version:  4.1.0-rc.0
+  Observed Generation:  1
+  Version Hash:         -XUey1xSiwE=
+Events:                 <none>
+```
+
+#### Look at the Nodes
+Execute the following command to see a list of the *Nodes* that OpenShift knows
+about:
+
+[source,bash,role="execute"]
+----
+oc get nodes
+----
+
+The output should look something like the following:
+
+----
+NAME                                         STATUS   ROLES    AGE    VERSION
+ip-10-0-135-172.us-east-2.compute.internal   Ready    master   141m   v1.13.4+da48e8391
+ip-10-0-143-247.us-east-2.compute.internal   Ready    worker   135m   v1.13.4+da48e8391
+ip-10-0-144-209.us-east-2.compute.internal   Ready    master   141m   v1.13.4+da48e8391
+ip-10-0-158-20.us-east-2.compute.internal    Ready    worker   135m   v1.13.4+da48e8391
+ip-10-0-164-111.us-east-2.compute.internal   Ready    worker   135m   v1.13.4+da48e8391
+ip-10-0-173-137.us-east-2.compute.internal   Ready    master   141m   v1.13.4+da48e8391
+----
+
+You have 3 masters and 3 workers. The OpenShift *Master* is also a *Node*
+because it needs to participate in the software defined network (SDN). If you
+need additional nodes for additional purposes, you can create them very
+easily when using IPI and leveraging the cloud provider operators. You will
+create nodes to run OpenShift infrastructure components (registry, router,
+etc.) in a subsequent exercise.
+
+#### Check the Web Console
+OpenShift provides a web console for users, developers, application
+operators, and administrators to interact with the environment. Many of the
+cluster administration functions, including upgrading the cluster itself, can
+be performed simply by using the web console.
+
+The web console actually runs as an application inside the OpenShift
+environment and is exposed via the OpenShift Router. You will learn more
+about the router in a subsequent exercise. For now, you can simply
+control+click the link:
+
+{{ MASTER_URL }}
+
+#### You will now exit the ssh session
+[source,role="execute"]
+----
+exit
+----
+If you accidentally hit exit more than once and connection to the console closed, refresh the webpage to reconnect.
+
+[WARNING]
+====
+You will receive a self-signed certificate error in your browser when you
+first visit the web console. When OpenShift is installed, by default, a CA
+and SSL certificates are generated for all inter-component communication
+within OpenShift, including the web console.
+====

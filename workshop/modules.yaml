@@ -25,6 +25,8 @@ modules:
     name: OpenShift Networking and NetworkPolicy
   ocs4:
     name: Deploying and Managing OpenShift Container Storage
+  disabling-project-self-provisioning:
+    name: Disabling Project Self-Provisioning
 config:
     template_engine: liquid.js  
     vars:

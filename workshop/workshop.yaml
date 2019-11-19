@@ -14,3 +14,4 @@ modules:
   - template-quota-limits
   - networking
   - ocs4
+  - disabling-project-self-provisioning

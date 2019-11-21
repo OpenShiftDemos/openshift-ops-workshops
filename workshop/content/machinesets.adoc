@@ -156,7 +156,7 @@ ip-10-0-194-62.ec2.internal    Ready    worker         1m   v1.12.4+509916ce1
 It can take several minutes for a `Machine` to be prepared and added as a `Node`.
 ====
 
-Scale the `MachineSet` from one back down to one before continuing.
+Scale the `MachineSet` from two back down to one before continuing.
 
 [source,bash,role="copypaste copypaste-warning"]
 ----

@@ -1,0 +1,253 @@
+## Cluster resource quotas
+
+[WARNING]
+====
+Before continuing, make sure you've done the LDAP lab.
+====
+
+In a previous lab, you worked with quotas and saw how they could be applied to projects. You also set up default quotas, so anytime someone requests a new project; they get assigned the default quota. These project quotas are great for maintaining control over the resources in your cluster.
+
+But what if you want to apply a quota not to individual projects, but accross projects?
+
+### Use cases
+
+There are two primary usecases where you would use `clusterresourcequota` instead of a project based `quota`. One of which, is when you want to set quotas on a specific user. This is useful when you want users to create as much projects as they need (thus achiving great multitenancy), but you want to limit the amount of resource they can consume.
+
+The other use case is if you want to set a quota by application vertical. In this case, you want to set the quota on an application stack wholistically; as an application stack can span multiple OpenShift Projects.
+
+In this lab, we will be exploring both use cases.
+
+#### Setting quota per user
+
+In order to set a `clusterresourcequota` to a user you need to be `kubeadmin`
+
+[source,bash,role="execute"]
+----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+----
+
+Now, set a quota for the `normaluser1`. We will be using the `annotation` key of `openshift.io/requester=` to identify the projects that will have these quotas assigned to. For this exercise, we will set a hard quota against creating more than 10 pods.
+
+[source,bash,role="execute"]
+----
+oc create clusterquota for-user-normaluser1 \
+     --project-annotation-selector openshift.io/requester=normaluser1 \
+     --hard pods=10
+----
+
+[NOTE]
+====
+The syntax is `openshift.io/requester=<username>`.
+====
+
+View the configuration.
+
+[source,bash,role="execute"]
+----
+oc get clusterresourcequotas for-user-normaluser1 -o yaml
+----
+
+The configuration should look something like this:
+
+[source,yaml]
+----
+apiVersion: quota.openshift.io/v1
+kind: ClusterResourceQuota
+metadata:
+  creationTimestamp: "2019-11-22T01:29:06Z"
+  generation: 1
+  name: for-user-normaluser1
+  resourceVersion: "73824"
+  selfLink: /apis/quota.openshift.io/v1/clusterresourcequotas/for-user-normaluser1
+  uid: 79764862-0cc7-11ea-bba7-0640f541f946
+spec:
+  quota:
+    hard:
+      pods: "10"
+  selector:
+    annotations:
+      openshift.io/requester: normaluser1
+----
+
+This user, `normaluser1`, can create no more than 10 pods accross all the projects he creates. This applies only to projects that he as created (based on the `openshift.io/requester: normaluser1` annotation), not any projects he has access to. More on this later.
+
+Now, login as `normaluser1`
+
+[source,bash,role="execute"]
+----
+oc login -u normaluser1 -p openshift
+----
+
+List all your current projects
+
+[source,bash,role="execute"]
+----
+oc get projects
+----
+
+This user shouldn't have any projects, and you should see output similar to this (don't worry if you do though):
+
+----
+No resources found.
+----
+
+Create two projects `welcome1` and `welcome2`.
+
+[source,bash,role="execute"]
+----
+oc new-project welcome1
+oc new-project welcome2
+----
+
+You'll be creating two applications. One in the `welcome1` project and the other in the `welcome2` project.
+
+[source,bash,role="execute"]
+----
+oc new-app -n welcome1 --name=php1 quay.io/redhatworkshops/welcome-php:latest
+oc new-app -n welcome2 --name=php2 quay.io/redhatworkshops/welcome-php:latest
+----
+
+After the deployment, you should have two running pods. One in each namespace. Check it with the `oc get pods` command:
+
+[source,bash,role="execute"]
+----
+oc get pods -n welcome1 -l app=php1
+oc get pods -n welcome2 -l app=php2
+----
+
+The output should look something like this:
+
+----
+[~] $ oc get pods -n welcome1 -l app=php1
+NAME           READY   STATUS    RESTARTS   AGE
+php1-1-tsmc6   1/1     Running   0          2m43s
+[~] $ oc get pods -n welcome2 -l app=php2
+NAME           READY   STATUS    RESTARTS   AGE
+php2-1-s5756   1/1     Running   0          2m15s
+----
+
+Now we can check the quota by first becoming `kubeadmin`:
+
+[source,bash,role="execute"]
+----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+----
+
+Now run `oc describe clusterresourcequotas for-user-normaluser1` to see the status of the quota:
+
+[source,bash,role="execute"]
+----
+oc describe clusterresourcequotas for-user-normaluser1
+----
+
+You should see the following output:
+
+----
+Name:		for-user-normaluser1
+Created:	22 minutes ago
+Labels:		<none>
+Annotations:	<none>
+Namespace Selector: ["welcome1" "welcome2"]
+Label Selector: 
+AnnotationSelector: map[openshift.io/requester:normaluser1]
+Resource	Used	Hard
+--------	----	----
+pods		2	10
+----
+
+You see that not only that 2 out of 10 pods are being used, but that the namespaces the quota is being applied to. Check the namespace manifest to see the annotation the quota is looking for:
+
+[source,bash,role="execute"]
+----
+oc get ns welcome1 -o yaml
+----
+
+The output should look something like this. Take special note of the annotations:
+
+[source,yaml]
+----
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/description: ""
+    openshift.io/display-name: ""
+    openshift.io/requester: normaluser1
+    openshift.io/sa.scc.mcs: s0:c26,c20
+    openshift.io/sa.scc.supplemental-groups: 1000690000/10000
+    openshift.io/sa.scc.uid-range: 1000690000/10000
+  creationTimestamp: "2019-11-22T01:40:10Z"
+  name: welcome1
+  resourceVersion: "76604"
+  selfLink: /api/v1/namespaces/welcome1
+  uid: 058b7e91-0cc9-11ea-8361-0a190b75e8c6
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+----
+
+Now as `normaluser1`, try to scale your apps beyond 10 pods:
+
+
+[source,bash,role="execute"]
+----
+oc login -u normaluser1 -p openshift
+oc scale dc/php1 -n welcome1 --replicas=5
+oc scale dc/php2 -n welcome2 --replicas=6
+----
+
+Take a note of how many pods are running:
+
+[source,bash,role="execute"]
+----
+oc get pods --no-headers -n welcome1 -l app=php1 | wc -l
+oc get pods --no-headers -n welcome2 -l app=php2 | wc -l
+----
+
+Both of these commands should return no more than 10 added up together. Check the events to see the quota in action!
+
+[source,bash,role="execute"]
+----
+oc get events -n welcome1 | grep "Error creating" | head -1
+oc get events -n welcome2 | grep "Error creating" | head -1
+----
+
+You should see a message like the following.
+
+----
+3m31s       Warning   FailedCreate                  replicationcontroller/php2-1   Error creating: pods "php2-1-wn22s" is forbidden: exceeded quota: for-user-normaluser1, requested: pods=1, used: pods=10, limited: pods=10
+----
+
+To see the status, switch to the `kubeadmin` account and run the `describe` command from before:
+
+[source,bash,role="execute"]
+----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc describe clusterresourcequotas for-user-normaluser1
+----
+
+You should see that the hard pod limit has been reached
+
+----
+Name:		for-user-normaluser1
+Created:	45 minutes ago
+Labels:		<none>
+Annotations:	<none>
+Namespace Selector: ["welcome1" "welcome2"]
+Label Selector: 
+AnnotationSelector: map[openshift.io/requester:normaluser1]
+Resource	Used	Hard
+--------	----	----
+pods		10	10
+----
+
+#### Setting quota by label
+
+In order to set a quota by application stacks that may span multiple projects, you'll have to use labels to identify the project. First, make sure you're `kubeadmin`
+
+[source,bash,role="execute"]
+----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+----

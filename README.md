@@ -109,14 +109,16 @@ oc new-app -n lab-ocp-cns https://raw.githubusercontent.com/redhat-cop/agnosticd
 
 # Wait for deployment to finish.
 
-oc rollout status dc/admin -n lab-ocp-cns
+oc rollout status dc/dashboard -n lab-ocp-cns
 ```
+
+> NOTE: In some cases you might need to do: `oc adm policy add-role-to-user admin kube:admin -n lab-ocp-cns`
 
 ## Doing the Labs
 Your lab guide should deploy in a few moments. To find its url, execute:
 
 ```bash
-oc get route admin -n labguide
+oc get route dashboard -n lab-ocp-cns
 ```
 
 You should be able to visit that URL and see the lab guide. From here you can

@@ -107,7 +107,7 @@ oc new-app -n welcome1 --name=php1 quay.io/redhatworkshops/welcome-php:latest
 oc new-app -n welcome2 --name=php2 quay.io/redhatworkshops/welcome-php:latest
 ----
 
-After the deployment, you should have two running pods. One in each namespace. Check it with the `oc get pods` command:
+After the deployment, you should have two running pods. One in each namespace. Check it with the `oc get pods` command (You may have to run this a few times before you see any output):
 
 [source,bash,role="execute"]
 ----

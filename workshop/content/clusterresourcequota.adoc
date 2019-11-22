@@ -31,8 +31,8 @@ Now, set a quota for the `normaluser1`. We will be using the `annotation` key of
 [source,bash,role="execute"]
 ----
 oc create clusterquota for-user-normaluser1 \
-     --project-annotation-selector openshift.io/requester=normaluser1 \
-     --hard pods=10
+    --project-annotation-selector openshift.io/requester=normaluser1 \
+    --hard pods=10
 ----
 
 [NOTE]
@@ -246,6 +246,151 @@ pods		10	10
 #### Setting quota by label
 
 In order to set a quota by application stacks that may span multiple projects, you'll have to use labels to identify the project. First, make sure you're `kubeadmin`
+
+[source,bash,role="execute"]
+----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+----
+
+Now set a quota based on a label. For this lab we will use `appstack=pricelist` key/value based label to identify projects.
+
+[source,bash,role="execute"]
+----
+oc create clusterresourcequota for-pricelist \
+    --project-label-selector=appstack=pricelist \
+    --hard=pods=5
+----
+
+Now create two projects:
+
+[source,bash,role="execute"]
+----
+oc adm new-project pricelist-frontend
+oc adm new-project pricelist-backend
+----
+
+Assign the `edit` role to the user `normaluser1` for these two projects:
+
+[source,bash,role="execute"]
+----
+oc adm policy add-role-to-user edit normaluser1 -n pricelist-frontend
+oc adm policy add-role-to-user edit normaluser1 -n pricelist-backend
+----
+
+To identify these two projects to belonging to the `pricelist` application stack, you will need to label the corresponding namespace:
+
+[source,bash,role="execute"]
+----
+oc label ns pricelist-frontend appstack=pricelist
+oc label ns pricelist-backend appstack=pricelist
+----
+
+Run the `oc describe` command for the `for-pricelist` cluster resource quota:
+
+[source,bash,role="execute"]
+----
+oc describe clusterresourcequotas for-pricelist
+----
+
+You should see that both of the projects are now being tracked:
+
+----
+Name:		for-pricelist
+Created:	6 minutes ago
+Labels:		<none>
+Annotations:	<none>
+Namespace Selector: ["pricelist-frontend" "pricelist-backend"]
+Label Selector: appstack=pricelist
+AnnotationSelector: map[]
+Resource	Used	Hard
+--------	----	----
+pods		0	5
+----
+
+Login as `normaluser1` and create the applications in their respective projects:
+
+[source,bash,role="execute"]
+----
+oc login -u normaluser1 -p openshift
+oc new-app -n pricelist-frontend --name frontend quay.io/redhatworkshops/pricelist:frontend
+oc new-app -n pricelist-backend --name backend quay.io/redhatworkshops/pricelist:backend
+----
+
+Check the status of the quota by logging in as `kubeadmin` and running the `describe` command:
+
+[source,bash,role="execute"]
+----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc describe clusterresourcequotas for-pricelist
+----
+
+You should see that 2 out of 5 pods are being used against this quota:
+
+----
+Name:		for-pricelist
+Created:	21 minutes ago
+Labels:		<none>
+Annotations:	<none>
+Namespace Selector: ["pricelist-frontend" "pricelist-backend"]
+Label Selector: appstack=pricelist
+AnnotationSelector: map[]
+Resource	Used	Hard
+--------	----	----
+pods		2	5
+----
+
+[NOTE]
+====
+The user `normaluser1` can create more pods because `pricelist-frontend` and `pricelist-backend` were assigned to the user by `kubeadmin`. They don't have the `openshift.io/requester=normaluser1` annotation since `normaluser1` didn't create them. You can already see how you can mix and match quota polices to fit your envrionment.
+====
+
+Test this by logging back in as `normaluser1` and try to scale the applications beyond 5 pods total.
+
+[source,bash,role="execute"]
+----
+oc login -u normaluser1 -p openshift
+oc scale -n pricelist-frontend dc/frontend --replicas=3
+oc scale -n pricelist-backend dc/backend --replicas=3
+----
+
+Just like before, you should see an error about not being able to scale:
+
+[source,bash,role="execute"]
+----
+oc get events -n pricelist-frontend | grep "Error creating" | head -1
+oc get events -n pricelist-backend | grep "Error creating" | head -1
+----
+
+The output should be like the other exercise:
+
+----
+2m51s       Warning   FailedCreate                  replicationcontroller/backend-1   Error creating: pods "backend-1-r78gk" is forbidden: exceeded quota: for-pricelist, requested: pods=1, used: pods=5, limited: pods=5
+----
+
+#### Clean Up
+
+Clean up the work you did by first becoming `kubeadmin`:
+
+[source,bash,role="execute"]
+----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+----
+
+These quotas may interfere with other labs; so delete both of the `clusterresourcequota` we created in this lab:
+
+[source,bash,role="execute"]
+----
+oc delete clusterresourcequotas for-pricelist for-user-normaluser1
+----
+
+Also delete the projects we created for this lab:
+
+[source,bash,role="execute"]
+----
+oc delete projects pricelist-backend pricelist-frontend welcome1 welcome2
+----
+
+Make sure you login as `kubeadmin` for the next lab.
 
 [source,bash,role="execute"]
 ----

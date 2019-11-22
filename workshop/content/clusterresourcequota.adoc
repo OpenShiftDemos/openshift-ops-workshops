@@ -155,7 +155,7 @@ Resource	Used	Hard
 pods		2	10
 ----
 
-You see that not only that 2 out of 10 pods are being used, but that the namespaces the quota is being applied to. Check the namespace manifest to see the annotation the quota is looking for:
+You see that not only that 2 out of 10 pods are being used, but that the namespaces the quota is being applied to. Check the namespace manifest for `welcome1` to see the annotation the quota is looking for:
 
 [source,bash,role="execute"]
 ----

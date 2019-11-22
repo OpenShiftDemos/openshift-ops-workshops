@@ -69,7 +69,7 @@ Now that you have the `workshop-settings.sh` file with the various required vari
 
 First, clone the repo
 
-> **NOTE** Remember to checkout the branch you want to test against a specific branch. 
+> **NOTE** Remember to checkout the branch you want to test against
 
 ```shell
 git clone https://github.com/openshift/openshift-cns-testdrive

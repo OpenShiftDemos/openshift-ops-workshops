@@ -109,7 +109,7 @@ oc new-app -n lab-ocp-cns https://raw.githubusercontent.com/redhat-cop/agnosticd
 
 # Wait for deployment to finish.
 
-oc rollout status dc/admin -n labguide
+oc rollout status dc/admin -n lab-ocp-cns
 ```
 
 ## Doing the Labs

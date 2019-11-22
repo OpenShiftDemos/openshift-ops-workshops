@@ -100,7 +100,7 @@ You will use this image to deploy the lab. The following command will log you in
 ```bash
 oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
 
-oc new-project labguide
+oc new-project lab-ocp-cns
 
 # Create deployment.
 oc new-app -n lab-ocp-cns https://raw.githubusercontent.com/redhat-cop/agnosticd/development/ansible/roles/ocp4-workload-workshop-admin-storage/files/production-cluster-admin.json \

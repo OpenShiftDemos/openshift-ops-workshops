@@ -27,6 +27,8 @@ modules:
     name: Deploying and Managing OpenShift Container Storage
   disabling-project-self-provisioning:
     name: Disabling Project Self-Provisioning
+  clusterresourcequota:
+    name: Cluster Resource Quotas
 config:
     template_engine: liquid.js  
     vars:

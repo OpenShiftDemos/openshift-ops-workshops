@@ -24,7 +24,7 @@ This hands-on workshop is for both system administrators and application develop
 * Use must-gather to collect support information
 
 .OpenShift Container Storage components
-image::imgs/OCS-Pods-Diagram.png[Showing OCS4 pods]
+image::images/ocs/OCS-Pods-Diagram.png[Showing OCS4 pods]
 
 [[labexercises]]
 
@@ -205,22 +205,22 @@ Once you are logged in, navigate to the `Operators` menu on the left and select 
 What you see, should be similar to the following example picture:
 
 .Installed operators:  1) Make sure you are in the right project; 2) Check Operator status; 3) Click on Openshift Container Storage Operator
-image::imgs/OCP-installed-operators.jpg[Openshift showing the installed operators in namespace openshift-storage]
+image::images/ocs/OCP-installed-operators.jpg[Openshift showing the installed operators in namespace openshift-storage]
 
 Click on `Openshift Container Storage Operator` to get to the OCS configuration screen.
 
 .OCS configuration screen
-image::imgs/OCS-config-screen-all.png[OCS configuration screen]
+image::images/ocs/OCS-config-screen-all.png[OCS configuration screen]
 
 On the top of the OCS configuration screen, scroll over to `Storage cluster` and click on `Create OCS Cluster Service`.
 
 .OCS Create Storage Cluster
-image::imgs/OCS-config-screen-storage-cluster.png[OCS Create Storage Cluster]
+image::images/ocs/OCS-config-screen-storage-cluster.png[OCS Create Storage Cluster]
 
 A dialog box will come up next.
 
 .OCS create a new storage cluster
-image::imgs/OCS-config-screen-new.png[OCS create a new storage cluster]
+image::images/ocs/OCS-config-screen-new.png[OCS create a new storage cluster]
 
 CAUTION: *Make sure to select three workers in different availability zones using instructions below*
 
@@ -269,7 +269,7 @@ You can also watch the deployment using the *Openshift Web Console* by going bac
 Please wait until all *Pods* are marked as `Running` in the CLI or until you see all instances shown below as `Ready` Status in the Web Console. Some instances may stay in `Unknown` Status which is not a concern if your `Ready` status matches the following diagram:
 
 .OCS instance overview after cluster install is finished
-image::imgs/OCS-finished-cluster-install.png[OCS instance overview after cluster install is finished]
+image::images/ocs/OCS-finished-cluster-install.png[OCS instance overview after cluster install is finished]
 
 [source,role="execute"]
 ----
@@ -318,7 +318,7 @@ rook-ceph-rgw-ocs-storagecluster-cephobjectstore-a-66499c5gt8q4   1/1     Runnin
 You can now also check the status of your storage cluster with the OCS specific *Dashboards* that are included in your *Openshift Web Console*. You can reach this by clicking on `Home` on your left navigation bar, then selecting `Dashboards` and finally clicking on `Persistent Storage` on the top navigation bar of the content page.
 
 .OCS Dashboard after successful backing storage installation
-image::imgs/OCS-dashboard-healthy.png[OCS Dashboard after successful backing storage installation]
+image::images/ocs/OCS-dashboard-healthy.png[OCS Dashboard after successful backing storage installation]
 
 [cols="0,1,10a"]
 |===
@@ -332,7 +332,7 @@ image::imgs/OCS-dashboard-healthy.png[OCS Dashboard after successful backing sto
 OCS ships with a *Dashboard* for the Object Store service as well. From within the *Dashboard* menu click on the `Object Service` on the top navigation bar of the content page.
 
 .OCS Multi-Cloud-Gateway Dashboard after successful installation
-image::imgs/OCS-noobaa-dashboard-healthy.png[OCS Multi-Cloud-Gateway Dashboard after successful installation]
+image::images/ocs/OCS-noobaa-dashboard-healthy.png[OCS Multi-Cloud-Gateway Dashboard after successful installation]
 
 [cols="0,1,10a"]
 |===
@@ -761,7 +761,7 @@ nothing.
 Select an arbitrary file from your local machine and upload it to the app.
 
 .A simple PHP-based file upload tool
-image::imgs/uploader_screen_upload.png[]
+image::images/ocs/uploader_screen_upload.png[]
 
 Once done click *_List uploaded files_* to see the list of all currently
 uploaded files.
@@ -1417,13 +1417,13 @@ To add storage, go to the Openshift Web Console and follow the steps to reach th
  - Click on `Openshift Container Storage Operator`
  - In the top navigation bar, scroll right to find the item `Storage Cluster` and click on it
 
-image::imgs/OCS-Storage-Cluster-overview-reachit.png[]
+image::images/ocs/OCS-Storage-Cluster-overview-reachit.png[]
 
  - The visible list should list only one item - click on the three dots on the far right to extend the options menu
  - Select `Add Capacity` from the options menu
 
 .Add capacity dialog
-image::imgs/OCS-add-capacity.png[]
+image::images/ocs/OCS-add-capacity.png[]
 
 In the new dialog you can set the requested additional (usable) capacity and the storage class. On AWS, the storage class should be set to `gp2`.
 
@@ -1715,7 +1715,7 @@ sudo mv oc /usr/bin
 Afterwards, go to your Openshift Web Console, log in and click on the username in the top right corner. There you will find the menu item `Copy Login Command`.
 
 .Copy Login command menu entry
-image::imgs/OCP-copy-login-command.png[]
+image::images/ocs/OCP-copy-login-command.png[]
 
 Clicking on `Copy Login Command` will open a new window and you might be required to login to your Openshift cluster again.
 After successfully login in, you see blue text `Display token` - click this and you will be shown your login command.
@@ -1802,7 +1802,7 @@ The content in this Appendix is relevant to learning about the critical componen
 The Ceph project has a long history as you can see in the timeline below.
 
 .Ceph Project History
-image::imgs/ceph101-timeline.png[Ceph Project Timeline]
+image::images/ocs/ceph101-timeline.png[Ceph Project Timeline]
 
 [.lead]
 It is a battle-tested software defined storage (SDS) solution that has been available as a storage backend for OpenStack and Kubernetes for quite some time.
@@ -1814,7 +1814,7 @@ The Ceph cluster provides a scalable storage solution while providing multiple a
 clients present within the IT infrastructure to get access to the data.
 
 .Ceph Architecture
-image::imgs/ceph101-overview.png[Ceph From Above]
+image::images/ocs/ceph101-overview.png[Ceph From Above]
 
 [.lead]
 The entire Ceph architecture is resilient and does not present any single point of failure (SPOF).
@@ -1861,7 +1861,7 @@ All the metadata is stored with RADOS and they do not server any data to the cli
 If we look at the Ceph cluster foundation layer, the full picture with the different types of daemons or containers looks like this.
 
 .RADOS as it stands
-image::imgs/ceph101-rados.png[RADOS Overview]
+image::images/ocs/ceph101-rados.png[RADOS Overview]
 
 The circle represent the MONs, the 'M' represent the MGRs and the squares with the bars represent the OSDs. In the diagram above, the cluster operates with
 3 Monitors, 2 Managers and 23 OSDs.
@@ -1872,7 +1872,7 @@ The circle represent the MONs, the 'M' represent the MGRs and the squares with t
 Ceph was designed to provides the IT environment with all the necessary access methods so that any application can use what is the best solution for its use-case.
 
 .Different Storage Types Supported
-image::imgs/ceph101-differentstoragetypes.png[Ceph Access Modes]
+image::images/ocs/ceph101-differentstoragetypes.png[Ceph Access Modes]
 
 Ceph supports block storage through the RADOS Block Device (aka RBD) access method, file storage through the Ceph Filesystem (aka CephFS) access method and
 object storage through its native `librados` API or through the RADOS Gateway (aka RADOSGW or RGW) for compatibility with the S3 and Swift protocols.
@@ -1883,7 +1883,7 @@ object storage through its native `librados` API or through the RADOS Gateway (a
 Librados allows developers to code natively against the native Ceph cluster API for maximum efficiency combined with a small footprint.
 
 .Application Native Object API
-image::imgs/ceph101-librados.png[librados]
+image::images/ocs/ceph101-librados.png[librados]
 
 The Ceph native API offers different wrappers such as C, C++, Python, Java, Ruby, Erlang, Go and Rust.
 
@@ -1900,7 +1900,7 @@ The kernel RBD driver offers superior performance compared to the userspace `lib
 not provide the same level of functionality. e.g., no RBD Mirroring support.
 
 .kRBD Diagram
-image::imgs/ceph101-krbd.png[Kernel based RADOS Block Device]
+image::images/ocs/ceph101-krbd.png[Kernel based RADOS Block Device]
 
 [.lead]
 *_Userspace RBD (librbd)_*
@@ -1909,7 +1909,7 @@ This access method is used in Red Hat OpenStack Environment or OpenShift through
 This mode allows us to leverage all existing RBD features such as RBD Mirroring.
 
 .librbd Diagram
-image::imgs/ceph101-librbd.png[Userspace RADOS Block Device]
+image::images/ocs/ceph101-librbd.png[Userspace RADOS Block Device]
 
 [.lead]
 *_Shared Filesystem (CephFS)_*
@@ -1918,7 +1918,7 @@ This method allows clients to jointly access a shared POSIX compliant filesystem
 the location of the object(s) for a given inode and then communicates directly with an OSD to perform the final IO request.
 
 .File Access (Ceph Filesystem or CephFS)
-image::imgs/ceph101-cephfs.png[Kernel Based CephFS Client]
+image::images/ocs/ceph101-cephfs.png[Kernel Based CephFS Client]
 
 CephFS is typically used for RWX claims but can also be used to support RWO claims.
 
@@ -1930,7 +1930,7 @@ Gateway can leverage the RADOS Gateway to support Object Bucket Claims. From the
 as a compatible S3 endpoint.
 
 .Amazone S3 or OpenStack Swift (Ceph RADOS Gateway)
-image::imgs/ceph101-rgw.png[S3 and Swift Support]
+image::images/ocs/ceph101-rgw.png[S3 and Swift Support]
 
 [.lead]
 *CRUSH*
@@ -1939,7 +1939,7 @@ The Ceph cluster being a distributed architecture some solution had to be design
 OSDs in the cluster. The technique used is called CRUSH or Controlled Replication Under Scalable Hashing. With CRUSH, every object is assigned to one
 and only one hash bucket known as a Placement Group (PG).
 
-image::imgs/ceph101-crushfromobjecttoosd.png[From Object to OSD]
+image::images/ocs/ceph101-crushfromobjecttoosd.png[From Object to OSD]
 
 CRUSH is the central point of configuration for the topology of the cluster. It offers a pseudo-random placement algorithm to distribute the objects across
 the PGs and uses rules to determine the mapping of the PGs to the OSDs. In essence, the PGs are an abstraction layer between the objects (application layer)
@@ -1966,7 +1966,7 @@ The cluster will be separated into logical partitions, known as pools. Each pool
 *Pools and PGs*
 
 .Pools and PGs
-image::imgs/ceph101-thefullpicture.png[From Object to OSD]
+image::images/ocs/ceph101-thefullpicture.png[From Object to OSD]
 
 The diagram above shows the relationship end to end between the object at the access method level down to the OSDs at the physical layer.
 
@@ -1981,7 +1981,7 @@ A Ceph pool has no size and is able to consume the space available any OSD where
 Ceph supports two types of data protection presented in the diagram below.
 
 .Ceph Data Protection
-image::imgs/ceph101-dataprotection.png[Replicated Pools vs Erasure Coded Pools]
+image::images/ocs/ceph101-dataprotection.png[Replicated Pools vs Erasure Coded Pools]
 
 Replicated pools provide better performance in almost all cases at the cost of a lower usable to raw storage ratio (1 usable byte is stored using 3 bytes of raw storage)
 while `Erasure Coding` provides a cost efficient way to store data with less performance. Red Hat supports the following `Erasure Coding` profiles with their corresponding usable to raw ratio:
@@ -2000,7 +2000,7 @@ To leverage the Ceph architecture at its best, all access methods but librados, 
 block device will be a collection of objects, each supporting a set of device sectors. Therefore, a 1GB file is stored in a CephFS directory will be split into multiple objects. Also a 5GB S3 object stored through the RADOS Gateway via the Multi Cloud Gateway will be divided in multiple objects.
 
 .Data Distribution
-image::imgs/ceph101-rbdlayout.png[RADOS Block Device Layout]
+image::images/ocs/ceph101-rbdlayout.png[RADOS Block Device Layout]
 
 [NOTE]
 ====

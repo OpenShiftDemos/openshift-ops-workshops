@@ -135,7 +135,8 @@ by clicking "Continue".
 ====
 +
   c. On the `Create Operator Subscription` page, select `All namespaces on
-    the cluster` under `Installation Mode`. Then, click `Subscribe`.
+    the cluster` under `Installation Mode`. And then select `preview` under
+    `Update Channel`. Leave `Approval Strategy` as `Automatic`. Then, click `Subscribe`.
 +
 This makes the Operator available to all users and projects that use this
 OpenShift Container Platform cluster.
@@ -154,7 +155,8 @@ namespace was created from the previous steps
     `Install`.
   c. On the `Create Operator Subscription` page, Under ensure `Installation
     Mode` that `A specific namespace on the cluster namespaces on the cluster`
-    is selected, and choose `openshift-logging`. Then, click `Subscribe`.
+    is selected, and choose `openshift-logging`. Select `preview` for the 
+    `Update Channel`. Then, click `Subscribe`.
 
 3. Verify the operator installations:
 

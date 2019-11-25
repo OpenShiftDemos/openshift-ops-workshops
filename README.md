@@ -69,7 +69,7 @@ Now that you have the `workshop-settings.sh` file with the various required vari
 
 First, clone the repo
 
-> **NOTE** Remember to checkout the branch you want to test against a specific branch. 
+> **NOTE** Remember to checkout the branch you want to test against
 
 ```shell
 git clone https://github.com/openshift/openshift-cns-testdrive
@@ -100,7 +100,7 @@ You will use this image to deploy the lab. The following command will log you in
 ```bash
 oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
 
-oc new-project labguide
+oc new-project lab-ocp-cns
 
 # Create deployment.
 oc new-app -n lab-ocp-cns https://raw.githubusercontent.com/redhat-cop/agnosticd/development/ansible/roles/ocp4-workload-workshop-admin-storage/files/production-cluster-admin.json \
@@ -109,14 +109,16 @@ oc new-app -n lab-ocp-cns https://raw.githubusercontent.com/redhat-cop/agnosticd
 
 # Wait for deployment to finish.
 
-oc rollout status dc/admin -n labguide
+oc rollout status dc/dashboard -n lab-ocp-cns
 ```
+
+> NOTE: In some cases you might need to do: `oc adm policy add-role-to-user admin kube:admin -n lab-ocp-cns`
 
 ## Doing the Labs
 Your lab guide should deploy in a few moments. To find its url, execute:
 
 ```bash
-oc get route admin -n labguide
+oc get route dashboard -n lab-ocp-cns
 ```
 
 You should be able to visit that URL and see the lab guide. From here you can

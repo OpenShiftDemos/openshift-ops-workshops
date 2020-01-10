@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rook-ceph-tools
-  namespace: rook-ceph
+  namespace: openshift-storage
   labels:
     app: rook-ceph-tools
 spec:
@@ -18,7 +18,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: rook-ceph-tools
-        image: rook/ceph:v0.9.0-557.g48380dd
+        image: rook/ceph:v1.1.8
         command: ["/tini"]
         args: ["-g", "--", "/usr/local/bin/toolbox.sh"]
         imagePullPolicy: IfNotPresent

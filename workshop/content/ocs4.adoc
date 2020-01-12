@@ -41,7 +41,7 @@ In this section, you will first validate the OCP environment has 3 master and 2 
 
 [source,role="execute"]
 ----
-oc get nodes -l node-role.kubernetes.io/worker -l '!node-role.kubernetes.io/infra'
+oc get nodes -l node-role.kubernetes.io/worker -l '!node-role.kubernetes.io/infra','!node-role.kubernetes.io/master' 
 ----
 .Example output:
 ----
@@ -95,9 +95,9 @@ They may be in `pending` for sometime so repeat command above until they are in 
 
 ----
 NAME                                                STATE     TYPE         REGION      ZONE         AGE
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2a-cqvwj   running   m4.4xlarge   us-east-2   us-east-2a   70s
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2b-g5p5v   running   m4.4xlarge   us-east-2   us-east-2b   70s
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c-rx4v8   running   m4.4xlarge   us-east-2   us-east-2c   70s
+cluster-ocs-0ec4-dgwqc-workerocs-us-east-2a-cqvwj   running   m5.4xlarge   us-east-2   us-east-2a   70s
+cluster-ocs-0ec4-dgwqc-workerocs-us-east-2b-g5p5v   running   m5.4xlarge   us-east-2   us-east-2b   70s
+cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c-rx4v8   running   m5.4xlarge   us-east-2   us-east-2c   70s
 ----
 
 You can see that the workerocs *machines* are using are also using the AWS EC2 instance type `m4.4xlarge`. The `m4.4xlarge` instance type follows our recommended instance sizing for OCS, 16 cpu and 64 GB mem.
@@ -113,9 +113,9 @@ This step could take more than 5 minutes. The result of this command needs to lo
 
 ----
 NAME                                          DESIRED   CURRENT   READY   AVAILABLE   AGE
-cluster-ocs-79cf-lj8wq-workerocs-us-east-1a   1         1         1       1           8m26s
-cluster-ocs-79cf-lj8wq-workerocs-us-east-1b   1         1         1       1           8m26s
-cluster-ocs-79cf-lj8wq-workerocs-us-east-1c   1         1         1       1           8m25s
+cluster-ocs-0ec4-dgwqc-workerocs-us-east-2a   1         1         1       1           8m26s
+cluster-ocs-0ec4-dgwqc-workerocs-us-east-2b   1         1         1       1           8m26s
+cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c   1         1         1       1           8m25s
 ----
 
 You can exit by pressing kbd:[Ctrl+C]
@@ -124,7 +124,7 @@ Now check to see that you have 3 new OCP worker nodes. The `NAME` of your OCP no
 
 [source,role="execute"]
 ----
-oc get nodes -l node-role.kubernetes.io/worker -l '!node-role.kubernetes.io/infra'
+oc get nodes -l node-role.kubernetes.io/worker -l '!node-role.kubernetes.io/infra','!node-role.kubernetes.io/master'
 ----
 .Example output:
 ----

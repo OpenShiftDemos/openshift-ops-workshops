@@ -43,7 +43,7 @@ spec:
           deviceIndex: 0
           iamInstanceProfile:
             id: CLUSTERID-worker-profile
-          instanceType: m4.4xlarge
+          instanceType: m5.4xlarge
           kind: AWSMachineProviderConfig
           metadata:
             creationTimestamp: null
@@ -113,7 +113,7 @@ spec:
           deviceIndex: 0
           iamInstanceProfile:
             id: CLUSTERID-worker-profile
-          instanceType: m4.4xlarge
+          instanceType: m5.4xlarge
           kind: AWSMachineProviderConfig
           metadata:
             creationTimestamp: null
@@ -183,7 +183,7 @@ spec:
           deviceIndex: 0
           iamInstanceProfile:
             id: CLUSTERID-worker-profile
-          instanceType: m4.4xlarge
+          instanceType: m5.4xlarge
           kind: AWSMachineProviderConfig
           metadata:
             creationTimestamp: null

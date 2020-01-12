@@ -418,36 +418,34 @@ Once inside the toolbox, try out the following Ceph commands:
 [source,role="execute"]
 ----
 ceph status
----
+----
 
 [source,role="execute"]
 ----
 ceph osd status
----
+----
 
 [source,role="execute"]
 ----
 ceph osd tree
----
+----
 
 [source,role="execute"]
 ----
 ceph df
----
+----
 
 [source,role="execute"]
 ----
 rados df
----
+----
 
 [source,role="execute"]
 ----
 ceph versions
----
-
 ----
+
 .Example output:
-[source]
 ----
 sh-4.2# ceph status
   cluster:

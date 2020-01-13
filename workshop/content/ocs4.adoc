@@ -11,7 +11,7 @@ This module is for both system administrators and application developers interes
 * Deploy the Rook toolbox to run Ceph and RADOS commands
 * Creating a Read-Write-Once (RWO) PVC that is based on Ceph RBDs
 * Creating a Read-Write-Many (RWX) PVC that is based on CephFS
-* Use OCS for Prometheus and Alertmanager storage
+* Use OCS for Prometheus and AlertManager storage
 * Use the MCG to create a bucket and use in an application
 * Add more storage to the Ceph cluster
 * Use must-gather to collect support information
@@ -119,7 +119,7 @@ cluster-ocs-0ec4-dgwqc-workerocs-us-east-2b   1         1         1       1     
 cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c   1         1         1       1           8m25s
 ----
 
-You can exit by pressing kbd:[Ctrl+C]
+You can exit by pressing `[Ctrl+C]`.
 
 Now check to see that you have 3 new OCP worker nodes. The `NAME` of your OCP nodes will be different than shown below.
 
@@ -208,7 +208,7 @@ NAME                    DISPLAY                       VERSION   REPLACES   PHASE
 ocs-operator.v0.0.284   OpenShift Container Storage   0.0.284              Succeeded
 ----
 
-You can exit by pressing kbd:[Ctrl+C]
+You can exit by pressing `[Ctrl+C]`.
 
 The resource `csv` is a shortened word for `clusterserviceversions.operators.coreos.com`.
 
@@ -469,7 +469,7 @@ sh-4.2# ceph status
     client:   1.2 KiB/s rd, 39 KiB/s wr, 2 op/s rd, 3 op/s wr
 ----
 
-You can exit the toolbox by either pressing kbd:[Ctrl+D] or by executing `exit`.
+You can exit the toolbox by either pressing `[Ctrl+D]` or by executing `exit`.
 
 == Create a new OCP application deployment using Ceph RBD volume
 
@@ -517,7 +517,7 @@ rails-pgsql-persistent-1-hook-pre   0/1     Completed   0          3m28s
 rails-pgsql-persistent-1-pjh6q      1/1     Running     0          3m14s
 ----
 
-You can exit by pressing kbd:[Ctrl+C]
+You can exit by pressing `[Ctrl+C]`
 
 Once the deployment is complete you can now test the application and the persistent storage on Ceph. Your `HOST/PORT` will be different.
 
@@ -560,7 +560,7 @@ rados df
 rbd -p ocs-storagecluster-cephblockpool ls | grep vol
 ----
 
-You can exit the toolbox by either pressing kbd:[Ctrl+D] or by executing `exit`.
+You can exit the toolbox by either pressing `[Ctrl+D]` or by executing `exit`.
 
 === Matching PVs to RBDs
 
@@ -590,6 +590,10 @@ The second half of the `VOLUMEHANDLE` column mostly matches what your RBD is nam
 [source,role="execute"]
 ----
 CSIVOL=$(oc get pv $(oc get pv | grep my-database-app | awk '{ print $1 }') -o jsonpath='{.spec.csi.volumeHandle}' | cut -d '-' -f 6- | awk '{print "csi-vol-"$1}')
+echo $CSIVOL
+----
+[source,role="execute"]
+----
 TOOLS_POD=$(oc get pods -n openshift-storage -l app=rook-ceph-tools -o name)
 oc rsh -n openshift-storage $TOOLS_POD rbd -p ocs-storagecluster-cephblockpool info $CSIVOL
 ----
@@ -629,7 +633,7 @@ Next deploy the example PHP application called `file-uploader`:
 oc new-app openshift/php:7.1~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
 ----
 
-.Sample Output
+.Sample Output:
 ----
 --> Found image 665111f (6 days old) in image stream "openshift/php" under tag "7.1" for "openshift/php:7.1"
 
@@ -665,7 +669,7 @@ Watch and wait for the application to be deployed:
 oc logs -f bc/file-uploader -n my-shared-storage
 ----
 
-.Sample Output
+.Sample Output:
 ----
 Cloning "https://github.com/christianh814/openshift-php-upload-demo" ...
 
@@ -761,7 +765,7 @@ with `oc set volume -h`. Now, let's look at the result of adding the volume:
 oc get pvc -n my-shared-storage
 ----
 
-.Sample Output
+.Sample Output:
 ----
 NAME                STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS                AGE
 my-shared-storage   Bound    pvc-371c2184-fb73-11e9-b901-0aad1a53052d   1Gi        RWX            ocs-storagecluster-cephfs   47s
@@ -785,7 +789,7 @@ oc get route file-uploader -n my-shared-storage -o jsonpath --template="{.spec.h
 
 This will return a route similar to this one (careful: there is no line break at the end so your shell prompt appears right after the output).
 
-.Sample Output
+.Sample Output:
 ----
 file-uploader-my-shared-storage.apps.cluster-ocs-9b06.ocs-9b06.example.opentlc.com
 ----
@@ -805,11 +809,9 @@ uploaded files.
 
 == Using OCS for Prometheus Metrics
 
-OpenShift ships with a pre-configured and self-updating monitoring stack that is based on the Prometheus open source project and its wider eco-system. It provides monitoring of cluster components and ships with a set of alerts to immediately notify the cluster administrator about any occurring problems.
+OpenShift ships with a pre-configured and self-updating monitoring stack that is based on the Prometheus open source project and its wider eco-system. It provides monitoring of cluster components and ships with a set of alerts to immediately notify the cluster administrator about any occurring problems. For production environments, it is highly recommended to configure persistent storage using block storage technology. OCS 4 provide block storage using Ceph RBD volumes. Running cluster monitoring with persistent storage means that your metrics are stored to a persistent volume and can survive a pod being restarted or recreated. This section will detail how to migrate Prometheus and AlertManager storage to Ceph RBD volumes for persistence.  
 
-Running cluster monitoring with persistent storage means that your metrics are stored to a persistent volume and can survive a pod being restarted or recreated. This is ideal if you require your metrics or alerting data to be guarded from data loss. For production environments, it is highly recommended to configure persistent storage using block storage technology. OCS 4 provide block storage using Ceph RBD volumes. The following instructions will detail how to migrate Prometheus and Alertmanager storage to Ceph RBD volumes for persistence.
-
-Let's discover what *Pods* and *PVCs* are installed in the `openshift-monitoring` namespace.
+First, let's discover what *Pods* and *PVCs* are installed in the `openshift-monitoring` namespace. In the prior module, OpenShift Infrastructure Nodes, the Prometheus and AlertManager resources were moved to the OCP infra nodes. 
 
 [source,role="execute"]
 ----
@@ -842,11 +844,11 @@ pod/prometheus-operator-cbfd89f9-95bgj             1/1     Running   0          
 pod/telemeter-client-7c65855db4-vd5jl              3/3     Running   0          6d23h
 ----
 
-At this point there are no *PVC* resources because Prometheus and Alertmanager are both using ephemeral (EmptyDir) storage. This is the way OpenShift is initially installed. The Prometheus stack consists of the Prometheus database and the alertmanager data. Persisting both is best-practice since data loss on either of these will cause you to lose your collected metrics and alerting data.
+At this point there are no *PVC* resources because Prometheus and AlertManager are both using ephemeral (EmptyDir) storage. This is the way OpenShift is initially installed. The Prometheus stack consists of the Prometheus database and the alertmanager data. Persisting both is best-practice since data loss on either of these will cause you to lose your collected metrics and alerting data.
 
 ### Modifying your Prometheus environment
 
-For Prometheus every supported configuration change is controlled through a central *ConfigMap*, which needs to be created before we can make changes. When you start off with a clean installation of Openshift, the ConfigMap to configure the Prometheus environment may not be present. To check if your ConfigMap is present, execute this:
+For Prometheus every supported configuration change is controlled through a central *ConfigMap*, which needs to exist before we can make changes. When you start off with a clean installation of Openshift, the ConfigMap to configure the Prometheus environment may not be present. To check if your ConfigMap is present, execute this:
 
 [source,role="execute"]
 ----
@@ -857,7 +859,7 @@ oc -n openshift-monitoring get configmap cluster-monitoring-config
 Error from server (NotFound): configmaps "cluster-monitoring-config" not found
 ----
 
-If you are missing the ConfigMap, create it using this command:
+If you are missing the *ConfigMap*, create it using this command:
 
 [source,role="execute"]
 ----
@@ -868,8 +870,9 @@ oc apply -f ~/content/support/ocslab_cluster-monitoring-noinfra.yaml
 configmap/cluster-monitoring-config created
 ----
 
-If the ConfigMap already exists, apply the correct changes using this command:
-
+[NOTE]
+====
+If the *ConfigMap* already exists because of completing prior module `OpenShift Infrastructure Nodes`, you will apply changes to the existing *ConfigMap*. 
 [source,role="execute"]
 ----
 oc apply -f ~/content/support/ocslab_cluster-monitoring-withinfra.yaml
@@ -878,6 +881,7 @@ oc apply -f ~/content/support/ocslab_cluster-monitoring-withinfra.yaml
 ----
 configmap/cluster-monitoring-config updated
 ----
+====
 
 You can view the *ConfigMap* with the following command:
 
@@ -891,10 +895,7 @@ oc -n openshift-monitoring get configmap cluster-monitoring-config -o yaml
 .ConfigMap sample output:
 [source,yaml]
 ----
-apiVersion: v1
-data:
-  config.yaml: |
-    prometheusK8s:
+...
       volumeClaimTemplate:
         metadata:
           name: prometheusdb
@@ -903,7 +904,7 @@ data:
           resources:
             requests:
               storage: 40Gi
-    alertmanagerMain:
+...
       volumeClaimTemplate:
         metadata:
           name: alertmanager
@@ -912,14 +913,7 @@ data:
           resources:
             requests:
               storage: 40Gi
-kind: ConfigMap
-metadata:
-  creationTimestamp: "2020-01-03T21:46:39Z"
-  name: cluster-monitoring-config
-  namespace: openshift-monitoring
-  resourceVersion: "666460"
-  selfLink: /api/v1/namespaces/openshift-monitoring/configmaps/cluster-monitoring-config
-  uid: 230c7b55-a099-4ba8-8a69-4d0a428d80aa
+...
 ----
 
 Once you create this new *ConfigMap* `cluster-monitoring-config`, the affected *Pods* will automatically be restarted and the new storage will be mounted in the Pods.
@@ -934,7 +928,7 @@ The *ConfigMap* above samples the case where no *ConfigMap* previously existed.
 It is not possible to retain data that was written on the default EmptyDir-based or ephemeral installation. Thus you will start with an empty DB after changing the backend storage thereby starting over with metric collection and reporting.
 ====
 
-After a couple of minutes, the Alertmanager and Prometheus *Pods* will have restarted and you will see new *PVCs* in the `openshift-monitoring` namespace that they are now providing persistent storage:
+After a couple of minutes, the AlertManager and Prometheus *Pods* will have restarted and you will see new *PVCs* in the `openshift-monitoring` namespace that they are now providing persistent storage:
 
 [source,role="execute"]
 ----
@@ -951,7 +945,7 @@ prometheusdb-prometheus-k8s-0      Bound    pvc-5b845908-d929-4326-976e-06599014
 prometheusdb-prometheus-k8s-1      Bound    pvc-f2d22176-6348-451f-9ede-c00b303339af   40Gi       RWO            ocs-storagecluster-ceph-rbd   3m31s
 ----
 
-You can validate that Prometheus and Alertmanager are working correctly after moving to persistent storage <<Monitoring the OCS environment,in a later section>> of this lab guide.
+You can validate that Prometheus and AlertManager are working correctly after moving to persistent storage <<Monitoring the OCS environment,in a later section>> of this lab guide.
 
 == Using the Multi-Cloud-Gateway
 
@@ -1308,9 +1302,7 @@ NAME             READY   STATUS      RESTARTS   AGE
 obc-test-bvg8h   0/1     Completed   0          22s
 ----
 
-Then you can fetch the output of s3cmd via kubectl:
-
-NOTE: Fetching the obc-test log via the `oc` command does not work correctly. It does work using the `kubectl` command.
+Then you can check the `obc-test` *Pod* logs for the contents of the S3 bucket using the command below (in this case there are zero objects in the bucket). 
 
 [source,role="execute"]
 ----
@@ -1324,7 +1316,7 @@ oc logs -n obc-test $(oc get pods -n obc-test -l app=obc-test -o jsonpath='{.ite
 0        Total
 ----
 
-As we can see above, we can access one bucket, which is currently empty. This proves that the access credentials from the OBC work and are set up correctly inside of the container. +
+This proves that the access credentials from the OBC work and are set up correctly inside of the container. +
 Most applications support reading out the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables natively, but you will have to figure out how to set the host and bucket name for each application. In our example we used CLI flags of s3cmd for this.
 
 == Adding storage to the Ceph Cluster
@@ -1382,41 +1374,13 @@ Once they are available, we can check on their labels like this:
 
 [source,role="execute"]
 ----
-oc get nodes -o json | jq '.items[] | select(.metadata.labels.role == "storage-node") | .metadata.name,.metadata.labels'
+oc get nodes -l node-role.kubernetes.io/worker -l '!cluster.ocs.openshift.io/openshift-storage' | grep -v NAME |cut -d' ' -f1
 ----
 .Example output:
-[source,json]
 ----
-"ip-10-0-131-209.us-east-2.compute.internal"
-{
-  "beta.kubernetes.io/arch": "amd64",
-  "beta.kubernetes.io/instance-type": "m4.4xlarge",
-  "beta.kubernetes.io/os": "linux",
-  "cluster.ocs.openshift.io/openshift-storage": "",
-  "failure-domain.beta.kubernetes.io/region": "us-east-2",
-  "failure-domain.beta.kubernetes.io/zone": "us-east-2a",
-  "kubernetes.io/arch": "amd64",
-  "kubernetes.io/hostname": "ip-10-0-131-209",
-  "kubernetes.io/os": "linux",
-  "node-role.kubernetes.io/worker": "",
-  "node.openshift.io/os_id": "rhcos",
-  "role": "storage-node"
-}
-"ip-10-0-133-99.us-east-2.compute.internal"
-{
-  "beta.kubernetes.io/arch": "amd64",
-  "beta.kubernetes.io/instance-type": "m4.4xlarge",
-  "beta.kubernetes.io/os": "linux",
-  "failure-domain.beta.kubernetes.io/region": "us-east-2",
-  "failure-domain.beta.kubernetes.io/zone": "us-east-2a",
-  "kubernetes.io/arch": "amd64",
-  "kubernetes.io/hostname": "ip-10-0-133-99",
-  "kubernetes.io/os": "linux",
-  "node-role.kubernetes.io/worker": "",
-  "node.openshift.io/os_id": "rhcos",
-  "role": "storage-node"
-}
-[...]
+ip-10-0-133-99.us-east-2.compute.internal
+ip-10-0-158-153.us-east-2.compute.internal
+ip-10-0-160-200.us-east-2.compute.internal
 ----
 
 We can see that there are three new nodes, which do not yet have the `cluster.ocs.openshift.io/openshift-storage` label applied yet. We will apply this now:
@@ -1685,7 +1649,7 @@ image::images/ocs/metrics-queryfield.png[OCP Monitoring Metrics Homepage]
 
 Use the query field to either enter the formula of your choice or to search for metrics by name. The metrics available will let you query both OCP related information or OCS related information. The queries can be simple or complex using the Prometheus query syntax and all its available functions.
 
-Let's start testing a simple query example and enter the following text (`ceph_osd_op`) in the query field. When you are done typing, simply hit kbd:[Enter]
+Let's start testing a simple query example and enter the following text (`ceph_osd_op`) in the query field. When you are done typing, simply hit `[Enter]`.
 
 .Simple Ceph Query
 image::images/ocs/metrics-simplecephquery.png[Ceph Simple Query]
@@ -1695,7 +1659,7 @@ The window should refresh with a graph similar to the one below.
 .Simple Ceph Graph
 image::images/ocs/metrics-simplecephgraph.png[Ceph Simple Graph]
 
-Then let's try a more relevant query example and enter the following text (`rate(ceph_osd_op[5m])` or `irate(ceph_osd_op[5m])`)in the query field. When you are done typing, simply hit kbd:[Enter]
+Then let's try a more relevant query example and enter the following text (`rate(ceph_osd_op[5m])` or `irate(ceph_osd_op[5m])`)in the query field. When you are done typing, simply hit `[Enter]`.
 
 .Complex Ceph Query
 image::images/ocs/metrics-complexcephquery.png[Ceph Complex Query]

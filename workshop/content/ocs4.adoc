@@ -2,23 +2,24 @@
 
 == Lab Overview
 
-This hands-on workshop is for both system administrators and application developers interested in learning how to deploy and manage OpenShift Container Storage (OCS). In this lab you will be using OpenShift Container Platform (OCP) 4.x and the OCS operator to deploy Ceph and the Multi-Cloud-Gateway (MCG) as a persistent storage solution for OCP workloads. This instruction was developed using the RHPDS `OpenShift 4.2 Workshop`. Instructions to `Order` this Workshop for Red Hat employees can be found at link:https://mojo.redhat.com/docs/DOC-1209703[OpenShift 4.2 Workshop]. If you are not a Red Hat employee you can deploy OpenShift 4 using this link link:http:try.openshift.com[OpenShift 4 Deployment] and then follow the instructions for AWS Installer-Provisioned Infrastructure (IPI). 
-
-NOTE: If deploying OpenShift 4 on VMware infrastructure or other User-Provisioned Infrastructure (UPI) skip the steps that include creating *machines* and *machinesets* given these resources are not currently available for UPI. To complete all of the instructions in this lab you will need to pre-provision six OCP worker nodes if OCP 4 is on UPI (i.e. not on AWS). To deploy OCS, OCP worker nodes need to have a minimum of 16 CPUs and 64 GB memory available.
+This module is for both system administrators and application developers interested in learning how to deploy and manage OpenShift Container Storage (OCS). In this module you will be using OpenShift Container Platform (OCP) 4.x and the OCS operator to deploy Ceph and the Multi-Cloud-Gateway (MCG) as a persistent storage solution for OCP workloads. 
 
 === In this lab you will learn how to
 
 * Configure and deploy containerized Ceph and NooBaa
-* Validate deployment of containerized Ceph Nautilus and NooBaa
+* Validate deployment of containerized Ceph and NooBaa
 * Deploy the Rook toolbox to run Ceph and RADOS commands
 * Creating a Read-Write-Once (RWO) PVC that is based on Ceph RBDs
 * Creating a Read-Write-Many (RWX) PVC that is based on CephFS
-* Using the MCG to create a bucket
+* Use OCS for Prometheus and Alertmanager storage
+* Use the MCG to create a bucket and use in an application
 * Add more storage to the Ceph cluster
 * Use must-gather to collect support information
 
 .OpenShift Container Storage components
 image::images/ocs/OCS-Pods-Diagram.png[Showing OCS4 pods]
+
+NOTE: If you want more information about how Ceph works please review <<Introduction to Ceph>> section before starting the exercises in this module.
 
 [[labexercises]]
 
@@ -37,7 +38,7 @@ git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-dev c
 
 === Scale OCP cluster and add 3 new nodes
 
-In this section, you will first validate the OCP environment has 3 master and 2 worker nodes (or 3 worker nodes) before increasing the cluster size by additional 3 worker nodes for OCS resources. The `NAME` of your OCP nodes will be different than shown below.
+In this section, you will first validate the OCP environment has 3 master and 3 worker nodes before increasing the cluster size by additional 3 worker nodes for OCS resources. The `NAME` of your OCP nodes will be different than shown below.
 
 [source,role="execute"]
 ----
@@ -1732,12 +1733,12 @@ oc adm must-gather
 Or like this for OCS specific insights:
 
 ----
-oc adm must-gather --image=quay.io/ocs-dev/ocs-must-gather
+oc adm must-gather --image=quay.io/rhceph-dev/ocs-must-gather
 ----
 
 The output will then be saved in the current directory inside of a new folder called `must-gather.local.(random)`
 
-More runtime options can be displayed with
+More runtime options can be displayed with this command:
 
 ----
 oc adm must-gather -h
@@ -1782,117 +1783,6 @@ Use "oc adm options" for a list of global command-line options (applies to all c
 ----
 
 // On the Openshift side must-gather has nowadays been replaced by `oc adm inspect`.
-
-[appendix]
-== Configuring the local oc client
-
-This section will explain how you set up your workstation with the Openshift CLI.
-
-To get the latest OpenShift CLI client run the following commands:
-
-
-.Mac steps
-[source]
-----
-wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/ --no-directories --accept="*client-mac*" --quiet --recursive --level=1
-ls -1 openshift-client-mac-*.tar.gz | tail -n1 | xargs -I {} tar xzvf {} oc
-sudo mv oc /usr/local/bin
-----
-
-In addition install the watch command to use with the `oc client` on your Mac using Homebrew.
-
-----
-brew install watch
-----
-Alternatively, add the following lines to your $HOME/.profile.
-
-----
-function watch {
-while :; do clear; date; echo; $@; sleep 2; done
-}
-----
-
-Then reload your profile with `source $HOME/.profile`.
-
-.Linux steps
-[source]
-----
-wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/ --no-directories --accept="*client-linux*" --quiet --recursive --level=1
-ls -1 openshift-client-linux-*.tar.gz | tail -n1 | xargs -I {} tar xzvf {} oc
-sudo mv oc /usr/bin
-----
-
-Afterwards, go to your Openshift Web Console, log in and click on the username in the top right corner. There you will find the menu item `Copy Login Command`.
-
-.Copy Login command menu entry
-image::images/ocs/OCP-copy-login-command.png[]
-
-Clicking on `Copy Login Command` will open a new window and you might be required to login to your Openshift cluster again.
-After successfully login in, you see blue text `Display token` - click this and you will be shown your login command.
-
-The login command will look similar to this
-
-`oc login --token=zoNoANLOOoJzXV3sb-TE1xIcg2aLBssdN0bTNIuV29w --server=https://api.cluster-ocs-89db.ocs-89db.example.opentlc.com:6443`
-
-execute this login command on your terminal. If you did not provision your RHPDS environment with Let's Encrypt certificates, it will ask if you want to connect without certificate checks, accept this.
-
-Check if you are successfully connected by issuing a command against the cluster:
-
-[source,role="execute"]
-----
-oc version
-----
-.Example output:
-----
-Client Version: openshift-clients-4.2.0-201910041700
-Server Version: 4.2.0
-Kubernetes Version: v1.14.6+2e5ed54
-----
-
-[NOTE]
-====
-The above commands will always pull the latest oc version, so your version might be higher than the version in the example output.
-====
-
-[appendix]
-== Install the NooBaa CLI client
-
-To install the CLI, follow these steps on your workstation:
-
-.Mac steps
-[source]
-----
-brew install noobaa/noobaa/noobaa
-----
-.Mac steps without Homebrew
-[source]
-----
-curl -s https://api.github.com/repos/noobaa/noobaa-operator/releases/latest | grep "mac" | cut -d : -f 2,3 | tr -d \" | wget -qi - ; mv noobaa-mac-* noobaa ; chmod +x noobaa; sudo mv noobaa /usr/local/bin/
-----
-
-.Linux steps
-[source]
-----
-curl -s https://api.github.com/repos/noobaa/noobaa-operator/releases/latest | grep "linux" | cut -d : -f 2,3 | tr -d \" | wget -qi - ; mv noobaa-linux-* noobaa ; chmod +x noobaa; sudo mv noobaa /usr/bin/
-----
-
-Check that your noobaa CLI installation was successful with this command:
-
-[source,role="execute"]
-----
-noobaa version
-----
-.Example output:
-----
-INFO[0000] CLI version: 2.0.9
-INFO[0000] noobaa-image: noobaa/noobaa-core:5.2.11
-INFO[0000] operator-image: noobaa/noobaa-operator:2.0.9
-----
-
-[NOTE]
-====
-The above commands will always pull the latest noobaa version, so your version might be higher than the version in the example output.
-====
 
 [appendix]
 == Introduction to Ceph

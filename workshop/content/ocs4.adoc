@@ -1,4 +1,4 @@
-= Lab: Deploying and Managing OpenShift Container Storage
+= Deploying and Managing OpenShift Container Storage
 
 == Lab Overview
 

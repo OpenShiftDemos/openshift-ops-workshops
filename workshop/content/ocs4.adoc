@@ -101,7 +101,7 @@ cluster-ocs-0ec4-dgwqc-workerocs-us-east-2b-g5p5v   running   m5.4xlarge   us-ea
 cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c-rx4v8   running   m5.4xlarge   us-east-2   us-east-2c   70s
 ----
 
-You can see that the workerocs *machines* are using are also using the AWS EC2 instance type `m4.4xlarge`. The `m4.4xlarge` instance type follows our recommended instance sizing for OCS, 16 cpu and 64 GB mem.
+You can see that the workerocs *machines* are using are also using the AWS EC2 instance type `m5.4xlarge`. The `m5.4xlarge` instance type follows our recommended instance sizing for OCS, 16 cpu and 64 GB mem.
 
 Now you want to see if our new *machines* are added to the OCP cluster.
 
@@ -160,15 +160,15 @@ You must add the monitoring label to this namespace. This is required to get pro
 oc label namespace openshift-storage "openshift.io/cluster-monitoring=true"
 ----
 
-NOTE: The below manifest file will not be needed when OCS 4 is released.
-
-To apply this manifest, execute the following:
-
-[source,role="execute"]
-----
-oc apply -f ~/content/support/ocslab_deploy-with-olm.yaml
-----
-
+//NOTE: The below manifest file will not be needed when OCS 4 is released.
+//
+//To apply this manifest, execute the following:
+//
+//[source,role="execute"]
+//----
+//oc apply -f ~/content/support/ocslab_deploy-with-olm.yaml
+//----
+//
 Now switch over to your *Openshift Web Console*. You can get your URL by issuing command below to get the OCP 4 `console` route. Put this URL in a browser tab. You will use the same Admin username and password you used to login and use the `oc client` to login to the OCP 4 `console`.
 
 [source,role="execute"]
@@ -204,8 +204,8 @@ watch oc -n openshift-storage get csv
 ----
 .Example output:
 ----
-NAME                    DISPLAY                       VERSION   REPLACES   PHASE
-ocs-operator.v0.0.284   OpenShift Container Storage   0.0.284              Succeeded
+NAME                  DISPLAY                       VERSION   REPLACES   PHASE
+ocs-operator.v4.2.0   OpenShift Container Storage   4.2.0                Succeeded
 ----
 
 You can exit by pressing `[Ctrl+C]`.
@@ -242,7 +242,7 @@ Click on `Openshift Container Storage Operator` to get to the OCS configuration 
 .OCS configuration screen
 image::images/ocs/OCS-config-screen-all.png[OCS configuration screen]
 
-On the top of the OCS configuration screen, scroll over to `Storage cluster` and click on `Create OCS Cluster Service`. If you do not see `Create OCS Cluster Service` refresh your browser window.
+On the top of the OCS configuration screen, scroll over to the right and click on `Storage cluster` and then click on `Create OCS Cluster Service`. If you do not see `Create OCS Cluster Service` refresh your browser window.
 
 .OCS Create Storage Cluster
 image::images/ocs/OCS-config-screen-storage-cluster.png[OCS Create Storage Cluster]
@@ -467,7 +467,7 @@ sh-4.2# ceph status
     client:   1.2 KiB/s rd, 39 KiB/s wr, 2 op/s rd, 3 op/s wr
 ----
 
-You can exit the toolbox by either pressing `[Ctrl+D]` or by executing `exit`.
+You can exit the toolbox by either pressing `[Ctrl+D]` or by typing `exit`.
 
 == Create a new OCP application deployment using Ceph RBD volume
 
@@ -554,11 +554,17 @@ Run the same Ceph commands as before the application deployment and compare to r
 [source,role="execute"]
 ----
 ceph df
+----
+[source,role="execute"]
+----
 rados df
+----
+[source,role="execute"]
+----
 rbd -p ocs-storagecluster-cephblockpool ls | grep vol
 ----
 
-You can exit the toolbox by either pressing `[Ctrl+D]` or by executing `exit`.
+You can exit the toolbox by either pressing `[Ctrl+D]` or by typing `exit`.
 
 === Matching PVs to RBDs
 
@@ -1653,12 +1659,14 @@ The OCS team has released its own image for the must-gather tool that runs stora
 
 You can run this diagnostic tool like this for generic Openshift debugging:
 
+[source,role="execute"]
 ----
 oc adm must-gather
 ----
 
 Or like this for OCS specific insights:
 
+[source,role="execute"]
 ----
 oc adm must-gather --image=quay.io/rhceph-dev/ocs-must-gather
 ----
@@ -1667,6 +1675,7 @@ The output will then be saved in the current directory inside of a new folder ca
 
 More runtime options can be displayed with this command:
 
+[source,role="execute"]
 ----
 oc adm must-gather -h
 ----

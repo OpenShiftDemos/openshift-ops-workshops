@@ -234,8 +234,8 @@ Now switch back to your *Openshift Web Console* for the remainder of the install
 Navigate to the `Operators` menu on the left and select `Installed Operators`. Make sure the selected project is set to `openshift-storage`.
 What you see, should be similar to the following example picture:
 
-.Installed operators:  1) Make sure you are in the right project; 2) Check Operator status; 3) Click on Openshift Container Storage Operator
-image::images/ocs/OCP-installed-operators.jpg[Openshift showing the installed operators in namespace openshift-storage]
+.Installed Operators in the openshift-storage namespace
+image::images/ocs/OCP-installed-operators.png[Openshift showing the installed operators in namespace openshift-storage]
 
 Click on `Openshift Container Storage Operator` to get to the OCS configuration screen.
 
@@ -262,8 +262,6 @@ oc get nodes --show-labels | grep storage-node |cut -d' ' -f1
 ----
 
 Select the three nodes that resulted from the command above. Then click on the button `Create` below the dialog box where you selected the 3 workers with a `checkmark`.
-
-NOTE: If your worker nodes do not have the label `role=storage-node` just select 3 worker nodes that meet requirements for OCS nodes (16 vCPUs and 64 GB Memory) and in different availability zones. It would be a good practice to add a unique label to OCP nodes that are to be used for creating the `Storage Cluster` prior to this step so they are easy to find in list of OCP nodes. In this case it was done by adding this label, `role=storage-node`, in the machineset YAML files that you used earlier to create the new OCS worker nodes.
 
 In the background this will start initiating a lot of new pods in the `openshift-storage` namespace, as can be seen on the CLI:
 

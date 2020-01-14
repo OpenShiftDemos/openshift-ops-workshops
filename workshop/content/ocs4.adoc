@@ -515,7 +515,7 @@ rails-pgsql-persistent-1-hook-pre   0/1     Completed   0          3m28s
 rails-pgsql-persistent-1-pjh6q      1/1     Running     0          3m14s
 ----
 
-You can exit by pressing `[Ctrl+C]`
+You can exit by pressing `[Ctrl+C]`.
 
 Once the deployment is complete you can now test the application and the persistent storage on Ceph. Your `HOST/PORT` will be different.
 
@@ -718,7 +718,13 @@ Let's make our application production ready by exposing it via a `Route` and sca
 [source,role="execute"]
 ----
 oc expose svc/file-uploader -n my-shared-storage
+----
+[source,role="execute"]
+----
 oc scale --replicas=3 dc/file-uploader -n my-shared-storage
+----
+[source,role="execute"]
+----
 oc get pods -n my-shared-storage
 ----
 
@@ -857,6 +863,12 @@ oc -n openshift-monitoring get configmap cluster-monitoring-config
 Error from server (NotFound): configmaps "cluster-monitoring-config" not found
 ----
 
+.Output if the ConfigMap is created:
+----
+NAME                        DATA   AGE
+cluster-monitoring-config   1      116m
+----
+
 If you are missing the *ConfigMap*, create it using this command:
 
 [source,role="execute"]
@@ -887,7 +899,7 @@ NOTE: The size of the Ceph RBD volumes, `40Gi`, can be modified to be larger or 
 
 [source,role="execute"]
 ----
-oc -n openshift-monitoring get configmap cluster-monitoring-config -o yaml
+oc -n openshift-monitoring get configmap cluster-monitoring-config -o yaml | more
 ---- 
 
 .ConfigMap sample output:
@@ -918,24 +930,20 @@ Once you create this new *ConfigMap* `cluster-monitoring-config`, the affected *
 
 [NOTE]
 ====
-The *ConfigMap* above samples the case where no *ConfigMap* previously existed.
-====
-
-[NOTE]
-====
 It is not possible to retain data that was written on the default EmptyDir-based or ephemeral installation. Thus you will start with an empty DB after changing the backend storage thereby starting over with metric collection and reporting.
 ====
 
-After a couple of minutes, the AlertManager and Prometheus *Pods* will have restarted and you will see new *PVCs* in the `openshift-monitoring` namespace that they are now providing persistent storage:
+After a couple of minutes, the AlertManager and Prometheus *Pods* will have restarted and you will see new *PVCs* in the `openshift-monitoring` namespace that they are now providing persistent storage.
 
 [source,role="execute"]
 ----
-oc get -n openshift-monitoring pvc
+oc get pods,pvc -n openshift-monitoring
 ----
 .Example output:
 [source,yaml]
 ----
 NAME                               STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS                  AGE
+...
 alertmanager-alertmanager-main-0   Bound    pvc-733be285-aaf9-4334-9662-44b63bb4efdf   40Gi       RWO            ocs-storagecluster-ceph-rbd   3m37s
 alertmanager-alertmanager-main-1   Bound    pvc-e07ebe61-de5d-404c-9a25-bb3a677281c5   40Gi       RWO            ocs-storagecluster-ceph-rbd   3m37s
 alertmanager-alertmanager-main-2   Bound    pvc-9de2edf2-9f5e-4f62-8aa7-ecfd01957748   40Gi       RWO            ocs-storagecluster-ceph-rbd   3m37s
@@ -947,10 +955,7 @@ You can validate that Prometheus and AlertManager are working correctly after mo
 
 == Using the Multi-Cloud-Gateway
 
-This section discusses the usage of the Multi-Cloud-Gateway (MCG). It is expected that the installation of MCG has been finished successfully and the local `oc` client is configured correctly to connect to the Openshift cluster.
-Currently the best way to configure the MCG is to use the CLI.
-
-To install the CLI follow the <<Install the NooBaa CLI client>> section.
+This section discusses the usage of the Multi-Cloud-Gateway (MCG). Currently the best way to configure the MCG is to use the CLI.
 
 NOTE: While the NooBaa Web Management Console is accessible, it should not be used to create any resources, since they are currently not synchronized back to the Openshift cluster.
 
@@ -1127,7 +1132,7 @@ status:
   phase: Bound
 ----
 
-Inside of your `openshift-storage` namespace, you will now find the CM and the secret to use this OBC. The CM and the secret have the same name as the OBC:
+Inside of your `openshift-storage` namespace, you will now find the *ConfigMap* and the *Secret* to use this OBC. The CM and the secret have the same name as the OBC:
 
 [source,role="execute"]
 ----
@@ -1276,12 +1281,12 @@ The first part creates an OBC that will create a ConfigMap and a secret that hav
 
 Let's try this out:
 
-.Deploy the Manifest
+.Deploy the Manifest:
 [source,role="execute"]
 ----
 oc apply -f ~/content/support/ocslab_obc-app-example.yaml
 ----
-.Example output
+.Example output:
 ----
 namespace/obc-test created
 objectbucketclaim.objectbucket.io/obc-test created
@@ -1294,7 +1299,7 @@ Afterwards watch the *Pod* be Created, Run and finally be marked `Completed` lik
 ----
 oc get pods -n obc-test -l app=obc-test
 ----
-.Example output
+.Example output:
 ----
 NAME             READY   STATUS      RESTARTS   AGE
 obc-test-bvg8h   0/1     Completed   0          22s
@@ -1323,7 +1328,6 @@ Adding storage to OCS adds capacity and performance to your already present clus
 
 [NOTE]
 ====
-For this you can select to either add more storage worker nodes, or leverage the already present nodes to add more storage capacity.
 The reason for adding more OCP worker nodes for storage is because the existing nodes do not have adequate CPU and/or Memory available.
 ====
 
@@ -1333,7 +1337,7 @@ This section will explain how one can add more worker nodes to the present stora
 
 To add more nodes, we could either add more machinesets like we did before, or scale the already present OCS machinesets. For this training, we will spawn more workers by scaling the already present OCS worker instances up:
 
-.Check on our present machinesets
+.Check on our present machinesets:
 [source,role="execute"]
 ----
 oc get machinesets -n openshift-machine-api | egrep 'NAME|workerocs'
@@ -1362,17 +1366,19 @@ oc scale -n openshift-machine-api --replicas=2 machineset.machine.openshift.io/c
 machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c scaled
 ----
 
-Wait until the new workers are available.
+Wait until the new workers are available. This could take 5 minutes or more so be patient.
 [source,role="execute"]
 ----
 watch "oc get machinesets -n openshift-machine-api | egrep 'NAME|workerocs'"
 ----
 
-Once they are available, we can check on their labels like this:
+You can exit by pressing `[Ctrl+C]`.
+
+Once they are available, we can check on which worker nodes do not have OCS label applied yet, these are the new workers just created. 
 
 [source,role="execute"]
 ----
-oc get nodes -l node-role.kubernetes.io/worker -l '!cluster.ocs.openshift.io/openshift-storage' | grep -v NAME |cut -d' ' -f1
+oc get nodes -l 'node-role.kubernetes.io/worker','!node-role.kubernetes.io/infra' --show-labels | grep -v NAME | grep -v storage-node | cut -d' ' -f1
 ----
 .Example output:
 ----
@@ -1403,17 +1409,17 @@ oc label nodes ip-10-0-162-215.us-east-2.compute.internal cluster.ocs.openshift.
 error: 'cluster.ocs.openshift.io/openshift-storage' already has a value (), and --overwrite is false
 ----
 
-We get errors for the nodes which already had the label applied, which is fine.
-Now we have the new instances prepared for extending the cluster, proceed to the next chapter to provision storage on these empty instances, the OCS operator will pick prefer the empty instances for new storage.
+You will see errors for the nodes which already had the OCS label applied, which is fine. +
+Now that you have the new instances prepared for extending the cluster by adding the OCS label, the next step is to add more storage to the Ceph cluster. The OCS operator will prefer the new OCP nodes because they have no OCS resources scheduled yet.
 
 === Add storage capacity
 
-In this section we will add storage capacity and performance to the configured OCS worker nodes. If you have followed the previous section you should now have 6 OCS nodes, otherwise you have three worker nodes, which is fine too.
+In this section we will add storage capacity and performance to the configured OCS worker nodes and the Ceph cluster. If you have followed the previous section you should now have 6 OCS nodes.
 
-To add storage, go to the Openshift Web Console and follow the steps to reach the OCS storage cluster overview:
+To add storage, go to the *Openshift Web Console* and follow these steps to reach the OCS storage cluster overview:
 
  - Click on `Operators` on the left navigation bar
- - Select `Installed Operators`
+ - Select `Installed Operators` and select `openshift-storage` project 
  - Click on `Openshift Container Storage Operator`
  - In the top navigation bar, scroll right to find the item `Storage Cluster` and click on it
 
@@ -1431,53 +1437,17 @@ NOTE: The effectively provisioned capacity will be three times as much as you pu
 
 Once you are done with your setting, proceed by clicking on `Add`. You will see the Status of the Storage Cluster change until it reaches `Ready` again.
 
-You can now see that there are new OSD pods and if you previously added new ndoes that they use the new OCS worker nodes:
+You can now see that there are new OSD pods:
 
 [source,role="execute"]
 ----
-oc get pod -o=custom-columns=NAME:.metadata.name,STATUS:.status.phase,NODE:.spec.nodeName -n openshift-storage
+oc get pod -o=custom-columns=NAME:.metadata.name,STATUS:.status.phase,NODE:.spec.nodeName -n openshift-storage | grep osd
 ----
 .Example output:
 ----
 NAME                                                              STATUS      NODE
-csi-cephfsplugin-5cksj                                            Running     ip-10-0-133-99.us-east-2.compute.internal
-csi-cephfsplugin-6t5cc                                            Running     ip-10-0-170-49.us-east-2.compute.internal
-csi-cephfsplugin-7slmp                                            Running     ip-10-0-162-215.us-east-2.compute.internal
-csi-cephfsplugin-865k6                                            Running     ip-10-0-138-9.us-east-2.compute.internal
-csi-cephfsplugin-8zn2w                                            Running     ip-10-0-131-209.us-east-2.compute.internal
-csi-cephfsplugin-9mmkp                                            Running     ip-10-0-150-39.us-east-2.compute.internal
-csi-cephfsplugin-mc2xs                                            Running     ip-10-0-160-200.us-east-2.compute.internal
-csi-cephfsplugin-provisioner-57f9567c-g44d6                       Running     ip-10-0-162-215.us-east-2.compute.internal
-csi-cephfsplugin-provisioner-57f9567c-tlnjz                       Running     ip-10-0-131-209.us-east-2.compute.internal
-csi-cephfsplugin-q86tr                                            Running     ip-10-0-155-12.us-east-2.compute.internal
-csi-cephfsplugin-s6sb4                                            Running     ip-10-0-158-153.us-east-2.compute.internal
-csi-rbdplugin-24t87                                               Running     ip-10-0-138-9.us-east-2.compute.internal
-csi-rbdplugin-4zp5v                                               Running     ip-10-0-131-209.us-east-2.compute.internal
-csi-rbdplugin-564v2                                               Running     ip-10-0-133-99.us-east-2.compute.internal
-csi-rbdplugin-5s5dc                                               Running     ip-10-0-150-39.us-east-2.compute.internal
-csi-rbdplugin-fd29r                                               Running     ip-10-0-160-200.us-east-2.compute.internal
-csi-rbdplugin-fjl6s                                               Running     ip-10-0-162-215.us-east-2.compute.internal
-csi-rbdplugin-kr2q6                                               Running     ip-10-0-158-153.us-east-2.compute.internal
-csi-rbdplugin-mrkr5                                               Running     ip-10-0-170-49.us-east-2.compute.internal
-csi-rbdplugin-pr9hn                                               Running     ip-10-0-155-12.us-east-2.compute.internal
-csi-rbdplugin-provisioner-69bb78d655-4hrzx                        Running     ip-10-0-162-215.us-east-2.compute.internal
-csi-rbdplugin-provisioner-69bb78d655-clzk5                        Running     ip-10-0-155-12.us-east-2.compute.internal
-noobaa-core-0                                                     Running     ip-10-0-131-209.us-east-2.compute.internal
-noobaa-operator-6d59cd7855-lhwg8                                  Running     ip-10-0-162-215.us-east-2.compute.internal
-ocs-operator-dc48d685-8qtqn                                       Running     ip-10-0-131-209.us-east-2.compute.internal
-rook-ceph-drain-canary-1e1fd4824c167161b5f69c6cf725d4c9-76vchxt   Running     ip-10-0-160-200.us-east-2.compute.internal
-rook-ceph-drain-canary-731c9dd8472082ee17090f034387aa3b-78k55k9   Running     ip-10-0-162-215.us-east-2.compute.internal
-rook-ceph-drain-canary-93e6590ed0bb3c88b985beb159ef084a-7c8kpsg   Running     ip-10-0-155-12.us-east-2.compute.internal
-rook-ceph-drain-canary-a28246b2da318cf936edd42362f92d37-59mjv4v   Running     ip-10-0-158-153.us-east-2.compute.internal
-rook-ceph-drain-canary-d0eaaceda4b757fe363def0873a5f86f-98s5k27   Running     ip-10-0-131-209.us-east-2.compute.internal
-rook-ceph-drain-canary-f9d3134dd5ed9bc3604bfe1a8ae31241-76tvspk   Running     ip-10-0-133-99.us-east-2.compute.internal
-rook-ceph-mds-ocs-storagecluster-cephfilesystem-a-7c865846g6k27   Running     ip-10-0-155-12.us-east-2.compute.internal
-rook-ceph-mds-ocs-storagecluster-cephfilesystem-b-69f846986g4n7   Running     ip-10-0-162-215.us-east-2.compute.internal
-rook-ceph-mgr-a-5486fc7cf5-l9h6z                                  Running     ip-10-0-131-209.us-east-2.compute.internal
-rook-ceph-mon-a-58c7cd4f9b-g4z2m                                  Running     ip-10-0-155-12.us-east-2.compute.internal
-rook-ceph-mon-b-684f66b8df-992wc                                  Running     ip-10-0-131-209.us-east-2.compute.internal
-rook-ceph-mon-c-6f7657b8b6-2sxl5                                  Running     ip-10-0-162-215.us-east-2.compute.internal
-rook-ceph-operator-d857c476f-4npzl                                Running     ip-10-0-155-12.us-east-2.compute.internal
+
+nl
 rook-ceph-osd-0-8675cf4f4-7gpbv                                   Running     ip-10-0-155-12.us-east-2.compute.internal
 rook-ceph-osd-1-58b9d954cf-9s6bw                                  Running     ip-10-0-162-215.us-east-2.compute.internal
 rook-ceph-osd-2-6994dd5f44-hsqrv                                  Running     ip-10-0-131-209.us-east-2.compute.internal
@@ -1490,7 +1460,6 @@ rook-ceph-osd-prepare-ocs-deviceset-1-0-9tmc6-svb84               Succeeded   ip
 rook-ceph-osd-prepare-ocs-deviceset-1-1-7qsxd-lppp6               Succeeded   ip-10-0-160-200.us-east-2.compute.internal
 rook-ceph-osd-prepare-ocs-deviceset-2-0-qtbfv-j4nr4               Succeeded   ip-10-0-155-12.us-east-2.compute.internal
 rook-ceph-osd-prepare-ocs-deviceset-2-1-glsgj-x4k7t               Succeeded   ip-10-0-158-153.us-east-2.compute.internal
-rook-ceph-tools-859dfcff6f-6jll4                                  Running     ip-10-0-150-39.us-east-2.compute.internal
 ----
 
 This is everything that you need to do to extend the OCS storage.
@@ -1499,14 +1468,14 @@ This is everything that you need to do to extend the OCS storage.
 
 Once you added the capacity and made sure that the OSD pods are present, you can also optionally check the additional storage capacity using the Ceph tools. To do this, follow these steps:
 
-.Enter the tools pod that you created in <<Using the Rook-Ceph toolbox to check on the Ceph backing storage,the previous section>>
+.Enter the tools pod that you created in <<Using the Rook-Ceph toolbox to check on the Ceph backing storage,the previous section>>:
 [source,role="execute"]
 ----
 TOOLS_POD=$(oc get pods -n openshift-storage -l app=rook-ceph-tools -o name)
 oc rsh -n openshift-storage $TOOLS_POD
 ----
 
-.Check the status of the Ceph cluster
+.Check the status of the Ceph cluster:
 [source,role="execute"]
 ----
 ceph status
@@ -1541,7 +1510,7 @@ In the Ceph status output, we can already see that:
 
 Besides that, nothing has changed in the output.
 
-.Check the topology of your cluster
+.Check the topology of your cluster:
 [source,role="execute"]
 ----
 ceph osd crush tree
@@ -1572,9 +1541,7 @@ ID  CLASS WEIGHT  TYPE NAME
 
 Since our Ceph cluster's CRUSH rules are set up to replicate data between the zones, this is an effective way to relax the load on the previous nodes.
 
-If you did not add more nodes and skipped the <<Add storage worker nodes>> section, then your output will be similar to as shown above. This is an effective way to scale out capacity and performance, using existing nodes, if you observe that your hosts are not exhausted and/or you are running out of either capacity or IOPs.
-
-In both scale-out cases, existing data on the old OSDs will be balanced out automatically, so that the old and the new OSDs share the load.
+Existing data on the original OSDs will be balanced out automatically, so that the old and the new OSDs share the load.
 
 == Monitoring the OCS environment
 

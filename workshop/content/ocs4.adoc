@@ -1446,8 +1446,6 @@ oc get pod -o=custom-columns=NAME:.metadata.name,STATUS:.status.phase,NODE:.spec
 .Example output:
 ----
 NAME                                                              STATUS      NODE
-
-nl
 rook-ceph-osd-0-8675cf4f4-7gpbv                                   Running     ip-10-0-155-12.us-east-2.compute.internal
 rook-ceph-osd-1-58b9d954cf-9s6bw                                  Running     ip-10-0-162-215.us-east-2.compute.internal
 rook-ceph-osd-2-6994dd5f44-hsqrv                                  Running     ip-10-0-131-209.us-east-2.compute.internal

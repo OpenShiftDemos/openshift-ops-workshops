@@ -467,7 +467,13 @@ sh-4.2# ceph status
     client:   1.2 KiB/s rd, 39 KiB/s wr, 2 op/s rd, 3 op/s wr
 ----
 
-You can exit the toolbox by either pressing `[Ctrl+D]` or by typing `exit`.
+Disconnect from the Ceph toolbox pod.
+
+[source,role="execute"]
+----
+exit
+----
+
 
 == Create a new OCP application deployment using Ceph RBD volume
 
@@ -564,7 +570,12 @@ rados df
 rbd -p ocs-storagecluster-cephblockpool ls | grep vol
 ----
 
-You can exit the toolbox by either pressing `[Ctrl+D]` or by typing `exit`.
+Disconnect from the Ceph toolbox pod.
+
+[source,role="execute"]
+----
+exit
+----
 
 === Matching PVs to RBDs
 
@@ -1384,7 +1395,7 @@ Once they are available, we can check on which worker nodes do not have OCS labe
 
 [source,role="execute"]
 ----
-oc get nodes -l 'node-role.kubernetes.io/worker','!node-role.kubernetes.io/infra' --show-labels | grep -v NAME | grep -v storage-node | cut -d' ' -f1
+oc get node --show-labels | grep storage-node | grep -v openshift-storage | cut -d' ' -f1
 ----
 .Example output:
 ----
@@ -1546,6 +1557,13 @@ ID  CLASS WEIGHT  TYPE NAME
 Since our Ceph cluster's CRUSH rules are set up to replicate data between the zones, this is an effective way to relax the load on the previous nodes.
 
 Existing data on the original OSDs will be balanced out automatically, so that the old and the new OSDs share the load.
+
+Disconnect from the Ceph toolbox pod.
+
+[source,role="execute"]
+----
+exit
+----
 
 == Monitoring the OCS environment
 

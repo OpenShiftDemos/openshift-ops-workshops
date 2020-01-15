@@ -1,8 +1,10 @@
 = Deploying and Managing OpenShift Container Storage
+// Activate experimental attribute for Keyboard Shortcut keys
+:experimental:
 
 == Lab Overview
 
-This module is for both system administrators and application developers interested in learning how to deploy and manage OpenShift Container Storage (OCS). In this module you will be using OpenShift Container Platform (OCP) 4.x and the OCS operator to deploy Ceph and the Multi-Cloud-Gateway (MCG) as a persistent storage solution for OCP workloads. 
+This module is for both system administrators and application developers interested in learning how to deploy and manage OpenShift Container Storage (OCS). In this module you will be using OpenShift Container Platform (OCP) 4.x and the OCS operator to deploy Ceph and the Multi-Cloud-Gateway (MCG) as a persistent storage solution for OCP workloads.
 
 === In this lab you will learn how to
 
@@ -42,7 +44,7 @@ In this section, you will first validate the OCP environment has 3 master and 3 
 
 [source,role="execute"]
 ----
-oc get nodes -l node-role.kubernetes.io/worker -l '!node-role.kubernetes.io/infra','!node-role.kubernetes.io/master' 
+oc get nodes -l node-role.kubernetes.io/worker -l '!node-role.kubernetes.io/infra','!node-role.kubernetes.io/master'
 ----
 .Example output:
 ----
@@ -119,7 +121,7 @@ cluster-ocs-0ec4-dgwqc-workerocs-us-east-2b   1         1         1       1     
 cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c   1         1         1       1           8m25s
 ----
 
-You can exit by pressing `[Ctrl+C]`.
+You can exit by pressing kbd:[Ctrl+C].
 
 Now check to see that you have 3 new OCP worker nodes. The `NAME` of your OCP nodes will be different than shown below.
 
@@ -160,15 +162,6 @@ You must add the monitoring label to this namespace. This is required to get pro
 oc label namespace openshift-storage "openshift.io/cluster-monitoring=true"
 ----
 
-//NOTE: The below manifest file will not be needed when OCS 4 is released.
-//
-//To apply this manifest, execute the following:
-//
-//[source,role="execute"]
-//----
-//oc apply -f ~/content/support/ocslab_deploy-with-olm.yaml
-//----
-//
 Now switch over to your *Openshift Web Console*. You can get your URL by issuing command below to get the OCP 4 `console` route. Put this URL in a browser tab. You will use the same Admin username and password you used to login and use the `oc client` to login to the OCP 4 `console`.
 
 [source,role="execute"]
@@ -208,7 +201,7 @@ NAME                  DISPLAY                       VERSION   REPLACES   PHASE
 ocs-operator.v4.2.0   OpenShift Container Storage   4.2.0                Succeeded
 ----
 
-You can exit by pressing `[Ctrl+C]`.
+You can exit by pressing kbd:[Ctrl+C].
 
 The resource `csv` is a shortened word for `clusterserviceversions.operators.coreos.com`.
 
@@ -467,7 +460,7 @@ sh-4.2# ceph status
     client:   1.2 KiB/s rd, 39 KiB/s wr, 2 op/s rd, 3 op/s wr
 ----
 
-Disconnect from the Ceph toolbox pod.
+You can exit the toolbox by either pressing kbd:[Ctrl+D] or by executing exit.
 
 [source,role="execute"]
 ----
@@ -521,7 +514,7 @@ rails-pgsql-persistent-1-hook-pre   0/1     Completed   0          3m28s
 rails-pgsql-persistent-1-pjh6q      1/1     Running     0          3m14s
 ----
 
-You can exit by pressing `[Ctrl+C]`.
+You can exit by pressing kbd:[Ctrl+C].
 
 Once the deployment is complete you can now test the application and the persistent storage on Ceph. Your `HOST/PORT` will be different.
 
@@ -570,7 +563,7 @@ rados df
 rbd -p ocs-storagecluster-cephblockpool ls | grep vol
 ----
 
-Disconnect from the Ceph toolbox pod.
+You can exit the toolbox by either pressing kbd:[Ctrl+D] or by executing exit.
 
 [source,role="execute"]
 ----
@@ -830,9 +823,9 @@ uploaded files.
 
 == Using OCS for Prometheus Metrics
 
-OpenShift ships with a pre-configured and self-updating monitoring stack that is based on the Prometheus open source project and its wider eco-system. It provides monitoring of cluster components and ships with a set of alerts to immediately notify the cluster administrator about any occurring problems. For production environments, it is highly recommended to configure persistent storage using block storage technology. OCS 4 provide block storage using Ceph RBD volumes. Running cluster monitoring with persistent storage means that your metrics are stored to a persistent volume and can survive a pod being restarted or recreated. This section will detail how to migrate Prometheus and AlertManager storage to Ceph RBD volumes for persistence.  
+OpenShift ships with a pre-configured and self-updating monitoring stack that is based on the Prometheus open source project and its wider eco-system. It provides monitoring of cluster components and ships with a set of alerts to immediately notify the cluster administrator about any occurring problems. For production environments, it is highly recommended to configure persistent storage using block storage technology. OCS 4 provide block storage using Ceph RBD volumes. Running cluster monitoring with persistent storage means that your metrics are stored to a persistent volume and can survive a pod being restarted or recreated. This section will detail how to migrate Prometheus and AlertManager storage to Ceph RBD volumes for persistence.
 
-First, let's discover what *Pods* and *PVCs* are installed in the `openshift-monitoring` namespace. In the prior module, OpenShift Infrastructure Nodes, the Prometheus and AlertManager resources were moved to the OCP infra nodes. 
+First, let's discover what *Pods* and *PVCs* are installed in the `openshift-monitoring` namespace. In the prior module, OpenShift Infrastructure Nodes, the Prometheus and AlertManager resources were moved to the OCP infra nodes.
 
 [source,role="execute"]
 ----
@@ -899,7 +892,7 @@ configmap/cluster-monitoring-config created
 
 [NOTE]
 ====
-If the *ConfigMap* already exists because of completing prior module `OpenShift Infrastructure Nodes`, you will apply changes to the existing *ConfigMap*. 
+If the *ConfigMap* already exists because of completing prior module `OpenShift Infrastructure Nodes`, you will apply changes to the existing *ConfigMap*.
 [source,role="execute"]
 ----
 oc apply -f ~/content/support/ocslab_cluster-monitoring-withinfra.yaml
@@ -912,12 +905,12 @@ configmap/cluster-monitoring-config updated
 
 You can view the *ConfigMap* with the following command:
 
-NOTE: The size of the Ceph RBD volumes, `40Gi`, can be modified to be larger or smaller depending on requirements. 
+NOTE: The size of the Ceph RBD volumes, `40Gi`, can be modified to be larger or smaller depending on requirements.
 
 [source,role="execute"]
 ----
 oc -n openshift-monitoring get configmap cluster-monitoring-config -o yaml | more
----- 
+----
 
 .ConfigMap sample output:
 [source,yaml]
@@ -1322,7 +1315,7 @@ NAME             READY   STATUS      RESTARTS   AGE
 obc-test-bvg8h   0/1     Completed   0          22s
 ----
 
-Then you can check the `obc-test` *Pod* logs for the contents of the S3 bucket using the command below (in this case there are zero objects in the bucket). 
+Then you can check the `obc-test` *Pod* logs for the contents of the S3 bucket using the command below (in this case there are zero objects in the bucket).
 
 [source,role="execute"]
 ----
@@ -1389,9 +1382,9 @@ Wait until the new workers are available. This could take 5 minutes or more so b
 watch "oc get machinesets -n openshift-machine-api | egrep 'NAME|workerocs'"
 ----
 
-You can exit by pressing `[Ctrl+C]`.
+You can exit by pressing kbd:[Ctrl+C].
 
-Once they are available, we can check on which worker nodes do not have OCS label applied yet, these are the new workers just created. 
+Once they are available, we can check on which worker nodes do not have OCS label applied yet, these are the new workers just created.
 
 [source,role="execute"]
 ----
@@ -1436,7 +1429,7 @@ In this section we will add storage capacity and performance to the configured O
 To add storage, go to the *Openshift Web Console* and follow these steps to reach the OCS storage cluster overview:
 
  - Click on `Operators` on the left navigation bar
- - Select `Installed Operators` and select `openshift-storage` project 
+ - Select `Installed Operators` and select `openshift-storage` project
  - Click on `Openshift Container Storage Operator`
  - In the top navigation bar, scroll right to find the item `Storage Cluster` and click on it
 
@@ -1558,7 +1551,7 @@ Since our Ceph cluster's CRUSH rules are set up to replicate data between the zo
 
 Existing data on the original OSDs will be balanced out automatically, so that the old and the new OSDs share the load.
 
-Disconnect from the Ceph toolbox pod.
+You can exit the toolbox by either pressing kbd:[Ctrl+D] or by executing exit.
 
 [source,role="execute"]
 ----

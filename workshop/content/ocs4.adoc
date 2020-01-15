@@ -162,15 +162,6 @@ You must add the monitoring label to this namespace. This is required to get pro
 oc label namespace openshift-storage "openshift.io/cluster-monitoring=true"
 ----
 
-//NOTE: The below manifest file will not be needed when OCS 4 is released.
-//
-//To apply this manifest, execute the following:
-//
-//[source,role="execute"]
-//----
-//oc apply -f ~/content/support/ocslab_deploy-with-olm.yaml
-//----
-//
 Now switch over to your *Openshift Web Console*. You can get your URL by issuing command below to get the OCP 4 `console` route. Put this URL in a browser tab. You will use the same Admin username and password you used to login and use the `oc client` to login to the OCP 4 `console`.
 
 [source,role="execute"]

@@ -1639,7 +1639,7 @@ The window should refresh with a graph similar to the one below.
 .Simple Ceph Graph
 image::images/ocs/metrics-simplecephgraph.png[Ceph Simple Graph]
 
-Then let's try a more relevant query example and enter the following text (`rate(ceph_osd_op[5m])` or `irate(ceph_osd_op[5m])`)in the query field. When you are done typing, simply hit `[Enter]`.
+Then let's try a more relevant query example and enter the following text `rate(ceph_osd_op[5m])` or `irate(ceph_osd_op[5m])` in the query field. When you are done typing, simply hit `[Enter]`.
 
 .Complex Ceph Query
 image::images/ocs/metrics-complexcephquery.png[Ceph Complex Query]

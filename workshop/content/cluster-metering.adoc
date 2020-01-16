@@ -1,0 +1,124 @@
+## Cluster Metering
+
+== Lab Overview
+
+This hands-on workshop is for both system administrators and application developers interested in learning how to deploy and manage Operator Metering. In this lab you will be using OpenShift Container Platform (OCP) 4.x and the OCS operator to deploy Ceph and the Multi-Cloud-Gateway (MCG) as a persistent storage solution for OCP workloads. This instruction was developed using the RHPDS `OpenShift 4.2 Workshop`. Instructions to `Order` this Workshop for Red Hat employees can be found at link:https://mojo.redhat.com/docs/DOC-1209703[OpenShift 4.2 Workshop]. If you are not a Red Hat employee you can deploy OpenShift 4 using this link link:http:try.openshift.com[OpenShift 4 Deployment] and then follow the instructions for AWS Installer-Provisioned Infrastructure (IPI).
+
+=== In this lab you will learn how to
+
+* Deploy Metering Operator from OperatorHub
+* Install the Metering stack
+* Verify the installation
+
+### Background
+
+OpenShift Container Platform (OCP) 4.2 made Operator Metering generally available. Operator Metering is a chargeback and reporting tool to provide accountability for how resources are used across a cluster. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster wide. Operator Metering is part of the link:https://coreos.com/blog/introducing-operator-framework-metering[Operator Framework].
+
+### Installing Operator Metering 
+
+[NOTE]
+====
+This lab assumes you have logged into an existing cluster with the `oc login` command
+====
+
+#### Examine cluster projects
+
+View the `projects` in the existing cluster by running the `oc projects` command (this is analogous to `kubectl namespaces`). Search for openshift-metering in the output to make sure you're not clobering an existing installation:
+
+[source,bash,role="execute"]
+----
+oc projects | grep openshift-metering
+----
+
+The output should reflect that no Metering projects currently exist.
+
+#### Add Metering Operator to cluster
+
+To install the Metering Operator first create an `openshift-metering` namespace, and then install the Metering Operator from OperatorHub.
+
+1. In the OpenShift Container Platform web console, click Administration → Namespaces → Create Namespace.
+
+2. Set the name to `openshift-metering`. No other namespace is supported. Label the namespace with `openshift.io/cluster-monitoring=true`, and click Create.
+
+3. Next, click *Operators* → *OperatorHub*, and filter for `metering` to find the Metering Operator.
+
+4. Click the *Metering* card, review the package description, and then click *Install*.
+
+5. On the *Create Operator Subscription* screen, select the `openshift-metering` namespace you created above. Specify your update channel and approval strategy, then click *Subscribe* to install metering.
+
+6. On the *Installed Operators* screen the *Status* displays *InstallSucceeded* when metering has finished installing. Click the name of the operator in the first column to view the *Operator Details* page.
+
+[NOTE]
+====
+It may take a few minutes for the metering operator to appear.
+====
+
+#### Install the Metering stack
+
+1. From the web console, ensure you are on the *Operator Details* page for the Metering Operator in the `openshift-metering` project. You can navigate to this page by clicking *Operators* → *Installed Operators*, then selecting the Metering Operator.
+
+2. Under *Provided APIs*, click *Create Instance* on the Metering Configuration card. This opens a YAML editor with the default MeteringConfig file where you can define your configuration.
+
+3. Replace the default configuration by copying and pasting the following MeteringConfig into the YAML editor and click Create:
+
+----
+apiVersion: metering.openshift.io/v1
+kind: MeteringConfig
+metadata:
+  name: "operator-metering"
+spec:
+  unsupportedFeatures:
+    enableHDFS: true
+
+  storage:
+    type: "hive"
+    hive:
+      type: "hdfs"
+      hdfs:
+        # Leave this value as-is.
+        namenode: "hdfs-namenode-0.hdfs-namenode:9820"
+----
+
+The MeteringConfig resource begins to create the necessary resources for your metering stack. You can now move on to verifying your installation.
+
+#### Verify Installation
+
+To verify your metering installation you can check that all the required Pods have been created, and check that your report data sources are beginning to import data.
+
+1. Navigate to *Workloads* → *Pods* in the metering namespace and verify that Pods are being created. This can take several minutes after installing the metering stack.
+
+You can run the same check using the `oc` CLI:
+
+[source,bash,role="execute"]
+----
+oc -n openshift-metering get pods
+----
+
+----
+NAME                                  READY   STATUS              RESTARTS   AGE
+hive-metastore-0                      1/2     Running             0          52s
+hive-server-0                         2/3     Running             0          52s
+metering-operator-68dd64cfb6-pxh8v    2/2     Running             0          2m49s
+presto-coordinator-0                  2/2     Running             0          31s
+reporting-operator-56c6c878fb-2zbhp   0/2     ContainerCreating   0          4s
+----
+
+2. Continue to check your Pods until they show `Ready`. This can take several minutes. Many Pods rely on other components to function before they themselves can be considered ready. Some Pods may restart if other Pods take too long to start, this is okay and can be expected during installation.
+
+Using the `oc` CLI, the same check shows output similar to the following:
+
+[source,bash,role="execute"]
+----
+oc -n openshift-metering get pods
+----
+
+----
+NAME                                  READY   STATUS    RESTARTS   AGE
+hdfs-datanode-0                       1/1     Running   0          13m
+hdfs-namenode-0                       1/1     Running   0          13m
+hive-metastore-0                      2/2     Running   0          12m
+hive-server-0                         3/3     Running   0          12m
+metering-operator-6465b49f8c-487tg    2/2     Running   0          1h30m
+presto-coordinator-0                  2/2     Running   0          12m
+reporting-operator-787868bfcc-w8qs6   2/2     Running   0          11m
+----

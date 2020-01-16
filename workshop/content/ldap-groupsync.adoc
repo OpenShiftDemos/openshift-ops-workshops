@@ -373,7 +373,7 @@ Make sure you login as the cluster administrator:
 
 [source,bash,role="execute"]
 ----
-oc login -u system:serviceaccount:labguide:admin-user
+oc login -u system:serviceaccount:lab-ocp-cns:dashboard-user
 ----
 
 Then, create several *Projects* for people to collaborate:

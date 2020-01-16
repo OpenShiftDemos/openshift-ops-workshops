@@ -65,7 +65,8 @@ In addition to the Alertmanager UI, OpenShift monitoring provides the
 queries of current metrics. This is useful when inspecting an alert as it
 allows queries for the alert's metric values over time.
 
-1. On the left hand side of the OpenShift Console, under the "Monitoring" section, click the link  for "Metrics".
+1. On the left hand side of the OpenShift Console, under the "Monitoring" section, click the link for "Metrics".
+1. At the top of "Metrics" page, click the link for "Prometheus UI".
 +
 [WARNING]
 ====
@@ -139,4 +140,3 @@ within OpenShift, including the Grafana dashboard.
 +
 .Dashboards UI (Grafana)
 image::grafana_dashboard.png[]
-

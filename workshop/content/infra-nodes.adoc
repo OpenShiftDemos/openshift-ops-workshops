@@ -57,9 +57,9 @@ metadata:
   creationTimestamp: 2019-01-25T16:00:34Z
   generation: 1
   labels:
-    sigs.k8s.io/cluster-api-cluster: 190125-3
-    sigs.k8s.io/cluster-api-machine-role: worker
-    sigs.k8s.io/cluster-api-machine-type: worker
+    machine.openshift.io/cluster-api-cluster: 190125-3
+    machine.openshift.io/cluster-api-machine-role: worker
+    machine.openshift.io/cluster-api-machine-type: worker
   name: 190125-3-worker-us-east-1b
   namespace: openshift-machine-api
   resourceVersion: "9027"
@@ -82,8 +82,8 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      sigs.k8s.io/cluster-api-cluster: 190125-3
-      sigs.k8s.io/cluster-api-machineset: 190125-3-worker-us-east-1b
+      machine.openshift.io/cluster-api-cluster: 190125-3
+      machine.openshift.io/cluster-api-machineset: 190125-3-worker-us-east-1b
 ```
 
 In this case, the cluster name is `190125-3` and there is an additional
@@ -99,10 +99,10 @@ make sure that things match here when we make changes:
     metadata:
       creationTimestamp: null
       labels:
-        sigs.k8s.io/cluster-api-cluster: 190125-3
-        sigs.k8s.io/cluster-api-machine-role: worker
-        sigs.k8s.io/cluster-api-machine-type: worker
-        sigs.k8s.io/cluster-api-machineset: 190125-3-worker-us-east-1b
+        machine.openshift.io/cluster-api-cluster: 190125-3
+        machine.openshift.io/cluster-api-machine-role: worker
+        machine.openshift.io/cluster-api-machine-type: worker
+        machine.openshift.io/cluster-api-machineset: 190125-3-worker-us-east-1b
 ```
 
 #### Template Spec
@@ -134,9 +134,9 @@ Now that you've analyzed an existing `MachineSet` it's time to go over the
 rules for creating one, at least for a simple change like we're making:
 
 1. Don't change anything in the `providerSpec`
-2. Don't change any instances of `sigs.k8s.io/cluster-api-cluster: <clusterid>`
+2. Don't change any instances of `machine.openshift.io/cluster-api-cluster: <clusterid>`
 3. Give your `MachineSet` a unique `name`
-4. Make sure any instances of `sigs.k8s.io/cluster-api-machineset` match the `name`
+4. Make sure any instances of `machine.openshift.io/cluster-api-machineset` match the `name`
 5. Add labels you want on the nodes to `.spec.template.spec.metadata.labels`
 6. Even though you're changing `MachineSet` `name` references, be sure not to change the `subnet`.
 

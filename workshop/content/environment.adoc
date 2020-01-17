@@ -140,12 +140,12 @@ We will now run `oc whoami` to see what account you will be using today:
 oc whoami
 ----
 
-Let's inspect _admin-cluster-admin_ `ClusterRoleBinding` that gave our
+Let's inspect _dashboard-cluster-admin_ `ClusterRoleBinding` that gave our
 `ServiceAccount` _cluster-admin_ `ClusterRole`:
 
 [source,bash,role="execute"]
 ----
-oc get clusterrolebinding admin-cluster-admin -o yaml
+oc get clusterrolebinding dashboard-cluster-admin -o yaml
 ----
 
 Notice that our `ServiceAccount` is a subject in this `ClusterRoleBinding`

@@ -4,6 +4,6 @@ metadata:
   name: "cluster"
   namespace: ""
 spec: 
-  projectRequestMessage: "You requested a new project with Limits & Quotas!"
+  projectRequestMessage: ""
   projectRequestTemplate: 
     name: "project-request"

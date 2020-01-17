@@ -2,13 +2,14 @@
 
 == Lab Overview
 
-This hands-on workshop is for both system administrators and application developers interested in learning how to deploy and manage Operator Metering. In this lab you will be using OpenShift Container Platform (OCP) 4.x and the OCS operator to deploy Ceph and the Multi-Cloud-Gateway (MCG) as a persistent storage solution for OCP workloads. This instruction was developed using the RHPDS `OpenShift 4.2 Workshop`. Instructions to `Order` this Workshop for Red Hat employees can be found at link:https://mojo.redhat.com/docs/DOC-1209703[OpenShift 4.2 Workshop]. If you are not a Red Hat employee you can deploy OpenShift 4 using this link link:http:try.openshift.com[OpenShift 4 Deployment] and then follow the instructions for AWS Installer-Provisioned Infrastructure (IPI).
+This hands-on workshop is for both system administrators and application developers interested in learning how to deploy and manage Metering operator and schedule reports. This instruction was developed using the RHPDS `OpenShift 4.2 Workshop`. Instructions to `Order` this Workshop for Red Hat employees can be found at link:https://mojo.redhat.com/docs/DOC-1209703[OpenShift 4.2 Workshop]. If you are not a Red Hat employee you can deploy OpenShift 4 using this link link:http:try.openshift.com[OpenShift 4 Deployment] and then follow the instructions for AWS Installer-Provisioned Infrastructure (IPI).
 
 === In this lab you will learn how to
 
 * Deploy Metering Operator from OperatorHub
 * Install the Metering stack
 * Verify the installation
+* Writing Reports
 
 ### Background
 
@@ -53,7 +54,7 @@ To install the Metering Operator first create an `openshift-metering` namespace,
 It may take a few minutes for the metering operator to appear.
 ====
 
-#### Install the Metering stack
+### Install the Metering stack
 
 1. From the web console, ensure you are on the *Operator Details* page for the Metering Operator in the `openshift-metering` project. You can navigate to this page by clicking *Operators* → *Installed Operators*, then selecting the Metering Operator.
 
@@ -81,7 +82,7 @@ spec:
 
 The MeteringConfig resource begins to create the necessary resources for your metering stack. You can now move on to verifying your installation.
 
-#### Verify Installation
+### Verify the installation
 
 To verify your metering installation you can check that all the required Pods have been created, and check that your report data sources are beginning to import data.
 
@@ -121,4 +122,64 @@ hive-server-0                         3/3     Running   0          12m
 metering-operator-6465b49f8c-487tg    2/2     Running   0          1h30m
 presto-coordinator-0                  2/2     Running   0          12m
 reporting-operator-787868bfcc-w8qs6   2/2     Running   0          11m
+----
+
+3. Next, use the `oc` CLI to verify that the ReportDataSources are beginning to import data, indicated by a valid timestamp in the `EARLIEST METRIC` column (this may take a few minutes). We filter out the "-raw" ReportDataSources which do not import data:
+
+[source,bash,role="execute"]
+----
+oc get reportdatasources -n openshift-metering | grep -v raw
+----
+
+After all Pods are ready and you have verified that data is being imported, you can begin using metering to collect data and report on your cluster.
+
+### Writing Reports
+
+The Report custom resource is used to manage the execution and status of reports. Metering produces reports derived from usage data sources, which can be used in further analysis and filtering.
+
+A single Report resource represents a job that manages a database table and updates it with new information according to a schedule. The Report exposes the data in that table via the reporting-operator HTTP API. Reports with a `spec.schedule` field set are always running and track what time periods it has collected data for. This ensures that if metering is shutdown or unavailable for an extended period of time, it will backfill the data starting where it left off. If the schedule is unset, then the Report will run once for the time specified by the `reportingStart` and `reportingEnd`. By default, reports wait for ReportDataSources to have fully imported any data covered in the reorting peroid. If the Report has a schedule, it will wait to run until the data in the period currently being processed has finished importing.
+
+Use the oc CLI to get ReportQueries to see what reports are available:
+
+[source,bash,role="execute"]
+----
+oc get reportqueries -n openshift-metering | grep -v raw
+----
+
+ReportQueries with the `-raw` suffix are used by other ReportQueries to build more complex queries, and should not be used directly for reports.
+
+#### Create Report with a Schedule
+
+The following example Report will contain information on every Pod’s CPU requests, and will run every hour, adding the last hours worth of data each time it runs.
+
+1. In the OpenShift Container Platform web console, click *Operators* → *Installed Operators*. 6. On the *Installed Operators* click the Metering operator.
+
+2. Under *Metering Report*, click *Create Instance* on the Metering Report card. This opens a YAML editor with the default MeteringConfig file where you can define your configuration.
+
+3. Replace the default configuration by copying and pasting the following MeteringConfig into the YAML editor and click Create:
+
+----
+apiVersion: metering.openshift.io/v1
+kind: Report
+metadata:
+  name: cluster-cpu-usage-hourly
+spec:
+  query: "cluster-cpu-usage"
+  schedule:
+    period: "hourly"
+----
+
+#### Create One-Time Report 
+
+----
+apiVersion: metering.openshift.io/v1
+kind: Report
+metadata:
+name: namespace-cpu-request-2020
+  namespace: openshift-metering
+spec:
+  query: namespace-cpu-request
+  reportingEnd: '2020-12-30T23:59:59Z'
+  reportingStart: '2020-01-01T00:00:00Z'
+  runImmediately: true
 ----

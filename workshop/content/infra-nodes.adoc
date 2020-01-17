@@ -369,8 +369,8 @@ status:
   selector: ingress.operator.openshift.io/ingress-controller-deployment=default
 ```
 
-Notice that the default placement is `node-role.kubernetes.io/worker`. We
-want to change that to `infra`. You can do that with the following command:
+To specify a `nodeSelector` that tells the router pods to hit the
+infrastructure nodes, we can apply the following configuration:
 
 [source,bash,role="execute"]
 ----

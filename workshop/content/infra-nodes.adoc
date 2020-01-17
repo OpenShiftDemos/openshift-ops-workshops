@@ -188,16 +188,16 @@ oc get nodes
 ----
 
 ```
-NAME                                         STATUS   ROLES          AGE    VERSION
-ip-10-0-132-151.us-east-2.compute.internal   Ready    infra,worker   107s   v1.12.4+509916ce1
-ip-10-0-137-86.us-east-2.compute.internal    Ready    infra,worker   110s   v1.12.4+509916ce1
-ip-10-0-138-38.us-east-2.compute.internal    Ready    worker         9h     v1.12.4+509916ce1
-ip-10-0-139-204.us-east-2.compute.internal   Ready    infra,worker   82s    v1.12.4+509916ce1
-ip-10-0-139-249.us-east-2.compute.internal   Ready    master         9h     v1.12.4+509916ce1
-ip-10-0-144-70.us-east-2.compute.internal    Ready    worker         9h     v1.12.4+509916ce1
-ip-10-0-145-199.us-east-2.compute.internal   Ready    master         9h     v1.12.4+509916ce1
-ip-10-0-162-32.us-east-2.compute.internal    Ready    master         9h     v1.12.4+509916ce1
-ip-10-0-173-37.us-east-2.compute.internal    Ready    worker         16m    v1.12.4+509916ce1
+NAME                                         STATUS   ROLES          AGE     VERSION
+ip-10-0-128-220.us-east-2.compute.internal   Ready    infra,worker   2m25s   v1.14.6+9fb2d5cf9
+ip-10-0-129-88.us-east-2.compute.internal    Ready    master         78m     v1.14.6+9fb2d5cf9
+ip-10-0-138-216.us-east-2.compute.internal   Ready    infra,worker   2m36s   v1.14.6+9fb2d5cf9
+ip-10-0-140-204.us-east-2.compute.internal   Ready    worker         72m     v1.14.6+9fb2d5cf9
+ip-10-0-143-196.us-east-2.compute.internal   Ready    infra,worker   2m30s   v1.14.6+9fb2d5cf9
+ip-10-0-154-172.us-east-2.compute.internal   Ready    worker         72m     v1.14.6+9fb2d5cf9
+ip-10-0-159-34.us-east-2.compute.internal    Ready    master         78m     v1.14.6+9fb2d5cf9
+ip-10-0-166-103.us-east-2.compute.internal   Ready    master         78m     v1.14.6+9fb2d5cf9
+ip-10-0-170-246.us-east-2.compute.internal   Ready    worker         10m     v1.14.6+9fb2d5cf9
 ```
 
 If you're having trouble figuring out which node is the new
@@ -217,7 +217,7 @@ oc get node ip-10-0-128-138.us-east-1.compute.internal --show-labels
 
 And, in the `LABELS` column we see:
 
-    beta.kubernetes.io/arch=amd64,beta.kubernetes.io/instance-type=m4.large,beta.kubernetes.io/os=linux,failure-domain.beta.kubernetes.io/region=us-east-1,failure-domain.beta.kubernetes.io/zone=us-east-1b,kubernetes.io/hostname=ip-10-0-128-138,node-role.kubernetes.io/infra=,node-role.kubernetes.io/worker=
+    beta.kubernetes.io/arch=amd64,beta.kubernetes.io/instance-type=m5.2xlarge,beta.kubernetes.io/os=linux,failure-domain.beta.kubernetes.io/region=us-east-2,failure-domain.beta.kubernetes.io/zone=us-east-2a,kubernetes.io/arch=amd64,kubernetes.io/hostname=ip-10-0-128-220,kubernetes.io/os=linux,node-role.kubernetes.io/infra=,node-role.kubernetes.io/worker=,node.openshift.io/os_id=rhcos
 
 It's hard to see, but our `node-role.kubernetes.io/infra` label is there.
 
@@ -369,8 +369,8 @@ status:
   selector: ingress.operator.openshift.io/ingress-controller-deployment=default
 ```
 
-Notice that the default placement is `node-role.kubernetes.io/worker`. We
-want to change that to `infra`. You can do that with the following command:
+To specify a `nodeSelector` that tells the router pods to hit the
+infrastructure nodes, we can apply the following configuration:
 
 [source,bash,role="execute"]
 ----

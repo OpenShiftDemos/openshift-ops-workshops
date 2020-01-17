@@ -3,7 +3,7 @@
 normal_color=$(echo -e "\e[0m")
 red_color=$(echo -e "\e[31m")
 green_color=$(echo -e "\e[32m")
-max_tries=10
+max_tries=3
 sleep_between_tries=1
 
 

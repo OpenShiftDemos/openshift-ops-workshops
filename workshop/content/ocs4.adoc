@@ -27,17 +27,6 @@ NOTE: If you want more information about how Ceph works please review <<Introduc
 
 == Deploy your storage backend using the OCS operator
 
-[NOTE]
-====
-If you haven not done so yet, make sure you download the appropriate support file for this lab using the following command:
-
-[source,bash,role="execute"]
-----
-cd ~
-git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-dev content
-----
-====
-
 === Scale OCP cluster and add 3 new nodes
 
 In this section, you will first validate the OCP environment has 3 master and 3 worker nodes before increasing the cluster size by additional 3 worker nodes for OCS resources. The `NAME` of your OCP nodes will be different than shown below.
@@ -84,7 +73,7 @@ Then create a new machinset for OCS deployment for our specific OCp cluster.
 
 [source,role="execute"]
 ----
-cat ~/content/support/ocslab_cluster-workerocs.yaml | sed "s/CLUSTERID/$CLUSTERID/g" | oc apply -f -
+cat {{ HOME_PATH }}/support/ocslab_cluster-workerocs.yaml | sed "s/CLUSTERID/$CLUSTERID/g" | oc apply -f -
 ----
 
 Check that you have new *machines* created.
@@ -394,7 +383,7 @@ Since the Rook-Ceph *toolbox* is not shipped with OCS, we need to deploy it manu
 
 [source,role="execute"]
 ----
-oc apply -f ~/content/support/ocslab_toolbox.yaml
+oc apply -f {{ HOME_PATH }}/support/ocslab_toolbox.yaml
 ----
 
 After the `rook-ceph-tools` *Pod* is `Running` you can access the toolbox like this:
@@ -480,7 +469,7 @@ Make sure that you completed all previous sections so that you are ready to star
 [source,role="execute"]
 ----
 oc new-project my-database-app
-oc new-app -f ~/content/support/ocslab_rails-app.yaml -p STORAGE_CLASS=ocs-storagecluster-ceph-rbd -p VOLUME_CAPACITY=5Gi
+oc new-app -f {{ HOME_PATH }}/support/ocslab_rails-app.yaml -p STORAGE_CLASS=ocs-storagecluster-ceph-rbd -p VOLUME_CAPACITY=5Gi
 ----
 
 After the deployment is started you can monitor with these commands.
@@ -883,7 +872,7 @@ If you are missing the *ConfigMap*, create it using this command:
 
 [source,role="execute"]
 ----
-oc apply -f ~/content/support/ocslab_cluster-monitoring-noinfra.yaml
+oc apply -f {{ HOME_PATH }}/support/ocslab_cluster-monitoring-noinfra.yaml
 ----
 .Sample output:
 ----
@@ -895,7 +884,7 @@ configmap/cluster-monitoring-config created
 If the *ConfigMap* already exists because of completing prior module `OpenShift Infrastructure Nodes`, you will apply changes to the existing *ConfigMap*.
 [source,role="execute"]
 ----
-oc apply -f ~/content/support/ocslab_cluster-monitoring-withinfra.yaml
+oc apply -f {{ HOME_PATH }}/support/ocslab_cluster-monitoring-withinfra.yaml
 ----
 .Sample output:
 ----
@@ -1294,7 +1283,7 @@ Let's try this out:
 .Deploy the Manifest:
 [source,role="execute"]
 ----
-oc apply -f ~/content/support/ocslab_obc-app-example.yaml
+oc apply -f {{ HOME_PATH }}/support/ocslab_obc-app-example.yaml
 ----
 .Example output:
 ----

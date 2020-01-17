@@ -5,15 +5,25 @@
 Before continuing, make sure you've done the LDAP lab.
 ====
 
-OpenShift, by default, allows authenticated users to create *Projects* to loggically house their applications. This feature enables admins to provide a "self service" feature that was popularized by the advent of the "PaaS" (Platform as a Service) model.
+OpenShift, by default, allows authenticated users to create *Projects* to
+loggically house their applications. This feature enables admins to provide a
+"self service" feature that was popularized by the advent of the "PaaS"
+(Platform as a Service) model.
 
-This feature may not be suitable for all sitations, and many administrators may want to have more control over Projects and who (if anyone) can create them. Some of these use cases may be:
+This feature may not be suitable for all sitations, and many administrators
+may want to have more control over Projects and who (if anyone) can create
+them. Some of these use cases may be:
 
-* Environment Protection - Administrators may not want Projects getting created withouth their knowladge.
-* Resource Allocation - Administrator may want fine grained control over resource allocation (i.e. "I don't want to overcommit")
-* Quota flexibility - Default quotas may be set, but Administrators may want to specify additional quotas (or fewer) depending on the Project scope.
-* Accounting and Chargeback - In a multitenant system, there may be a need to do accounting and chargeback.
-* General Administrative Control - Administrators may want total control in what goes in an environment.
+* Environment Protection - Administrators may not want Projects getting created
+  without their knowledge.
+* Resource Allocation - Administrator may want fine grained control over
+  resource allocation (i.e. "I don't want to overcommit")
+* Quota flexibility - Default quotas may be set, but Administrators may want to
+  specify additional quotas (or fewer) depending on the Project scope.
+* Accounting and Chargeback - In a multitenant system, there may be a need to
+  do accounting and chargeback.
+* General Administrative Control - Administrators may want total control in
+  what goes in an environment.
 
 [NOTE]
 ====
@@ -21,14 +31,28 @@ There are other ways to gain this type of control besides disabling Project self
 ====
 
 ### Background: Projects
+What are you disabling exactly? In a previous lab, you learned that a Project
+is a "bucket" of sorts; which holds all the resources for an application. You
+also learned that Projects can be assigned to a user or group for
+collaboration. But what's the difference between a Project and a Kubernetes
+Namespace?
 
-What are you disabling exactly? In a previous lab, you learned that a Project is a "bucket" of sorts; which holds all the resources for an application. You also learned that Projects can be assigned to a user or group for collaboration. But what's the difference between a Project and a Kubernetes Namespace?
-
-A Project directly maps to a Kubernetes Namespace. It also maps to the internal registry's namespace as well as to a VXLAN VNID. So giving access to a Project does more than let users collaborate. You are allowing network communications, regestry namespace access, and access to objects within a Kubernetes Namespace.
+A Project directly maps to a Kubernetes Namespace. It also maps to the
+internal registry's namespace as well as to a VXLAN VNID. So giving access to
+a Project does more than let users collaborate. You are allowing network
+communications, regestry namespace access, and access to objects within a
+Kubernetes Namespace.
 
 #### Examine the Clusterrolebinding
+In order to examine the `clusterrolebinding` for `self-provisioners`; you
+need to be *kubeadmin*.
 
-In order to examine the `clusterrolebinding` for `self-provisioners`; you need to be *kubeadmin*.
+[NOTE]
+====
+You could also use the serviceaccount user that we've used in previous labs.
+Since `kubeadmin` and the service account user both have the `cluster-admin`
+role, it really doesn't matter.
+====
 
 [source,bash,role="execute"]
 ----
@@ -57,13 +81,17 @@ Subjects:
   Group  system:authenticated:oauth
 ----
 
-Here, it's saying that the group `system:authenticated:oauth` (which is a group that every user that has authenticated is a part of, by default), is bound to the `self-provisioners` role. This role is a built-in role in OpenShift that allows the users to create projects.
+Here, it's saying that the group `system:authenticated:oauth` (which is a
+group that every user that has authenticated is a part of, by default), is
+bound to the `self-provisioners` role. This role is a built-in role in
+OpenShift that allows the users to create projects.
 
 [NOTE]
 ====
-If you are interested in the different roles that come with OpenShift, you can
-learn more about them in the
-link:https://docs.openshift.com/container-platform/4.1/authentication/using-rbac.html[role-based access control (RBAC)^] documentation.
+If you are interested in the different roles that come with OpenShift, you
+can learn more about them in the
+link:https://docs.openshift.com/container-platform/4.1/authentication/using-rbac.html[role-based
+access control (RBAC)^] documentation.
 ====
 
 To view the configuration itself, inspect the yaml by running the following:
@@ -99,15 +127,18 @@ subjects:
 ----
 
 #### Removing Self Provisioning Projects
-
-To remove the `self-provisioner` cluster role from the group `system:authenticated:oauth` you need to remove that group from the role binding.
+To remove the `self-provisioner` cluster role from the group
+`system:authenticated:oauth` you need to remove that group from the role
+binding.
 
 [source,bash,role="execute"]
 ----
 oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects": null}'
 ----
 
-Automatic updates reset the cluster roles to a default state. In order to disable this, you need to set the annotation `rbac.authorization.kubernetes.io/autoupdate` to `false` by running:
+Automatic updates reset the cluster roles to a default state. In order to
+disable this, you need to set the annotation
+`rbac.authorization.kubernetes.io/autoupdate` to `false` by running:
 
 [source,bash,role="execute"]
 ----
@@ -163,19 +194,23 @@ oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
 
 #### Customizing the request message
+Now any time a user tries to create a project they will be greated with the
+same message `You may not request a new project via this API`. You can
+customize this message to give a more meaningful call to action.
 
-Now any time a user tries to create a project they will be greated with the same message `You may not request a new project via this API`. You can customize this message to give a more meaningful call to action.
-
-For example, you can have the users submit a ticket requesting a project. We can do this by changing the text given, to include instructions:
+For example, you can have the users submit a ticket requesting a project. We
+can do this by changing the text given, to include instructions:
 
 [source,bash,role="execute"]
 ----
 oc patch --type=merge project.config.openshift.io cluster -p '{"spec":{"projectRequestMessage":"Please visit https://ticket.example.com to request a project"}}'
 ----
 
-Here, you are adding the `projectRequestMessage` and the value `Please visit https://ticket.example.com to request a project` to the specification.
+Here, you are adding the `projectRequestMessage` and the value `Please visit
+https://ticket.example.com to request a project` to the specification.
 
-Now, the user will get this message when trying to create a project. Test this by becoming `fancyuser1` and try to create a project.
+Now, the user will get this message when trying to create a project. Test
+this by becoming `fancyuser1` and try to create a project.
 
 [source,bash,role="execute"]
 ----
@@ -189,7 +224,9 @@ You should see the following message:
 Error from server (Forbidden): Please visit https://ticket.example.com to request a project
 ----
 
-You may have to run the `oc new-project fancyuserproject` command a few times to see the updated text.
+It may take some time before the operator updates the master config, which
+means it could take some time before you see the new message. Wait a few
+moments and try again.
 
 [source,bash,role="execute"]
 ----
@@ -205,11 +242,10 @@ Make sure you login as `kubeadmin` for the next lab.
 oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
 
-Future labs require the `self-provisioners` role, so make sure users can create projects:
+Other labs may require the `self-provisioners` role, so let's undo what we did:
 
 [source,bash,role="execute"]
 ----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects":[{"apiGroup":"rbac.authorization.k8s.io","kind":"Group","name":"system:authenticated:oauth"}]}'
 oc patch clusterrolebinding.rbac self-provisioners -p '{"metadata":{"annotations":{"rbac.authorization.kubernetes.io/autoupdate":"true"}}}'
 oc patch --type=json project.config.openshift.io cluster -p '[{"op": "remove", "path": "/spec/projectRequestMessage"}]'

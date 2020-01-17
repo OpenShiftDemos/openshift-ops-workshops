@@ -19,6 +19,16 @@ Kubernetes community to implement their own SDN plugins, and several of these
 are supported by the vendors for use with OpenShift. These plugin
 implementations make use of appc/CNI, which is outside the scope of this lab.
 
+### Switch Your Project
+Before continuing, make sure you are using a project that actually exists. If
+the last thing you did in the previous lab was delete a project, this will
+cause errors in the scripts in this lab.
+
+[source,bash,role="execute"]
+----
+oc project default
+----
+
 ### Execute the Creation Script
 Only users with project or cluster administration privileges can manipulate *Project*
 networks.

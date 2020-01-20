@@ -1,0 +1,18 @@
+name: OpenShift and Container Storage for Admins
+
+modules:
+  activate:
+  - environment
+  - installation
+  - app-mgmt-basics
+  - app-storage-basics
+  - machinesets
+  - infra-nodes
+  - ocs4
+  - logging
+  - ldap-groupsync
+  - monitoring-basics
+  - template-quota-limits
+  - networking
+  - disabling-project-self-provisioning
+  - clusterresourcequota

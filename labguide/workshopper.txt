@@ -1,1 +1,0 @@
-quay.io/osevg/workshopper -e CONTENT_URL_PREFIX=https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/40-rewrite/labguide WORKSHOPS_URLS="https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/40-rewrite/labguide/_ocp_admin_testdrive.yaml"

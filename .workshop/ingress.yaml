@@ -1,0 +1,7 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: spawner
+  annotations:
+    homeroom/title: "AsciiDoc Sample"
+    homeroom/description: "A sample workshop using AsciiDoc."

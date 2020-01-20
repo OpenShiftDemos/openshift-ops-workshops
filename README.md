@@ -22,10 +22,10 @@ https://try.openshift.com -- a free "subscription" to / membership in the
 developer program is required.
 
 ## Deploying the Lab Guide
-Deploying the lab guide will take two steps. First, you will need to get
-information about your cluster. Second, you will deploy the lab guide using
-the information you found so that proper URLs and references are
-automatically displayed in the guide.
+Deploying the lab guide will take three steps. First, you will need to get
+information about your cluster. Second, you will build a container based on your lab. 
+Third, you will deploy the lab guide using the information you found so that proper
+URLs and references are automatically displayed in the guide.
 
 ### Required Environment Variables
 Most of the information can be found in the output of the installer.
@@ -47,56 +47,78 @@ Specific to Red Hat internal systems
 - `BASTION_FQDN` - Bastion Domain Name
     - `bastion.gu1d.sandbox101.opentlc.com`
 
-Edit the following to your values and run.
+Create a file called `workshop-settings.sh` using the values of your environment. Here is an example.
 
-:warning: For `export` ensure [special characters](http://mywiki.wooledge.org/BashGuide/SpecialCharacters) are escaped (ie. use `\!` in place of `!`).
+> :warning: For `export` ensure [special characters](http://mywiki.wooledge.org/BashGuide/SpecialCharacters) are escaped (ie. use `\!` in place of `!`).
+
 ```bash
-export API_URL=https://api......:6443
-export MASTER_URL=https://console-openshift-console.....
-export KUBEADMIN_PASSWORD=xxx
-export SSH_USERNAME=lab-user
-export SSH_PASSWORD=xxxx
-export ROUTE_SUBDOMAIN=apps.mycluster.company.com
-export GUID=xxxx
-export BASTION_FQDN=foo.bar.com
-export HOME_PATH=/opt/app-root/src
+API_URL=https://api.openshift4.example.com:6443
+MASTER_URL=https://console-openshift-console.apps.openshift4.example.com
+KUBEADMIN_PASSWORD=IqJK7-o3hYR-ZTr6c-7sztN
+SSH_USERNAME=lab-user
+SSH_PASSWORD=apassword
+BASTION_FQDN=foo.bar.com
+GUID=XXX
+ROUTE_SUBDOMAIN=apps.openshift4.example.com
+HOME_PATH=/opt/app-root/src
 ```
+
 ### Deploy the Lab Guide
-Now that you have exported the various required variables, you can deploy the
-lab guide into your cluster. The following will log you in
-as `kubeadmin` on systems with `oc` client installed:
+
+Now that you have the `workshop-settings.sh` file with the various required variables, you can deploy the lab guide into your cluster.
+
+First, clone the repo
+
+> **NOTE** Remember to checkout the branch you want to test against
+
+```shell
+git clone https://github.com/openshift/openshift-cns-testdrive
+```
+
+Next, Build a container (using `docker` or `podman`) using the repo/branch you checked out.
+
+```shell
+cd openshift-cns-testdrive
+docker build -t lab-sample-workshop .
+```
+
+Now, login to quay (it's free to sign up) or another registry your cluster has access to.
+
+```shell
+docker login quay.io
+```
+
+Next, tag and push your container to your repo.
+
+```shell
+docker tag lab-sample-workshop:my-feature quay.io/myusername/lab-sample-workshop:my-feature
+docker push quay.io/myusername/lab-sample-workshop:my-feature
+```
+
+You will use this image to deploy the lab. The following command will log you in as `kubeadmin` on systems with `oc` client installed:
+
 ```bash
 oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
 
-oc new-project labguide
+oc new-project lab-ocp-cns
 
 # Create deployment.
-oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-dashboard/3.5.0/templates/production-cluster-admin.json -n labguide \
-   --param APPLICATION_NAME=admin \
-   --param PROJECT_NAME=labguide \
-   --param WORKSHOPPER_URLS=https://raw.githubusercontent.com/openshift/openshift-cns-testdrive/ocp4-dev/labguide/_ocp_admin_testdrive.yaml \
-   --param PROJECT_NAME=labguide \
-   --param WORKSHOP_ENVVARS="
-API_URL=$API_URL \
-MASTER_URL=$MASTER_URL \
-KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD \
-SSH_USERNAME=$SSH_USERNAME \
-SSH_PASSWORD=$SSH_PASSWORD \
-BASTION_FQDN=$BASTION_FQDN \
-GUID=$GUID \
-ROUTE_SUBDOMAIN=$ROUTE_SUBDOMAIN \
-HOME_PATH=$HOME_PATH"
+oc new-app -n lab-ocp-cns https://raw.githubusercontent.com/redhat-cop/agnosticd/development/ansible/roles/ocp4-workload-workshop-admin-storage/files/production-cluster-admin.json \
+--param TERMINAL_IMAGE="quay.io/myusername/lab-sample-workshop:my-feature" --param PROJECT_NAME="lab-ocp-cns" \
+--param WORKSHOP_ENVVARS="$(cat ./workshop-settings.sh)"
 
 # Wait for deployment to finish.
 
-oc rollout status dc/admin -n labguide
+oc rollout status dc/dashboard -n lab-ocp-cns
 ```
+
+> NOTE: In some cases you might need to do: `oc adm policy add-role-to-user admin kube:admin -n lab-ocp-cns`
 
 ## Doing the Labs
 Your lab guide should deploy in a few moments. To find its url, execute:
 
 ```bash
-oc get route admin -n labguide
+oc get route dashboard -n lab-ocp-cns
 ```
 
 You should be able to visit that URL and see the lab guide. From here you can
@@ -129,3 +151,7 @@ To delete deployment run
 ```
 oc delete all,serviceaccount,rolebinding,configmap -l app=admin -n labguide
 ```
+
+# License
+This repository and everything within it are licensed under the [GNU General
+Public License (GPL) v3.0](LICENSE)

@@ -83,7 +83,7 @@ To create the namespace, run the following command:
 
 [source,bash,role="execute"]
 ----
-oc create -f {{ HOME_PATH }}/content/support/openshift_logging_namespace.yaml
+oc create -f {{ HOME_PATH }}/support/openshift_logging_namespace.yaml
 ----
 
 
@@ -194,6 +194,11 @@ and then refresh the page.
 ====
 +
 4. On the `Cluster Loggings` page, click `Create Cluster Logging`.
++
+[WARNING]
+====
+This step requires that you have completed the `Deploying and Managing OpenShift Container Storage` Module. If you have not completed the `OCS` module, you will need to substitute `storageClassName: ocs-storagecluster-ceph-rbd` with `storageClassName: gp2` in the `YAML` below before copying to the editor. 
+====
 
 5. In the `YAML` editor, replace the code with the following:
 
@@ -211,7 +216,9 @@ spec:
     type: "elasticsearch"
     elasticsearch:
       nodeCount: 3
-      storage: {}
+      storage:
+         storageClassName: ocs-storagecluster-ceph-rbd
+         size: 100Gi
       redundancyPolicy: "SingleRedundancy"
       nodeSelector:
         node-role.kubernetes.io/infra: ""
@@ -295,9 +302,26 @@ You should expect 1 `fluentd` *Pod* for every *Node* in your cluster.
 Remember that *Masters* are still *Nodes* and `fluentd` will run there, too,
 to slurp the various logs.
 
-You will also see the storage for ElasticSearch being automatically
-provisioned from the default storage service if you query the
-PersistentVolumeClaim objects in this project
+You will also see the storage for ElasticSearch has been automatically
+provisioned. If you query the *PersistentVolumeClaim* objects in this project you will see the new storage.
+
+[source,bash,role="execute"]
+----
+oc get pvc -n openshift-logging
+----
+
+You will see something like:
+
+----
+NAME                                         STATUS   VOLUME                                     CAPACITY   ACCESS
+MODES   STORAGECLASS                  AGE
+elasticsearch-elasticsearch-cdm-ggzilasv-1   Bound    pvc-f3239564-389c-11ea-bab2-06ca7918708a   100Gi      RWO
+        ocs-storagecluster-ceph-rbd   15m
+elasticsearch-elasticsearch-cdm-ggzilasv-2   Bound    pvc-f324a252-389c-11ea-bab2-06ca7918708a   100Gi      RWO
+        ocs-storagecluster-ceph-rbd   15m
+elasticsearch-elasticsearch-cdm-ggzilasv-3   Bound    pvc-f326aa7d-389c-11ea-bab2-06ca7918708a   100Gi      RWO
+        ocs-storagecluster-ceph-rbd   15m
+----		
 
 [NOTE]
 ====

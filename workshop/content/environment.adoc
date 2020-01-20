@@ -52,19 +52,6 @@ you hover over the command block above and left-click, it should
 automatically highlight all the text to make for easier copying. Look at the
 symbol next to the block to see if it will copy or execute.
 
-### Cloning content
-We have prepared various YAML files and other artifacts that you will use for
-the exercises in advance. You will need to clone these artifacts now. Please
-execute the following:
-
-[source,bash,role="execute"]
-----
-git clone https://github.com/openshift/openshift-cns-testdrive.git -b ocp4-prod content
-----
-
-Exercises will refer to `{{ HOME_PATH }}/content/support` as the source for
-the artifacts you cloned.
-
 ### Cluster Admin Authentication
 The login you provided to access this lab guide actually has nothing to do
 with the terminal or web console you will interact with. We use a feature of
@@ -153,5 +140,3 @@ with a role referenced being the _cluster-admin_ `ClusterRole`
 
 As a cluster-admin throughout the exercises, you will be able to do anything
 with the cluster as you have noted earlier, so follow instructions carefully.
-
-Future exercises will refer to `{{ HOME_PATH }}/content/support`.

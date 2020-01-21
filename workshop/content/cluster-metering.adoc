@@ -224,5 +224,12 @@ cluster-cpu-usage-hourly     cluster-cpu-usage       hourly     ReportingPeriodW
 namespace-cpu-request-2020   namespace-cpu-request              Finished                          2020-12-30T23:59:59Z   28s
 ----
 
-
 ### Reading Reports
+
+To view reports do the following: 
+
+1. In the OpenShift Container Platform web console, click Administration → Chargeback
+
+2. Select the one-time report created in the previous section titled namespace-cpu-request-2020
+
+3. From this screen the report can be downloaded as a CSV file by clicking the Download button. The report is also displayed in the lower part of the screen.

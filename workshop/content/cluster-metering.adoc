@@ -10,6 +10,7 @@ This hands-on workshop is for both system administrators and application develop
 * Install the Metering stack
 * Verify the installation
 * Writing Reports
+* Reading Reports
 
 ### Background
 
@@ -47,7 +48,7 @@ To install the Metering Operator first create an `openshift-metering` namespace,
 
 5. On the *Create Operator Subscription* screen, select the `openshift-metering` namespace you created above. Specify your update channel and approval strategy, then click *Subscribe* to install metering.
 
-6. On the *Installed Operators* screen the *Status* displays *InstallSucceeded* when metering has finished installing. Click the name of the operator in the first column to view the *Operator Details* page.
+6. On the *Installed Operators* screen the *Status* displays *InstallSucceeded* when metering has finished installing. Click the name of the operator (Metering) in the first column to view the *Operator Details* page.
 
 [NOTE]
 ====
@@ -152,9 +153,9 @@ ReportQueries with the `-raw` suffix are used by other ReportQueries to build mo
 
 The following example Report will contain information on every Pod’s CPU requests, and will run every hour, adding the last hours worth of data each time it runs.
 
-1. In the OpenShift Container Platform web console, click *Operators* → *Installed Operators*. 6. On the *Installed Operators* click the Metering operator.
+1. In the OpenShift Container Platform web console, click *Operators* → *Installed Operators*. On the *Installed Operators* click the Metering operator.
 
-2. Under *Metering Report*, click *Create Instance* on the Metering Report card. This opens a YAML editor with the default MeteringConfig file where you can define your configuration.
+2. Under *Metering Report*, click *Create Instance*. This opens a YAML editor with the default MeteringConfig file where you can define your configuration.
 
 3. Replace the default configuration by copying and pasting the following MeteringConfig into the YAML editor and click Create:
 
@@ -169,13 +170,30 @@ spec:
     period: "hourly"
 ----
 
-#### Create One-Time Report 
+4. Next, use the `oc` CLI to verify that the report was created:
+
+[source,bash,role="execute"]
+----
+oc get reports
+---- 
+
+5. The alloted time will pass (one hour) and a report will be run. For the purpose of this workshop, let's keep going.
+
+#### Create One-Time Report
+
+The following example Report will contain information on every Namespace’s CPU requests, and will run one time.
+
+1. In the OpenShift Container Platform web console, click *Operators* → *Installed Operators*. On the *Installed Operators* click the Metering operator.
+
+2. Under *Metering Report*, click *Create Instance*. This opens a YAML editor with the default MeteringConfig file where you can define your configuration.
+
+3. Replace the default configuration by copying and pasting the following MeteringConfig into the YAML editor and click Create:
 
 ----
 apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
-name: namespace-cpu-request-2020
+  name: namespace-cpu-request-2020
   namespace: openshift-metering
 spec:
   query: namespace-cpu-request
@@ -183,3 +201,12 @@ spec:
   reportingStart: '2020-01-01T00:00:00Z'
   runImmediately: true
 ----
+
+4. Next, use the `oc` CLI to verify that the report was created:
+
+[source,bash,role="execute"]
+----
+oc get reports
+----
+
+### Reading Reports

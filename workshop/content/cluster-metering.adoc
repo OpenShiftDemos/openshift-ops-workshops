@@ -140,7 +140,7 @@ The Report custom resource is used to manage the execution and status of reports
 
 A single Report resource represents a job that manages a database table and updates it with new information according to a schedule. The Report exposes the data in that table via the reporting-operator HTTP API. Reports with a `spec.schedule` field set are always running and track what time periods it has collected data for. This ensures that if metering is shutdown or unavailable for an extended period of time, it will backfill the data starting where it left off. If the schedule is unset, then the Report will run once for the time specified by the `reportingStart` and `reportingEnd`. By default, reports wait for ReportDataSources to have fully imported any data covered in the reorting peroid. If the Report has a schedule, it will wait to run until the data in the period currently being processed has finished importing.
 
-Use the oc CLI to get ReportQueries to see what reports are available:
+Use the `oc` CLI to get ReportQueries to see what reports are available:
 
 [source,bash,role="execute"]
 ----
@@ -177,6 +177,13 @@ spec:
 oc get reports
 ---- 
 
+Using the `oc` CLI, it shows output similar to the following:
+
+----
+NAME                       QUERY               SCHEDULE   RUNNING                  FAILED   LAST REPORT TIME   AGE
+cluster-cpu-usage-hourly   cluster-cpu-usage   hourly     ReportingPeriodWaiting                               7s
+----
+
 5. The alloted time will pass (one hour) and a report will be run. For the purpose of this workshop, let's keep going.
 
 #### Create One-Time Report
@@ -208,5 +215,14 @@ spec:
 ----
 oc get reports
 ----
+
+Using the `oc` CLI, it shows output similar to the following:
+
+----
+NAME                         QUERY                   SCHEDULE   RUNNING                  FAILED   LAST REPORT TIME       AGE
+cluster-cpu-usage-hourly     cluster-cpu-usage       hourly     ReportingPeriodWaiting                                   4m37s
+namespace-cpu-request-2020   namespace-cpu-request              Finished                          2020-12-30T23:59:59Z   28s
+----
+
 
 ### Reading Reports

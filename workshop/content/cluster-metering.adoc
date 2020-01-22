@@ -81,7 +81,7 @@ spec:
         namenode: "hdfs-namenode-0.hdfs-namenode:9820"
 ----
 
-The MeteringConfig resource begins to create the necessary resources for your metering stack. You can now move on to verifying your installation.
+Lab environments are difficult to assign storage to. For the purposes of this lab we're using an HDFS node. The MeteringConfig resource begins to create the necessary resources for your metering stack. You can now move on to verifying your installation.
 
 ### Verify the installation
 

@@ -12,6 +12,7 @@ modules:
   - ldap-groupsync
   - monitoring-basics
   - template-quota-limits
+  - cluster-metering
   - networking
   - ocs4
   - disabling-project-self-provisioning

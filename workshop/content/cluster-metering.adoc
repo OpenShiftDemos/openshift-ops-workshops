@@ -174,7 +174,7 @@ spec:
 
 [source,bash,role="execute"]
 ----
-oc get reports
+oc get reports -n openshift-metering
 ---- 
 
 Using the `oc` CLI, it shows output similar to the following:
@@ -213,7 +213,7 @@ spec:
 
 [source,bash,role="execute"]
 ----
-oc get reports
+oc get reports -n openshift-metering
 ----
 
 Using the `oc` CLI, it shows output similar to the following:
@@ -228,7 +228,7 @@ namespace-cpu-request-2020   namespace-cpu-request              Finished        
 
 To view reports do the following: 
 
-1. In the OpenShift Container Platform web console, click Administration → Chargeback
+1. In the OpenShift Container Platform web console, click *Administration* → *Chargeback*
 
 2. Select the one-time report created in the previous section titled namespace-cpu-request-2020
 

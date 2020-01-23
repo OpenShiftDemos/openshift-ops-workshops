@@ -43,10 +43,10 @@ not covered in the exercise or documentation at this time.
 
 OpenShift Container Platform cluster logging is designed to be used with the
 default configuration, which is tuned for small to medium sized OpenShift
-Container Platform clusters.
-The installation instructions that follow include a sample Cluster Logging
-Custom Resource (CR), which you can use to create a cluster logging instance
-and configure your cluster logging deployment.
+Container Platform clusters. The installation instructions that follow
+include a sample Cluster Logging Custom Resource (CR), which you can use to
+create a cluster logging instance and configure your cluster logging
+deployment.
 
 If you want to use the default cluster logging install, you can use the
 sample CR directly.
@@ -83,7 +83,7 @@ To create the namespace, run the following command:
 
 [source,bash,role="execute"]
 ----
-oc create -f {{ HOME_PATH }}/content/support/openshift_logging_namespace.yaml
+oc create -f {{ HOME_PATH }}/support/openshift_logging_namespace.yaml
 ----
 
 
@@ -116,20 +116,11 @@ To begin, log-in to the OpenShift Cluster's GUI.
 Then follow the following steps:
 
 1. Install the Elasticsearch Operator:
-  a. In the OpenShift console, click `Catalog` → `OperatorHub`.
+  a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Choose `Elasticsearch Operator` from the list of available Operators,
     and click `Install`.
-+
-[NOTE]
-====
-You may receive a warning about Community Operators. By the time OpenShift 4
-is generally available, the various EFK operators required for the log
-aggregation solution will no longer be "community" status. Accept the warning
-by clicking "Continue".
-====
-+
-  c. On the `Create Operator Subscription` page, select `All namespaces on
-    the cluster` under `Installation Mode`. Then, click `Subscribe`.
+  c. On the `Create Operator Subscription` page, leave all of the defaults
+     and then click `Subscribe`.
 +
 This makes the Operator available to all users and projects that use this
 OpenShift Container Platform cluster.
@@ -143,20 +134,21 @@ The `Cluster Logging` operator needs to be installed in the
 namespace was created from the previous steps
 ====
 
-  a. In the OpenShift console, click `Catalog` → `OperatorHub`.
+  a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Choose `Cluster Logging` from the list of available Operators, and click
     `Install`.
   c. On the `Create Operator Subscription` page, Under ensure `Installation
-    Mode` that `A specific namespace on the cluster namespaces on the cluster`
-    is selected, and choose `openshift-logging`. Then, click `Subscribe`.
+     Mode` that `A specific namespace on the cluster` is selected, and choose
+     `openshift-logging`. Leave the other defaults and then, click `Subscribe`.
 
 3. Verify the operator installations:
 
-  a. Switch to the `Catalog` → `Installed Operators` page.
+  a. Switch to the `Operators` → `Installed Operators` page.
 
-  b. Ensure that `Cluster Logging` and `Elasticsearch Operator` are listed on
-    the `InstallSucceeded` tab with a Status of `InstallSucceeded`. Change the
-    project to `all projects` if necessary.
+  b. Make sure the `openshift-logging` project is selected.
+
+  c. In the _Status_ column you should see green checks with either
+     `InstallSucceeded` or `Copied` and the text _Up to date_.
 +
 [NOTE]
 ====
@@ -202,6 +194,11 @@ and then refresh the page.
 ====
 +
 4. On the `Cluster Loggings` page, click `Create Cluster Logging`.
++
+[WARNING]
+====
+This step requires that you have completed the `Deploying and Managing OpenShift Container Storage` Module. If you have not completed the `OCS` module, you will need to substitute `storageClassName: ocs-storagecluster-ceph-rbd` with `storageClassName: gp2` in the `YAML` below before copying to the editor. 
+====
 
 5. In the `YAML` editor, replace the code with the following:
 
@@ -219,7 +216,9 @@ spec:
     type: "elasticsearch"
     elasticsearch:
       nodeCount: 3
-      storage: {}
+      storage:
+         storageClassName: ocs-storagecluster-ceph-rbd
+         size: 100Gi
       redundancyPolicy: "SingleRedundancy"
       nodeSelector:
         node-role.kubernetes.io/infra: ""
@@ -256,7 +255,8 @@ Now that Logging has been created, let's verify that things are working.
 
 2. Select the `openshift-logging` project.
 
-You should see pods for cluster logging, Elasticsearch, and Fluentd, as shown in the following CLI output:
+You should see pods for cluster logging (the operator itself), Elasticsearch,
+and Fluentd, and Kibana.
 
 Alternatively, you can verify from the command line by using the following command:
 
@@ -294,17 +294,34 @@ oc get daemonset -n openshift-logging
 You will see something like:
 
 ----
-NAME      DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
-fluentd   8         8         8         8            8           <none>          15m
+NAME      DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+fluentd   9         9         9       9            9           kubernetes.io/os=linux   94s
 ----
 
 You should expect 1 `fluentd` *Pod* for every *Node* in your cluster.
 Remember that *Masters* are still *Nodes* and `fluentd` will run there, too,
 to slurp the various logs.
 
-You will also see the storage for ElasticSearch being automatically
-provisioned from the default storage service if you query the
-PersistentVolumeClaim objects in this project
+You will also see the storage for ElasticSearch has been automatically
+provisioned. If you query the *PersistentVolumeClaim* objects in this project you will see the new storage.
+
+[source,bash,role="execute"]
+----
+oc get pvc -n openshift-logging
+----
+
+You will see something like:
+
+----
+NAME                                         STATUS   VOLUME                                     CAPACITY   ACCESS
+MODES   STORAGECLASS                  AGE
+elasticsearch-elasticsearch-cdm-ggzilasv-1   Bound    pvc-f3239564-389c-11ea-bab2-06ca7918708a   100Gi      RWO
+        ocs-storagecluster-ceph-rbd   15m
+elasticsearch-elasticsearch-cdm-ggzilasv-2   Bound    pvc-f324a252-389c-11ea-bab2-06ca7918708a   100Gi      RWO
+        ocs-storagecluster-ceph-rbd   15m
+elasticsearch-elasticsearch-cdm-ggzilasv-3   Bound    pvc-f326aa7d-389c-11ea-bab2-06ca7918708a   100Gi      RWO
+        ocs-storagecluster-ceph-rbd   15m
+----		
 
 [NOTE]
 ====
@@ -356,14 +373,9 @@ There is a special authentication proxy that is configured as part of the EFK
 installation that results in Kibana requiring OpenShift credentials for
 access.
 
-////
- You should login to Kibana as the `fancyuser1` user with password
-`openshift` to be able to see all of the cluster's logs. Kibana utilizes the same RBAC
-underpinning OpenShift to ensure that users can only see the logs they should
-have access to.
-////
-
-
+Because you've already authenticated to the OpenShift Console as a
+cluster-admin user, you will see an administrative view of what Kibana has to
+show you (which you authorized by clicking the button).
 
 #### Queries with _Kibana_
 
@@ -387,7 +399,8 @@ To select fields to show for messages, look on left hand side fore the
 `Available Fields` label. Below this are fields that can be selected and
 shown in the middle of the screen. Find the `hostname` field below the
 `Available Fields` and click `add`. Notice now, in the message pain, each
-message's hostname is displayed. More fields may be added.
+message's hostname is displayed. More fields may be added. Click the `add`
+button for `kubernetes.pod_name` and also for `message`.
 
 To create a query for logs, the `Add a filter +` link right below the search
 box may be used. This will allow us to build queries using the fields of the
@@ -405,8 +418,8 @@ Notice all of the available fields that we can use to build the query
 
 5. Click the "Save" button
 
-Now, in the center of the screen you will see all of the logs from the
-`openshift-logging` namespace.
+Now, in the center of the screen you will see all of the logs from all the
+pods in the `openshift-logging` namespace.
 
 Of course, you may add more filters to refine the query.
 

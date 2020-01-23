@@ -169,9 +169,9 @@ As the `kubeadmin` user apply the OAuth configuration with `oc`.
 [source,bash,role="execute"]
 ----
 oc create secret generic ldap-secret --from-literal=bindPassword=bindingpassword -n openshift-config
-wget http://idm.openshiftworkshop.com/pub/ca.crt -O {{ HOME_PATH }}/content/support/ca.crt
-oc create configmap ca-config-map --from-file={{ HOME_PATH }}/content/support/ca.crt -n openshift-config
-oc apply -f {{ HOME_PATH }}/content/support/oauth-cluster.yaml
+wget http://idm.openshiftworkshop.com/pub/ca.crt -O {{ HOME_PATH }}/support/ca.crt
+oc create configmap ca-config-map --from-file={{ HOME_PATH }}/support/ca.crt -n openshift-config
+oc apply -f {{ HOME_PATH }}/support/oauth-cluster.yaml
 ----
 
 [NOTE]
@@ -197,7 +197,7 @@ We have provided a `groupsync` configuration file for you:
 View configuration file
 [source,bash,role="execute"]
 ----
-cat {{ HOME_PATH }}/content/support/groupsync.yaml
+cat {{ HOME_PATH }}/support/groupsync.yaml
 ----
 
 Without going into too much detail (you can look at the documentation), the
@@ -215,7 +215,7 @@ Execute the `groupsync`:
 
 [source,bash,role="execute"]
 ----
-oc adm groups sync --sync-config={{ HOME_PATH }}/content/support/groupsync.yaml --confirm
+oc adm groups sync --sync-config={{ HOME_PATH }}/support/groupsync.yaml --confirm
 ----
 
 You will see output like the following:
@@ -373,7 +373,7 @@ Make sure you login as the cluster administrator:
 
 [source,bash,role="execute"]
 ----
-oc login -u system:serviceaccount:labguide:admin-user
+oc login -u system:serviceaccount:lab-ocp-cns:dashboard-user
 ----
 
 Then, create several *Projects* for people to collaborate:
@@ -549,7 +549,7 @@ After logging in, the first time you will be presented with an auth proxy
 permissions acknowledgement:
 
 .Auth Proxy Acceptance.
-image::prometheus-auth-proxy.png[]
+image::images/prometheus-auth-proxy.png[]
 
 There is actually an OAuth proxy that sits in the flow between you and the
 Prometheus container. This proxy is used to validate your AuthenticatioN
@@ -560,3 +560,10 @@ used as part of accessing Prometheus. Hit _Allow selected permissions_.
 At this point you are viewing Prometheus. There are no alerts configured. If
 you look at `Status` and then `Targets` you can see some interesting
 information about the current state of the cluster.
+
+After you are done, make sure to login again as the admin user:
+
+[source,bash,role="execute"]
+----
+oc login -u system:serviceaccount:lab-ocp-cns:dashboard-user
+----

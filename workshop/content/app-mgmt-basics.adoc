@@ -68,7 +68,7 @@ message by running `oc new-app -h`.
 ### Pods
 
 .OpenShift Pods
-image::openshift_pod.png[]
+image::images/openshift_pod.png[]
 
 Pods are one or more containers deployed together on a host. A pod is the
 smallest compute unit you can define, deploy and manage in OpenShift. Each pod is allocated
@@ -181,7 +181,7 @@ and other information about what is going on.
 
 ### Services
 .OpenShift Service
-image::openshift_service.png[]
+image::images/openshift_service.png[]
 
 *Services* provide a convenient abstraction layer inside OpenShift to find a
 group of like *Pods*. They also act as an internal proxy/load balancer between
@@ -555,7 +555,7 @@ fixed it by scheduling another *Pod*.
 
 ### Background: Routes
 .OpenShift Route
-image::openshift_route.png[]
+image::images/openshift_route.png[]
 
 While *Services* provide internal abstraction and load balancing within an
 OpenShift environment, sometimes clients (users, systems, devices, etc.)
@@ -682,7 +682,7 @@ readiness probe can be used to signal to the endpoint's controller that even
 though a container is running, it should not receive any traffic.
 
 More information on probing applications is available in the
-https://docs.openshift.com/container-platform/latest/dev_guide/application_health.html[Application
+https://docs.openshift.com/container-platform/4.2/nodes/containers/nodes-containers-health.html[Application
 Health] section of the documentation.
 
 ### Add Probes to the Application

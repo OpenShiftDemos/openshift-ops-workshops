@@ -53,9 +53,9 @@ NAME                                         INSTANCE              STATE     TYP
 cluster-f4a3-lpxbs-master-0                  i-04280885cafad3130   running   m4.xlarge    us-east-2   us-east-2a   47h
 cluster-f4a3-lpxbs-master-1                  i-0def910edcae51d11   running   m4.xlarge    us-east-2   us-east-2b   47h
 cluster-f4a3-lpxbs-master-2                  i-0beb5e40214d706fc   running   m4.xlarge    us-east-2   us-east-2c   47h
-cluster-f4a3-lpxbs-worker-us-east-2a-b94pr   i-0a922c0fe765caa3c   running   m4.2xlarge   us-east-2   us-east-2a   47h
-cluster-f4a3-lpxbs-worker-us-east-2b-m8gbx   i-0fb8d960b8a3a3343   running   m4.2xlarge   us-east-2   us-east-2b   47h
-cluster-f4a3-lpxbs-worker-us-east-2c-5tmg7   i-0151c72cd85f85038   running   m4.2xlarge   us-east-2   us-east-2c   47h
+cluster-f4a3-lpxbs-worker-us-east-2a-b94pr   i-0a922c0fe765caa3c   running   m5.2xlarge   us-east-2   us-east-2a   47h
+cluster-f4a3-lpxbs-worker-us-east-2b-m8gbx   i-0fb8d960b8a3a3343   running   m5.2xlarge   us-east-2   us-east-2b   47h
+cluster-f4a3-lpxbs-worker-us-east-2c-5tmg7   i-0151c72cd85f85038   running   m5.2xlarge   us-east-2   us-east-2c   47h
 ----
 
 Each `Machine` has a corresponding `INSTANCE`. Do those IDs look familiar?
@@ -81,13 +81,13 @@ oc get nodes
 You will see something like:
 
 ----
-NAME                           STATUS   ROLES          AGE   VERSION
-ip-10-0-129-33.ec2.internal    Ready    master         47h   v1.12.4+509916ce1
-ip-10-0-139-97.ec2.internal    Ready    worker         47h   v1.12.4+509916ce1
-ip-10-0-144-15.ec2.internal    Ready    master         47h   v1.12.4+509916ce1
-ip-10-0-157-196.ec2.internal   Ready    worker         47h   v1.12.4+509916ce1
-ip-10-0-164-163.ec2.internal   Ready    master         47h   v1.12.4+509916ce1
-ip-10-0-175-100.ec2.internal   Ready    worker         47h   v1.12.4+509916ce1
+NAME                                         STATUS   ROLES    AGE   VERSION
+ip-10-0-129-88.us-east-2.compute.internal    Ready    master   63m   v1.14.6+9fb2d5cf9
+ip-10-0-140-204.us-east-2.compute.internal   Ready    worker   57m   v1.14.6+9fb2d5cf9
+ip-10-0-154-172.us-east-2.compute.internal   Ready    worker   57m   v1.14.6+9fb2d5cf9
+ip-10-0-159-34.us-east-2.compute.internal    Ready    master   63m   v1.14.6+9fb2d5cf9
+ip-10-0-162-119.us-east-2.compute.internal   Ready    worker   57m   v1.14.6+9fb2d5cf9
+ip-10-0-166-103.us-east-2.compute.internal   Ready    master   63m   v1.14.6+9fb2d5cf9
 ----
 
 Each `Machine` ends up corresponding to a `Node`. With IPI, there is a
@@ -133,7 +133,7 @@ You probably already have a new entry for a `Machine` with a `STATE` of
 and will look something like:
 
 ----
-cluster-f4a3-lpxbs-worker-us-east-2c-h7gdt   i-0b9208ec47f0e206b   running   m4.2xlarge     us-east-2   us-east-2c   47s
+cluster-f4a3-lpxbs-worker-us-east-2c-h7gdt   i-0b9208ec47f0e206b   running   m5.2xlarge     us-east-2   us-east-2c   47s
 ----
 
 At this point, in the background, the bootstrap process is happening
@@ -148,7 +148,7 @@ oc get nodes
 You should see your fresh and happy new node as the one with a very young age:
 
 ----
-ip-10-0-194-62.ec2.internal    Ready    worker         1m   v1.12.4+509916ce1
+ip-10-0-166-103.us-east-2.compute.internal   Ready    worker   1m   v1.14.6+9fb2d5cf9
 ----
 
 [NOTE]
@@ -156,7 +156,7 @@ ip-10-0-194-62.ec2.internal    Ready    worker         1m   v1.12.4+509916ce1
 It can take several minutes for a `Machine` to be prepared and added as a `Node`.
 ====
 
-Scale the `MachineSet` from one back down to one before continuing.
+Scale the `MachineSet` from two back down to one before continuing.
 
 [source,bash,role="copypaste copypaste-warning"]
 ----

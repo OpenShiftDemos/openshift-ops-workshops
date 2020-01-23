@@ -1,4 +1,4 @@
-  ## OpenShift Monitoring
+## OpenShift Monitoring
 In this lab you will explore various aspects of the builtin OpenShift
 Monitoring. This includes an overview of the OpenShift Alertmanager UI,
 accessing the Prometheus web console, running PromQL (Prometheuses Query
@@ -15,7 +15,7 @@ administrator about any occurring problems and a set of Grafana dashboards.
 The cluster monitoring stack is only supported for monitoring OpenShift
 Container Platform clusters.
 
-#### Connect to the OpenShift Monitoring Alertmanager UI
+#### Examine Alerting Configuration
 
 1. Login to the link:{{ MASTER_URL }}[OpenShift Web Console] with the kubeadmin credentials.
 +
@@ -38,18 +38,13 @@ within OpenShift, including the web console.
 ====
 +
 1. On the left hand side, click on the "Monitoring" drop down.
-1. Click on "Alerts". This page is the "Alertmanager UI".
+1. Click on "Alerting". This is the OpenShift console's view of the alert configuration.
 
+The Alerting tab shows you information about currently configured and/or
+active alerts. You can see and do several things:
 
-##### Contents of Alertmanager UI
-
-The main page of the Alertmanager UI is the Alerts page.
-
-.Alerts Screen
-image::openshift_console_monitoring.png[]
-
-1. Filtering alerts by their names.
-1. Filtering the alerts by their states. To fire, some alerts need a certain
+1. Filter alerts by their names.
+1. Filter the alerts by their states. To fire, some alerts need a certain
   condition to be true for the duration of a timeout. If a condition of an
   alert is currently true, but the timeout has not been reached, such an alert
   is in the Pending state.
@@ -59,46 +54,34 @@ image::openshift_console_monitoring.png[]
 1. Value of the Severity label of the alert.
 1. Actions you can do with the alert.
 
+You'll also note that you can click directly into the Alertmanager UI with a
+link that's at the top of this page.
+
 ##### Metrics UI (Prometheus Console)
-In addition to the Alertmanager UI, OpenShift monitoring provides the
-"Mertics" UI (aka the "Prometheus Console") which allows for real time
-queries of current metrics. This is useful when inspecting an alert as it
-allows queries for the alert's metric values over time.
+In addition to the Alerting screen, OpenShift's built-in monitoring provides
+an interface to access metrics collected by Prometheus using the link:https://prometheus.io/docs/prometheus/latest/querying/basics/[Prometheus
+Query Language (PromQL)].
 
-1. On the left hand side of the OpenShift Console, under the "Monitoring" section, click the link  for "Metrics".
-+
-[WARNING]
-====
-You will receive a self-signed certificate error in your browser when you
-first visit the Alertmanager UI console. When OpenShift is installed, by default, a CA
-and SSL certificates are generated for all inter-component communication
-within OpenShift, including the Prometheus web console.
-====
-+
-1. Click "Log in with OpenShift" button.
-1. On the "Authorize Access" page, click the "Allow selected permissions" button.
-1. This is the Prometheus Console where PromQL queries can be executed.
-+
-.Metrics UI (Prometheus Console)
-image::prometheus_console.png[]
-
+1. On the left hand side of the OpenShift Console, under the "Monitoring" section, click the link for "Metrics".
 
 ##### Running Prometheus Queries
 Let's run a query to see the resources memory limit all pod definitions have defined.
 
-1. Copy and paste the following query into the query text box:
+1. Copy and paste the following query into the expression text box:
 +
 [source,role="copypaste"]
 ----
 sum(kube_pod_container_resource_limits_memory_bytes)/(1024^3)
 ----
 +
-1. Click the "Execute" button
+1. Click the "Run Queries" button
 1. You should now see a timeseries with a value in the list. This value is
   the latest gathered value for the timeseries as defined by this query.
+  You will also see a graph showing the value over the last time period (defaults to 30m).
 
 Now let's run a query to see the cpu usage for the entire cluster.
 
+1. Click "Add Query"
 1. Copy and paste the following query into the query text box:
 +
 [source,role="copypaste"]
@@ -106,18 +89,22 @@ Now let's run a query to see the cpu usage for the entire cluster.
 cluster:cpu_usage_cores:sum
 ----
 +
-1. Click the "Execute" button
+1. Click the "Run Queries" button
 1. You should now see a timeseries with a value in the list. This value is
   the latest gathered value for the timeseries as defined by this query.
-1. Click the "Graph" tab to see a graph of these values over time.
+  You'll also see that your new query got plotted on the same graph.
 
+The metrics interface lets you run powerful queries on the information
+collected about your cluster.
+
+You'll also note that you can click directly into the Prometheus UI with a
+link that's at the top of this page.
 
 ##### Dashboards UI (Grafana)
 In addition to the Metrics UI, OpenShift monitoring provides a preconfigured
 "Dashboards" UI (aka "Grafana"). The purpose of these Dashboards is to show
-multiple metrics in easy to consume form.
+multiple metrics in easy to consume form graphed over time.
 
-1. Go back to the OpenShift Console.
 1. Click the "Dashboards" link under the "Monitoring" section on the left hand side.
 +
 [WARNING]
@@ -129,8 +116,20 @@ within OpenShift, including the Grafana dashboard.
 ====
 +
 1. Click "Log in with OpenShift" button.
+1. Click "kube:admin" if the option is provided.
++
+[source,role="copypaste"]
+----
+kubeadmin
+----
++
+[source,role="copypaste"]
+----
+{{ KUBEADMIN_PASSWORD }}
+----
++
 1. On the "Authorize Access" page, click the "Allow selected permissions" button.
-1. This is the Graphana "Home Dashboard" page.
+1. This is the Grafana "Home Dashboard" page.
 1. Click on the "Home" dropdown at the top of the page
 1. Select the "Kubernetes / Compute Resources / Cluster" dashboard.
   The "Kubernetes / Compute Resources / Cluster" dashbard shows an overview
@@ -138,5 +137,4 @@ within OpenShift, including the Grafana dashboard.
   cluster.
 +
 .Dashboards UI (Grafana)
-image::grafana_dashboard.png[]
-
+image::images/grafana_dashboard.png[]

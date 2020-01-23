@@ -2,7 +2,7 @@
 
 == Lab Overview
 
-This hands-on workshop is for both system administrators and application developers interested in learning how to deploy and manage Metering operator and schedule reports. This instruction was developed using the RHPDS `OpenShift 4.2 Workshop`. Instructions to `Order` this Workshop for Red Hat employees can be found at link:https://mojo.redhat.com/docs/DOC-1209703[OpenShift 4.2 Workshop]. If you are not a Red Hat employee you can deploy OpenShift 4 using this link link:http:try.openshift.com[OpenShift 4 Deployment] and then follow the instructions for AWS Installer-Provisioned Infrastructure (IPI).
+This hands-on workshop is for both system administrators and application developers interested in learning how to deploy and manage Metering operator and schedule reports. This instruction was developed using the RHPDS `OpenShift 4.2 Workshop`. Instructions to `Order` this Workshop for Red Hat employees can be found at link:https://mojo.redhat.com/docs/DOC-1209703[OpenShift 4.2 Workshop]. If you are not a Red Hat employee, you can deploy OpenShift 4 using this link link:http:try.openshift.com[OpenShift 4 Deployment] and then follow the instructions for AWS Installer-Provisioned Infrastructure (IPI).
 
 === In this lab you will learn how to
 
@@ -25,7 +25,7 @@ This lab assumes you have logged into an existing cluster with the `oc login` co
 
 #### Examine cluster projects
 
-View the `projects` in the existing cluster by running the `oc projects` command (this is analogous to `kubectl namespaces`). Search for openshift-metering in the output to make sure you're not clobering an existing installation:
+View the `projects` in the existing cluster by running the `oc projects` command (this is analogous to `kubectl namespaces`). Search for openshift-metering in the output to make sure you're not clobbering an existing installation:
 
 [source,bash,role="execute"]
 ----
@@ -85,7 +85,7 @@ Lab environments are difficult to assign storage to. For the purposes of this la
 
 ### Verify the installation
 
-To verify your metering installation you can check that all the required Pods have been created, and check that your report data sources are beginning to import data.
+To verify your metering installation, you can check that all the required Pods have been created, and check that your report data sources are beginning to import data.
 
 1. Navigate to *Workloads* → *Pods* in the metering namespace and verify that Pods are being created. This can take several minutes after installing the metering stack.
 

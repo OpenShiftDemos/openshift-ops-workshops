@@ -38,7 +38,7 @@ The output should reflect that no Metering projects currently exist.
 
 To install the Metering Operator first create an `openshift-metering` namespace, and then install the Metering Operator from OperatorHub.
 
-1. In the OpenShift Container Platform web console, click Administration → Namespaces → Create Namespace.
+1. In the OpenShift Container Platform web console, click *Administration* → *Namespaces* → *Create Namespace*.
 
 2. Set the name to `openshift-metering`. No other namespace is supported. Label the namespace with `openshift.io/cluster-monitoring=true`, and click Create.
 

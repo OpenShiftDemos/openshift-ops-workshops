@@ -136,7 +136,7 @@ Now that there are new OCP worker nodes they will be labeled to schedule OCS res
 oc get nodes -l role=storage-node -o name | xargs -n1 -t -I {} oc label {} cluster.ocs.openshift.io/openshift-storage=""
 ----
 
-Let's check to make sure the new OCP nodes are labeled with OCS label.
+Let's check to make sure the new OCP nodes have the new OCS label.
 
 [source,role="execute"]
 ----

@@ -129,6 +129,26 @@ ip-10-0-162-215.us-east-2.compute.internal   Ready    worker   2m14s   v1.14.6+9
 ip-10-0-170-49.us-east-2.compute.internal    Ready    worker   128m    v1.14.6+9fb2d5cf9
 ----
 
+Now that there are new OCP worker nodes they will be labeled to schedule OCS resources.
+
+[source,role="execute"]
+----
+oc get nodes -l role=storage-node -o name | xargs -n1 -t -I {} oc label {} cluster.ocs.openshift.io/openshift-storage=""
+----
+
+Let's check to make sure the new OCP nodes have the new OCS label.
+
+[source,role="execute"]
+----
+oc get nodes -l cluster.ocs.openshift.io/openshift-storage=
+----
+.Example output:
+----
+NAME                                         STATUS   ROLES    AGE    VERSION
+ip-10-0-131-209.us-east-2.compute.internal   Ready    worker   5m25s   v1.14.6+9fb2d5cf9
+ip-10-0-155-12.us-east-2.compute.internal    Ready    worker   5m26s   v1.14.6+9fb2d5cf9
+ip-10-0-162-215.us-east-2.compute.internal   Ready    worker   5m19s   v1.14.6+9fb2d5cf9
+----
 === Installing the OCS operator
 
 In this section you will be using three of the worker OCP 4 nodes to deploy OCS 4 using the OCS Operator in OperatorHub. The following will be installed:
@@ -173,10 +193,19 @@ Select `OpenShift Container Storage Operator` and then select *Install*.
 .OCP OperatorHub Install OpenShift Container Storage
 image::images/ocs/OCS-OCP-OperatorHub-Install.png[OCP OperatorHub Install]
 
-On the next screen make sure the settings are as shown in this figure. Make sure to change to `A specific namespace on the cluster` and chose namespace `openshift-storage`. Click `Subscribe`.
+On the next screen make sure the settings are as shown in this figure.  
 
 .OCP Subscribe to OpenShift Container Storage
 image::images/ocs/OCS-OCP-OperatorHub-Subscribe.png[OCP OperatorHub Subscribe]
+
+Make sure to change to `A specific namespace on the cluster` and chose namespace `openshift-storage`.
+
+.Select specific namespace openshift-storage
+image::images/ocs/OCS-OCP-OperatorHub-Subscribe-Detail.png[OCP OperatorHub Subscribe Details]
+
+NOTE: Do not change any configuration other than the namespace as shown above.
+
+Click `Subscribe`.
 
 Now you can go back to your terminal window to check the progress of the installation.
 
@@ -234,16 +263,16 @@ A dialog box will come up next.
 .OCS create a new storage cluster
 image::images/ocs/OCS-config-screen-new.png[OCS create a new storage cluster]
 
-CAUTION: *Make sure to select three workers in different availability zones using instructions below*
+CAUTION: *Make sure there are three workers in different availability zones selected*
 
-To select the appropriate worker nodes of your OCP 4 cluster you can find them by searching for the node label `role=storage-node`.
+There should be 3 worker nodes already selected that had the OCS label applied in the last section. Execute command below and make sure they are all selected.
 
 [source,role="execute"]
 ----
-oc get nodes --show-labels | grep storage-node |cut -d' ' -f1
+oc get nodes --show-labels | grep ocs |cut -d' ' -f1
 ----
 
-Select the three nodes that resulted from the command above. Then click on the button `Create` below the dialog box where you selected the 3 workers with a `checkmark`.
+Then click on the button `Create` below the dialog box with the 3 workers selected with a `checkmark`.
 
 In the background this will start initiating a lot of new pods in the `openshift-storage` namespace, as can be seen on the CLI:
 

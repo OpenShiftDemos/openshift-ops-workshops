@@ -119,7 +119,7 @@ Then follow the following steps:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Choose `Elasticsearch Operator` from the list of available Operators,
     and click `Install`.
-  c. On the `Create Operator Subscription` page, leave all of the defaults
+  c. On the `Create Operator Subscription` page, *select Update Channel 4.2*, leave all other defaults
      and then click `Subscribe`.
 +
 This makes the Operator available to all users and projects that use this
@@ -139,7 +139,8 @@ namespace was created from the previous steps
     `Install`.
   c. On the `Create Operator Subscription` page, Under ensure `Installation
      Mode` that `A specific namespace on the cluster` is selected, and choose
-     `openshift-logging`. Leave the other defaults and then, click `Subscribe`.
+     `openshift-logging`. In addition, *select Update Channel 4.2* and leave all other defaults
+     and then click `Subscribe`.
 
 3. Verify the operator installations:
 

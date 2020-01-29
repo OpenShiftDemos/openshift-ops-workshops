@@ -23,6 +23,8 @@ modules:
     name: OpenShift Monitoring with Prometheus
   template-quota-limits:
     name: Project Template, Quota, and Limits
+  cluster-metering:
+    name: Cluster Metering
   networking:
     name: OpenShift Networking and NetworkPolicy
   disabling-project-self-provisioning:

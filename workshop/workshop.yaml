@@ -16,3 +16,5 @@ modules:
   - networking
   - disabling-project-self-provisioning
   - clusterresourcequota
+  - cluster-metering
+  

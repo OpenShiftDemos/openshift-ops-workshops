@@ -1697,7 +1697,7 @@ Or like this for OCS specific insights:
 
 [source,role="execute"]
 ----
-oc adm must-gather --image=quay.io/rhceph-dev/ocs-must-gather
+oc adm must-gather --image=quay.io/rhceph-dev/ocs-must-gather:latest-4.2
 ----
 
 The output will then be saved in the current directory inside of a new folder called `must-gather.local.(random)`

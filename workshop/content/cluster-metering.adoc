@@ -95,6 +95,7 @@ It may take a few minutes for the metering operator to appear.
 
 3. Replace the default configuration by copying and pasting the following MeteringConfig into the YAML editor and click Create:
 +
+[source,role="copypaste"]
 ----
 apiVersion: metering.openshift.io/v1
 kind: MeteringConfig

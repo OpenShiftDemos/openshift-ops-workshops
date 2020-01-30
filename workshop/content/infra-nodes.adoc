@@ -148,14 +148,14 @@ replicas. It requires the `jq` program be installed.
 View its content
 [source,bash,role="execute"]
 ----
-cat {{ HOME_PATH }}/content/support/infra-nodes.sh
+cat {{ HOME_PATH }}/support/infra-nodes.sh
 ----
 
 You can execute that script by doing the following:
 
 [source,bash,role="execute"]
 ----
-bash {{ HOME_PATH }}/content/support/infra-nodes.sh
+bash {{ HOME_PATH }}/support/infra-nodes.sh
 ----
 
 Then go ahead and run:
@@ -374,7 +374,7 @@ infrastructure nodes, we can apply the following configuration:
 
 [source,bash,role="execute"]
 ----
-oc apply -f {{ HOME_PATH }}/content/support/ingresscontroller.yaml
+oc apply -f {{ HOME_PATH }}/support/ingresscontroller.yaml
 ----
 
 
@@ -559,7 +559,7 @@ You can create the new monitoring config with the following command:
 
 [source,bash,role="execute"]
 ----
-oc create -f {{ HOME_PATH }}/content/support/cluster-monitoring-configmap.yaml
+oc create -f {{ HOME_PATH }}/support/cluster-monitoring-configmap.yaml
 ----
 
 Watch the monitoring pods move from `worker` to `infra` `Nodes` with:

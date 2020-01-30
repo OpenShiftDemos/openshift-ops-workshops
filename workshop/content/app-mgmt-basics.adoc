@@ -682,7 +682,7 @@ readiness probe can be used to signal to the endpoint's controller that even
 though a container is running, it should not receive any traffic.
 
 More information on probing applications is available in the
-https://docs.openshift.com/container-platform/latest/dev_guide/application_health.html[Application
+https://docs.openshift.com/container-platform/4.2/nodes/containers/nodes-containers-health.html[Application
 Health] section of the documentation.
 
 ### Add Probes to the Application

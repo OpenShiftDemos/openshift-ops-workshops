@@ -16,6 +16,15 @@ This hands-on workshop is for both system administrators and application develop
 
 OpenShift Container Platform (OCP) 4.2 made Operator Metering generally available. Operator Metering is a chargeback and reporting tool to provide accountability for how resources are used across a cluster. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster wide. Operator Metering is part of the link:https://coreos.com/blog/introducing-operator-framework-metering[Operator Framework].
 
+[NOTE]
+====
+This exercise is done with a mix of CLI and the OpenShift web console. All of
+the interactions with the web console are effectively creating or
+manipulating API objects in the background. It is possible to fully automate
+the process and/or do it using the CLI or other tools, but these methods are
+not covered in the exercise or documentation at this time.
+====
+
 ### Installing Operator Metering 
 
 [NOTE]
@@ -34,9 +43,32 @@ oc projects | grep openshift-metering
 
 The output should reflect that no Metering projects currently exist.
 
+#### Login to the OpenShift Web Console
+
+Login to the link:{{ MASTER_URL }}[OpenShift Web Console] with the kubeadmin credentials.
++
+[source,role="copypaste"]
+----
+kubeadmin
+----
++
+[source,role="copypaste"]
+----
+{{ KUBEADMIN_PASSWORD }}
+----
++
+[WARNING]
+====
+You will receive a self-signed certificate error in your browser when you
+first visit the OpenShift Web console. When OpenShift is installed, by default, a CA
+and SSL certificates are generated for all inter-component communication
+within OpenShift, including the web console.
+====
++
+
 #### Add Metering Operator to cluster
 
-To install the Metering Operator first create an `openshift-metering` namespace, and then install the Metering Operator from OperatorHub.
+To install the Metering Operator using the OpenShift Web Console first create an `openshift-metering` namespace, and then install the Metering Operator from OperatorHub.
 
 1. In the OpenShift Container Platform web console, click *Administration* → *Namespaces* → *Create Namespace*.
 
@@ -62,7 +94,7 @@ It may take a few minutes for the metering operator to appear.
 2. Under *Provided APIs*, click *Create Instance* on the Metering Configuration card. This opens a YAML editor with the default MeteringConfig file where you can define your configuration.
 
 3. Replace the default configuration by copying and pasting the following MeteringConfig into the YAML editor and click Create:
-
++
 ----
 apiVersion: metering.openshift.io/v1
 kind: MeteringConfig
@@ -80,7 +112,7 @@ spec:
         # Leave this value as-is.
         namenode: "hdfs-namenode-0.hdfs-namenode:9820"
 ----
-
++
 Lab environments are difficult to assign storage to. For the purposes of this lab we're using an HDFS node. The MeteringConfig resource begins to create the necessary resources for your metering stack. You can now move on to verifying your installation.
 
 ### Verify the installation
@@ -88,14 +120,15 @@ Lab environments are difficult to assign storage to. For the purposes of this la
 To verify your metering installation, you can check that all the required Pods have been created, and check that your report data sources are beginning to import data.
 
 1. Navigate to *Workloads* → *Pods* in the metering namespace and verify that Pods are being created. This can take several minutes after installing the metering stack.
-
++
 You can run the same check using the `oc` CLI:
-
++
 [source,bash,role="execute"]
 ----
 oc -n openshift-metering get pods
 ----
-
++
+You should see similiar output:
 ----
 NAME                                  READY   STATUS              RESTARTS   AGE
 hive-metastore-0                      1/2     Running             0          52s
@@ -104,16 +137,16 @@ metering-operator-68dd64cfb6-pxh8v    2/2     Running             0          2m4
 presto-coordinator-0                  2/2     Running             0          31s
 reporting-operator-56c6c878fb-2zbhp   0/2     ContainerCreating   0          4s
 ----
-
++
 2. Continue to check your Pods until they show `Ready`. This can take several minutes. Many Pods rely on other components to function before they themselves can be considered ready. Some Pods may restart if other Pods take too long to start, this is okay and can be expected during installation.
-
++
 Using the `oc` CLI, the same check shows output similar to the following:
-
++
 [source,bash,role="execute"]
 ----
 oc -n openshift-metering get pods
 ----
-
++
 ----
 NAME                                  READY   STATUS    RESTARTS   AGE
 hdfs-datanode-0                       1/1     Running   0          13m
@@ -124,14 +157,14 @@ metering-operator-6465b49f8c-487tg    2/2     Running   0          1h30m
 presto-coordinator-0                  2/2     Running   0          12m
 reporting-operator-787868bfcc-w8qs6   2/2     Running   0          11m
 ----
-
++
 3. Next, use the `oc` CLI to verify that the ReportDataSources are beginning to import data, indicated by a valid timestamp in the `EARLIEST METRIC` column (this may take a few minutes). We filter out the "-raw" ReportDataSources which do not import data:
-
++
 [source,bash,role="execute"]
 ----
 oc get reportdatasources -n openshift-metering | grep -v raw
 ----
-
++
 After all Pods are ready and you have verified that data is being imported, you can begin using metering to collect data and report on your cluster.
 
 ### Writing Reports
@@ -158,7 +191,7 @@ The following example Report will contain information on every Pod’s CPU reque
 2. Under *Metering Report*, click *Create Instance*. This opens a YAML editor with the default MeteringConfig file where you can define your configuration.
 
 3. Replace the default configuration by copying and pasting the following MeteringConfig into the YAML editor and click Create:
-
++
 ----
 apiVersion: metering.openshift.io/v1
 kind: Report
@@ -169,21 +202,21 @@ spec:
   schedule:
     period: "hourly"
 ----
-
++
 4. Next, use the `oc` CLI to verify that the report was created:
-
++
 [source,bash,role="execute"]
 ----
 oc get reports -n openshift-metering
 ---- 
-
++
 Using the `oc` CLI, it shows output similar to the following:
-
++
 ----
 NAME                       QUERY               SCHEDULE   RUNNING                  FAILED   LAST REPORT TIME   AGE
 cluster-cpu-usage-hourly   cluster-cpu-usage   hourly     ReportingPeriodWaiting                               7s
 ----
-
++
 5. The alloted time will pass (one hour) and a report will be run. For the purpose of this workshop, let's keep going.
 
 #### Create One-Time Report
@@ -195,7 +228,7 @@ The following example Report will contain information on every Namespace’s CPU
 2. Under *Metering Report*, click *Create Instance*. This opens a YAML editor with the default MeteringConfig file where you can define your configuration.
 
 3. Replace the default configuration by copying and pasting the following MeteringConfig into the YAML editor and click Create:
-
++
 ----
 apiVersion: metering.openshift.io/v1
 kind: Report
@@ -208,16 +241,16 @@ spec:
   reportingStart: '2020-01-01T00:00:00Z'
   runImmediately: true
 ----
-
++
 4. Next, use the `oc` CLI to verify that the report was created:
-
++
 [source,bash,role="execute"]
 ----
 oc get reports -n openshift-metering
 ----
-
++
 Using the `oc` CLI, it shows output similar to the following:
-
++
 ----
 NAME                         QUERY                   SCHEDULE   RUNNING                  FAILED   LAST REPORT TIME       AGE
 cluster-cpu-usage-hourly     cluster-cpu-usage       hourly     ReportingPeriodWaiting                                   4m37s

@@ -2,7 +2,7 @@
 
 == Lab Overview
 
-This hands-on workshop is for both system administrators and application developers interested in learning how to deploy and manage Metering operator and schedule reports. This instruction was developed using the RHPDS `OpenShift 4.2 Workshop`. Instructions to `Order` this Workshop for Red Hat employees can be found at link:https://mojo.redhat.com/docs/DOC-1209703[OpenShift 4.2 Workshop]. If you are not a Red Hat employee, you can deploy OpenShift 4 using this link link:http:try.openshift.com[OpenShift 4 Deployment] and then follow the instructions for AWS Installer-Provisioned Infrastructure (IPI).
+This hands-on workshop is for both system administrators and application developers interested in learning how to deploy and manage Metering operator and schedule reports.
 
 === In this lab you will learn how to
 

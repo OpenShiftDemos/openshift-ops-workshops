@@ -72,13 +72,20 @@ To install the Metering Operator using the OpenShift Web Console first create an
 
 1. In the OpenShift Container Platform web console, click *Administration* → *Namespaces* → *Create Namespace*.
 
-2. Set the name to `openshift-metering`. No other namespace is supported. Label the namespace with `openshift.io/cluster-monitoring=true`, and click Create.
+2. Set the name to `openshift-metering`. No other namespace is supported. Label the namespace with 
++
+[source,role="copypaste"]
+----
+openshift.io/cluster-monitoring=true
+----
++
+Then click Create.
 
 3. Next, click *Operators* → *OperatorHub*, and filter for `metering` to find the Metering Operator.
 
 4. Click the *Metering* card, review the package description, and then click *Install*.
 
-5. On the *Create Operator Subscription* screen, select the `openshift-metering` namespace you created above. Specify your update channel and approval strategy, then click *Subscribe* to install metering.
+5. On the *Create Operator Subscription* screen, select the `openshift-metering` namespace you created above. Specify `4.2` as the Update Channel and `Automatic` as the Approval Strategy, then click *Subscribe* to install metering.
 
 6. On the *Installed Operators* screen the *Status* displays *InstallSucceeded* when metering has finished installing. Click the name of the operator (Metering) in the first column to view the *Operator Details* page.
 
@@ -114,7 +121,7 @@ spec:
         namenode: "hdfs-namenode-0.hdfs-namenode:9820"
 ----
 +
-Lab environments are difficult to assign storage to. For the purposes of this lab we're using an HDFS node. The MeteringConfig resource begins to create the necessary resources for your metering stack. You can now move on to verifying your installation.
+In order to not create a dependency on OpenShift Container Storage, this lab uses an unsupported storage configuration, HDFS, that the Metering operator deploys by itself.
 
 ### Verify the installation
 
@@ -241,7 +248,7 @@ metadata:
   namespace: openshift-metering
 spec:
   query: namespace-cpu-request
-  reportingEnd: '2020-12-30T23:59:59Z'
+  reportingEnd: '2025-12-30T23:59:59Z'
   reportingStart: '2020-01-01T00:00:00Z'
   runImmediately: true
 ----

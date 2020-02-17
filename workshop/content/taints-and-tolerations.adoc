@@ -1,6 +1,6 @@
 ## Taints and Tolerations
 
-In a previous lab, you created "infra" nodes leveraging https://docs.openshift.com/container-platform/4.3/nodes/scheduling/nodes-scheduler-node-selectors.html[nodeSelector] to control where the workload lands. You saw how you can set nodes to perform certain tasks. The `nodeSelector`in  the `nodePlacement` attracts pods to a set of nodes. But what if you want the opposite? What if you want to repel pods?
+In a previous lab, you created "infra" nodes leveraging https://docs.openshift.com/container-platform/4.3/nodes/scheduling/nodes-scheduler-node-selectors.html[nodeSelector] to control where the workload lands. You saw how you can set nodes to perform certain tasks. The `nodeSelector` in  the `nodePlacement` attracts pods to a set of nodes. But what if you want the opposite? What if you want to repel pods?
 
 Having a taint in place will make sure a pod does NOT run on the tainted node. Some usecases include:
 

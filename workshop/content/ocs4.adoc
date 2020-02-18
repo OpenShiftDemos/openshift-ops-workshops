@@ -61,7 +61,7 @@ cluster-ocs-0ec4-dgwqc-worker-us-east-2c   1         1         1       1        
 
 WARNING: *Make sure you do the next step for finding and using your CLUSTERID*
 
-First set some environment variable to comply with lab content.
+First set environment variable to comply with lab content.
 
 [source,role="execute"]
 ----
@@ -69,11 +69,11 @@ CLUSTERID=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].m
 echo $CLUSTERID
 ----
 
-Then create a new machinset for OCS deployment for our specific OCp cluster.
+Then create new *machinsets* for OCS deployment for your specific OCP cluster.
 
 [source,role="execute"]
 ----
-cat {{ HOME_PATH }}/support/ocslab_cluster-workerocs.yaml | sed "s/CLUSTERID/$CLUSTERID/g" | oc apply -f -
+curl -s https://lfbf6bao0k.execute-api.eu-central-1.amazonaws.com/machineset-lambda?clusterID=$CLUSTERID | oc apply -f -
 ----
 
 Check that you have new *machines* created.

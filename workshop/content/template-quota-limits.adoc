@@ -25,7 +25,7 @@ oc adm create-bootstrap-project-template -o yaml
 Inspecting the the YAML output of this command, you will notice that there are
 various parameters associated with this *Template* displayed towards the bottom.
 
-[source,bash,role="execute"]
+[source,bash]
 ----
 ...
 parameters:
@@ -293,9 +293,9 @@ metadata:
   name: "cluster"
   namespace: ""
 spec:
-  projectRequestMessage: "You requested a new project with Limits & Quotas!"
+  projectRequestMessage: ""
   projectRequestTemplate:
-    name: "project-request"
+    name: "openshift-config/project-request"
 ----
 
 Notice the *projectRequestTemplate* name matches the name of the template we
@@ -326,7 +326,7 @@ Notice the new *projectConfig* section:
 ...
   "kind": "OpenShiftAPIServerConfig",
   "projectConfig": {
-    "projectRequestMessage": "You requested a new project with Limits & Quotas!",
+    "projectRequestMessage": "",
     "projectRequestTemplate": "openshift-config/project-request"
   },
 ...

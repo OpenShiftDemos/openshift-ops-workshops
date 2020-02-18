@@ -17,4 +17,5 @@ modules:
   - disabling-project-self-provisioning
   - clusterresourcequota
   - cluster-metering
+  - taints-and-tolerations
   

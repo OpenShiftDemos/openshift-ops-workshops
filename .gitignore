@@ -33,3 +33,4 @@ ci-test-container/qwiklab-secret.yaml
 build.hwm
 build.pwd
 build.pwi
+workshop-settings.sh

@@ -1,10 +1,29 @@
 = Deploying and Managing OpenShift Container Storage
+:toc: right
+:toclevels: 2
+:icons: font
+:source-highlighter: pygments
+:source-language: shell
+:numbered:
+:imagesdir: images/ocs/
+:github-raw-url: https://raw.githubusercontent.com/red-hat-storage/ocs-training/master
+:instance-type: m5.4xlarge
+:aws-region: us-east-2
 // Activate experimental attribute for Keyboard Shortcut keys
 :experimental:
 
+// Build content for the training
+// :training:
+
+// Build content for the roadshow
+:roadshow:
+
 == Lab Overview
 
-This module is for both system administrators and application developers interested in learning how to deploy and manage OpenShift Container Storage (OCS). In this module you will be using OpenShift Container Platform (OCP) 4.x and the OCS operator to deploy Ceph and the Multi-Cloud-Gateway (MCG) as a persistent storage solution for OCP workloads.
+This hands-on workshop is for both system administrators and application developers interested in learning how to deploy and manage OpenShift Container Storage (OCS). In this lab you will be using OpenShift Container Platform (OCP) 4.x and the OCS operator to deploy Ceph and the Multi-Cloud-Gateway (MCG) as a persistent storage solution for OCP workloads.
+This instruction was developed using the RHPDS `OpenShift 4.2 Workshop`. Instructions to `Order` this Workshop for Red Hat employees can be found at link:https://mojo.redhat.com/docs/DOC-1209703[OpenShift 4.2 Workshop]. If you are not a Red Hat employee you can deploy OpenShift 4 using this link link:http:try.openshift.com[OpenShift 4 Deployment] and then follow the instructions for AWS Installer-Provisioned Infrastructure (IPI).
+
+NOTE: If deploying OpenShift 4 on VMware infrastructure or other User-Provisioned Infrastructure (UPI) skip the steps that include creating *machines* and *machinesets* given these resources are not currently available for UPI. To complete all of the instructions in this lab you will need to pre-provision six OCP worker nodes if OCP 4 is on UPI (i.e. not on AWS). To deploy OCS, OCP worker nodes need to have a minimum of 16 CPUs and 64 GB memory available.
 
 === In this lab you will learn how to
 
@@ -19,9 +38,11 @@ This module is for both system administrators and application developers interes
 * Use must-gather to collect support information
 
 .OpenShift Container Storage components
-image::images/ocs/OCS-Pods-Diagram.png[Showing OCS4 pods]
+image::OCS-Pods-Diagram.png[Showing OCS4 pods]
 
+ifdef::roadshow[]
 NOTE: If you want more information about how Ceph works please review <<Introduction to Ceph>> section before starting the exercises in this module.
+endif::[]
 
 [[labexercises]]
 
@@ -33,14 +54,15 @@ In this section, you will first validate the OCP environment has 3 master and 3 
 
 [source,role="execute"]
 ----
-oc get nodes -l node-role.kubernetes.io/worker -l '!node-role.kubernetes.io/infra','!node-role.kubernetes.io/master'
+oc get nodes -l node-role.kubernetes.io/worker
 ----
 .Example output:
+[subs=attributes+]
 ----
 NAME                                         STATUS   ROLES    AGE   VERSION
-ip-10-0-138-9.us-east-2.compute.internal     Ready    worker   77m   v1.14.6+9fb2d5cf9
-ip-10-0-150-39.us-east-2.compute.internal    Ready    worker   77m   v1.14.6+9fb2d5cf9
-ip-10-0-170-49.us-east-2.compute.internal    Ready    worker   77m   v1.14.6+9fb2d5cf9
+ip-10-0-138-9.{aws-region}.compute.internal     Ready    worker   77m   v1.14.6+9fb2d5cf9
+ip-10-0-150-39.{aws-region}.compute.internal    Ready    worker   77m   v1.14.6+9fb2d5cf9
+ip-10-0-170-49.{aws-region}.compute.internal    Ready    worker   77m   v1.14.6+9fb2d5cf9
 ----
 
 Now you are going to add 3 more OCP compute nodes to cluster using *machinesets*.
@@ -52,16 +74,21 @@ oc get machinesets -n openshift-machine-api | grep -v infra
 
 This will show you the existing *machinesets* used to create the 3 worker nodes in the cluster already. There is a *machineset* for each AWS AZ (us-east-1a, us-east-1b, us-east-1c). Your *machinesets* `NAME` will be different than below.
 
+[subs=attributes+]
 ----
 NAME                                       DESIRED   CURRENT   READY   AVAILABLE   AGE
-cluster-ocs-0ec4-dgwqc-worker-us-east-2a   1         1         1       1           86m
-cluster-ocs-0ec4-dgwqc-worker-us-east-2b   1         1         1       1           86m
-cluster-ocs-0ec4-dgwqc-worker-us-east-2c   1         1         1       1           86m
+cluster-ocs-0ec4-dgwqc-worker-{aws-region}a   1         1         1       1           86m
+cluster-ocs-0ec4-dgwqc-worker-{aws-region}b   1         1         1       1           86m
+cluster-ocs-0ec4-dgwqc-worker-{aws-region}c   1         1         1       1           86m
 ----
 
+<<<<<<< HEAD
 WARNING: *Make sure you do the next step for finding and using your CLUSTERID*
 
 First set environment variable to comply with lab content.
+=======
+WARNING: *Make sure you do the next steps for finding and using your CLUSTERID*
+>>>>>>> Update OCS4 content
 
 [source,role="execute"]
 ----
@@ -69,14 +96,27 @@ CLUSTERID=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].m
 echo $CLUSTERID
 ----
 
+<<<<<<< HEAD
 Then create new *machinesets* for OCS deployment for your specific OCP cluster.
+=======
+Now you will create new *machinesets* and *machines* for OCS4.
+>>>>>>> Update OCS4 content
 
 [source,role="execute"]
 ----
-cat {{ HOME_PATH }}/support/ocslab_cluster-workerocs.yaml | sed "s/CLUSTERID/$CLUSTERID/g" | oc apply -f -
+ifdef::roadshow[]
+curl -s https://lfbf6bao0k.execute-api.eu-central-1.amazonaws.com/machineset-lambda?clusterID=$CLUSTERID | oc apply -f -
+endif::[]
+ifdef::training[]
+curl -s https://raw.githubusercontent.com/red-hat-storage/ocs-training/master/ocp4ocs4/cluster-workerocs.yaml | sed -e "s/CLUSTERID/${CLUSTERID}/g" | oc apply -f -
+endif::[]
 ----
 
 Check that you have new *machines* created.
+
+ifdef::roadshow[]
+NOTE: If the lambda function failed, go to <<Use a local YAML file as Machineset>> and try the fallback in that section
+endif::[]
 
 [source,role="execute"]
 ----
@@ -85,14 +125,15 @@ oc get machines -n openshift-machine-api | egrep 'NAME|workerocs'
 
 They may be in `pending` for sometime so repeat command above until they are in a `running` STATE. The `NAME` of your machines will be different than shown below.
 
+[subs=attributes+]
 ----
 NAME                                                STATE     TYPE         REGION      ZONE         AGE
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2a-cqvwj   running   m5.4xlarge   us-east-2   us-east-2a   70s
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2b-g5p5v   running   m5.4xlarge   us-east-2   us-east-2b   70s
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c-rx4v8   running   m5.4xlarge   us-east-2   us-east-2c   70s
+cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}a-cqvwj   running   {instance-type}   {aws-region}   {aws-region}a   70s
+cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}b-g5p5v   running   {instance-type}   {aws-region}   {aws-region}b   70s
+cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}c-rx4v8   running   {instance-type}   {aws-region}   {aws-region}c   70s
 ----
 
-You can see that the workerocs *machines* are using are also using the AWS EC2 instance type `m5.4xlarge`. The `m5.4xlarge` instance type follows our recommended instance sizing for OCS, 16 cpu and 64 GB mem.
+You can see that the workerocs *machines* are using are also using the AWS EC2 instance type `{instance-type}`. The `{instance-type}` instance type follows our recommended instance sizing for OCS, 16 cpu and 64 GB mem.
 
 Now you want to see if our new *machines* are added to the OCP cluster.
 
@@ -103,52 +144,34 @@ watch "oc get machinesets -n openshift-machine-api | egrep 'NAME|workerocs'"
 
 This step could take more than 5 minutes. The result of this command needs to look like below before you proceed. All new workerocs *machinesets* should have an integer, in this case `1`, filled out for all rows and under columns `READY` and `AVAILABLE`. The `NAME` of your *machinesets* will be different than shown below.
 
+[subs=attributes+]
 ----
 NAME                                          DESIRED   CURRENT   READY   AVAILABLE   AGE
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2a   1         1         1       1           8m26s
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2b   1         1         1       1           8m26s
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c   1         1         1       1           8m25s
+cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}a   1         1         1       1           8m26s
+cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}b   1         1         1       1           8m26s
+cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}c   1         1         1       1           8m25s
 ----
 
-You can exit by pressing kbd:[Ctrl+C].
+You can exit by pressing kbd:[Ctrl+C]
 
 Now check to see that you have 3 new OCP worker nodes. The `NAME` of your OCP nodes will be different than shown below.
 
 [source,role="execute"]
 ----
-oc get nodes -l node-role.kubernetes.io/worker -l '!node-role.kubernetes.io/infra','!node-role.kubernetes.io/master'
+oc get nodes -l node-role.kubernetes.io/worker
 ----
 .Example output:
+[subs=attributes+]
 ----
 NAME                                         STATUS   ROLES    AGE     VERSION
-ip-10-0-131-209.us-east-2.compute.internal   Ready    worker   2m21s   v1.14.6+9fb2d5cf9
-ip-10-0-138-9.us-east-2.compute.internal     Ready    worker   128m    v1.14.6+9fb2d5cf9
-ip-10-0-150-39.us-east-2.compute.internal    Ready    worker   128m    v1.14.6+9fb2d5cf9
-ip-10-0-155-12.us-east-2.compute.internal    Ready    worker   2m22s   v1.14.6+9fb2d5cf9
-ip-10-0-162-215.us-east-2.compute.internal   Ready    worker   2m14s   v1.14.6+9fb2d5cf9
-ip-10-0-170-49.us-east-2.compute.internal    Ready    worker   128m    v1.14.6+9fb2d5cf9
+ip-10-0-131-209.{aws-region}.compute.internal   Ready    worker   2m21s   v1.14.6+9fb2d5cf9
+ip-10-0-138-9.{aws-region}.compute.internal     Ready    worker   128m    v1.14.6+9fb2d5cf9
+ip-10-0-150-39.{aws-region}.compute.internal    Ready    worker   128m    v1.14.6+9fb2d5cf9
+ip-10-0-155-12.{aws-region}.compute.internal    Ready    worker   2m22s   v1.14.6+9fb2d5cf9
+ip-10-0-162-215.{aws-region}.compute.internal   Ready    worker   2m14s   v1.14.6+9fb2d5cf9
+ip-10-0-170-49.{aws-region}.compute.internal    Ready    worker   128m    v1.14.6+9fb2d5cf9
 ----
 
-Now that there are new OCP worker nodes they will be labeled to schedule OCS resources.
-
-[source,role="execute"]
-----
-oc get nodes -l role=storage-node -o name | xargs -n1 -t -I {} oc label {} cluster.ocs.openshift.io/openshift-storage=""
-----
-
-Let's check to make sure the new OCP nodes have the new OCS label.
-
-[source,role="execute"]
-----
-oc get nodes -l cluster.ocs.openshift.io/openshift-storage=
-----
-.Example output:
-----
-NAME                                         STATUS   ROLES    AGE    VERSION
-ip-10-0-131-209.us-east-2.compute.internal   Ready    worker   5m25s   v1.14.6+9fb2d5cf9
-ip-10-0-155-12.us-east-2.compute.internal    Ready    worker   5m26s   v1.14.6+9fb2d5cf9
-ip-10-0-162-215.us-east-2.compute.internal   Ready    worker   5m19s   v1.14.6+9fb2d5cf9
-----
 === Installing the OCS operator
 
 In this section you will be using three of the worker OCP 4 nodes to deploy OCS 4 using the OCS Operator in OperatorHub. The following will be installed:
@@ -171,6 +194,19 @@ You must add the monitoring label to this namespace. This is required to get pro
 oc label namespace openshift-storage "openshift.io/cluster-monitoring=true"
 ----
 
+// NOTE: The below manifest file will not be needed when OCS 4 is released.
+
+// To apply this manifest, execute the following:
+// [source,role="execute"]
+// ----
+// ifdef::roadshow[]
+// oc apply -f {{ HOME_PATH }}/support/ocslab_deploy-with-olm.yaml
+// endif::[]
+// ifdef::training[]
+// oc apply -f http://bit.ly/ocs-olm-training
+// endif::[]
+// ----
+
 Now switch over to your *Openshift Web Console*. You can get your URL by issuing command below to get the OCP 4 `console` route. Put this URL in a browser tab. You will use the same Admin username and password you used to login and use the `oc client` to login to the OCP 4 `console`.
 
 [source,role="execute"]
@@ -181,27 +217,27 @@ oc get -n openshift-console route console
 Once you are logged in, navigate to the *OperatorHub* menu.
 
 .OCP OperatorHub
-image::images/ocs/OCS-OCP-OperatorHub.png[OCP OperatorHub]
+image::OCS-OCP-OperatorHub.png[OCP OperatorHub]
 
 Now type `container storage` in the *Filter by _keyword..._* box.
 
 .OCP OperatorHub filter on OpenShift Container Storage Operator
-image::images/ocs/OCS-OCP-OperatorHub-Filter.png[OCP OperatorHub Filter]
+image::OCS-OCP-OperatorHub-Filter.png[OCP OperatorHub Filter]
 
 Select `OpenShift Container Storage Operator` and then select *Install*.
 
 .OCP OperatorHub Install OpenShift Container Storage
-image::images/ocs/OCS-OCP-OperatorHub-Install.png[OCP OperatorHub Install]
+image::OCS-OCP-OperatorHub-Install.png[OCP OperatorHub Install]
 
-On the next screen make sure the settings are as shown in this figure.  
+On the next screen make sure the settings are as shown in this figure.
 
 .OCP Subscribe to OpenShift Container Storage
-image::images/ocs/OCS-OCP-OperatorHub-Subscribe.png[OCP OperatorHub Subscribe]
+image::OCS-OCP-OperatorHub-Subscribe.png[OCP OperatorHub Subscribe]
 
 Make sure to change to `A specific namespace on the cluster` and chose namespace `openshift-storage`.
 
 .Select specific namespace openshift-storage
-image::images/ocs/OCS-OCP-OperatorHub-Subscribe-Detail.png[OCP OperatorHub Subscribe Details]
+image::OCS-OCP-OperatorHub-Subscribe-Detail.png[OCP OperatorHub Subscribe Details]
 
 NOTE: Do not change any configuration other than the namespace as shown above.
 
@@ -219,7 +255,7 @@ NAME                  DISPLAY                       VERSION   REPLACES   PHASE
 ocs-operator.v4.2.0   OpenShift Container Storage   4.2.0                Succeeded
 ----
 
-You can exit by pressing kbd:[Ctrl+C].
+You can exit by pressing kbd:[Ctrl+C]
 
 The resource `csv` is a shortened word for `clusterserviceversions.operators.coreos.com`.
 
@@ -245,34 +281,34 @@ Now switch back to your *Openshift Web Console* for the remainder of the install
 Navigate to the `Operators` menu on the left and select `Installed Operators`. Make sure the selected project is set to `openshift-storage`.
 What you see, should be similar to the following example picture:
 
-.Installed Operators in the openshift-storage namespace
-image::images/ocs/OCP-installed-operators.png[Openshift showing the installed operators in namespace openshift-storage]
+.Installed operators:  1) Make sure you are in the right project; 2) Check Operator status; 3) Click on Openshift Container Storage Operator
+image::OCP-installed-operators.png[Openshift showing the installed operators in namespace openshift-storage]
 
 Click on `Openshift Container Storage Operator` to get to the OCS configuration screen.
 
 .OCS configuration screen
-image::images/ocs/OCS-config-screen-all.png[OCS configuration screen]
+image::OCS-config-screen-all.png[OCS configuration screen]
 
 On the top of the OCS configuration screen, scroll over to the right and click on `Storage cluster` and then click on `Create OCS Cluster Service`. If you do not see `Create OCS Cluster Service` refresh your browser window.
 
 .OCS Create Storage Cluster
-image::images/ocs/OCS-config-screen-storage-cluster.png[OCS Create Storage Cluster]
+image::OCS-config-screen-storage-cluster.png[OCS Create Storage Cluster]
 
 A dialog box will come up next.
 
 .OCS create a new storage cluster
-image::images/ocs/OCS-config-screen-new.png[OCS create a new storage cluster]
+image::OCS-config-screen-new.png[OCS create a new storage cluster]
 
-CAUTION: *Make sure there are three workers in different availability zones selected*
+CAUTION: *Make sure to select three workers in different availability zones using instructions below*
 
-There should be 3 worker nodes already selected that had the OCS label applied in the last section. Execute command below and make sure they are all selected.
+To select the appropriate worker nodes of your OCP 4 cluster you can find them by searching for the node label `role=storage-node`.
 
 [source,role="execute"]
 ----
-oc get nodes --show-labels | grep ocs |cut -d' ' -f1
+oc get nodes --show-labels | grep storage-node |cut -d' ' -f1
 ----
 
-Then click on the button `Create` below the dialog box with the 3 workers selected with a `checkmark`.
+Select the three nodes that resulted from the command above. Then click on the button `Create` below the dialog box where you selected the 3 workers with a `checkmark`.
 
 In the background this will start initiating a lot of new pods in the `openshift-storage` namespace, as can be seen on the CLI:
 
@@ -310,7 +346,7 @@ You can also watch the deployment using the *Openshift Web Console* by going bac
 Please wait until all *Pods* are marked as `Running` in the CLI or until you see all instances shown below as `Ready` Status in the Web Console. Some instances may stay in `Unknown` Status which is not a concern if your `Ready` status matches the following diagram:
 
 .OCS instance overview after cluster install is finished
-image::images/ocs/OCS-finished-cluster-install.png[OCS instance overview after cluster install is finished]
+image::OCS-finished-cluster-install.png[OCS instance overview after cluster install is finished]
 
 [source,role="execute"]
 ----
@@ -363,7 +399,7 @@ You can now also check the status of your storage cluster with the OCS specific 
 NOTE: If you just finished your OCS 4 deployment it could take 5-10 minutes for your *Dashboards* to fully populate.
 
 .OCS Dashboard after successful backing storage installation
-image::images/ocs/OCS-dashboard-healthy.png[OCS Dashboard after successful backing storage installation]
+image::OCS-dashboard-healthy.png[OCS Dashboard after successful backing storage installation]
 
 [cols="0,1,10a"]
 |===
@@ -377,7 +413,7 @@ image::images/ocs/OCS-dashboard-healthy.png[OCS Dashboard after successful backi
 OCS ships with a *Dashboard* for the Object Store service as well. From within the *Dashboard* menu click on the `Object Service` on the top navigation bar of the content page.
 
 .OCS Multi-Cloud-Gateway Dashboard after successful installation
-image::images/ocs/OCS-noobaa-dashboard-healthy.png[OCS Multi-Cloud-Gateway Dashboard after successful installation]
+image::OCS-noobaa-dashboard-healthy.png[OCS Multi-Cloud-Gateway Dashboard after successful installation]
 
 [cols="0,1,10a"]
 |===
@@ -404,7 +440,7 @@ oc -n openshift-storage get sc
 
 Please make sure the three storage classes are available in your cluster before proceeding.
 
-NOTE: The NooBaa pod used the `ocs-storagecluster-ceph-rbd` storage class for creating a PVC for mounting to it's `db` container.
+NOTE: The NooBaa pod used the `ocs-storagecluster-ceph-rbd` storage class for creating a PVC for mounting to its `db` container.
 
 === Using the Rook-Ceph toolbox to check on the Ceph backing storage
 
@@ -412,7 +448,12 @@ Since the Rook-Ceph *toolbox* is not shipped with OCS, we need to deploy it manu
 
 [source,role="execute"]
 ----
+ifdef::roadshow[]
 oc apply -f {{ HOME_PATH }}/support/ocslab_toolbox.yaml
+endif::[]
+ifdef::training[]
+curl -s https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/toolbox.yaml | sed 's/namespace: rook-ceph/namespace: openshift-storage/g'| oc apply -f -
+endif::[]
 ----
 
 After the `rook-ceph-tools` *Pod* is `Running` you can access the toolbox like this:
@@ -456,6 +497,7 @@ ceph versions
 ----
 
 .Example output:
+[source]
 ----
 sh-4.2# ceph status
   cluster:
@@ -467,7 +509,11 @@ sh-4.2# ceph status
     mgr: a(active, since 10m)
     mds: ocs-storagecluster-cephfilesystem:1 {0=ocs-storagecluster-cephfilesystem-a=up:active} 1 up:standby-replay
     osd: 3 osds: 3 up (since 9m), 3 in (since 9m)
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> Update OCS4 content
   data:
     pools:   3 pools, 24 pgs
     objects: 90 objects, 75 MiB
@@ -478,27 +524,31 @@ sh-4.2# ceph status
     client:   1.2 KiB/s rd, 42 KiB/s wr, 2 op/s rd, 2 op/s wr
 ----
 
-You can exit the toolbox by either pressing kbd:[Ctrl+D] or by executing exit.
+You can exit the toolbox by either pressing kbd:[Ctrl+D] or by executing
 
 [source,role="execute"]
 ----
 exit
 ----
 
-
 == Create a new OCP application deployment using Ceph RBD volume
 
 In this section the `ocs-storagecluster-ceph-rbd` *storage class* will be used by an OCP application + database *deployment* to create RWO (ReadWriteOnce) persistent storage. The persistent storage will be a Ceph RBD (RADOS Block Device) volume (object) in the Ceph pool `ocs-storagecluster-cephblockpool`.
 
 To do so we have created a template file, based on the OpenShift rails-pgsql-persistent template, that includes an extra parameter STORAGE_CLASS that enables the end user to specify the storage class the PVC should use.
-Feel free to download `https://raw.githubusercontent.com/red-hat-storage/ocs-training/master/ocp4ocs4/configurable-rails-app.yaml` to check on the format of this template. Search for `STORAGE_CLASS` in the downloaded content.
+Feel free to download `{github-raw-url}/ocp4ocs4/configurable-rails-app.yaml` to check on the format of this template. Search for `STORAGE_CLASS` in the downloaded content.
 
 Make sure that you completed all previous sections so that you are ready to start the Rails + PostgreSQL deployment.
 
-[source,role="execute"]
+[source,role="execute",subs=attributes+]
 ----
 oc new-project my-database-app
-oc new-app -f {{ HOME_PATH }}/support/ocslab_rails-app.yaml -p STORAGE_CLASS=ocs-storagecluster-ceph-rbd -p VOLUME_CAPACITY=5Gi
+ifdef::roadshow[]
+oc new-app {{ HOME_PATH }}/support/ocslab_rails-app.yaml -p STORAGE_CLASS=ocs-storagecluster-ceph-rbd -p VOLUME_CAPACITY=5Gi
+endif::[]
+ifdef::training[]
+curl {github-raw-url}/ocp4ocs4/configurable-rails-app.yaml | oc new-app -p STORAGE_CLASS=ocs-storagecluster-ceph-rbd -p VOLUME_CAPACITY=5Gi -f -
+endif::[]
 ----
 
 After the deployment is started you can monitor with these commands.
@@ -532,7 +582,7 @@ rails-pgsql-persistent-1-hook-pre   0/1     Completed   0          3m28s
 rails-pgsql-persistent-1-pjh6q      1/1     Running     0          3m14s
 ----
 
-You can exit by pressing kbd:[Ctrl+C].
+You can exit by pressing kbd:[Ctrl+C]
 
 Once the deployment is complete you can now test the application and the persistent storage on Ceph. Your `HOST/PORT` will be different.
 
@@ -571,22 +621,11 @@ Run the same Ceph commands as before the application deployment and compare to r
 [source,role="execute"]
 ----
 ceph df
-----
-[source,role="execute"]
-----
 rados df
-----
-[source,role="execute"]
-----
 rbd -p ocs-storagecluster-cephblockpool ls | grep vol
 ----
 
-You can exit the toolbox by either pressing kbd:[Ctrl+D] or by executing exit.
-
-[source,role="execute"]
-----
-exit
-----
+You can exit the toolbox by either pressing kbd:[Ctrl+D] or by executing `exit`.
 
 === Matching PVs to RBDs
 
@@ -599,47 +638,63 @@ oc get pv -o 'custom-columns=NAME:.spec.claimRef.name,PVNAME:.metadata.name,STOR
 .Example output:
 ----
 NAME                      PVNAME                                     STORAGECLASS                  VOLUMEHANDLE
-ocs-deviceset-0-0-d2ppm   pvc-2c08bd9c-332d-11ea-a32f-061f7a67362c   gp2                           <none>
-ocs-deviceset-1-0-9tmc6   pvc-2c0a0ed5-332d-11ea-a32f-061f7a67362c   gp2                           <none>
-ocs-deviceset-2-0-qtbfv   pvc-2c0babb3-332d-11ea-a32f-061f7a67362c   gp2                           <none>
-db-noobaa-core-0          pvc-4610a3ce-332d-11ea-a32f-061f7a67362c   ocs-storagecluster-ceph-rbd   0001-0011-openshift-storage-0000000000000001-4a74e248-332d-11ea-9a7c-0a580a820205
-postgresql                pvc-874f93cb-3330-11ea-90b1-0a10d22e734a   ocs-storagecluster-ceph-rbd   0001-0011-openshift-storage-0000000000000001-8765a21d-3330-11ea-9a7c-0a580a820205
-rook-ceph-mon-a           pvc-d462ecb0-332c-11ea-a32f-061f7a67362c   gp2                           <none>
-rook-ceph-mon-b           pvc-d79d0db4-332c-11ea-a32f-061f7a67362c   gp2                           <none>
-rook-ceph-mon-c           pvc-da9cc0e3-332c-11ea-a32f-061f7a67362c   gp2                           <none>
+ocs-deviceset-0-0-gzxjb   pvc-1cf104d2-2033-11ea-ac56-0a9ccb4b29e2   gp2                           <none>
+ocs-deviceset-1-0-s87xm   pvc-1cf33c42-2033-11ea-ac56-0a9ccb4b29e2   gp2                           <none>
+ocs-deviceset-2-0-zcjk4   pvc-1cf4f825-2033-11ea-ac56-0a9ccb4b29e2   gp2                           <none>
+db-noobaa-core-0          pvc-3008e684-2033-11ea-a83b-065b3ec3da7c   ocs-storagecluster-ceph-rbd   0001-0011-openshift-storage-0000000000000001-3c0bb177-2033-11ea-9396-0a580a800406
+postgresql                pvc-4ca89d3d-2060-11ea-9a42-02dfa51cba90   ocs-storagecluster-ceph-rbd   0001-0011-openshift-storage-0000000000000001-4cbba393-2060-11ea-9396-0a580a800406
+rook-ceph-mon-a           pvc-cac661b6-2032-11ea-ac56-0a9ccb4b29e2   gp2                           <none>
+rook-ceph-mon-b           pvc-cde2d8b3-2032-11ea-ac56-0a9ccb4b29e2   gp2                           <none>
+rook-ceph-mon-c           pvc-d0efbd9d-2032-11ea-ac56-0a9ccb4b29e2   gp2                           <none>
+lab-ossm-hub-data         pvc-dc1d4bdc-2028-11ea-ad6c-0a9ccb4b29e2   gp2                           <none>
 ----
 
 The second half of the `VOLUMEHANDLE` column mostly matches what your RBD is named inside of Ceph. All you have to do is append `csi-vol-` to the front like this:
 
-.Get the full RBD name and the associated information for our postgreSQL PV
+.Get the full RBD name of our postgreSQL PV in one command
+[source,role="execute"]
+----
+oc get pv pvc-4ca89d3d-2060-11ea-9a42-02dfa51cba90 -o jsonpath='{.spec.csi.volumeHandle}' | cut -d '-' -f 6- | awk '{print "csi-vol-"$1}'
+----
 
-[source,role="execute"]
-----
-CSIVOL=$(oc get pv $(oc get pv | grep my-database-app | awk '{ print $1 }') -o jsonpath='{.spec.csi.volumeHandle}' | cut -d '-' -f 6- | awk '{print "csi-vol-"$1}')
-echo $CSIVOL
-----
-[source,role="execute"]
-----
-TOOLS_POD=$(oc get pods -n openshift-storage -l app=rook-ceph-tools -o name)
-oc rsh -n openshift-storage $TOOLS_POD rbd -p ocs-storagecluster-cephblockpool info $CSIVOL
-----
+[NOTE]
+====
+You will need to adjust the above command to use your `PVNAME` name
+====
 
 .Example output:
 ----
-rbd image 'csi-vol-8765a21d-3330-11ea-9a7c-0a580a820205':
-        size 5 GiB in 1280 objects
-        order 22 (4 MiB objects)
-        snapshot_count: 0
-        id: 17e811c7f287
-        block_name_prefix: rbd_data.17e811c7f287
-        format: 2
-        features: layering
-        op_features:
-        flags:
-        create_timestamp: Thu Jan  9 22:36:51 2020
-        access_timestamp: Thu Jan  9 22:36:51 2020
-        modify_timestamp: Thu Jan  9 22:36:51 2020
+csi-vol-4cbba393-2060-11ea-9396-0a580a800406
 ----
+
+Now we can check on the details of our RBD from inside of the tools pod:
+
+[source,role="execute"]
+----
+TOOLS_POD=$(oc get pods -n openshift-storage -l app=rook-ceph-tools -o name)
+oc rsh -n openshift-storage $TOOLS_POD rbd -p ocs-storagecluster-cephblockpool info csi-vol-4cbba393-2060-11ea-9396-0a580a800406
+----
+.Example output:
+----
+rbd image 'csi-vol-4cbba393-2060-11ea-9396-0a580a800406':
+	size 5 GiB in 1280 objects
+	order 22 (4 MiB objects)
+	snapshot_count: 0
+	id: 95e4f3973e8
+	block_name_prefix: rbd_data.95e4f3973e8
+	format: 2
+	features: layering
+	op_features:
+	flags:
+	create_timestamp: Tue Dec 17 00:00:57 2019
+	access_timestamp: Tue Dec 17 00:00:57 2019
+	modify_timestamp: Tue Dec 17 00:00:57 2019
+----
+
+[NOTE]
+====
+You will need to adjust the above command to use your `RBD` name
+====
 
 == Create a new OCP application deployment using CephFS volume
 
@@ -834,16 +889,22 @@ nothing.
 Select an arbitrary file from your local machine and upload it to the app.
 
 .A simple PHP-based file upload tool
-image::images/ocs/uploader_screen_upload.png[]
+image::uploader_screen_upload.png[]
 
 Once done click *_List uploaded files_* to see the list of all currently
 uploaded files.
 
 == Using OCS for Prometheus Metrics
 
-OpenShift ships with a pre-configured and self-updating monitoring stack that is based on the Prometheus open source project and its wider eco-system. It provides monitoring of cluster components and ships with a set of alerts to immediately notify the cluster administrator about any occurring problems. For production environments, it is highly recommended to configure persistent storage using block storage technology. OCS 4 provide block storage using Ceph RBD volumes. Running cluster monitoring with persistent storage means that your metrics are stored to a persistent volume and can survive a pod being restarted or recreated. This section will detail how to migrate Prometheus and AlertManager storage to Ceph RBD volumes for persistence.
+OpenShift ships with a pre-configured and self-updating monitoring stack that is based on the Prometheus open source project and its wider eco-system. It provides monitoring of cluster components and ships with a set of alerts to immediately notify the cluster administrator about any occurring problems.
 
-First, let's discover what *Pods* and *PVCs* are installed in the `openshift-monitoring` namespace. In the prior module, OpenShift Infrastructure Nodes, the Prometheus and AlertManager resources were moved to the OCP infra nodes.
+For production environments, it is highly recommended to configure persistent storage using block storage technology. OCS 4 provide block storage using Ceph RBD volumes. Running cluster monitoring with persistent storage means that your metrics are stored to a persistent volume and can survive a pod being restarted or recreated. This is ideal if you require your metrics or alerting data to be guarded from data loss. For production environments, it is highly recommended to configure persistent storage using block storage technology. OCS 4 provide block storage using Ceph RBD volumes. The following instructions will detail how to migrate Prometheus and Alertmanager storage to Ceph RBD volumes for persistence.
+
+First, let's discover what *Pods* and *PVCs* are installed in the `openshift-monitoring` namespace.
+
+ifdef::roadshow[]
+In the prior module, OpenShift Infrastructure Nodes, the Prometheus and AlertManager resources were moved to the OCP infra nodes.
+endif::[]
 
 [source,role="execute"]
 ----
@@ -899,15 +960,21 @@ cluster-monitoring-config   1      116m
 
 If you are missing the *ConfigMap*, create it using this command:
 
-[source,role="execute"]
+[source,role="execute",subs=attributes+]
 ----
+ifdef::roadshow[]
 oc apply -f {{ HOME_PATH }}/support/ocslab_cluster-monitoring-noinfra.yaml
+endif::[]
+ifdef::training[]
+oc apply -f {github-raw-url}/ocp4ocs4/cluster-monitoring-config.yaml
+endif::[]
 ----
 .Sample output:
 ----
 configmap/cluster-monitoring-config created
 ----
 
+ifdef::roadshow[]
 [NOTE]
 ====
 If the *ConfigMap* already exists because of completing prior module `OpenShift Infrastructure Nodes`, you will apply changes to the existing *ConfigMap*.
@@ -920,6 +987,7 @@ oc apply -f {{ HOME_PATH }}/support/ocslab_cluster-monitoring-withinfra.yaml
 configmap/cluster-monitoring-config updated
 ----
 ====
+endif::[]
 
 You can view the *ConfigMap* with the following command:
 
@@ -927,7 +995,7 @@ NOTE: The size of the Ceph RBD volumes, `40Gi`, can be modified to be larger or 
 
 [source,role="execute"]
 ----
-oc -n openshift-monitoring get configmap cluster-monitoring-config -o yaml | more
+oc -n openshift-monitoring get configmap cluster-monitoring-config -o yaml
 ----
 
 .ConfigMap sample output:
@@ -984,6 +1052,10 @@ You can validate that Prometheus and AlertManager are working correctly after mo
 == Using the Multi-Cloud-Gateway
 
 This section discusses the usage of the Multi-Cloud-Gateway (MCG). Currently the best way to configure the MCG is to use the CLI.
+
+ifdef::training[]
+To install the CLI follow the <<Install the NooBaa CLI client>> section.
+endif::[]
 
 NOTE: While the NooBaa Web Management Console is accessible, it should not be used to create any resources, since they are currently not synchronized back to the Openshift cluster.
 
@@ -1310,9 +1382,14 @@ The first part creates an OBC that will create a ConfigMap and a secret that hav
 Let's try this out:
 
 .Deploy the Manifest:
-[source,role="execute"]
+[source,role="execute",subs=attributes+]
 ----
+ifdef::roadshow[]
 oc apply -f {{ HOME_PATH }}/support/ocslab_obc-app-example.yaml
+endif::[]
+ifdef::training[]
+curl -s {github-raw-url}/ocp4ocs4/obc_app_example.yaml | oc apply -f -
+endif::[]
 ----
 .Example output:
 ----
@@ -1335,19 +1412,21 @@ obc-test-bvg8h   0/1     Completed   0          22s
 
 Then you can check the `obc-test` *Pod* logs for the contents of the S3 bucket using the command below (in this case there are zero objects in the bucket).
 
+NOTE: Fetching the obc-test log via the `oc` command does not work correctly. It does work using the `kubectl` command.
+
 [source,role="execute"]
 ----
-oc logs -n obc-test $(oc get pods -n obc-test -l app=obc-test -o jsonpath='{.items[0].metadata.name}')
+kubectl logs -n obc-test -l app=obc-test
 ----
-.Example output
+.Example output:
 ----
-+ s3cmd --no-check-certificate --host 10.0.131.209:31199 --host-bucket 10.0.131.209:31199 du
-0        0 objects s3://obc-test-noobaa-1ec979bc-c53f-42e0-b551-ffaa895c06a6/
++ s3cmd --no-check-certificate --host 10.0.140.19:30052 --host-bucket 10.0.140.19:30052 du
+0        0 objects s3://obc-test-noobaa-784461cb-1e77-4ccf-b62d-007a6ae3ef15/
 --------
 0        Total
 ----
 
-This proves that the access credentials from the OBC work and are set up correctly inside of the container. +
+As we can see above, we can access one bucket, which is currently empty. This proves that the access credentials from the OBC work and are set up correctly inside of the container. +
 Most applications support reading out the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables natively, but you will have to figure out how to set the host and bucket name for each application. In our example we used CLI flags of s3cmd for this.
 
 == Adding storage to the Ceph Cluster
@@ -1371,11 +1450,12 @@ To add more nodes, we could either add more machinesets like we did before, or s
 oc get machinesets -n openshift-machine-api | egrep 'NAME|workerocs'
 ----
 Example output:
+[subs=attributes+]
 ----
 NAME                                          DESIRED   CURRENT   READY   AVAILABLE   AGE
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2a   1         1         1       1           3h50m
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2b   1         1         1       1           3h50m
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c   1         1         1       1           3h50m
+cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}a   1         1         1       1           3h50m
+cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}b   1         1         1       1           3h50m
+cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}c   1         1         1       1           3h50m
 ----
 
 Let's scale the workerocs machinesets up with this command:
@@ -1385,13 +1465,14 @@ Let's scale the workerocs machinesets up with this command:
 oc get machinesets -n openshift-machine-api -o name | grep workerocs | xargs -n1 -t oc scale -n openshift-machine-api --replicas=2
 ----
 .Example output:
+[subs=attributes+]
 ----
-oc scale -n openshift-machine-api --replicas=2 machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-us-east-2a
-machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-us-east-2a scaled
-oc scale -n openshift-machine-api --replicas=2 machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-us-east-2b
-machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-us-east-2b scaled
-oc scale -n openshift-machine-api --replicas=2 machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c
-machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c scaled
+oc scale -n openshift-machine-api --replicas=2 machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}a
+machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}a scaled
+oc scale -n openshift-machine-api --replicas=2 machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}b
+machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}b scaled
+oc scale -n openshift-machine-api --replicas=2 machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}c
+machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-{aws-region}c scaled
 ----
 
 Wait until the new workers are available. This could take 5 minutes or more so be patient.
@@ -1409,10 +1490,11 @@ Once they are available, we can check on which worker nodes do not have OCS labe
 oc get node --show-labels | grep storage-node | grep -v openshift-storage | cut -d' ' -f1
 ----
 .Example output:
+[subs=attributes+]
 ----
-ip-10-0-133-99.us-east-2.compute.internal
-ip-10-0-158-153.us-east-2.compute.internal
-ip-10-0-160-200.us-east-2.compute.internal
+ip-10-0-133-99.{aws-region}.compute.internal
+ip-10-0-158-153.{aws-region}.compute.internal
+ip-10-0-160-200.{aws-region}.compute.internal
 ----
 
 We can see that there are three new nodes, which do not yet have the `cluster.ocs.openshift.io/openshift-storage` label applied yet. We will apply this now:
@@ -1422,18 +1504,19 @@ We can see that there are three new nodes, which do not yet have the `cluster.oc
 oc get nodes -o json | jq '.items[] | select(.metadata.labels.role == "storage-node") | .metadata.name' | xargs -n1 -t -I {} oc label nodes {} cluster.ocs.openshift.io/openshift-storage=""
 ----
 .Example output:
+[subs=attributes+]
 ----
-oc label nodes ip-10-0-131-209.us-east-2.compute.internal cluster.ocs.openshift.io/openshift-storage=
+oc label nodes ip-10-0-131-209.{aws-region}.compute.internal cluster.ocs.openshift.io/openshift-storage=
 error: 'cluster.ocs.openshift.io/openshift-storage' already has a value (), and --overwrite is false
-oc label nodes ip-10-0-133-99.us-east-2.compute.internal cluster.ocs.openshift.io/openshift-storage=
-node/ip-10-0-133-99.us-east-2.compute.internal labeled
-oc label nodes ip-10-0-155-12.us-east-2.compute.internal cluster.ocs.openshift.io/openshift-storage=
+oc label nodes ip-10-0-133-99.{aws-region}.compute.internal cluster.ocs.openshift.io/openshift-storage=
+node/ip-10-0-133-99.{aws-region}.compute.internal labeled
+oc label nodes ip-10-0-155-12.{aws-region}.compute.internal cluster.ocs.openshift.io/openshift-storage=
 error: 'cluster.ocs.openshift.io/openshift-storage' already has a value (), and --overwrite is false
-oc label nodes ip-10-0-158-153.us-east-2.compute.internal cluster.ocs.openshift.io/openshift-storage=
-node/ip-10-0-158-153.us-east-2.compute.internal labeled
-oc label nodes ip-10-0-160-200.us-east-2.compute.internal cluster.ocs.openshift.io/openshift-storage=
-node/ip-10-0-160-200.us-east-2.compute.internal labeled
-oc label nodes ip-10-0-162-215.us-east-2.compute.internal cluster.ocs.openshift.io/openshift-storage=
+oc label nodes ip-10-0-158-153.{aws-region}.compute.internal cluster.ocs.openshift.io/openshift-storage=
+node/ip-10-0-158-153.{aws-region}.compute.internal labeled
+oc label nodes ip-10-0-160-200.{aws-region}.compute.internal cluster.ocs.openshift.io/openshift-storage=
+node/ip-10-0-160-200.{aws-region}.compute.internal labeled
+oc label nodes ip-10-0-162-215.{aws-region}.compute.internal cluster.ocs.openshift.io/openshift-storage=
 error: 'cluster.ocs.openshift.io/openshift-storage' already has a value (), and --overwrite is false
 ----
 
@@ -1451,13 +1534,13 @@ To add storage, go to the *Openshift Web Console* and follow these steps to reac
  - Click on `Openshift Container Storage Operator`
  - In the top navigation bar, scroll right to find the item `Storage Cluster` and click on it
 
-image::images/ocs/OCS-Storage-Cluster-overview-reachit.png[]
+image::OCS-Storage-Cluster-overview-reachit.png[]
 
  - The visible list should list only one item - click on the three dots on the far right to extend the options menu
  - Select `Add Capacity` from the options menu
 
 .Add capacity dialog
-image::images/ocs/OCS-add-capacity.png[]
+image::OCS-add-capacity.png[]
 
 In the new dialog you can set the requested additional (usable) capacity and the storage class. On AWS, the storage class should be set to `gp2`.
 
@@ -1472,20 +1555,21 @@ You can now see that there are new OSD pods:
 oc get pod -o=custom-columns=NAME:.metadata.name,STATUS:.status.phase,NODE:.spec.nodeName -n openshift-storage | grep osd
 ----
 .Example output:
+[subs=attributes+]
 ----
 NAME                                                              STATUS      NODE
-rook-ceph-osd-0-8675cf4f4-7gpbv                                   Running     ip-10-0-155-12.us-east-2.compute.internal
-rook-ceph-osd-1-58b9d954cf-9s6bw                                  Running     ip-10-0-162-215.us-east-2.compute.internal
-rook-ceph-osd-2-6994dd5f44-hsqrv                                  Running     ip-10-0-131-209.us-east-2.compute.internal
-rook-ceph-osd-3-6675d5495c-7p68z                                  Running     ip-10-0-133-99.us-east-2.compute.internal
-rook-ceph-osd-4-8665bfc79b-xn8xg                                  Running     ip-10-0-160-200.us-east-2.compute.internal
-rook-ceph-osd-5-8ffff58d6-kscbt                                   Running     ip-10-0-158-153.us-east-2.compute.internal
-rook-ceph-osd-prepare-ocs-deviceset-0-0-d2ppm-vvlt8               Succeeded   ip-10-0-131-209.us-east-2.compute.internal
-rook-ceph-osd-prepare-ocs-deviceset-0-1-869tk-btn8x               Succeeded   ip-10-0-133-99.us-east-2.compute.internal
-rook-ceph-osd-prepare-ocs-deviceset-1-0-9tmc6-svb84               Succeeded   ip-10-0-162-215.us-east-2.compute.internal
-rook-ceph-osd-prepare-ocs-deviceset-1-1-7qsxd-lppp6               Succeeded   ip-10-0-160-200.us-east-2.compute.internal
-rook-ceph-osd-prepare-ocs-deviceset-2-0-qtbfv-j4nr4               Succeeded   ip-10-0-155-12.us-east-2.compute.internal
-rook-ceph-osd-prepare-ocs-deviceset-2-1-glsgj-x4k7t               Succeeded   ip-10-0-158-153.us-east-2.compute.internal
+rook-ceph-osd-0-8675cf4f4-7gpbv                                   Running     ip-10-0-155-12.{aws-region}.compute.internal
+rook-ceph-osd-1-58b9d954cf-9s6bw                                  Running     ip-10-0-162-215.{aws-region}.compute.internal
+rook-ceph-osd-2-6994dd5f44-hsqrv                                  Running     ip-10-0-131-209.{aws-region}.compute.internal
+rook-ceph-osd-3-6675d5495c-7p68z                                  Running     ip-10-0-133-99.{aws-region}.compute.internal
+rook-ceph-osd-4-8665bfc79b-xn8xg                                  Running     ip-10-0-160-200.{aws-region}.compute.internal
+rook-ceph-osd-5-8ffff58d6-kscbt                                   Running     ip-10-0-158-153.{aws-region}.compute.internal
+rook-ceph-osd-prepare-ocs-deviceset-0-0-d2ppm-vvlt8               Succeeded   ip-10-0-131-209.{aws-region}.compute.internal
+rook-ceph-osd-prepare-ocs-deviceset-0-1-869tk-btn8x               Succeeded   ip-10-0-133-99.{aws-region}.compute.internal
+rook-ceph-osd-prepare-ocs-deviceset-1-0-9tmc6-svb84               Succeeded   ip-10-0-162-215.{aws-region}.compute.internal
+rook-ceph-osd-prepare-ocs-deviceset-1-1-7qsxd-lppp6               Succeeded   ip-10-0-160-200.{aws-region}.compute.internal
+rook-ceph-osd-prepare-ocs-deviceset-2-0-qtbfv-j4nr4               Succeeded   ip-10-0-155-12.{aws-region}.compute.internal
+rook-ceph-osd-prepare-ocs-deviceset-2-1-glsgj-x4k7t               Succeeded   ip-10-0-158-153.{aws-region}.compute.internal
 ----
 
 This is everything that you need to do to extend the OCS storage.
@@ -1518,7 +1602,11 @@ sh-4.2# ceph status
     mgr: a(active, since 24m)
     mds: ocs-storagecluster-cephfilesystem:1 {0=ocs-storagecluster-cephfilesystem-a=up:active} 1 up:standby-replay
     osd: 6 osds: 6 up (since 38s), 6 in (since 38s)
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> Update OCS4 content
   data:
     pools:   3 pools, 24 pgs
     objects: 92 objects, 81 MiB
@@ -1543,6 +1631,7 @@ ceph osd crush tree
 ----
 .Example output:
 ----
+<<<<<<< HEAD
 ID  CLASS WEIGHT   TYPE NAME                                
  -1       11.99396 root default                             
  -5       11.99396     region us-east-1                     
@@ -1560,6 +1649,25 @@ ID  CLASS WEIGHT   TYPE NAME
  -9        1.99899             host ocs-deviceset-2-0-fhp7l 
   1   ssd  1.99899                 osd.1                    
 -21        1.99899             host ocs-deviceset-2-1-xvjmb 
+=======
+ID  CLASS WEIGHT   TYPE NAME
+ -1       11.99396 root default
+ -5       11.99396     region us-east-1
+-14        3.99799         zone us-east-1a
+-13        1.99899             host ocs-deviceset-1-0-6z8c2
+  2   ssd  1.99899                 osd.2
+-19        1.99899             host ocs-deviceset-1-1-zszws
+  4   ssd  1.99899                 osd.4
+ -4        3.99799         zone us-east-1b
+ -3        1.99899             host ocs-deviceset-0-0-xnm9c
+  0   ssd  1.99899                 osd.0
+-17        1.99899             host ocs-deviceset-0-1-9xng5
+  3   ssd  1.99899                 osd.3
+-10        3.99799         zone us-east-1c
+ -9        1.99899             host ocs-deviceset-2-0-fhp7l
+  1   ssd  1.99899                 osd.1
+-21        1.99899             host ocs-deviceset-2-1-xvjmb
+>>>>>>> Update OCS4 content
   5   ssd  1.99899                 osd.5
 ----
 
@@ -1569,7 +1677,7 @@ Since our Ceph cluster's CRUSH rules are set up to replicate data between the zo
 
 Existing data on the original OSDs will be balanced out automatically, so that the old and the new OSDs share the load.
 
-You can exit the toolbox by either pressing kbd:[Ctrl+D] or by executing exit.
+Disconnect from the Ceph toolbox pod.
 
 [source,role="execute"]
 ----
@@ -1593,12 +1701,12 @@ The tools are accessible through the main UI window left pane. Click the *Monito
 Click on the *Alerting* item to open the Alert window as illustrated in the screen capture below.
 
 .OCP Monitoring Menu
-image::images/ocs/metrics-alertingleftpanemenu.png[OCP Monitoring Menu]
+image::metrics-alertingleftpanemenu.png[OCP Monitoring Menu]
 
 This will take you to the *Alerting* homepage as illustrated below.
 
 .OCP Alerting Homepage
-image::images/ocs/metrics-alertinghomepage.png[OCP Alerting Homepage]
+image::metrics-alertinghomepage.png[OCP Alerting Homepage]
 
 You can display the alerts in the main window by state. To do so you must highlight the states you want to display. The states are:
 
@@ -1614,22 +1722,22 @@ As illustrated below, you can filter the alerts being displayed based on their s
 NOTE: You need at least one state highlighted.
 
 .OCP Alerting Status Filtering
-image::images/ocs/metrics-alertingstatusfilter.png[OCP Alert Status Filtering]
+image::metrics-alertingstatusfilter.png[OCP Alert Status Filtering]
 
 As illustrated below, you can also filter alerts by name using the *Filter* area on the top right of the window to search for a particular alert or set of alerts.
 
 .OCP Alerting Name Filtering
-image::images/ocs/metrics-alertingnamefilter.png[OCP Alert Name Filtering]
+image::metrics-alertingnamefilter.png[OCP Alert Name Filtering]
 
 Through the 3 dot icon on the right hand side of each alert line you have access to a contextual menu to either view the alert definition or to silence the alert.
 
 .OCP Alert Contextual Menu
-image::images/ocs/metrics-alertingcontextualmenu.png[OCP Alert Contextual Menu]
+image::metrics-alertingcontextualmenu.png[OCP Alert Contextual Menu]
 
 If you select `View Alerting Rule` you will get access to the details of the rule that triggered the alert. The details include the Prometheus query used by the alert to perform the detection of the condition.
 
 .OCP Alert Detail Display
-image::images/ocs/metrics-alertingviewrule.png[OCP Alert Detailed Display]
+image::metrics-alertingviewrule.png[OCP Alert Detailed Display]
 
 NOTE: If desired, you can click the Prometheus query embedded in the alert. Doing so will take you to the *Metrics* page where you will be able to execute the alert and to test updates to the alert.
 
@@ -1638,39 +1746,39 @@ NOTE: If desired, you can click the Prometheus query embedded in the alert. Doin
 Click on the *Metrics* item as illustrated below.
 
 .OCP Metrics Menu
-image::images/ocs/metrics-metricsleftpanemenu.png[OCP Metrics Menu]
+image::metrics-metricsleftpanemenu.png[OCP Metrics Menu]
 
 This will take you to the *Metrics* homepage as illustrated below.
 
 .OCP UI Metrics Homepage
-image::images/ocs/metrics-queryfield.png[OCP Monitoring Metrics Homepage]
+image::metrics-queryfield.png[OCP Monitoring Metrics Homepage]
 
 Use the query field to either enter the formula of your choice or to search for metrics by name. The metrics available will let you query both OCP related information or OCS related information. The queries can be simple or complex using the Prometheus query syntax and all its available functions.
 
-Let's start testing a simple query example and enter the following text (`ceph_osd_op`) in the query field. When you are done typing, simply hit `[Enter]`.
+Let's start testing a simple query example and enter the following text `ceph_osd_op` in the query field. When you are done typing, simply hit kbd:[Enter]
 
 .Simple Ceph Query
-image::images/ocs/metrics-simplecephquery.png[Ceph Simple Query]
+image::metrics-simplecephquery.png[Ceph Simple Query]
 
 The window should refresh with a graph similar to the one below.
 
 .Simple Ceph Graph
-image::images/ocs/metrics-simplecephgraph.png[Ceph Simple Graph]
+image::metrics-simplecephgraph.png[Ceph Simple Graph]
 
-Then let's try a more relevant query example and enter the following text `rate(ceph_osd_op[5m])` or `irate(ceph_osd_op[5m])` in the query field. When you are done typing, simply hit `[Enter]`.
+Then let's try a more relevant query example and enter the following text `rate(ceph_osd_op[5m])` or `irate(ceph_osd_op[5m])` in the query field. When you are done typing, simply hit kbd:[Enter]
 
 .Complex Ceph Query
-image::images/ocs/metrics-complexcephquery.png[Ceph Complex Query]
+image::metrics-complexcephquery.png[Ceph Complex Query]
 
 The window should refresh with a graph similar to the one below.
 
 .Complex Ceph Graph
-image::images/ocs/metrics-complexcephgraph.png[Ceph Complex Graph]
+image::metrics-complexcephgraph.png[Ceph Complex Graph]
 
 All OCP metrics are also available through the integrated *Metrics* window. Feel free to try with any of the OCP related metrics such as `process_cpu_seconds_total` for example.
 
 .Complex OCP Graph
-image::images/ocs/metrics-complexocpgraph.png[OCP Complex Graph]
+image::metrics-complexocpgraph.png[OCP Complex Graph]
 
 NOTE: Have a look at the difference between `sum(irate(process_cpu_seconds_total[5m]))` and `irate(process_cpu_seconds_total[5m])` for instance.
 
@@ -1681,7 +1789,7 @@ For more information on the Prometheus query language visit the link:https://pro
 
 == Using must-gather
 
-Must-gather is a tool for collecting data about the current'y running Openshift cluster. It loads a predefined set of containers that execute multiple programs and dump it on the local workstations filesystem.
+Must-gather is a tool for collecting data about the currently running Openshift cluster. It loads a predefined set of containers that execute multiple programs and dump it on the local workstations filesystem in unique must-gather directories.
 The local files can then be used by a remote support engineer to debug a problem more easily without needing direct cluster access. This is similar to sosreports for RHEL hosts.
 
 The OCS team has released its own image for the must-gather tool that runs storage specific commands.
@@ -1749,6 +1857,133 @@ Use "oc adm options" for a list of global command-line options (applies to all c
 
 // On the Openshift side must-gather has nowadays been replaced by `oc adm inspect`.
 
+ifdef::roadshow[]
+[appendix]
+== Use a local YAML file as Machineset
+
+This section will explain how to add the OCS machineset without using the lambda function.
+
+[source,role="execute"]
+----
+oc apply -f /opt/app-root/src/support/ocslab_cluster-workerocs.yaml
+----
+endif::[]
+
+Afterwards, go back to section <<Scale OCP cluster and add 3 new nodes>>
+
+ifdef::training[]
+[appendix]
+== Configuring the local oc client
+
+This section will explain how you set up your workstation with the Openshift CLI.
+
+To get the latest OpenShift CLI client run the following commands:
+
+
+.Mac steps
+[source]
+----
+wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/ --no-directories --accept="*client-mac*" --quiet --recursive --level=1
+ls -1 openshift-client-mac-*.tar.gz | tail -n1 | xargs -I {} tar xzvf {} oc
+sudo mv oc /usr/local/bin
+----
+
+In addition install the watch command to use with the `oc client` on your Mac using Homebrew.
+
+----
+brew install watch
+----
+Alternatively, add the following lines to your $HOME/.profile.
+
+----
+function watch {
+while :; do clear; date; echo; $@; sleep 2; done
+}
+----
+
+Then reload your profile with `source $HOME/.profile`.
+
+.Linux steps
+[source]
+----
+wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/ --no-directories --accept="*client-linux*" --quiet --recursive --level=1
+ls -1 openshift-client-linux-*.tar.gz | tail -n1 | xargs -I {} tar xzvf {} oc
+sudo mv oc /usr/bin
+----
+
+Afterwards, go to your Openshift Web Console, log in and click on the username in the top right corner. There you will find the menu item `Copy Login Command`.
+
+.Copy Login command menu entry
+image::OCP-copy-login-command.png[]
+
+Clicking on `Copy Login Command` will open a new window and you might be required to login to your Openshift cluster again.
+After successfully login in, you see blue text `Display token` - click this and you will be shown your login command.
+
+The login command will look similar to this
+
+`oc login --token=zoNoANLOOoJzXV3sb-TE1xIcg2aLBssdN0bTNIuV29w --server=https://api.cluster-ocs-89db.ocs-89db.example.opentlc.com:6443`
+
+execute this login command on your terminal. If you did not provision your RHPDS environment with Let's Encrypt certificates, it will ask if you want to connect without certificate checks, accept this.
+
+Check if you are successfully connected by issuing a command against the cluster:
+
+[source,role="execute"]
+----
+oc version
+----
+.Example output:
+----
+Client Version: openshift-clients-4.2.0-201910041700
+Server Version: 4.2.0
+Kubernetes Version: v1.14.6+2e5ed54
+----
+
+[NOTE]
+====
+The above commands will always pull the latest oc version, so your version might be higher than the version in the example output.
+====
+
+[appendix]
+== Install the NooBaa CLI client
+
+To install the CLI, follow these steps on your workstation:
+
+.Mac steps
+[source]
+----
+brew install noobaa/noobaa/noobaa
+----
+.Mac steps without Homebrew
+[source]
+----
+curl -s https://api.github.com/repos/noobaa/noobaa-operator/releases/latest | grep "mac" | cut -d : -f 2,3 | tr -d \" | wget -qi - ; mv noobaa-mac-* noobaa ; chmod +x noobaa; sudo mv noobaa /usr/local/bin/
+----
+
+.Linux steps
+[source]
+----
+curl -s https://api.github.com/repos/noobaa/noobaa-operator/releases/latest | grep "linux" | cut -d : -f 2,3 | tr -d \" | wget -qi - ; mv noobaa-linux-* noobaa ; chmod +x noobaa; sudo mv noobaa /usr/bin/
+----
+
+Check that your noobaa CLI installation was successful with this command:
+
+[source,role="execute"]
+----
+noobaa version
+----
+.Example output:
+----
+INFO[0000] CLI version: 2.0.9
+INFO[0000] noobaa-image: noobaa/noobaa-core:5.2.11
+INFO[0000] operator-image: noobaa/noobaa-operator:2.0.9
+----
+
+[NOTE]
+====
+The above commands will always pull the latest noobaa version, so your version might be higher than the version in the example output.
+====
+endif::[]
+
 [appendix]
 == Introduction to Ceph
 
@@ -1766,7 +2001,7 @@ The content in this Appendix is relevant to learning about the critical componen
 The Ceph project has a long history as you can see in the timeline below.
 
 .Ceph Project History
-image::images/ocs/ceph101-timeline.png[Ceph Project Timeline]
+image::ceph101-timeline.png[Ceph Project Timeline]
 
 [.lead]
 It is a battle-tested software defined storage (SDS) solution that has been available as a storage backend for OpenStack and Kubernetes for quite some time.
@@ -1778,7 +2013,7 @@ The Ceph cluster provides a scalable storage solution while providing multiple a
 clients present within the IT infrastructure to get access to the data.
 
 .Ceph Architecture
-image::images/ocs/ceph101-overview.png[Ceph From Above]
+image::ceph101-overview.png[Ceph From Above]
 
 [.lead]
 The entire Ceph architecture is resilient and does not present any single point of failure (SPOF).
@@ -1790,10 +2025,10 @@ The heart of Ceph is an object store known as RADOS (Reliable Autonomic Distribu
 layer provides the Ceph software defined storage with the ability to store data (serve IO requests, to protect the data, to check
 the consistency and the integrity of the data through built-in mechanisms. The RADOS layer is composed of the following daemons:
 
-<1> MONs or Monitors
-<2> OSDs or Object Storage Devices
-<3> MGRs or Managers
-<4> MDSs or Meta Data Servers
+1. MONs or Monitors
+2. OSDs or Object Storage Devices
+3. MGRs or Managers
+4. MDSs or Meta Data Servers
 
 .*_Monitors_*
 The Monitors maintain the cluster map and state and provide distributed decision-making while configured in an odd number, 3 or 5 depending
@@ -1825,7 +2060,7 @@ All the metadata is stored with RADOS and they do not server any data to the cli
 If we look at the Ceph cluster foundation layer, the full picture with the different types of daemons or containers looks like this.
 
 .RADOS as it stands
-image::images/ocs/ceph101-rados.png[RADOS Overview]
+image::ceph101-rados.png[RADOS Overview]
 
 The circle represent the MONs, the 'M' represent the MGRs and the squares with the bars represent the OSDs. In the diagram above, the cluster operates with
 3 Monitors, 2 Managers and 23 OSDs.
@@ -1836,7 +2071,7 @@ The circle represent the MONs, the 'M' represent the MGRs and the squares with t
 Ceph was designed to provides the IT environment with all the necessary access methods so that any application can use what is the best solution for its use-case.
 
 .Different Storage Types Supported
-image::images/ocs/ceph101-differentstoragetypes.png[Ceph Access Modes]
+image::ceph101-differentstoragetypes.png[Ceph Access Modes]
 
 Ceph supports block storage through the RADOS Block Device (aka RBD) access method, file storage through the Ceph Filesystem (aka CephFS) access method and
 object storage through its native `librados` API or through the RADOS Gateway (aka RADOSGW or RGW) for compatibility with the S3 and Swift protocols.
@@ -1847,7 +2082,7 @@ object storage through its native `librados` API or through the RADOS Gateway (a
 Librados allows developers to code natively against the native Ceph cluster API for maximum efficiency combined with a small footprint.
 
 .Application Native Object API
-image::images/ocs/ceph101-librados.png[librados]
+image::ceph101-librados.png[librados]
 
 The Ceph native API offers different wrappers such as C, C++, Python, Java, Ruby, Erlang, Go and Rust.
 
@@ -1864,7 +2099,7 @@ The kernel RBD driver offers superior performance compared to the userspace `lib
 not provide the same level of functionality. e.g., no RBD Mirroring support.
 
 .kRBD Diagram
-image::images/ocs/ceph101-krbd.png[Kernel based RADOS Block Device]
+image::ceph101-krbd.png[Kernel based RADOS Block Device]
 
 [.lead]
 *_Userspace RBD (librbd)_*
@@ -1873,7 +2108,7 @@ This access method is used in Red Hat OpenStack Environment or OpenShift through
 This mode allows us to leverage all existing RBD features such as RBD Mirroring.
 
 .librbd Diagram
-image::images/ocs/ceph101-librbd.png[Userspace RADOS Block Device]
+image::ceph101-librbd.png[Userspace RADOS Block Device]
 
 [.lead]
 *_Shared Filesystem (CephFS)_*
@@ -1882,7 +2117,7 @@ This method allows clients to jointly access a shared POSIX compliant filesystem
 the location of the object(s) for a given inode and then communicates directly with an OSD to perform the final IO request.
 
 .File Access (Ceph Filesystem or CephFS)
-image::images/ocs/ceph101-cephfs.png[Kernel Based CephFS Client]
+image::ceph101-cephfs.png[Kernel Based CephFS Client]
 
 CephFS is typically used for RWX claims but can also be used to support RWO claims.
 
@@ -1894,7 +2129,7 @@ Gateway can leverage the RADOS Gateway to support Object Bucket Claims. From the
 as a compatible S3 endpoint.
 
 .Amazone S3 or OpenStack Swift (Ceph RADOS Gateway)
-image::images/ocs/ceph101-rgw.png[S3 and Swift Support]
+image::ceph101-rgw.png[S3 and Swift Support]
 
 [.lead]
 *CRUSH*
@@ -1903,7 +2138,7 @@ The Ceph cluster being a distributed architecture some solution had to be design
 OSDs in the cluster. The technique used is called CRUSH or Controlled Replication Under Scalable Hashing. With CRUSH, every object is assigned to one
 and only one hash bucket known as a Placement Group (PG).
 
-image::images/ocs/ceph101-crushfromobjecttoosd.png[From Object to OSD]
+image::ceph101-crushfromobjecttoosd.png[From Object to OSD]
 
 CRUSH is the central point of configuration for the topology of the cluster. It offers a pseudo-random placement algorithm to distribute the objects across
 the PGs and uses rules to determine the mapping of the PGs to the OSDs. In essence, the PGs are an abstraction layer between the objects (application layer)
@@ -1930,7 +2165,7 @@ The cluster will be separated into logical partitions, known as pools. Each pool
 *Pools and PGs*
 
 .Pools and PGs
-image::images/ocs/ceph101-thefullpicture.png[From Object to OSD]
+image::ceph101-thefullpicture.png[From Object to OSD]
 
 The diagram above shows the relationship end to end between the object at the access method level down to the OSDs at the physical layer.
 
@@ -1945,7 +2180,7 @@ A Ceph pool has no size and is able to consume the space available any OSD where
 Ceph supports two types of data protection presented in the diagram below.
 
 .Ceph Data Protection
-image::images/ocs/ceph101-dataprotection.png[Replicated Pools vs Erasure Coded Pools]
+image::ceph101-dataprotection.png[Replicated Pools vs Erasure Coded Pools]
 
 Replicated pools provide better performance in almost all cases at the cost of a lower usable to raw storage ratio (1 usable byte is stored using 3 bytes of raw storage)
 while `Erasure Coding` provides a cost efficient way to store data with less performance. Red Hat supports the following `Erasure Coding` profiles with their corresponding usable to raw ratio:
@@ -1964,7 +2199,7 @@ To leverage the Ceph architecture at its best, all access methods but librados, 
 block device will be a collection of objects, each supporting a set of device sectors. Therefore, a 1GB file is stored in a CephFS directory will be split into multiple objects. Also a 5GB S3 object stored through the RADOS Gateway via the Multi Cloud Gateway will be divided in multiple objects.
 
 .Data Distribution
-image::images/ocs/ceph101-rbdlayout.png[RADOS Block Device Layout]
+image::ceph101-rbdlayout.png[RADOS Block Device Layout]
 
 [NOTE]
 ====

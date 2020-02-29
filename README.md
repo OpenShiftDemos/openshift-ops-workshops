@@ -23,7 +23,7 @@ developer program is required.
 
 ## Deploying the Lab Guide
 Deploying the lab guide will take three steps. First, you will need to get
-information about your cluster. Second, you will build a container based on your lab. 
+information about your cluster. Second, you will build a container based on your lab.
 Third, you will deploy the lab guide using the information you found so that proper
 URLs and references are automatically displayed in the guide.
 
@@ -79,7 +79,9 @@ Next, Build a container (using `docker` or `podman`) using the repo/branch you c
 
 ```shell
 cd openshift-cns-testdrive
-docker build -t lab-sample-workshop .
+export QUAY_USER=myusername
+export BRANCH=$(git branch --show-current)
+docker build -t quay.io/${QUAY_USER}/lab-sample-workshop:${BRANCH} .
 ```
 
 Now, login to quay (it's free to sign up) or another registry your cluster has access to.
@@ -88,11 +90,10 @@ Now, login to quay (it's free to sign up) or another registry your cluster has a
 docker login quay.io
 ```
 
-Next, tag and push your container to your repo.
+Next push your container to your repo.
 
 ```shell
-docker tag lab-sample-workshop:my-feature quay.io/myusername/lab-sample-workshop:my-feature
-docker push quay.io/myusername/lab-sample-workshop:my-feature
+docker push quay.io/${QUAY_USER}/lab-sample-workshop:${BRANCH}
 ```
 
 You will use this image to deploy the lab. The following command will log you in as `kubeadmin` on systems with `oc` client installed:
@@ -104,7 +105,7 @@ oc new-project lab-ocp-cns
 
 # Create deployment.
 oc new-app -n lab-ocp-cns https://raw.githubusercontent.com/redhat-cop/agnosticd/development/ansible/roles/ocp4-workload-workshop-admin-storage/files/production-cluster-admin.json \
---param TERMINAL_IMAGE="quay.io/myusername/lab-sample-workshop:my-feature" --param PROJECT_NAME="lab-ocp-cns" \
+--param TERMINAL_IMAGE="quay.io/${QUAY_USER}/lab-sample-workshop:${BRANCH}" --param PROJECT_NAME="lab-ocp-cns" \
 --param WORKSHOP_ENVVARS="$(cat ./workshop-settings.sh)"
 
 # Wait for deployment to finish.
@@ -113,6 +114,12 @@ oc rollout status dc/dashboard -n lab-ocp-cns
 ```
 
 > NOTE: In some cases you might need to do: `oc adm policy add-role-to-user admin kube:admin -n lab-ocp-cns`
+
+If you made changes to the container image and want to refresh your deployed Homeroom quickly, execute this:
+
+```shell
+oc import-image -n lab-ocp-cns dashboard
+```
 
 ## Doing the Labs
 Your lab guide should deploy in a few moments. To find its url, execute:

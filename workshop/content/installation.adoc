@@ -183,7 +183,7 @@ And you will see some output like:
 
 ```
 NAME      VERSION   AVAILABLE   PROGRESSING   SINCE   STATUS
-version   4.2.7     True        False         30m     Cluster version is 4.2.7
+version   4.2.16    True        False         31m     Cluster version is 4.2.16
 ```
 
 For more details, you can execute the following command:
@@ -196,27 +196,52 @@ oc describe clusterversion
 Which will give you additional details, such as available updates:
 ```
 Name:         version
-Namespace:
+Namespace:    
 Labels:       <none>
 Annotations:  <none>
 API Version:  config.openshift.io/v1
 Kind:         ClusterVersion
 Metadata:
-  Creation Timestamp:  2020-01-16T21:31:40Z
+  Creation Timestamp:  2020-02-04T19:01:10Z
   Generation:          1
-  Resource Version:    18061
+  Resource Version:    17066
   Self Link:           /apis/config.openshift.io/v1/clusterversions/version
-  UID:                 955b6607-38a7-11ea-9b5b-0273e094ef96
+  UID:                 b505a0ab-4780-11ea-b5ab-021c3b3e4e96
 Spec:
   Channel:     stable-4.2
-  Cluster ID:  c72df8ea-11b0-40f3-95e1-f3f6c586193a
+  Cluster ID:  62fc704c-a6eb-4e0c-9769-9e3791d4214b
   Upstream:    https://api.openshift.com/api/upgrades_info/v1/graph
 Status:
-  Available Updates:
+  Available Updates:  <nil>
+  Conditions:
+    Last Transition Time:  2020-02-04T19:20:07Z
+    Message:               Done applying 4.2.16
+    Status:                True
+    Type:                  Available
+    Last Transition Time:  2020-02-04T19:14:52Z
+    Status:                False
+    Type:                  Failing
+    Last Transition Time:  2020-02-04T19:20:07Z
+    Message:               Cluster version is 4.2.16
+    Status:                False
+    Type:                  Progressing
+    Last Transition Time:  2020-02-04T19:01:20Z
+    Status:                True
+    Type:                  RetrievedUpdates
+  Desired:
     Force:    false
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:3fabe939da31f9a31f509251b9f73d321e367aba2d09ff392c2f452f6433a95a
-    Version:  4.2.14
-....
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:e5a6e348721c38a78d9299284fbb5c60fb340135a86b674b038500bf190ad514
+    Version:  4.2.16
+  History:
+    Completion Time:    2020-02-04T19:20:07Z
+    Image:              quay.io/openshift-release-dev/ocp-release@sha256:e5a6e348721c38a78d9299284fbb5c60fb340135a86b674b038500bf190ad514
+    Started Time:       2020-02-04T19:01:20Z
+    State:              Completed
+    Verified:           false
+    Version:            4.2.16
+  Observed Generation:  1
+  Version Hash:         98OBLkQ90x8=
+Events:                 <none>
 ```
 
 #### Look at the Nodes
@@ -232,12 +257,12 @@ The output should look something like the following:
 
 ----
 NAME                                         STATUS   ROLES    AGE    VERSION
-ip-10-0-129-88.us-east-2.compute.internal    Ready    master   51m   v1.14.6+9fb2d5cf9
-ip-10-0-140-204.us-east-2.compute.internal   Ready    worker   45m   v1.14.6+9fb2d5cf9
-ip-10-0-154-172.us-east-2.compute.internal   Ready    worker   45m   v1.14.6+9fb2d5cf9
-ip-10-0-159-34.us-east-2.compute.internal    Ready    master   51m   v1.14.6+9fb2d5cf9
-ip-10-0-162-119.us-east-2.compute.internal   Ready    worker   45m   v1.14.6+9fb2d5cf9
-ip-10-0-166-103.us-east-2.compute.internal   Ready    master   51m   v1.14.6+9fb2d5cf9
+ip-10-0-133-191.us-east-2.compute.internal   Ready    worker   44m   v1.14.6+97c81d00e
+ip-10-0-136-83.us-east-2.compute.internal    Ready    master   51m   v1.14.6+97c81d00e
+ip-10-0-152-132.us-east-2.compute.internal   Ready    worker   44m   v1.14.6+97c81d00e
+ip-10-0-157-139.us-east-2.compute.internal   Ready    master   51m   v1.14.6+97c81d00e
+ip-10-0-167-9.us-east-2.compute.internal     Ready    worker   44m   v1.14.6+97c81d00e
+ip-10-0-169-121.us-east-2.compute.internal   Ready    master   51m   v1.14.6+97c81d00e
 ----
 
 You have 3 masters and 3 workers. The OpenShift *Master* is also a *Node*

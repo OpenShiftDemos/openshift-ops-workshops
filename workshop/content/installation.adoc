@@ -183,7 +183,7 @@ And you will see some output like:
 
 ```
 NAME      VERSION   AVAILABLE   PROGRESSING   SINCE   STATUS
-version   4.2.16    True        False         31m     Cluster version is 4.2.16
+version   4.3.1     True        False         15m     Cluster version is 4.3.1
 ```
 
 For more details, you can execute the following command:
@@ -196,51 +196,52 @@ oc describe clusterversion
 Which will give you additional details, such as available updates:
 ```
 Name:         version
-Namespace:    
+Namespace:
 Labels:       <none>
 Annotations:  <none>
 API Version:  config.openshift.io/v1
 Kind:         ClusterVersion
 Metadata:
-  Creation Timestamp:  2020-02-04T19:01:10Z
+  Creation Timestamp:  2020-03-03T13:46:19Z
   Generation:          1
-  Resource Version:    17066
+  Resource Version:    17564
   Self Link:           /apis/config.openshift.io/v1/clusterversions/version
-  UID:                 b505a0ab-4780-11ea-b5ab-021c3b3e4e96
+  UID:                 0cf1369c-0cdf-4be8-85a1-86e4f5611746
 Spec:
-  Channel:     stable-4.2
-  Cluster ID:  62fc704c-a6eb-4e0c-9769-9e3791d4214b
+  Channel:     stable-4.3
+  Cluster ID:  b10d095f-03fe-41c8-985e-75d4d82bfc5e
   Upstream:    https://api.openshift.com/api/upgrades_info/v1/graph
 Status:
   Available Updates:  <nil>
   Conditions:
-    Last Transition Time:  2020-02-04T19:20:07Z
-    Message:               Done applying 4.2.16
+    Last Transition Time:  2020-03-03T14:06:32Z
+    Message:               Done applying 4.3.1
     Status:                True
     Type:                  Available
-    Last Transition Time:  2020-02-04T19:14:52Z
+    Last Transition Time:  2020-03-03T14:02:02Z
     Status:                False
     Type:                  Failing
-    Last Transition Time:  2020-02-04T19:20:07Z
-    Message:               Cluster version is 4.2.16
+    Last Transition Time:  2020-03-03T14:06:32Z
+    Message:               Cluster version is 4.3.1
     Status:                False
     Type:                  Progressing
-    Last Transition Time:  2020-02-04T19:01:20Z
+    Last Transition Time:  2020-03-03T13:46:28Z
     Status:                True
     Type:                  RetrievedUpdates
   Desired:
     Force:    false
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:e5a6e348721c38a78d9299284fbb5c60fb340135a86b674b038500bf190ad514
-    Version:  4.2.16
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:ea7ac3ad42169b39fce07e5e53403a028644810bee9a212e7456074894df40f3
+    Version:  4.3.1
   History:
-    Completion Time:    2020-02-04T19:20:07Z
-    Image:              quay.io/openshift-release-dev/ocp-release@sha256:e5a6e348721c38a78d9299284fbb5c60fb340135a86b674b038500bf190ad514
-    Started Time:       2020-02-04T19:01:20Z
+    Completion Time:    2020-03-03T14:06:32Z
+    Image:              quay.io/openshift-release-dev/ocp-release@sha256:ea7ac3ad42169b39fce07e5e53403a028644810bee9a212e745607
+4894df40f3
+    Started Time:       2020-03-03T13:46:28Z
     State:              Completed
     Verified:           false
-    Version:            4.2.16
+    Version:            4.3.1
   Observed Generation:  1
-  Version Hash:         98OBLkQ90x8=
+  Version Hash:         7VzR42wcDZ4=
 Events:                 <none>
 ```
 
@@ -257,12 +258,12 @@ The output should look something like the following:
 
 ----
 NAME                                         STATUS   ROLES    AGE    VERSION
-ip-10-0-133-191.us-east-2.compute.internal   Ready    worker   44m   v1.14.6+97c81d00e
-ip-10-0-136-83.us-east-2.compute.internal    Ready    master   51m   v1.14.6+97c81d00e
-ip-10-0-152-132.us-east-2.compute.internal   Ready    worker   44m   v1.14.6+97c81d00e
-ip-10-0-157-139.us-east-2.compute.internal   Ready    master   51m   v1.14.6+97c81d00e
-ip-10-0-167-9.us-east-2.compute.internal     Ready    worker   44m   v1.14.6+97c81d00e
-ip-10-0-169-121.us-east-2.compute.internal   Ready    master   51m   v1.14.6+97c81d00e
+ip-10-0-133-191.us-east-2.compute.internal   Ready    worker   44m   v1.16.2
+ip-10-0-129-109.us-east-2.compute.internal   Ready    master   59m   v1.16.2
+ip-10-0-133-205.us-east-2.compute.internal   Ready    worker   49m   v1.16.2
+ip-10-0-146-235.us-east-2.compute.internal   Ready    worker   49m   v1.16.2
+ip-10-0-153-202.us-east-2.compute.internal   Ready    master   58m   v1.16.2
+ip-10-0-165-150.us-east-2.compute.internal   Ready    master   59m   v1.16.2
 ----
 
 You have 3 masters and 3 workers. The OpenShift *Master* is also a *Node*

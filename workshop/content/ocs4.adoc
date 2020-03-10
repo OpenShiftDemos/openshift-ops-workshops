@@ -35,8 +35,7 @@ module.
 
 === Scale OCP cluster and add 3 new nodes
 
-In this section, you will first validate the OCP environment has 3 worker nodes before increasing the cluster size by additional 3 worker
-nodes for OCS resources. The `NAME` of your OCP nodes will be different than
+In this section, you will first validate the OCP environment has 3 worker nodes before increasing the cluster size by additional 3 worker nodes for OCS resources. The `NAME` of your OCP nodes will be different than
 shown below.
 
 [source,role="execute"]
@@ -1568,8 +1567,7 @@ oc scale -n openshift-machine-api --replicas=2 machineset.machine.openshift.io/c
 machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c scaled
 ----
 
-Wait until the new OCP workers are available. This could take 5 minutes or more
-so be patient. You will know the new OCP worker nodes are available when you have the number `2` in all columns.
+Wait until the new OCP workers are available. This could take 5 minutes or more so be patient. You will know the new OCP worker nodes are available when you have the number `2` in all columns.
 
 [source,role="execute"]
 ----

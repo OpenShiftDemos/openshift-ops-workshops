@@ -29,7 +29,7 @@ spec:
         name: welcome-php
         resources: {}
       nodeSelector:
-        node-role.kubernetes.io/worker: ""
+        appnode: welcome-php
 ---
 apiVersion: v1
 kind: Service

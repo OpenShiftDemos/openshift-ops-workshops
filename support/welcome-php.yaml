@@ -30,6 +30,15 @@ spec:
         resources: {}
       nodeSelector:
         node-role.kubernetes.io/worker: ""
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/worker
+                operator: In
+                values:
+                - ""
 ---
 apiVersion: v1
 kind: Service

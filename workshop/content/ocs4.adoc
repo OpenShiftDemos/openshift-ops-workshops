@@ -1535,9 +1535,9 @@ OCS cluster to provision storage on these new nodes.
 
 To add more nodes, we could either add more *machinesets* like we did before,
 or scale the already present OCS *machinesets*. For this training, we will
-spawn more workers by scaling the already present OCS worker instances up:
+spawn more workers by scaling the already present OCS worker instances up from 1 to 2 *machines*.
 
-.Check on our present machinesets:
+.Check on our current machinesets:
 [source,role="execute"]
 ----
 oc get machinesets -n openshift-machine-api | egrep 'NAME|workerocs'

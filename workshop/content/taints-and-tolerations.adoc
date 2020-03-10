@@ -30,11 +30,11 @@ In order to examine the nodes, make sure you're running as `kubeadmin`
 oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
 
-List the current worker nodes (by default, only worker nodes run application workloads)
+List the current worker nodes (by default, only worker nodes run application workloads), ignoring infra nodes.
 
 [source,bash,role="execute"]
 ----
-oc get nodes -l node-role.kubernetes.io/worker
+oc get nodes -l 'node-role.kubernetes.io/worker,!node-role.kubernetes.io/infra'
 ----
 
 Depending on which labs you've done, you may have 3 more more nodes with the worker label.
@@ -43,7 +43,7 @@ Now, let's look to see if there are any taints added to these workers.
 
 [source,bash,role="execute"]
 ----
-oc describe nodes -l node-role.kubernetes.io/worker  | grep Taint
+oc describe nodes -l 'node-role.kubernetes.io/worker,!node-role.kubernetes.io/infra'  | grep Taint
 ----
 
 There shouldn't be any taints assinged to the workers.
@@ -75,7 +75,7 @@ Now scale the pods to equal to the number of nodes we have. Also we'll wait for 
 
 [source,bash,role="execute"]
 ----
-NODE_NUMBER=$(oc get nodes --no-headers -l node-role.kubernetes.io/worker | wc -l)
+NODE_NUMBER=$(oc get nodes --no-headers -l 'node-role.kubernetes.io/worker,!node-role.kubernetes.io/infra' | wc -l)
 oc scale deploy welcome-php --replicas=${NODE_NUMBER}
 oc rollout status deploy welcome-php
 ----
@@ -94,7 +94,7 @@ Verify that the pods are spread evenly accross workers (there should be one pod 
 ----
 clear
 oc get po -o wide
-oc get nodes -l node-role.kubernetes.io/worker
+oc get nodes -l 'node-role.kubernetes.io/worker,!node-role.kubernetes.io/infra'
 ----
 
 [NOTE]
@@ -126,7 +126,7 @@ For this lab we will taint the first node with `welcome-php=run:NoSchedule`. Thi
 
 [source,bash,role="execute"]
 ----
-TTNODE=$(oc get nodes -l node-role.kubernetes.io/worker -o jsonpath='{range .items[0]}{.metadata.name}')
+TTNODE=$(oc get nodes -l 'node-role.kubernetes.io/worker,!node-role.kubernetes.io/infra' -o jsonpath='{range .items[0]}{.metadata.name}')
 oc adm taint node ${TTNODE} welcome-php=run:NoSchedule
 ----
 
@@ -134,7 +134,7 @@ Examine all the nodes and see that the taint is applied
 
 [source,bash,role="execute"]
 ----
-oc describe nodes -l node-role.kubernetes.io/worker  | grep Taint
+oc describe nodes -l 'node-role.kubernetes.io/worker,!node-role.kubernetes.io/infra'  | grep Taint
 ----
 
 Since we used `NoSchedule` for the effect, so a pod should still be there (the command should return a `1`)
@@ -165,7 +165,7 @@ Examine where the pods are running.
 ----
 clear
 oc get po -o wide
-oc get nodes -l node-role.kubernetes.io/worker
+oc get nodes -l 'node-role.kubernetes.io/worker,!node-role.kubernetes.io/infra'
 ----
 
 #### Tolerations
@@ -223,7 +223,7 @@ Now when you list all pods, they should be now spread evenly.
 ----
 clear
 oc get po -o wide
-oc get nodes -l node-role.kubernetes.io/worker
+oc get nodes -l 'node-role.kubernetes.io/worker,!node-role.kubernetes.io/infra'
 ----
 
 To read more about taints and tolerations, you can take a look at the https://docs.openshift.com/container-platform/4.2/nodes/scheduling/nodes-scheduler-taints-tolerations.html[Official Documentation].
@@ -249,5 +249,5 @@ Make sure the nodes have that taint removed
 
 [source,bash,role="execute"]
 ----
-oc describe nodes -l node-role.kubernetes.io/worker  | grep Taint
+oc describe nodes -l 'node-role.kubernetes.io/worker,!node-role.kubernetes.io/infra'  | grep Taint
 ----

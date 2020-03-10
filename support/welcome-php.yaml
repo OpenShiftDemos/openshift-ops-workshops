@@ -33,8 +33,8 @@ spec:
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
+          - labelSelector:
+              matchExpressions:
               - key: node-role.kubernetes.io/infra
                 operator: In
                 values:

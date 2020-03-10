@@ -1578,14 +1578,13 @@ watch "oc get machinesets -n openshift-machine-api | egrep 'NAME|workerocs'"
 
 You can exit by pressing kbd:[Ctrl+C].
 
-Once they are available, you can check to see if the new OCP worker nodes have the OCS
-label applied. The total of OCP nodes with the OCS label should now be six.
+Once they are available, you can check to see if the new OCP worker nodes have the OCS label applied. The total of OCP nodes with the OCS label should now be six.
 
 NOTE: The OCS label `cluster.ocs.openshift.io/openshift-storage=` is already applied because it is configured in the workerocs *machinesets* that you used to create the new worker nodes. 
 
 [source,role="execute"]
 ----
-oc get nodes -l cluster.ocs.openshift.io/openshift-storage= | cut -d' ' -f1
+oc get nodes -l cluster.ocs.openshift.io/openshift-storage -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}'
 ----
 .Example output:
 ----
@@ -1597,9 +1596,7 @@ ip-10-0-160-200.us-east-2.compute.internal
 ip-10-0-162-215.us-east-2.compute.internal
 ----
 
-Now that you have the new instances created with the OCS label, the next step is to add more storage to the
-Ceph cluster. The OCS operator will prefer the new OCP nodes with the OCS label because they
-have no OCS *Pods* scheduled yet.
+Now that you have the new instances created with the OCS label, the next step is to add more storage to the Ceph cluster. The OCS operator will prefer the new OCP nodes with the OCS label because they have no OCS *Pods* scheduled yet.
 
 === Add storage capacity
 

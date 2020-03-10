@@ -35,8 +35,7 @@ module.
 
 === Scale OCP cluster and add 3 new nodes
 
-In this section, you will first validate the OCP environment has 3 worker nodes before increasing the cluster size by additional 3 worker nodes for OCS resources. The `NAME` of your OCP nodes will be different than
-shown below.
+In this section, you will first validate the OCP environment has 3 worker nodes before increasing the cluster size by additional 3 worker nodes for OCS resources. The `NAME` of your OCP nodes will be different than shown below.
 
 [source,role="execute"]
 ----

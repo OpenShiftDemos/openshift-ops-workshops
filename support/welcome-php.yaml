@@ -28,6 +28,8 @@ spec:
       - image: quay.io/redhatworkshops/welcome-php:latest
         name: welcome-php
         resources: {}
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""
 ---
 apiVersion: v1
 kind: Service

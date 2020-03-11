@@ -35,7 +35,9 @@ module.
 
 === Scale OCP cluster and add 3 new nodes
 
-In this section, you will first validate the OCP environment has 3 worker nodes before increasing the cluster size by additional 3 worker nodes for OCS resources. The `NAME` of your OCP nodes will be different than shown below.
+In this section, you will first validate the OCP environment has 3 worker nodes
+before increasing the cluster size by additional 3 worker nodes for OCS
+resources. The `NAME` of your OCP nodes will be different than shown below.
 
 [source,role="execute"]
 ----
@@ -1566,7 +1568,9 @@ oc scale -n openshift-machine-api --replicas=2 machineset.machine.openshift.io/c
 machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c scaled
 ----
 
-Wait until the new OCP workers are available. This could take 5 minutes or more so be patient. You will know the new OCP worker nodes are available when you have the number `2` in all columns.
+Wait until the new OCP workers are available. This could take 5 minutes or more
+so be patient. You will know the new OCP worker nodes are available when you
+have the number `2` in all columns.
 
 [source,role="execute"]
 ----
@@ -1575,9 +1579,13 @@ watch "oc get machinesets -n openshift-machine-api | egrep 'NAME|workerocs'"
 
 You can exit by pressing kbd:[Ctrl+C].
 
-Once they are available, you can check to see if the new OCP worker nodes have the OCS label applied. The total of OCP nodes with the OCS label should now be six.
+Once they are available, you can check to see if the new OCP worker nodes have
+the OCS label applied. The total of OCP nodes with the OCS label should now be
+six.
 
-NOTE: The OCS label `cluster.ocs.openshift.io/openshift-storage=` is already applied because it is configured in the workerocs *machinesets* that you used to create the new worker nodes. 
+NOTE: The OCS label `cluster.ocs.openshift.io/openshift-storage=` is already
+applied because it is configured in the workerocs *machinesets* that you used to
+create the new worker nodes. 
 
 [source,role="execute"]
 ----
@@ -1593,7 +1601,9 @@ ip-10-0-160-200.us-east-2.compute.internal
 ip-10-0-162-215.us-east-2.compute.internal
 ----
 
-Now that you have the new instances created with the OCS label, the next step is to add more storage to the Ceph cluster. The OCS operator will prefer the new OCP nodes with the OCS label because they have no OCS *Pods* scheduled yet.
+Now that you have the new instances created with the OCS label, the next step is
+to add more storage to the Ceph cluster. The OCS operator will prefer the new
+OCP nodes with the OCS label because they have no OCS *Pods* scheduled yet.
 
 === Add storage capacity
 
@@ -1759,7 +1769,8 @@ The tools are accessible through the main UI window left pane. Click the
 
 === Alerting
 
-Click on the *Alerting* item to open the Alert window as illustrated in the screen capture below.
+Click on the *Alerting* item to open the Alert window as illustrated in the
+screen capture below.
 
 .OCP Monitoring Menu
 image::images/ocs/metrics-alertingleftpanemenu.png[OCP Monitoring Menu]
@@ -1991,7 +2002,8 @@ clients present within the IT infrastructure to get access to the data.
 image::images/ocs/ceph101-overview.png[Ceph From Above]
 
 [.lead]
-The entire Ceph architecture is resilient and does not present any single point of failure (SPOF).
+The entire Ceph architecture is resilient and does not present any single point
+of failure (SPOF).
 
 [.lead]
 *RADOS*

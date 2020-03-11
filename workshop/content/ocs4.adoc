@@ -35,10 +35,9 @@ module.
 
 === Scale OCP cluster and add 3 new nodes
 
-In this section, you will first validate the OCP environment has 3 master and
-3 worker nodes before increasing the cluster size by additional 3 worker
-nodes for OCS resources. The `NAME` of your OCP nodes will be different than
-shown below.
+In this section, you will first validate the OCP environment has 3 worker nodes
+before increasing the cluster size by additional 3 worker nodes for OCS
+resources. The `NAME` of your OCP nodes will be different than shown below.
 
 [source,role="execute"]
 ----
@@ -88,15 +87,15 @@ Check that you have new *machines* created.
 oc get machines -n openshift-machine-api | egrep 'NAME|workerocs'
 ----
 
-They may be in `pending` for sometime so repeat command above until they are
-in a `running` STATE. The `NAME` of your machines will be different than
+They may be in `Provisioning` for sometime so repeat command above until they are
+in a `Running` STATE. The `NAME` of your machines will be different than
 shown below.
 
 ----
 NAME                                                STATE     TYPE         REGION      ZONE         AGE
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2a-cqvwj   running   m5.4xlarge   us-east-2   us-east-2a   70s
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2b-g5p5v   running   m5.4xlarge   us-east-2   us-east-2b   70s
-cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c-rx4v8   running   m5.4xlarge   us-east-2   us-east-2c   70s
+cluster-ocs-0ec4-dgwqc-workerocs-us-east-2a-cqvwj   Running   m5.4xlarge   us-east-2   us-east-2a   70s
+cluster-ocs-0ec4-dgwqc-workerocs-us-east-2b-g5p5v   Running   m5.4xlarge   us-east-2   us-east-2b   70s
+cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c-rx4v8   Running   m5.4xlarge   us-east-2   us-east-2c   70s
 ----
 
 You can see that the workerocs *machines* are using are also using the AWS
@@ -232,8 +231,9 @@ watch oc -n openshift-storage get csv
 ----
 .Example output:
 ----
-NAME                  DISPLAY                       VERSION   REPLACES   PHASE
-ocs-operator.v4.2.0   OpenShift Container Storage   4.2.0                Succeeded
+NAME                            DISPLAY                       VERSION   REPLACES   PHASE
+lib-bucket-provisioner.v1.0.0   lib-bucket-provisioner        1.0.0                Succeeded
+ocs-operator.v4.2.2             OpenShift Container Storage   4.2.2                Succeeded
 ----
 
 You can exit by pressing kbd:[Ctrl+C].
@@ -245,7 +245,7 @@ The resource `csv` is a shortened word for
 CAUTION: This will mark that the installation of your operator was
 successful. Reaching this state can take several minutes.
 
-You will now also see some new operator pods in the new `openshift-storage`
+You will now also see new operator pods in `openshift-storage`
 namespace:
 
 [source,role="execute"]
@@ -254,10 +254,11 @@ oc -n openshift-storage get pods
 ----
 .Example output:
 ----
-NAME                                 READY   STATUS    RESTARTS   AGE
-noobaa-operator-6d59cd7855-lhwg8     1/1     Running   0          79s
-ocs-operator-dc48d685-8qtqn          1/1     Running   0          79s
-rook-ceph-operator-d857c476f-4npzl   1/1     Running   0          79s
+NAME                                     READY   STATUS    RESTARTS   AGE
+lib-bucket-provisioner-dc8cb8bfd-5sr9w   1/1     Running   0          2m14s
+noobaa-operator-58d8fbb457-hg495         1/1     Running   0          2m6s
+ocs-operator-66c778887d-8qkqm            1/1     Running   0          2m6s
+rook-ceph-operator-98b4c45c9-zxlxz       1/1     Running   0          2m6s
 ----
 
 Now switch back to your *Openshift Web Console* for the remainder of the
@@ -1534,11 +1535,11 @@ This section will explain how one can add more worker nodes to the present
 storage cluster. Afterwards follow the next sub-section on how to extend the
 OCS cluster to provision storage on these new nodes.
 
-To add more nodes, we could either add more machinesets like we did before,
-or scale the already present OCS machinesets. For this training, we will
-spawn more workers by scaling the already present OCS worker instances up:
+To add more nodes, we could either add more *machinesets* like we did before,
+or scale the already present OCS *machinesets*. For this training, we will
+spawn more workers by scaling the already present OCS worker instances up from 1 to 2 *machines*.
 
-.Check on our present machinesets:
+.Check on our current machinesets:
 [source,role="execute"]
 ----
 oc get machinesets -n openshift-machine-api | egrep 'NAME|workerocs'
@@ -1567,8 +1568,9 @@ oc scale -n openshift-machine-api --replicas=2 machineset.machine.openshift.io/c
 machineset.machine.openshift.io/cluster-ocs-0ec4-dgwqc-workerocs-us-east-2c scaled
 ----
 
-Wait until the new workers are available. This could take 5 minutes or more
-so be patient.
+Wait until the new OCP workers are available. This could take 5 minutes or more
+so be patient. You will know the new OCP worker nodes are available when you
+have the number `2` in all columns.
 
 [source,role="execute"]
 ----
@@ -1577,49 +1579,31 @@ watch "oc get machinesets -n openshift-machine-api | egrep 'NAME|workerocs'"
 
 You can exit by pressing kbd:[Ctrl+C].
 
-Once they are available, we can check on which worker nodes do not have OCS
-label applied yet, these are the new workers just created.
+Once they are available, you can check to see if the new OCP worker nodes have
+the OCS label applied. The total of OCP nodes with the OCS label should now be
+six.
+
+NOTE: The OCS label `cluster.ocs.openshift.io/openshift-storage=` is already
+applied because it is configured in the workerocs *machinesets* that you used to
+create the new worker nodes. 
 
 [source,role="execute"]
 ----
-oc get node --show-labels | grep storage-node | grep -v openshift-storage | cut -d' ' -f1
+oc get nodes -l cluster.ocs.openshift.io/openshift-storage -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}'
 ----
 .Example output:
 ----
+ip-10-0-131-209.us-east-2.compute.internal
 ip-10-0-133-99.us-east-2.compute.internal
+ip-10-0-155-12.us-east-2.compute.internal
 ip-10-0-158-153.us-east-2.compute.internal
 ip-10-0-160-200.us-east-2.compute.internal
+ip-10-0-162-215.us-east-2.compute.internal
 ----
 
-We can see that there are three new nodes, which do not yet have the
-`cluster.ocs.openshift.io/openshift-storage` label applied yet. We will apply
-this now:
-
-[source,role="execute"]
-----
-oc get nodes -o json | jq '.items[] | select(.metadata.labels.role == "storage-node") | .metadata.name' | xargs -n1 -t -I {} oc label nodes {} cluster.ocs.openshift.io/openshift-storage=""
-----
-.Example output:
-----
-oc label nodes ip-10-0-131-209.us-east-2.compute.internal cluster.ocs.openshift.io/openshift-storage=
-error: 'cluster.ocs.openshift.io/openshift-storage' already has a value (), and --overwrite is false
-oc label nodes ip-10-0-133-99.us-east-2.compute.internal cluster.ocs.openshift.io/openshift-storage=
-node/ip-10-0-133-99.us-east-2.compute.internal labeled
-oc label nodes ip-10-0-155-12.us-east-2.compute.internal cluster.ocs.openshift.io/openshift-storage=
-error: 'cluster.ocs.openshift.io/openshift-storage' already has a value (), and --overwrite is false
-oc label nodes ip-10-0-158-153.us-east-2.compute.internal cluster.ocs.openshift.io/openshift-storage=
-node/ip-10-0-158-153.us-east-2.compute.internal labeled
-oc label nodes ip-10-0-160-200.us-east-2.compute.internal cluster.ocs.openshift.io/openshift-storage=
-node/ip-10-0-160-200.us-east-2.compute.internal labeled
-oc label nodes ip-10-0-162-215.us-east-2.compute.internal cluster.ocs.openshift.io/openshift-storage=
-error: 'cluster.ocs.openshift.io/openshift-storage' already has a value (), and --overwrite is false
-----
-
-You will see errors for the nodes which already had the OCS label applied,
-which is fine. Now that you have the new instances prepared for extending the
-cluster by adding the OCS label, the next step is to add more storage to the
-Ceph cluster. The OCS operator will prefer the new OCP nodes because they
-have no OCS resources scheduled yet.
+Now that you have the new instances created with the OCS label, the next step is
+to add more storage to the Ceph cluster. The OCS operator will prefer the new
+OCP nodes with the OCS label because they have no OCS *Pods* scheduled yet.
 
 === Add storage capacity
 
@@ -1785,7 +1769,8 @@ The tools are accessible through the main UI window left pane. Click the
 
 === Alerting
 
-Click on the *Alerting* item to open the Alert window as illustrated in the screen capture below.
+Click on the *Alerting* item to open the Alert window as illustrated in the
+screen capture below.
 
 .OCP Monitoring Menu
 image::images/ocs/metrics-alertingleftpanemenu.png[OCP Monitoring Menu]
@@ -2017,7 +2002,8 @@ clients present within the IT infrastructure to get access to the data.
 image::images/ocs/ceph101-overview.png[Ceph From Above]
 
 [.lead]
-The entire Ceph architecture is resilient and does not present any single point of failure (SPOF).
+The entire Ceph architecture is resilient and does not present any single point
+of failure (SPOF).
 
 [.lead]
 *RADOS*

@@ -1,12 +1,11 @@
 kind: LDAPSyncConfig
 apiVersion: v1
-url: ldap://idm.openshiftworkshop.com
-ca: /opt/app-root/src/support/ca.crt
-bindDN: uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=openshiftworkshop,dc=com
-bindPassword: bindingpassword
+url: ldaps://ldap.jumpcloud.com
+bindDN: uid=openshiftworkshop,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com
+bindPassword: b1ndP^ssword
 rfc2307:
   groupsQuery:
-    baseDN: cn=groups,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com
+    baseDN: ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com
     derefAliases: never
     filter: '(|(cn=ose-*))'
   groupUIDAttribute: dn
@@ -15,9 +14,8 @@ rfc2307:
   groupMembershipAttributes:
   - member
   usersQuery:
-    baseDN: cn=users,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com
+    baseDN: ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com
     derefAliases: never
   userUIDAttribute: dn
   userNameAttributes:
   - uid
-

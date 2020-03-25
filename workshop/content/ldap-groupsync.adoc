@@ -13,9 +13,7 @@ membership.
 
 ### Background: LDAP Structure
 
-In this environment we are providing LDAP with a Red Hat Identity Management
-server running on Red Hat Enterprise Linux 7 running in a VM. IDM is configured
-with the following user groups:
+In this environment we are providing LDAP with the following user groups:
 
 * `ose-user`: Users with OpenShift access
 ** Any users who should be able to log-in to OpenShift must be members of this
@@ -45,15 +43,15 @@ You will see something like:
 apiVersion: config.openshift.io/v1
 kind: OAuth
 metadata:
-  creationTimestamp: 2019-05-03T08:16:00Z
+  annotations:
+    release.openshift.io/create-only: "true"
+  creationTimestamp: "2020-03-17T18:12:52Z"
   generation: 1
   name: cluster
-  resourceVersion: "8336"
+  resourceVersion: "1563"
   selfLink: /apis/config.openshift.io/v1/oauths/cluster
-  uid: afc6e10d-6d7b-11e9-aa4e-061f775e74c4
-spec:
-  tokenConfig:
-    accessTokenMaxAgeSeconds: 86400
+  uid: ebb0582d-b0e4-4c40-a33f-12459593f8e2
+spec: {}
 ```
 
 There are a few things to note here. Firstly, there's basically nothing here!
@@ -100,7 +98,7 @@ metadata:
   name: cluster
 spec:
   identityProviders:
-  - name: idm <1>
+  - name: ldap <1>
     challenge: false
     login: true
     mappingMethod: claim <2>
@@ -115,13 +113,13 @@ spec:
         - cn
         preferredUsername:
         - uid
-      bindDN: "uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=openshiftworkshop,dc=com" <4>
+      bindDN: "uid=openshiftworkshop,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com" <4>
       bindPassword: <5>
         name: ldap-secret
       ca: <6>
         name: ca-config-map
       insecure: false
-      url: "ldap://idm.openshiftworkshop.com/cn=users,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com)" <7>
+      url: "ldaps://ldap.jumpcloud.com/ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com?uid?sub?(memberOf=cn=ose-user,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com)" <7>
   tokenConfig:
     accessTokenMaxAgeSeconds: 86400
 ----
@@ -168,8 +166,8 @@ As the `kubeadmin` user apply the OAuth configuration with `oc`.
 
 [source,bash,role="execute"]
 ----
-oc create secret generic ldap-secret --from-literal=bindPassword=bindingpassword -n openshift-config
-wget http://idm.openshiftworkshop.com/pub/ca.crt -O {{ HOME_PATH }}/support/ca.crt
+oc create secret generic ldap-secret --from-literal=bindPassword=b1ndP^ssword -n openshift-config
+wget https://ssl-ccp.godaddy.com/repository/gd-class2-root.crt -O {{ HOME_PATH }}/support/ca.crt
 oc create configmap ca-config-map --from-file={{ HOME_PATH }}/support/ca.crt -n openshift-config
 oc apply -f {{ HOME_PATH }}/support/oauth-cluster.yaml
 ----
@@ -180,8 +178,6 @@ We use `apply` because there is an existing `OAuth` object. If you used
 `create` you would get an outright error that the object already exists. You
 still get a warning, but that's OK.
 ====
-
-In the above commands, we're downloading the ca.crt file because the IDM server intends to be the CA for all corporate certificates.
 
 #### Syncing LDAP Groups to OpenShift Groups
 In OpenShift, groups can be used to manage users and control permissions for
@@ -221,9 +217,9 @@ oc adm groups sync --sync-config={{ HOME_PATH }}/support/groupsync.yaml --confir
 You will see output like the following:
 
 ----
+group/ose-fancy-dev
 group/ose-user
 group/ose-normal-dev
-group/ose-fancy-dev
 group/ose-teamed-app
 ----
 
@@ -245,7 +241,7 @@ NAME             USERS
 ose-fancy-dev    fancyuser1, fancyuser2
 ose-normal-dev   normaluser1, teamuser1, teamuser2
 ose-teamed-app   teamuser1, teamuser2
-ose-user         normaluser1, fancyuser1, fancyuser2, teamuser1, teamuser2
+ose-user         fancyuser1, fancyuser2, normaluser1, teamuser1, teamuser2
 ----
 
 Take a look at a specific group in YAML:
@@ -263,16 +259,16 @@ apiVersion: user.openshift.io/v1
 kind: Group
 metadata:
   annotations:
-    openshift.io/ldap.sync-time: 2019-04-18T13:54:35Z
-    openshift.io/ldap.uid: cn=ose-fancy-dev,cn=groups,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com
-    openshift.io/ldap.url: idm.openshiftworkshop.com:389
-  creationTimestamp: 2019-04-18T13:46:15Z
+    openshift.io/ldap.sync-time: 2020-03-11T10:57:03-0400
+    openshift.io/ldap.uid: cn=ose-fancy-dev,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com
+    openshift.io/ldap.url: ldap.jumpcloud.com:636
+  creationTimestamp: "2020-03-11T14:57:03Z"
   labels:
-    openshift.io/ldap.host: idm.openshiftworkshop.com
+    openshift.io/ldap.host: ldap.jumpcloud.com
   name: ose-fancy-dev
-  resourceVersion: "2239168"
+  resourceVersion: "48481"
   selfLink: /apis/user.openshift.io/v1/groups/ose-fancy-dev
-  uid: 55c57ee9-61e0-11e9-b61c-0a580a82002f
+  uid: 630a9d2b-b577-46bd-8294-6b26e7f9a6e1
 users:
 - fancyuser1
 - fancyuser2
@@ -327,7 +323,7 @@ Go ahead and login as a regular user:
 
 [source,bash,role="execute"]
 ----
-oc login -u normaluser1 -p openshift
+oc login -u normaluser1 -p Op#nSh1ft
 ----
 
 Then, try to list *Projects*:
@@ -347,7 +343,7 @@ Now, login as a member of `ose-fancy-dev`:
 
 [source,bash,role="execute"]
 ----
-oc login -u fancyuser1 -p openshift
+oc login -u fancyuser1 -p Op#nSh1ft
 ----
 
 And then perform the same `oc get projects` and you will now see the list of all
@@ -439,7 +435,7 @@ Log in as `normaluser1` and see what *Projects* you can see:
 
 [source,bash,role="execute"]
 ----
-oc login -u normaluser1 -p openshift
+oc login -u normaluser1 -p Op#nSh1ft
 oc get projects
 ----
 
@@ -453,7 +449,7 @@ Then, try `teamuser1` from the `ose-teamed-app` group:
 
 [source,bash,role="execute"]
 ----
-oc login -u teamuser1 -p openshift
+oc login -u teamuser1 -p Op#nSh1ft
 oc get projects
 ----
 
@@ -508,7 +504,7 @@ Login as a the user with `cluster-reader` privileges:
 
 [source,bash,role="execute"]
 ----
-oc login -u fancyuser1 -p openshift
+oc login -u fancyuser1 -p Op#nSh1ft
 ----
 
 Find the `prometheus` `Route` with the following command:
@@ -538,7 +534,7 @@ The installer configured a `Route` for Prometheus by default. Go ahead and
 control+click the link:https://prometheus-k8s-openshift-monitoring.{{
 ROUTE_SUBDOMAIN }}[Prometheus link] to open it in your browser. You'll be
 greeted with a login screen. Click the *Log in with OpenShift* button, then
-select the `idm` auth mechanism, and use the `fancyuser1` user that you gave
+select the `ldap` auth mechanism, and use the `fancyuser1` user that you gave
 `cluster-reader` privileges to earlier. More specifically, the
 `ose-fancy-dev` group has `cluster-reader` permissions, and `fancyuser1` is a
 member. Remember that the password for all of these users is `openshift`. You

@@ -209,7 +209,7 @@ image::images/ocs/OCS-OCP-OperatorHub-Install.png[OCP OperatorHub Install]
 On the next screen make sure the settings are as shown in this figure.  
 
 .OCP Subscribe to OpenShift Container Storage
-image::images/ocs/OCS-OCP-OperatorHub-Subscribe.png[OCP OperatorHub Subscribe]
+image::images/ocs/OCS4-OCP-OperatorHub-Subscribe.png[OCP OperatorHub Subscribe]
 
 Make sure to change to `A specific namespace on the cluster` and chose
 namespace `openshift-storage`.
@@ -231,9 +231,9 @@ watch oc -n openshift-storage get csv
 ----
 .Example output:
 ----
-NAME                            DISPLAY                       VERSION   REPLACES   PHASE
-lib-bucket-provisioner.v1.0.0   lib-bucket-provisioner        1.0.0                Succeeded
-ocs-operator.v4.2.2             OpenShift Container Storage   4.2.2                Succeeded
+NAME                            DISPLAY                       VERSION        REPLACES   PHASE
+lib-bucket-provisioner.v1.0.0   lib-bucket-provisioner        1.0.0                     Succeeded
+ocs-operator.v4.3.0-379.ci      OpenShift Container Storage   4.3.0                     Succeeded
 ----
 
 You can exit by pressing kbd:[Ctrl+C].
@@ -287,9 +287,9 @@ image::images/ocs/OCS-config-screen-storage-cluster.png[OCS Create Storage Clust
 A dialog box will come up next.
 
 .OCS create a new storage cluster
-image::images/ocs/OCS-config-screen-new.png[OCS create a new storage cluster]
+image::images/ocs/OCS4-config-screen.png[OCS create a new storage cluster]
 
-CAUTION: *Make sure there are three workers in different availability zones selected*
+CAUTION: *Make sure there are three workers in different availability zones selected.*
 
 There should be 3 worker nodes already selected that had the OCS label
 applied in the last section. Execute command below and make sure they are all
@@ -300,42 +300,17 @@ selected.
 oc get nodes --show-labels | grep ocs |cut -d' ' -f1
 ----
 
+You will then need to select the size of your storage as shown below.
+
+.OCS select storage size
+image::images/ocs/OCS4-config-screen-osd-size.png[OCS select storage size]
+
+CAUTION: *The size chosen for OCS Service Capacity will be used for all future storage expansions.*
+
 Then click on the button `Create` below the dialog box with the 3 workers
 selected with a `checkmark`.
 
-In the background this will start initiating a lot of new pods in the
-`openshift-storage` namespace, as can be seen on the CLI:
-
-[source,role="execute"]
-----
-oc -n openshift-storage get pods
-----
-.Example of a in process installation of the OCS storage cluster:
-----
-NAME                                          READY   STATUS              RESTARTS   AGE
-csi-cephfsplugin-6t5cc                        0/3     ContainerCreating   0          21s
-csi-cephfsplugin-7slmp                        0/3     ContainerCreating   0          21s
-csi-cephfsplugin-865k6                        0/3     ContainerCreating   0          21s
-csi-cephfsplugin-8zn2w                        0/3     ContainerCreating   0          21s
-csi-cephfsplugin-9mmkp                        0/3     ContainerCreating   0          21s
-csi-cephfsplugin-provisioner-57f9567c-g44d6   0/4     ContainerCreating   0          21s
-csi-cephfsplugin-provisioner-57f9567c-tlnjz   0/4     ContainerCreating   0          21s
-csi-cephfsplugin-q86tr                        0/3     ContainerCreating   0          21s
-csi-rbdplugin-24t87                           0/3     ContainerCreating   0          21s
-csi-rbdplugin-4zp5v                           0/3     ContainerCreating   0          21s
-csi-rbdplugin-5s5dc                           0/3     ContainerCreating   0          21s
-csi-rbdplugin-fjl6s                           0/3     ContainerCreating   0          21s
-csi-rbdplugin-mrkr5                           0/3     ContainerCreating   0          21s
-csi-rbdplugin-pr9hn                           0/3     ContainerCreating   0          21s
-csi-rbdplugin-provisioner-69bb78d655-4hrzx    0/4     ContainerCreating   0          21s
-csi-rbdplugin-provisioner-69bb78d655-clzk5    0/4     ContainerCreating   0          21s
-noobaa-operator-6d59cd7855-lhwg8              1/1     Running             0          2m59s
-ocs-operator-dc48d685-8qtqn                   0/1     Running             0          2m59s
-rook-ceph-detect-version-znh2f                0/1     Init:0/1            0          15s
-rook-ceph-operator-d857c476f-4npzl            1/1     Running             0          2m59s
-----
-
-You can also watch the deployment using the *Openshift Web Console* by going
+You can watch the deployment using the *Openshift Web Console* by going
 back to the `Openshift Container Storage Operator` screen and selecting `All
 instances`.
 
@@ -345,7 +320,7 @@ instances may stay in `Unknown` Status which is not a concern if your `Ready`
 status matches the following diagram:
 
 .OCS instance overview after cluster install is finished
-image::images/ocs/OCS-finished-cluster-install.png[OCS instance overview after cluster install is finished]
+image::images/ocs/OCS4-finished-cluster-install.png[OCS instance overview after cluster install is finished]
 
 [source,role="execute"]
 ----
@@ -354,41 +329,47 @@ oc -n openshift-storage get pods
 .Output when the cluster installation is finished
 ----
 NAME                                                              READY   STATUS      RESTARTS   AGE
-csi-cephfsplugin-6t5cc                                            3/3     Running     0          9m30s
-csi-cephfsplugin-7slmp                                            3/3     Running     0          9m30s
-csi-cephfsplugin-865k6                                            3/3     Running     0          9m30s
-csi-cephfsplugin-8zn2w                                            3/3     Running     0          9m30s
-csi-cephfsplugin-9mmkp                                            3/3     Running     0          9m30s
-csi-cephfsplugin-provisioner-57f9567c-g44d6                       4/4     Running     0          9m30s
-csi-cephfsplugin-provisioner-57f9567c-tlnjz                       4/4     Running     0          9m30s
-csi-cephfsplugin-q86tr                                            3/3     Running     0          9m30s
-csi-rbdplugin-24t87                                               3/3     Running     0          9m30s
-csi-rbdplugin-4zp5v                                               3/3     Running     0          9m30s
-csi-rbdplugin-5s5dc                                               3/3     Running     0          9m30s
-csi-rbdplugin-fjl6s                                               3/3     Running     0          9m30s
-csi-rbdplugin-mrkr5                                               3/3     Running     0          9m30s
-csi-rbdplugin-pr9hn                                               3/3     Running     0          9m30s
-csi-rbdplugin-provisioner-69bb78d655-4hrzx                        4/4     Running     0          9m30s
-csi-rbdplugin-provisioner-69bb78d655-clzk5                        4/4     Running     0          9m30s
-noobaa-core-0                                                     2/2     Running     0          5m38s
-noobaa-operator-6d59cd7855-lhwg8                                  1/1     Running     0          12m
-ocs-operator-dc48d685-8qtqn                                       1/1     Running     0          12m
-rook-ceph-drain-canary-731c9dd8472082ee17090f034387aa3b-78k55k9   1/1     Running     0          5m48s
-rook-ceph-drain-canary-93e6590ed0bb3c88b985beb159ef084a-7c8kpsg   1/1     Running     0          5m55s
-rook-ceph-drain-canary-d0eaaceda4b757fe363def0873a5f86f-98s5k27   1/1     Running     0          5m45s
-rook-ceph-mds-ocs-storagecluster-cephfilesystem-a-7c865846g6k27   1/1     Running     0          5m33s
-rook-ceph-mds-ocs-storagecluster-cephfilesystem-b-69f846986g4n7   1/1     Running     0          5m32s
-rook-ceph-mgr-a-5486fc7cf5-l9h6z                                  1/1     Running     0          6m44s
-rook-ceph-mon-a-58c7cd4f9b-g4z2m                                  1/1     Running     0          8m17s
-rook-ceph-mon-b-684f66b8df-992wc                                  1/1     Running     0          7m43s
-rook-ceph-mon-c-6f7657b8b6-2sxl5                                  1/1     Running     0          7m13s
-rook-ceph-operator-d857c476f-4npzl                                1/1     Running     0          12m
-rook-ceph-osd-0-8675cf4f4-7gpbv                                   1/1     Running     0          5m55s
-rook-ceph-osd-1-58b9d954cf-9s6bw                                  1/1     Running     0          5m48s
-rook-ceph-osd-2-6994dd5f44-hsqrv                                  1/1     Running     0          5m45s
-rook-ceph-osd-prepare-ocs-deviceset-0-0-d2ppm-vvlt8               0/1     Completed   0          6m22s
-rook-ceph-osd-prepare-ocs-deviceset-1-0-9tmc6-svb84               0/1     Completed   0          6m22s
-rook-ceph-osd-prepare-ocs-deviceset-2-0-qtbfv-j4nr4               0/1     Completed   0          6m21s
+csi-cephfsplugin-6qvmf                                            3/3     Running     0          17m
+csi-cephfsplugin-8rqr5                                            3/3     Running     0          17m
+csi-cephfsplugin-ctr66                                            3/3     Running     0          17m
+csi-cephfsplugin-m7xfp                                            3/3     Running     0          17m
+csi-cephfsplugin-provisioner-65b59d9dc9-bb9c5                     5/5     Running     0          17m
+csi-cephfsplugin-provisioner-65b59d9dc9-tclkw                     5/5     Running     0          17m
+csi-cephfsplugin-wslm9                                            3/3     Running     0          17m
+csi-cephfsplugin-zt76r                                            3/3     Running     0          17m
+csi-rbdplugin-5dx5r                                               3/3     Running     0          17m
+csi-rbdplugin-5kg88                                               3/3     Running     0          17m
+csi-rbdplugin-g8tzm                                               3/3     Running     0          17m
+csi-rbdplugin-gn27b                                               3/3     Running     0          17m
+csi-rbdplugin-jrnh9                                               3/3     Running     0          17m
+csi-rbdplugin-provisioner-86c8bc888d-6xfbr                        5/5     Running     0          17m
+csi-rbdplugin-provisioner-86c8bc888d-ks6zv                        5/5     Running     0          17m
+csi-rbdplugin-x9nqb                                               3/3     Running     0          17m
+lib-bucket-provisioner-55f74d96f6-79tlk                           1/1     Running     0          93m
+noobaa-core-0                                                     1/1     Running     0          14m
+noobaa-db-0                                                       1/1     Running     0          14m
+noobaa-endpoint-7f5fff7d49-554qs                                  1/1     Running     0          12m
+noobaa-operator-b77ccff86-4lvks                                   1/1     Running     0          93m
+ocs-operator-6dd9fd9d8d-8gpj5                                     1/1     Running     0          93m
+rook-ceph-crashcollector-ip-10-0-141-60-85445fcd84-4lcbv          1/1     Running     0          15m
+rook-ceph-crashcollector-ip-10-0-147-83-54cf7f47c9-msjgn          1/1     Running     0          16m
+rook-ceph-crashcollector-ip-10-0-166-106-9d874cdb4-cjrrt          1/1     Running     0          15m
+rook-ceph-drain-canary-69e8faf0c5145b285b2bef426fecc57e-66glnz5   1/1     Running     0          14m
+rook-ceph-drain-canary-930e025127d0657f5254c19f87943be3-bdx9sh6   1/1     Running     0          14m
+rook-ceph-drain-canary-cd3910173d92c098f7310ab3eb082fce-56j2pkd   1/1     Running     0          14m
+rook-ceph-mds-ocs-storagecluster-cephfilesystem-a-7646cc945x56v   1/1     Running     0          13m
+rook-ceph-mds-ocs-storagecluster-cephfilesystem-b-58b5fd94rww7b   1/1     Running     0          13m
+rook-ceph-mgr-a-97f7f799b-d9fhk                                   1/1     Running     0          14m
+rook-ceph-mon-a-b5cd8d595-njmzk                                   1/1     Running     0          16m
+rook-ceph-mon-b-d89df794d-cpj6n                                   1/1     Running     0          15m
+rook-ceph-mon-c-5f989bbff-lc8b8                                   1/1     Running     0          15m
+rook-ceph-operator-599dbd974f-nm4nz                               1/1     Running     0          93m
+rook-ceph-osd-0-7795b7c779-glk4g                                  1/1     Running     0          14m
+rook-ceph-osd-1-7877cd76c5-dxxzg                                  1/1     Running     0          14m
+rook-ceph-osd-2-7544dc9db-vq7gj                                   1/1     Running     0          14m
+rook-ceph-osd-prepare-ocs-deviceset-0-0-wlsqw-bg5bl               0/1     Completed   0          14m
+rook-ceph-osd-prepare-ocs-deviceset-1-0-nxc46-p7s97               0/1     Completed   0          14m
+rook-ceph-osd-prepare-ocs-deviceset-2-0-qxd7g-h9hkb               0/1     Completed   0          14m
 ----
 
 The great thing about operators and OpenShift is that the operator has the
@@ -421,7 +402,7 @@ selecting `Dashboards` and finally clicking on `Persistent Storage` on the
 top navigation bar of the content page.
 
 NOTE: If you just finished your OCS 4 deployment it could take 5-10 minutes
-for your *Dashboards* to fully populate.
+for your *Dashboards* to fully populate. Different versions of OCP 4 may have minor differences in *Dashboard* sections and naming of *Dashboards*.
 
 .OCS Dashboard after successful backing storage installation
 image::images/ocs/OCS-dashboard-healthy.png[OCS Dashboard after successful backing storage installation]
@@ -477,12 +458,13 @@ creating a PVC for mounting to it's `db` container.
 === Using the Rook-Ceph toolbox to check on the Ceph backing storage
 
 Since the Rook-Ceph *toolbox* is not shipped with OCS, we need to deploy it
-manually. For this, we can leverage the upstream `toolbox.yaml` file, but we
-need to modify the namespace as shown below.
+manually. 
+
+You can patch the `OCSInitialization ocsinit` using the following command line:
 
 [source,role="execute"]
 ----
-oc apply -f {{ HOME_PATH }}/support/ocslab_toolbox.yaml
+oc patch OCSInitialization ocsinit -n openshift-storage --type json --patch  '[{ "op": "replace", "path": "/spec/enableCephTools", "value": true }]'
 ----
 
 After the `rook-ceph-tools` *Pod* is `Running` you can access the toolbox
@@ -1401,10 +1383,16 @@ To deploy the OBC and the example application we apply this YAML file:
 
 [source,yaml]
 ----
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: obc-test
+---
 apiVersion: objectbucket.io/v1alpha1
 kind: ObjectBucketClaim
 metadata:
   name: obc-test
+  namespace: obc-test
 spec:
   generateBucketName: "obc-test-noobaa"
   storageClassName: openshift-storage.noobaa.io
@@ -1413,6 +1401,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: obc-test
+  namespace: obc-test
   labels:
     app: obc-test
 spec:
@@ -1425,7 +1414,7 @@ spec:
       containers:
         - image: mesosphere/aws-cli:latest
           command: ["sh"]
-          args:
+          args: 
             - '-c'
             - 'set -x && s3cmd --no-check-certificate --host $BUCKET_HOST:$BUCKET_PORT --host-bucket $BUCKET_HOST:$BUCKET_PORT du'
           name: obc-test
@@ -1624,15 +1613,13 @@ image::images/ocs/OCS-Storage-Cluster-overview-reachit.png[]
  - The visible list should list only one item - click on the three dots on the far right to extend the options menu
  - Select `Add Capacity` from the options menu
 
-.Add capacity dialog
-image::images/ocs/OCS-add-capacity.png[]
+.Add Capacity dialog
+image::images/ocs/OCS4-add-capacity.png[Add Capacity dialog]
 
-In the new dialog you can set the requested additional (usable) capacity and
-the storage class. On AWS, the storage class should be set to `gp2`.
-
-NOTE: The effectively provisioned capacity will be three times as much as you
-put into the `Requested Capacity` field, because OCS uses a replica count of
+The storage class should be set to `gp2`. The added provisioned capacity will be three times as much as you see in the `Raw Capacity` field, because OCS uses a replica count of
 3.
+
+NOTE: *The size chosen for OCS Service Capacity during the initial deployment of OCS is greyed out and cannot be changed.*
 
 Once you are done with your setting, proceed by clicking on `Add`. You will
 see the Status of the Storage Cluster change until it reaches `Ready` again.

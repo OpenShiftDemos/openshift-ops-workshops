@@ -1120,102 +1120,107 @@ noobaa status -n openshift-storage
 ----
 .Example output:
 ----
-INFO[0000] CLI version: 2.0.9
-INFO[0000] noobaa-image: noobaa/noobaa-core:5.2.11
-INFO[0000] operator-image: noobaa/noobaa-operator:2.0.9
-INFO[0000] Namespace: openshift-storage
-INFO[0000]
-INFO[0000] CRD Status:
-INFO[0000] ✅ Exists: CustomResourceDefinition "noobaas.noobaa.io"
-INFO[0001] ✅ Exists: CustomResourceDefinition "backingstores.noobaa.io"
-INFO[0001] ✅ Exists: CustomResourceDefinition "bucketclasses.noobaa.io"
-INFO[0001] ✅ Exists: CustomResourceDefinition "objectbucketclaims.objectbucket.io"
-INFO[0001] ✅ Exists: CustomResourceDefinition "objectbuckets.objectbucket.io"
-INFO[0001]
-INFO[0001] Operator Status:
-INFO[0001] ✅ Exists: Namespace "openshift-storage"
-INFO[0001] ✅ Exists: ServiceAccount "noobaa"
-INFO[0001] ✅ Exists: Role "ocs-operator.v0.0.273-l5jqf"
-INFO[0001] ✅ Exists: RoleBinding "ocs-operator.v0.0.273-l5jqf-noobaa-s4vrx"
-INFO[0002] ✅ Exists: ClusterRole "ocs-operator.v0.0.273-k4j99"
-INFO[0002] ✅ Exists: ClusterRoleBinding "ocs-operator.v0.0.273-k4j99-noobaa-6hcbk"
-INFO[0002] ✅ Exists: Deployment "noobaa-operator"
-INFO[0002]
-INFO[0002] System Status:
-INFO[0002] ✅ Exists: NooBaa "noobaa"
-INFO[0002] ✅ Exists: StatefulSet "noobaa-core"
-INFO[0002] ✅ Exists: Service "noobaa-mgmt"
-INFO[0002] ✅ Exists: Service "s3"
-INFO[0002] ✅ Exists: Secret "noobaa-server"
-INFO[0002] ✅ Exists: Secret "noobaa-operator"
-INFO[0002] ✅ Exists: Secret "noobaa-admin"
-INFO[0003] ✅ Exists: StorageClass "openshift-storage.noobaa.io"
-INFO[0003] ✅ Exists: BucketClass "noobaa-default-bucket-class"
-INFO[0003] ✅ (Optional) Exists: BackingStore "noobaa-default-backing-store"
-INFO[0003] ✅ (Optional) Exists: CredentialsRequest "noobaa-cloud-creds"
-INFO[0003] ✅ (Optional) Exists: PrometheusRule "noobaa-prometheus-rules"
-INFO[0003] ✅ (Optional) Exists: ServiceMonitor "noobaa-service-monitor"
-INFO[0003] ✅ (Optional) Exists: Route "noobaa-mgmt"
-INFO[0003] ✅ (Optional) Exists: Route "s3"
-INFO[0003] ✅ Exists: PersistentVolumeClaim "db-noobaa-core-0"
-INFO[0003] ✅ System Phase is "Ready"
-INFO[0003] ✅ Exists:  "noobaa-admin"
+INFO[0000] CLI version: 2.1.0                           
+INFO[0000] noobaa-image: noobaa/noobaa-core:5.3.0       
+INFO[0000] operator-image: noobaa/noobaa-operator:2.1.0 
+INFO[0000] Namespace: openshift-storage                 
+INFO[0000]                                              
+INFO[0000] CRD Status:                                  
+INFO[0000] ✅ Exists: CustomResourceDefinition "noobaas.noobaa.io" 
+INFO[0000] ✅ Exists: CustomResourceDefinition "backingstores.noobaa.io" 
+INFO[0000] ✅ Exists: CustomResourceDefinition "bucketclasses.noobaa.io" 
+INFO[0000] ✅ Exists: CustomResourceDefinition "objectbucketclaims.objectbucket.io" 
+INFO[0000] ✅ Exists: CustomResourceDefinition "objectbuckets.objectbucket.io" 
+INFO[0000]                                              
+INFO[0000] Operator Status:                             
+INFO[0000] ✅ Exists: Namespace "openshift-storage"      
+INFO[0000] ✅ Exists: ServiceAccount "noobaa"            
+INFO[0000] ✅ Exists: Role "ocs-operator.v4.3.0-379.ci-hl98v" 
+INFO[0000] ✅ Exists: RoleBinding "ocs-operator.v4.3.0-379.ci-hl98v-noobaa-dntmk" 
+INFO[0000] ✅ Exists: ClusterRole "ocs-operator.v4.3.0-379.ci-vwg96" 
+INFO[0000] ✅ Exists: ClusterRoleBinding "ocs-operator.v4.3.0-379.ci-vwg96-noobaa-sm9pv" 
+INFO[0000] ✅ Exists: Deployment "noobaa-operator"       
+INFO[0000]                                              
+INFO[0000] System Status:                               
+INFO[0000] ✅ Exists: NooBaa "noobaa"                    
+INFO[0000] ✅ Exists: StatefulSet "noobaa-core"          
+INFO[0000] ✅ Exists: StatefulSet "noobaa-db"            
+INFO[0000] ✅ Exists: Service "noobaa-mgmt"              
+INFO[0000] ✅ Exists: Service "s3"                       
+INFO[0000] ✅ Exists: Service "noobaa-db"                
+INFO[0000] ✅ Exists: Secret "noobaa-server"             
+INFO[0000] ✅ Exists: Secret "noobaa-operator"           
+INFO[0000] ✅ Exists: Secret "noobaa-endpoints"          
+INFO[0000] ✅ Exists: Secret "noobaa-admin"              
+INFO[0000] ✅ Exists: StorageClass "openshift-storage.noobaa.io" 
+INFO[0000] ✅ Exists: BucketClass "noobaa-default-bucket-class" 
+INFO[0000] ✅ Exists: Deployment "noobaa-endpoint"       
+INFO[0000] ✅ Exists: HorizontalPodAutoscaler "noobaa-endpoint" 
+INFO[0000] ✅ (Optional) Exists: BackingStore "noobaa-default-backing-store" 
+INFO[0000] ✅ (Optional) Exists: CredentialsRequest "noobaa-cloud-creds" 
+INFO[0000] ✅ (Optional) Exists: PrometheusRule "noobaa-prometheus-rules" 
+INFO[0000] ✅ (Optional) Exists: ServiceMonitor "noobaa-service-monitor" 
+INFO[0000] ✅ (Optional) Exists: Route "noobaa-mgmt"     
+INFO[0000] ✅ (Optional) Exists: Route "s3"              
+INFO[0000] ✅ Exists: PersistentVolumeClaim "db-noobaa-db-0" 
+INFO[0000] ✅ System Phase is "Ready"                    
+INFO[0000] ✅ Exists:  "noobaa-admin"                    
 
 #------------------#
 #- Mgmt Addresses -#
 #------------------#
 
-ExternalDNS : [https://noobaa-mgmt-openshift-storage.apps.cluster-ocs-18dd.ocs-18dd.example.opentlc.com https://aa9e6c341187a11ea8e670a863dc4c4d-1226242861.us-east-1.elb.amazonaws.com:443]
+ExternalDNS : [https://noobaa-mgmt-openshift-storage.apps.ocp43.makestoragegreatagain.com https://a81f4015a847b410c9ed68338c26b654-444130336.us-east-2.elb.amazonaws.com:443]
 ExternalIP  : []
-NodePorts   : [https://10.0.157.178:31811]
+NodePorts   : [https://10.0.156.225:30445]
 InternalDNS : [https://noobaa-mgmt.openshift-storage.svc:443]
-InternalIP  : [https://172.30.212.225:443]
-PodPorts    : [https://10.130.2.10:8443]
+InternalIP  : [https://172.30.11.223:443]
+PodPorts    : [https://10.129.2.21:8443]
 
 #--------------------#
 #- Mgmt Credentials -#
 #--------------------#
 
 email    : admin@noobaa.io
-password : 5Iqq3+XoZS/sPWTkD2c5Aw==
+password : ORS2csCe2bz8B7B3Pzp9/A==
 
 #----------------#
 #- S3 Addresses -#
 #----------------#
 
-ExternalDNS : [https://s3-openshift-storage.apps.cluster-ocs-18dd.ocs-18dd.example.opentlc.com https://aa9f0fa4b187a11ea8e670a863dc4c4d-390690077.us-east-1.elb.amazonaws.com:443]
+ExternalDNS : [https://s3-openshift-storage.apps.ocp43.makestoragegreatagain.com https://a620dcd7cf7f94ab2b0f66c3dc58b305-1999213520.us-east-2.elb.amazonaws.com:443]
 ExternalIP  : []
-NodePorts   : [https://10.0.157.178:31605]
+NodePorts   : [https://10.0.169.39:31682]
 InternalDNS : [https://s3.openshift-storage.svc:443]
-InternalIP  : [https://172.30.252.169:443]
-PodPorts    : [https://10.130.2.10:6443]
+InternalIP  : [https://172.30.231.73:443]
+PodPorts    : [https://10.130.2.20:6443]
 
 #------------------#
 #- S3 Credentials -#
 #------------------#
 
-AWS_ACCESS_KEY_ID     : rQNcbCCIGxkApCA3U8TB
-AWS_SECRET_ACCESS_KEY : V9qxglxRrJETkmEFBo04aWYu8Jpp6IBMS9w73fQr
+AWS_ACCESS_KEY_ID     : JmE0a2yPGOLEoz8qTnGF
+AWS_SECRET_ACCESS_KEY : wf/XM2TScK93pBD+pj93185OSA8vff19KmVN/n/I
 
 #------------------#
 #- Backing Stores -#
 #------------------#
 
-NAME                           TYPE     TARGET-BUCKET                                               PHASE   AGE
-noobaa-default-backing-store   aws-s3   noobaa-backing-store-0b438b35-023f-4ce4-99e5-557f88c210b0   Ready   1h39m31s
+NAME                           TYPE     TARGET-BUCKET                                           PHASE   AGE       
+noobaa-default-backing-store   aws-s3   nb.1585673526229.apps.ocp43.makestoragegreatagain.com   Ready   3h1m40s   
 
 #------------------#
 #- Bucket Classes -#
 #------------------#
 
-NAME                          PLACEMENT                                                             PHASE   AGE
-noobaa-default-bucket-class   {Tiers:[{Placement: BackingStores:[noobaa-default-backing-store]}]}   Ready   1h39m31s
+NAME                          PLACEMENT                                                             PHASE   AGE       
+noobaa-default-bucket-class   {Tiers:[{Placement: BackingStores:[noobaa-default-backing-store]}]}   Ready   3h1m40s   
 
 #-----------------#
 #- Bucket Claims -#
 #-----------------#
 
-No OBC's found.
+No OBCs found.
 ----
 
 As you can see - the NooBaa CLI will first check on the environment and will
@@ -1895,7 +1900,7 @@ Or like this for OCS specific insights:
 
 [source,role="execute"]
 ----
-oc adm must-gather --image=quay.io/rhceph-dev/ocs-must-gather:latest-4.2
+oc adm must-gather --image=quay.io/rhceph-dev/ocs-must-gather:latest-4.3
 ----
 
 The output will then be saved in the current directory inside of a new folder

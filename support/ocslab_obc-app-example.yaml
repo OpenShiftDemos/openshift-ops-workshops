@@ -31,7 +31,7 @@ spec:
           command: ["sh"]
           args: 
             - '-c'
-            - 'set -x && s3cmd --no-check-certificate --host $BUCKET_HOST:$BUCKET_PORT --host-bucket $BUCKET_HOST:$BUCKET_PORT du'
+            - 'set -x && s3cmd --no-check-certificate --signature-v2 --host $BUCKET_HOST:$BUCKET_PORT --host-bucket $BUCKET_HOST:$BUCKET_PORT du'
           name: obc-test
           env:
             - name: BUCKET_NAME

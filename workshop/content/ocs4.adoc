@@ -1421,7 +1421,7 @@ spec:
           command: ["sh"]
           args: 
             - '-c'
-            - 'set -x && s3cmd --no-check-certificate --host $BUCKET_HOST:$BUCKET_PORT --host-bucket $BUCKET_HOST:$BUCKET_PORT du'
+            - 'set -x && s3cmd --no-check-certificate --signature-v2 --host $BUCKET_HOST:$BUCKET_PORT --host-bucket $BUCKET_HOST:$BUCKET_PORT du'
           name: obc-test
           env:
             - name: BUCKET_NAME
@@ -1500,7 +1500,7 @@ oc logs -n obc-test $(oc get pods -n obc-test -l app=obc-test -o jsonpath='{.ite
 ----
 .Example output
 ----
-+ s3cmd --no-check-certificate --host 10.0.131.209:31199 --host-bucket 10.0.131.209:31199 du
++ s3cmd --no-check-certificate --signature-v2 --host s3.openshift-storage.svc:443 --host-bucket s3.openshift-storage.svc:443 du
 0        0 objects s3://obc-test-noobaa-1ec979bc-c53f-42e0-b551-ffaa895c06a6/
 --------
 0        Total

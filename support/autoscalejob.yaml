@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: autoscaler-work-queue
+  namespace: openshift-machine-api
+spec:
+  template:
+    spec:
+      containers:
+      - name: work
+        image: busybox
+        command: ["sleep", "300"]
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 500m
+      restartPolicy: Never
+  backoffLimit: 4
+  completions: 100
+  parallelism: 100

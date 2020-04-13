@@ -162,3 +162,100 @@ Scale the `MachineSet` from two back down to one before continuing.
 ----
 oc scale machineset cluster-5fa6-hx2ml-worker-us-east-2c -n openshift-machine-api --replicas=1
 ----
+
+### Cluster Autoscaling
+Not only can you manually scale machines in your cluster, but you can also automatically scale them based on workload.
+
+
+
+.Set the MACHINESET variable to be used in later configurations
+[source,bash,role="execute"]
+----
+MACHINESET=$(oc get machinesets -n openshift-machine-api -o jsonpath='{.items[2].metadata.name}')
+echo $MACHINESET
+----
+
+The ClusterAutoscaler sets general autoscaling configuration values for the cluster.
+
+When the ClusterAutoscaler object is created, a corresponding pod will be created by the cluster-autoscaler-operator. The name of the pod will have the name of the ClusterAutoscaler object (in this case `default`) embedded in it.
+
+.Deploy Cluster Autoscaler
+[source,bash,role="execute"]
+----
+oc apply -f {{ HOME_PATH }}/support/clusterautoscaler.yaml
+oc get pods -n openshift-machine-api | grep cluster-autoscaler-default
+----
+
+The MachineAutoscaler object defines which machineset should be autoscaled as well as to what thresholds.
+
+The cluster autoscaler pod automatically increases the number of replicas in a machineset when it detects that the Kubernetes pod scheduler needs more resources.
+
+.Deploy The Machine Autoscaler
+[source,bash,role="execute"]
+----
+oc process -p MACHINESET="$MACHINESET" -f {{ HOME_PATH }}/support/machineautoscaler-template.yaml | oc apply -n openshift-machine-api -f -
+----
+
+Show the machine autoscaler. Note that it has a `MIN` of 1 and a `MAX` of 2 replicas. This means that the machineset can have a minimum of 1 machine and can scale up to a maximum of 2 machines.
+
+[source,bash,role="execute"]
+----
+oc get machineautoscaler -n openshift-machine-api
+----
+
+Now let's show the machineset and note that the `CURRENT` number of replicas is set to 1
+
+[source,bash,role="execute"]
+----
+oc get machineset $MACHINESET -n openshift-machine-api
+----
+
+Let's generate a workload to force an automatic scale up:
+
+[source,bash,role="execute"]
+----
+oc apply -f {{ HOME_PATH }}/support/autoscalejob.yaml
+----
+
+Wait a few seconds and then show the machineset.  Note that the `CURRENT` number of replicas is now set to 2. This can take up to a minute to change.
+
+[source,bash,role="execute"]
+----
+oc get machineset $MACHINESET -n openshift-machine-api
+----
+
+What happened here is that the autoscaler detected that the Kubernetes pod scheduler didn't have enough resources and scaled up the machineset from 1 to 2 machines. Remember that we artificially limited the machine autoscaler to only being able to scale the machineset to up to 2 machines maximum. Otherwise the cluster autoscaler could have scaled up the number of machines in the machineset even higher.
+
+
+Now that we've seen the autoscaler scale up machines based on load, let's clean up so we can move on to the next exercise.
+
+Remove the job that forced the scale up:
+
+[source,bash,role="execute"]
+----
+oc delete job -n openshift-machine-api autoscaler-work-queue
+----
+
+Remove machine autoscaler:
+[source,bash,role="execute"]
+----
+oc delete machineautoscaler -n openshift-machine-api machineautoscaler
+----
+
+Remove cluster autoscaler:
+[source,bash,role="execute"]
+----
+oc delete clusterautoscaler default
+----
+
+Manually scale replicas for the machineset back to 1:
+[source,bash,role="execute"]
+----
+oc scale machineset $MACHINESET -n openshift-machine-api --replicas=1
+----
+
+Ensure that the machineset is now set back to a `DESIRED` value of 1.
+[source,bash,role="execute"]
+----
+oc get machineset $MACHINESET -n openshift-machine-api
+----

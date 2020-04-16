@@ -204,7 +204,7 @@ image::images/ocs/OCS-OCP-OperatorHub-Filter.png[OCP OperatorHub Filter]
 Select `OpenShift Container Storage Operator` and then select *Install*.
 
 .OCP OperatorHub Install OpenShift Container Storage
-image::images/ocs/OCS-OCP-OperatorHub-Install.png[OCP OperatorHub Install]
+image::images/ocs/OCS4-OCP-OperatorHub-Install.png[OCP OperatorHub Install]
 
 On the next screen make sure the settings are as shown in this figure.  
 
@@ -231,9 +231,9 @@ watch oc -n openshift-storage get csv
 ----
 .Example output:
 ----
-NAME                            DISPLAY                       VERSION        REPLACES   PHASE
-lib-bucket-provisioner.v1.0.0   lib-bucket-provisioner        1.0.0                     Succeeded
-ocs-operator.v4.3.0-379.ci      OpenShift Container Storage   4.3.0                     Succeeded
+NAME                            DISPLAY                       VERSION   REPLACES   PHASE
+lib-bucket-provisioner.v1.0.0   lib-bucket-provisioner        1.0.0                Succeeded
+ocs-operator.v4.3.0             OpenShift Container Storage   4.3.0                Succeeded
 ----
 
 You can exit by pressing kbd:[Ctrl+C].
@@ -275,19 +275,19 @@ Click on `Openshift Container Storage Operator` to get to the OCS
 configuration screen.
 
 .OCS configuration screen
-image::images/ocs/OCS-config-screen-all.png[OCS configuration screen]
+image::images/ocs/OCS4-config-screen-all.png[OCS configuration screen]
 
 On the top of the OCS configuration screen, scroll over to the right and
 click on `Storage cluster` and then click on `Create OCS Cluster Service`. If
 you do not see `Create OCS Cluster Service` refresh your browser window.
 
 .OCS Create Storage Cluster
-image::images/ocs/OCS-config-screen-storage-cluster.png[OCS Create Storage Cluster]
+image::images/ocs/OCS4-config-screen-storage-cluster.png[OCS Create Storage Cluster]
 
 A dialog box will come up next.
 
 .OCS create a new storage cluster
-image::images/ocs/OCS4-config-screen.png[OCS create a new storage cluster]
+image::images/ocs/OCS4-config-screen-partial.png[OCS create a new storage cluster]
 
 CAUTION: *Make sure there are three workers in different availability zones selected.*
 

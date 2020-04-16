@@ -1613,7 +1613,7 @@ reach the OCS storage cluster overview:
  - Click on `Openshift Container Storage Operator`
  - In the top navigation bar, scroll right to find the item `Storage Cluster` and click on it
 
-image::images/ocs/OCS-Storage-Cluster-overview-reachit.png[]
+image::images/ocs/OCS4-Storage-Cluster-overview-reachit.png[]
 
  - The visible list should list only one item - click on the three dots on the far right to extend the options menu
  - Select `Add Capacity` from the options menu

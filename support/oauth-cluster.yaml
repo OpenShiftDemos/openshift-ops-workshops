@@ -4,7 +4,7 @@ metadata:
   name: cluster
 spec:
   identityProviders:
-  - name: idm
+  - name: ldap
     challenge: false
     login: true
     mappingMethod: claim
@@ -19,12 +19,12 @@ spec:
         - cn
         preferredUsername:
         - uid
-      bindDN: "uid=system,cn=sysaccounts,cn=etc,dc=auth,dc=openshiftworkshop,dc=com"
+      bindDN: "uid=openshiftworkshop,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com"
       bindPassword:
         name: ldap-secret
       ca:
         name: ca-config-map
       insecure: false
-      url: "ldap://idm.openshiftworkshop.com/cn=users,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com?uid?sub?(memberOf=cn=ose-user,cn=groups,cn=accounts,dc=auth,dc=openshiftworkshop,dc=com)"
+      url: "ldaps://ldap.jumpcloud.com/ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com?uid?sub?(memberOf=cn=ose-user,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com)"
   tokenConfig:
     accessTokenMaxAgeSeconds: 86400

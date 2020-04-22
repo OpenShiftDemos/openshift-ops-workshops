@@ -82,12 +82,12 @@ You will see something like:
 
 ----
 NAME                                         STATUS   ROLES    AGE   VERSION
-ip-10-0-133-191.us-east-2.compute.internal   Ready    worker   44m   v1.14.6+97c81d00e
-ip-10-0-136-83.us-east-2.compute.internal    Ready    master   51m   v1.14.6+97c81d00e
-ip-10-0-152-132.us-east-2.compute.internal   Ready    worker   44m   v1.14.6+97c81d00e
-ip-10-0-157-139.us-east-2.compute.internal   Ready    master   51m   v1.14.6+97c81d00e
-ip-10-0-167-9.us-east-2.compute.internal     Ready    worker   44m   v1.14.6+97c81d00e
-ip-10-0-169-121.us-east-2.compute.internal   Ready    master   51m   v1.14.6+97c81d00e
+ip-10-0-133-191.us-east-2.compute.internal   Ready    worker   44m   v1.16.2
+ip-10-0-136-83.us-east-2.compute.internal    Ready    master   51m   v1.16.2
+ip-10-0-152-132.us-east-2.compute.internal   Ready    worker   44m   v1.16.2
+ip-10-0-157-139.us-east-2.compute.internal   Ready    master   51m   v1.16.2
+ip-10-0-167-9.us-east-2.compute.internal     Ready    worker   44m   v1.16.2
+ip-10-0-169-121.us-east-2.compute.internal   Ready    master   51m   v1.16.2
 ----
 
 Each `Machine` ends up corresponding to a `Node`. With IPI, there is a
@@ -148,7 +148,7 @@ oc get nodes
 You should see your fresh and happy new node as the one with a very young age:
 
 ----
-ip-10-0-166-103.us-east-2.compute.internal   Ready    worker   1m   v1.14.6+97c81d00e
+ip-10-0-166-103.us-east-2.compute.internal   Ready    worker   1m   v1.16.2
 ----
 
 [NOTE]

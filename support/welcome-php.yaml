@@ -28,6 +28,8 @@ spec:
       - image: quay.io/redhatworkshops/welcome-php:latest
         name: welcome-php
         resources: {}
+      nodeSelector:
+        appnode: welcome-php
 ---
 apiVersion: v1
 kind: Service

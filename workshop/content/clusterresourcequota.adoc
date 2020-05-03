@@ -75,7 +75,7 @@ Now, login as `normaluser1`
 
 [source,bash,role="execute"]
 ----
-oc login -u normaluser1 -p openshift
+oc login -u normaluser1 -p Op#nSh1ft
 ----
 
 List all your current projects

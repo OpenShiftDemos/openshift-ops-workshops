@@ -537,7 +537,7 @@ greeted with a login screen. Click the *Log in with OpenShift* button, then
 select the `ldap` auth mechanism, and use the `fancyuser1` user that you gave
 `cluster-reader` privileges to earlier. More specifically, the
 `ose-fancy-dev` group has `cluster-reader` permissions, and `fancyuser1` is a
-member. Remember that the password for all of these users is `openshift`. You
+member. Remember that the password for all of these users is `Op#nSh1ft`. You
 will probably get a certificate error because of the self-signed certificate.
 Make sure to accept it.
 

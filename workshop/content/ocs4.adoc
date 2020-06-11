@@ -204,18 +204,18 @@ image::images/ocs/OCS4-OCP-OperatorHub-Filter.png[OCP OperatorHub Filter]
 Select `OpenShift Container Storage Operator` and then select *Install*.
 
 .OCP OperatorHub Install OpenShift Container Storage
-image::images/ocs/OCS4-OCP-OperatorHub-Install.png[OCP OperatorHub Install]
+image::images/ocs/OCS4-OCP43-OperatorHub-Install.png[OCP OperatorHub Install]
 
 On the next screen make sure the settings are as shown in this figure.  
 
 .OCP Subscribe to OpenShift Container Storage
-image::images/ocs/OCS4-OCP-OperatorHub-Subscribe.png[OCP OperatorHub Subscribe]
+image::images/ocs/OCS4-OCP43-OperatorHub-Subscribe.png[OCP OperatorHub Subscribe]
 
 Make sure to change to `A specific namespace on the cluster` and chose
 namespace `openshift-storage`.
 
 .Select specific namespace openshift-storage
-image::images/ocs/OCS-OCP-OperatorHub-Subscribe-Detail.png[OCP OperatorHub Subscribe Details]
+image::images/ocs/OCS4-OCP43-OperatorHub-Subscribe-Detail.png[OCP OperatorHub Subscribe Details]
 
 NOTE: Do not change any configuration other than the namespace as shown
 above.
@@ -275,14 +275,14 @@ Click on `Openshift Container Storage Operator` to get to the OCS
 configuration screen.
 
 .OCS configuration screen
-image::images/ocs/OCS4-config-screen-all.png[OCS configuration screen]
+image::images/ocs/OCS4-OCP43-config-screen-all.png[OCS configuration screen]
 
 On the top of the OCS configuration screen, scroll over to the right and
 click on `Storage cluster` and then click on `Create OCS Cluster Service`. If
 you do not see `Create OCS Cluster Service` refresh your browser window.
 
 .OCS Create Storage Cluster
-image::images/ocs/OCS4-config-screen-storage-cluster.png[OCS Create Storage Cluster]
+image::images/ocs/OCS4-OCP43-config-screen-storage-cluster.png[OCS Create Storage Cluster]
 
 A dialog box will come up next.
 
@@ -315,10 +315,10 @@ back to the `Openshift Container Storage Operator` screen and selecting `All
 instances`.
 
 Please wait until all *Pods* are marked as `Running` in the CLI or until you
-see all instances shown below as `Ready` Status in the Web Console matches the following diagram:
+see all instances shown below as `Ready` Status in the Web Console matches the following diagram (some Status may be unknown):
 
 .OCS instance overview after cluster install is finished
-image::images/ocs/OCS4-finished-cluster-install.png[OCS instance overview after cluster install is finished]
+image::images/ocs/OCS4-OCP43-finished-cluster-install.png[OCS instance overview after cluster install is finished]
 
 [source,role="execute"]
 ----
@@ -1611,7 +1611,7 @@ reach the OCS storage cluster overview:
  - Click on `Openshift Container Storage Operator`
  - In the top navigation bar, scroll right to find the item `Storage Cluster` and click on it
 
-image::images/ocs/OCS4-Storage-Cluster-overview-reachit.png[]
+image::images/ocs/OCS4-OCP43-Storage-Cluster-overview-reachit.png[]
 
  - The visible list should list only one item - click on the three dots on the far right to extend the options menu
  - Select `Add Capacity` from the options menu

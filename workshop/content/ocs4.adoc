@@ -282,7 +282,7 @@ click on `Storage cluster` and then click on `Create OCS Cluster Service`. If
 you do not see `Create OCS Cluster Service` refresh your browser window.
 
 .OCS Create Storage Cluster
-image::images/ocs/OCS4-config-screen-storage-cluster.png[OCS Create Storage Cluster]
+image::images/ocs/OCS4-OCP43-config-screen-storage-cluster.png[OCS Create Storage Cluster]
 
 A dialog box will come up next.
 

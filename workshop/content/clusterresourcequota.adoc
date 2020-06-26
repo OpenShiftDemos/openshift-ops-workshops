@@ -75,7 +75,7 @@ Now, login as `normaluser1`
 
 [source,bash,role="execute"]
 ----
-oc login -u normaluser1 -p openshift
+oc login -u normaluser1 -p Op#nSh1ft
 ----
 
 List all your current projects
@@ -111,19 +111,19 @@ After the deployment, you should have two running pods. One in each namespace. C
 
 [source,bash,role="execute"]
 ----
-oc get pods -n welcome1 -l app=php1
-oc get pods -n welcome2 -l app=php2
+oc get pods -n welcome1 -l deploymentconfig=php1
+oc get pods -n welcome2 -l deploymentconfig=php2
 ----
 
 The output should look something like this:
 
 ----
-[~] $ oc get pods -n welcome1 -l app=php1
+[~] $ oc get pods -n welcome1 -l deploymentconfig=php1
 NAME           READY   STATUS    RESTARTS   AGE
-php1-1-tsmc6   1/1     Running   0          2m43s
-[~] $ oc get pods -n welcome2 -l app=php2
+php1-1-nww4m   1/1     Running   0          4m20s
+[~] $ oc get pods -n welcome2 -l deploymentconfig=php2
 NAME           READY   STATUS    RESTARTS   AGE
-php2-1-s5756   1/1     Running   0          2m15s
+php2-1-ljw9w   1/1     Running   0          4m20s
 ----
 
 Now we can check the quota by first becoming `kubeadmin`:
@@ -193,7 +193,7 @@ Now as `normaluser1`, try to scale your apps beyond 10 pods:
 
 [source,bash,role="execute"]
 ----
-oc login -u normaluser1 -p openshift
+oc login -u normaluser1 -p Op#nSh1ft
 oc scale dc/php1 -n welcome1 --replicas=5
 oc scale dc/php2 -n welcome2 --replicas=6
 ----
@@ -202,8 +202,8 @@ Take a note of how many pods are running:
 
 [source,bash,role="execute"]
 ----
-oc get pods --no-headers -n welcome1 -l app=php1 | wc -l
-oc get pods --no-headers -n welcome2 -l app=php2 | wc -l
+oc get pods --no-headers -n welcome1 -l deploymentconfig=php1 | wc -l
+oc get pods --no-headers -n welcome2 -l deploymentconfig=php2 | wc -l
 ----
 
 Both of these commands should return no more than 10 added up together. Check the events to see the quota in action!
@@ -311,7 +311,7 @@ Login as `normaluser1` and create the applications in their respective projects:
 
 [source,bash,role="execute"]
 ----
-oc login -u normaluser1 -p openshift
+oc login -u normaluser1 -p Op#nSh1ft
 oc new-app -n pricelist-frontend --name frontend quay.io/redhatworkshops/pricelist:frontend
 oc new-app -n pricelist-backend --name backend quay.io/redhatworkshops/pricelist:backend
 ----
@@ -348,7 +348,7 @@ Test this by logging back in as `normaluser1` and try to scale the applications 
 
 [source,bash,role="execute"]
 ----
-oc login -u normaluser1 -p openshift
+oc login -u normaluser1 -p Op#nSh1ft
 oc scale -n pricelist-frontend dc/frontend --replicas=3
 oc scale -n pricelist-backend dc/backend --replicas=3
 ----

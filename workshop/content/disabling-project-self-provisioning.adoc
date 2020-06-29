@@ -176,7 +176,7 @@ Test this by logging in as `fancyuser1` and try to create a project.
 
 [source,bash,role="execute"]
 ----
-oc login -u fancyuser1 -p openshift
+oc login -u fancyuser1 -p Op#nSh1ft
 oc new-project fancyuserproject
 ----
 
@@ -214,7 +214,7 @@ this by becoming `fancyuser1` and try to create a project.
 
 [source,bash,role="execute"]
 ----
-oc login -u fancyuser1 -p openshift
+oc login -u fancyuser1 -p Op#nSh1ft
 oc new-project fancyuserproject
 ----
 

@@ -2,14 +2,14 @@ runtime:
   cache_dir: ./.cache/antora
 
 site:
-  title: Template Tutorial
-  url: https://redhat-scholars.github.io/course-template
+  title: OCP4 and Container Storage for Admins
+  url: https://github.com/openshift/openshift-cns-testdrive
 
 content:
-  sources:
+  sources: rhs-openshift-ocs-admins
     - url: ./
       start_path: documentation
-      start_page: template-tutorial::index.adoc
+      start_page: rhs-openshift-ocs-admins::index.adoc
 
 asciidoc:
   attributes:

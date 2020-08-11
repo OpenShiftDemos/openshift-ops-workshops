@@ -4,7 +4,7 @@ runtime:
 site:
   title: Template Tutorial(Dev Mode)
   url: http://localhost:3000/rhs-build-course/index.html
-  start_page: template-tutorial::index.adoc
+  start_page: rhs-openshift-ocs-admins::index.adoc
 
 content:
   sources:

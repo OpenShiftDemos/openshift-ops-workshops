@@ -23,7 +23,7 @@ a persistent storage solution for OCP workloads.
 * Use must-gather to collect support information
 
 .OpenShift Container Storage components
-image::images/ocs/OCS-Pods-Diagram.png[Showing OCS4 pods]
+image::ocs/OCS-Pods-Diagram.png[Showing OCS4 pods]
 
 NOTE: If you want more information about how Ceph works please review
 <<Introduction to Ceph>> section before starting the exercises in this
@@ -194,28 +194,28 @@ Remember that the login is `kubeadmin` and the password is:
 Once you are logged in, navigate to the *Operators* -> *OperatorHub* menu.
 
 .OCP OperatorHub
-image::images/ocs/OCS-OCP-OperatorHub.png[OCP OperatorHub]
+image::ocs/OCS-OCP-OperatorHub.png[OCP OperatorHub]
 
 Now type `container storage` in the *Filter by _keyword..._* box.
 
 .OCP OperatorHub filter on OpenShift Container Storage Operator
-image::images/ocs/OCS4-OCP-OperatorHub-Filter.png[OCP OperatorHub Filter]
+image::ocs/OCS4-OCP-OperatorHub-Filter.png[OCP OperatorHub Filter]
 
 Select `OpenShift Container Storage Operator` and then select *Install*.
 
 .OCP OperatorHub Install OpenShift Container Storage
-image::images/ocs/OCS4-OCP43-OperatorHub-Install.png[OCP OperatorHub Install]
+image::ocs/OCS4-OCP43-OperatorHub-Install.png[OCP OperatorHub Install]
 
 On the next screen make sure the settings are as shown in this figure.  
 
 .OCP Subscribe to OpenShift Container Storage
-image::images/ocs/OCS4-OCP43-OperatorHub-Subscribe.png[OCP OperatorHub Subscribe]
+image::ocs/OCS4-OCP43-OperatorHub-Subscribe.png[OCP OperatorHub Subscribe]
 
 Make sure to change to `A specific namespace on the cluster` and chose
 namespace `openshift-storage`.
 
 .Select specific namespace openshift-storage
-image::images/ocs/OCS4-OCP43-OperatorHub-Subscribe-Detail.png[OCP OperatorHub Subscribe Details]
+image::ocs/OCS4-OCP43-OperatorHub-Subscribe-Detail.png[OCP OperatorHub Subscribe Details]
 
 NOTE: Do not change any configuration other than the namespace as shown
 above.
@@ -269,25 +269,25 @@ Operators`. Make sure the selected project is set to `openshift-storage`.
 What you see, should be similar to the following example picture:
 
 .Installed Operators in the openshift-storage namespace
-image::images/ocs/OCP4-installed-operators.png[Openshift showing the installed operators in namespace openshift-storage]
+image::ocs/OCP4-installed-operators.png[Openshift showing the installed operators in namespace openshift-storage]
 
 Click on `Openshift Container Storage Operator` to get to the OCS
 configuration screen.
 
 .OCS configuration screen
-image::images/ocs/OCS4-OCP43-config-screen-all.png[OCS configuration screen]
+image::ocs/OCS4-OCP43-config-screen-all.png[OCS configuration screen]
 
 On the top of the OCS configuration screen, scroll over to the right and
 click on `Storage cluster` and then click on `Create OCS Cluster Service`. If
 you do not see `Create OCS Cluster Service` refresh your browser window.
 
 .OCS Create Storage Cluster
-image::images/ocs/OCS4-OCP43-config-screen-storage-cluster.png[OCS Create Storage Cluster]
+image::ocs/OCS4-OCP43-config-screen-storage-cluster.png[OCS Create Storage Cluster]
 
 A dialog box will come up next.
 
 .OCS create a new storage cluster
-image::images/ocs/OCS4-config-screen-partial.png[OCS create a new storage cluster]
+image::ocs/OCS4-config-screen-partial.png[OCS create a new storage cluster]
 
 CAUTION: *Make sure there are three workers in different availability zones selected.*
 
@@ -303,7 +303,7 @@ oc get nodes --show-labels | grep ocs |cut -d' ' -f1
 You will then need to select the size of your storage as shown below.
 
 .OCS select storage size
-image::images/ocs/OCS4-config-screen-osd-size.png[OCS select storage size]
+image::ocs/OCS4-config-screen-osd-size.png[OCS select storage size]
 
 CAUTION: *The size chosen for OCS Service Capacity will be used for all future storage expansions.*
 
@@ -318,7 +318,7 @@ Please wait until all *Pods* are marked as `Running` in the CLI or until you
 see all instances shown below as `Ready` Status in the Web Console matches the following diagram (some Status may be unknown):
 
 .OCS instance overview after cluster install is finished
-image::images/ocs/OCS4-OCP43-finished-cluster-install.png[OCS instance overview after cluster install is finished]
+image::ocs/OCS4-OCP43-finished-cluster-install.png[OCS instance overview after cluster install is finished]
 
 [source,role="execute"]
 ----
@@ -403,7 +403,7 @@ NOTE: If you just finished your OCS 4 deployment it could take 5-10 minutes
 for your *Dashboards* to fully populate. Different versions of OCP 4 may have minor differences in *Dashboard* sections and naming of *Dashboards*.
 
 .OCS Dashboard after successful backing storage installation
-image::images/ocs/OCS-dashboard-healthy.png[OCS Dashboard after successful backing storage installation]
+image::ocs/OCS-dashboard-healthy.png[OCS Dashboard after successful backing storage installation]
 
 [cols="0,1,10a"]
 |===
@@ -419,7 +419,7 @@ within the *Dashboard* menu click on the `Object Service` on the top
 navigation bar of the content page.
 
 .OCS Multi-Cloud-Gateway Dashboard after successful installation
-image::images/ocs/OCS-noobaa-dashboard-healthy.png[OCS Multi-Cloud-Gateway Dashboard after successful installation]
+image::ocs/OCS-noobaa-dashboard-healthy.png[OCS Multi-Cloud-Gateway Dashboard after successful installation]
 
 [cols="0,1,10a"]
 |===
@@ -917,7 +917,7 @@ nothing.
 Select an arbitrary file from your local machine and upload it to the app.
 
 .A simple PHP-based file upload tool
-image::images/ocs/uploader_screen_upload.png[]
+image::ocs/uploader_screen_upload.png[]
 
 Once done click *_List uploaded files_* to see the list of all currently
 uploaded files.
@@ -1611,13 +1611,13 @@ reach the OCS storage cluster overview:
  - Click on `Openshift Container Storage Operator`
  - In the top navigation bar, scroll right to find the item `Storage Cluster` and click on it
 
-image::images/ocs/OCS4-OCP43-Storage-Cluster-overview-reachit.png[]
+image::ocs/OCS4-OCP43-Storage-Cluster-overview-reachit.png[]
 
  - The visible list should list only one item - click on the three dots on the far right to extend the options menu
  - Select `Add Capacity` from the options menu
 
 .Add Capacity dialog
-image::images/ocs/OCS4-add-capacity.png[Add Capacity dialog]
+image::ocs/OCS4-add-capacity.png[Add Capacity dialog]
 
 The storage class should be set to `gp2`. The added provisioned capacity will be three times as much as you see in the `Raw Capacity` field, because OCS uses a replica count of
 3.
@@ -1763,12 +1763,12 @@ Click on the *Alerting* item to open the Alert window as illustrated in the
 screen capture below.
 
 .OCP Monitoring Menu
-image::images/ocs/metrics-alertingleftpanemenu.png[OCP Monitoring Menu]
+image::ocs/metrics-alertingleftpanemenu.png[OCP Monitoring Menu]
 
 This will take you to the *Alerting* homepage as illustrated below.
 
 .OCP Alerting Homepage
-image::images/ocs/metrics-alertinghomepage.png[OCP Alerting Homepage]
+image::ocs/metrics-alertinghomepage.png[OCP Alerting Homepage]
 
 You can display the alerts in the main window by state. To do so you must
 highlight the states you want to display. The states are:
@@ -1789,28 +1789,28 @@ states highlighted in blue will be displayed.
 NOTE: You need at least one state highlighted.
 
 .OCP Alerting Status Filtering
-image::images/ocs/metrics-alertingstatusfilter.png[OCP Alert Status Filtering]
+image::ocs/metrics-alertingstatusfilter.png[OCP Alert Status Filtering]
 
 As illustrated below, you can also filter alerts by name using the *Filter*
 area on the top right of the window to search for a particular alert or set
 of alerts.
 
 .OCP Alerting Name Filtering
-image::images/ocs/metrics-alertingnamefilter.png[OCP Alert Name Filtering]
+image::ocs/metrics-alertingnamefilter.png[OCP Alert Name Filtering]
 
 Through the 3 dot icon on the right hand side of each alert line you have
 access to a contextual menu to either view the alert definition or to silence
 the alert.
 
 .OCP Alert Contextual Menu
-image::images/ocs/metrics-alertingcontextualmenu.png[OCP Alert Contextual Menu]
+image::ocs/metrics-alertingcontextualmenu.png[OCP Alert Contextual Menu]
 
 If you select `View Alerting Rule` you will get access to the details of the
 rule that triggered the alert. The details include the Prometheus query used
 by the alert to perform the detection of the condition.
 
 .OCP Alert Detail Display
-image::images/ocs/metrics-alertingviewrule.png[OCP Alert Detailed Display]
+image::ocs/metrics-alertingviewrule.png[OCP Alert Detailed Display]
 
 NOTE: If desired, you can click the Prometheus query embedded in the alert.
 Doing so will take you to the *Metrics* page where you will be able to
@@ -1821,12 +1821,12 @@ execute the alert and to test updates to the alert.
 Click on the *Metrics* item as illustrated below.
 
 .OCP Metrics Menu
-image::images/ocs/metrics-metricsleftpanemenu.png[OCP Metrics Menu]
+image::ocs/metrics-metricsleftpanemenu.png[OCP Metrics Menu]
 
 This will take you to the *Metrics* homepage as illustrated below.
 
 .OCP UI Metrics Homepage
-image::images/ocs/metrics-queryfield.png[OCP Monitoring Metrics Homepage]
+image::ocs/metrics-queryfield.png[OCP Monitoring Metrics Homepage]
 
 Use the query field to either enter the formula of your choice or to search
 for metrics by name. The metrics available will let you query both OCP
@@ -1838,31 +1838,31 @@ Let's start testing a simple query example and enter the following text
 `[Enter]`.
 
 .Simple Ceph Query
-image::images/ocs/metrics-simplecephquery.png[Ceph Simple Query]
+image::ocs/metrics-simplecephquery.png[Ceph Simple Query]
 
 The window should refresh with a graph similar to the one below.
 
 .Simple Ceph Graph
-image::images/ocs/metrics-simplecephgraph.png[Ceph Simple Graph]
+image::ocs/metrics-simplecephgraph.png[Ceph Simple Graph]
 
 Then let's try a more relevant query example and enter the following text
 `rate(ceph_osd_op[5m])` or `irate(ceph_osd_op[5m])` in the query field. When
 you are done typing, simply hit `[Enter]`.
 
 .Complex Ceph Query
-image::images/ocs/metrics-complexcephquery.png[Ceph Complex Query]
+image::ocs/metrics-complexcephquery.png[Ceph Complex Query]
 
 The window should refresh with a graph similar to the one below.
 
 .Complex Ceph Graph
-image::images/ocs/metrics-complexcephgraph.png[Ceph Complex Graph]
+image::ocs/metrics-complexcephgraph.png[Ceph Complex Graph]
 
 All OCP metrics are also available through the integrated *Metrics* window.
 Feel free to try with any of the OCP related metrics such as
 `process_cpu_seconds_total` for example.
 
 .Complex OCP Graph
-image::images/ocs/metrics-complexocpgraph.png[OCP Complex Graph]
+image::ocs/metrics-complexocpgraph.png[OCP Complex Graph]
 
 NOTE: Have a look at the difference between
 `sum(irate(process_cpu_seconds_total[5m]))` and
@@ -1974,7 +1974,7 @@ outside of OCP 4.
 The Ceph project has a long history as you can see in the timeline below.
 
 .Ceph Project History
-image::images/ocs/ceph101-timeline.png[Ceph Project Timeline]
+image::ocs/ceph101-timeline.png[Ceph Project Timeline]
 
 [.lead]
 It is a battle-tested software defined storage (SDS) solution that has been
@@ -1989,7 +1989,7 @@ multiple access methods to enable the different types of
 clients present within the IT infrastructure to get access to the data.
 
 .Ceph Architecture
-image::images/ocs/ceph101-overview.png[Ceph From Above]
+image::ocs/ceph101-overview.png[Ceph From Above]
 
 [.lead]
 The entire Ceph architecture is resilient and does not present any single point
@@ -2051,7 +2051,7 @@ If we look at the Ceph cluster foundation layer, the full picture with the
 different types of daemons or containers looks like this.
 
 .RADOS as it stands
-image::images/ocs/ceph101-rados.png[RADOS Overview]
+image::ocs/ceph101-rados.png[RADOS Overview]
 
 The circle represent the MONs, the 'M' represent the MGRs and the squares
 with the bars represent the OSDs. In the diagram above, the cluster operates
@@ -2065,7 +2065,7 @@ access methods so that any application can use what is the best solution for
 its use-case.
 
 .Different Storage Types Supported
-image::images/ocs/ceph101-differentstoragetypes.png[Ceph Access Modes]
+image::ocs/ceph101-differentstoragetypes.png[Ceph Access Modes]
 
 Ceph supports block storage through the RADOS Block Device (aka RBD) access
 method, file storage through the Ceph Filesystem (aka CephFS) access method
@@ -2080,7 +2080,7 @@ Librados allows developers to code natively against the native Ceph cluster
 API for maximum efficiency combined with a small footprint.
 
 .Application Native Object API
-image::images/ocs/ceph101-librados.png[librados]
+image::ocs/ceph101-librados.png[librados]
 
 The Ceph native API offers different wrappers such as C, C++, Python, Java,
 Ruby, Erlang, Go and Rust.
@@ -2101,7 +2101,7 @@ The kernel RBD driver offers superior performance compared to the userspace
 same level of functionality. e.g., no RBD Mirroring support.
 
 .kRBD Diagram
-image::images/ocs/ceph101-krbd.png[Kernel based RADOS Block Device]
+image::ocs/ceph101-krbd.png[Kernel based RADOS Block Device]
 
 [.lead]
 *_Userspace RBD (librbd)_*
@@ -2112,7 +2112,7 @@ This mode allows us to leverage all existing RBD features such as RBD
 Mirroring.
 
 .librbd Diagram
-image::images/ocs/ceph101-librbd.png[Userspace RADOS Block Device]
+image::ocs/ceph101-librbd.png[Userspace RADOS Block Device]
 
 [.lead]
 *_Shared Filesystem (CephFS)_*
@@ -2123,7 +2123,7 @@ location of the object(s) for a given inode and then communicates directly
 with an OSD to perform the final IO request.
 
 .File Access (Ceph Filesystem or CephFS)
-image::images/ocs/ceph101-cephfs.png[Kernel Based CephFS Client]
+image::ocs/ceph101-cephfs.png[Kernel Based CephFS Client]
 
 CephFS is typically used for RWX claims but can also be used to support RWO claims.
 
@@ -2137,7 +2137,7 @@ the Multi Cloud Gateway perspective the RADOS Gateway will be tagged as a
 compatible S3 endpoint.
 
 .Amazone S3 or OpenStack Swift (Ceph RADOS Gateway)
-image::images/ocs/ceph101-rgw.png[S3 and Swift Support]
+image::ocs/ceph101-rgw.png[S3 and Swift Support]
 
 [.lead]
 *CRUSH*
@@ -2148,7 +2148,7 @@ multiple OSDs in the cluster. The technique used is called CRUSH or
 Controlled Replication Under Scalable Hashing. With CRUSH, every object is
 assigned to one and only one hash bucket known as a Placement Group (PG).
 
-image::images/ocs/ceph101-crushfromobjecttoosd.png[From Object to OSD]
+image::ocs/ceph101-crushfromobjecttoosd.png[From Object to OSD]
 
 CRUSH is the central point of configuration for the topology of the cluster.
 It offers a pseudo-random placement algorithm to distribute the objects
@@ -2181,7 +2181,7 @@ pool has the following properties that can be adjusted:
 *Pools and PGs*
 
 .Pools and PGs
-image::images/ocs/ceph101-thefullpicture.png[From Object to OSD]
+image::ocs/ceph101-thefullpicture.png[From Object to OSD]
 
 The diagram above shows the relationship end to end between the object at the
 access method level down to the OSDs at the physical layer.
@@ -2198,7 +2198,7 @@ where its PGs are created. A Placement Group or PG belongs to only one pool.
 Ceph supports two types of data protection presented in the diagram below.
 
 .Ceph Data Protection
-image::images/ocs/ceph101-dataprotection.png[Replicated Pools vs Erasure Coded Pools]
+image::ocs/ceph101-dataprotection.png[Replicated Pools vs Erasure Coded Pools]
 
 Replicated pools provide better performance in almost all cases at the cost
 of a lower usable to raw storage ratio (1 usable byte is stored using 3 bytes
@@ -2227,7 +2227,7 @@ stored through the RADOS Gateway via the Multi Cloud Gateway will be divided
 in multiple objects.
 
 .Data Distribution
-image::images/ocs/ceph101-rbdlayout.png[RADOS Block Device Layout]
+image::ocs/ceph101-rbdlayout.png[RADOS Block Device Layout]
 
 [NOTE]
 ====

@@ -1,17 +1,19 @@
-FROM quay.io/openshifthomeroom/workshop-dashboard:4.2.2
+FROM registry.fedoraproject.org/fedora:32
 
-USER root
+RUN dnf -y install npm nodejs
 
-RUN wget https://github.com/noobaa/noobaa-operator/releases/download/v2.1.1/noobaa-linux-v2.1.1 -O /usr/bin/noobaa
-RUN chmod +x /usr/bin/noobaa
+RUN mkdir -m 0777 -p /srv
 
-COPY . /tmp/src
+COPY ./ /srv/
 
-RUN rm -rf /tmp/src/.git* && \
-    chown -R 1001 /tmp/src && \
-    chgrp -R 0 /tmp/src && \
-    chmod -R g+w /tmp/src
+RUN chown -R 1001:0 /srv
 
-USER 1001
+RUN npm -g install gulp
 
-RUN /usr/libexec/s2i/assemble
+WORKDIR /srv
+
+RUN npm install
+
+EXPOSE 3000 3001
+
+ENTRYPOINT ["gulp"]

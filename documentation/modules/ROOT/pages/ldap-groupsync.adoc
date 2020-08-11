@@ -545,7 +545,7 @@ After logging in, the first time you will be presented with an auth proxy
 permissions acknowledgement:
 
 .Auth Proxy Acceptance.
-image::images/prometheus-auth-proxy.png[]
+image::prometheus-auth-proxy.png[]
 
 There is actually an OAuth proxy that sits in the flow between you and the
 Prometheus container. This proxy is used to validate your AuthenticatioN

@@ -137,4 +137,4 @@ kubeadmin
   cluster.
 +
 .Dashboards UI (Grafana)
-image::images/grafana_dashboard.png[]
+image::grafana_dashboard.png[]

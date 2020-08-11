@@ -1,0 +1,48 @@
+{
+  "Add Tabs": {
+    "prefix": "tabs",
+    "body": [
+      "[tabs]",
+      "====",
+      "${1:tab1}::",
+      "+",
+      "--",
+      "--",
+      "${2:tab2}::",
+      "+",
+      "--",
+      "--",
+      "===="
+    ],
+    "description": "Add Tabs macro"
+  },
+  "Add Navigation": {
+    "prefix": "nav",
+    "body": [
+      "${1|*,**,***|} xref:${2:page.adoc}[${3:Nav Title}]"
+    ],
+    "description": "Add new navigation"
+  },
+  "Console Input": {
+    "prefix": "input",
+    "body": [
+      "[.console-input]",
+      "[source,${1:bash}]",
+      "----",
+      "${2:echo \"Hello World\"}",
+      "----"
+    ],
+    "description": "Adds Console Input source fragment"
+  },
+  "Console Output": {
+    "prefix": "output",
+    "body": [
+      "[.console-output]",
+      "[source,${1:bash}]",
+      "----",
+      "${2:\"Hello World\"}",
+      "----"
+    ],
+    "description": "Adds Console Output source fragment"
+  }
+}

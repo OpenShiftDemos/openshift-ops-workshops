@@ -1,0 +1,26 @@
+runtime:
+  cache_dir: ./.cache/antora
+
+site:
+  title: Template Tutorial(Dev Mode)
+  url: http://localhost:3000/rhs-build-course/index.html
+  start_page: template-tutorial::index.adoc
+
+content:
+  sources:
+    - url: .
+      branches: HEAD
+      start_path: documentation
+asciidoc:
+  attributes:
+    title: Template Tutorial(Dev Mode)
+  extensions:
+    - ./lib/remote-include-processor.js
+    - ./lib/tab-block.js
+ui:
+  bundle:
+    url: https://github.com/redhat-scholars/course-ui/releases/download/v0.1.1/ui-bundle.zip
+    snapshot: true
+  supplemental_files: ./supplemental-ui
+output:
+  dir: ./gh-pages

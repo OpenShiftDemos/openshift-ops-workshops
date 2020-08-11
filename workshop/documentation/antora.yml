@@ -1,0 +1,7 @@
+name: rhs-openshift-ocs-admins
+title: OpenShift and Container Storage for Administrators
+version: master
+nav:
+  - modules/ROOT/nav.adoc
+
+start_page: ROOT:index.adoc

@@ -1,0 +1,43 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+audit.log
+.cache/
+*.log
+
+docs/
+gh-pages/
+dependency-reduced-pom.xml
+svm.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+.DS_Store
+.vscode
+istio-1.1.1
+firebase*
+yarn*
+package*
+!package.json
+node_modules
+.firebaserc
+.firebase

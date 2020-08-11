@@ -1,0 +1,15 @@
+= Welcome to OpenShift and Container Storage for Administrators
+:!sectids:
+
+[.text-center.strong]
+== OpenShift and Container Storage for Administrators Workshops
+
+The OCP and Container Storage for Admins workshop is designed to be a
+full-day experience introducing OpenShift 4 administrative concepts as
+well as OpenShift Container Storage administrative concepts. It contains
+several modules, most of which are stand-alone.
+
+[.tiles.browse]
+== Browse modules
+
+IMPORTANT: MODULE UNDER DEVELOPMENT

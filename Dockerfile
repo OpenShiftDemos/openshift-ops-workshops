@@ -16,4 +16,6 @@ RUN npm install
 
 EXPOSE 3000 3001
 
+USER 1001
+
 ENTRYPOINT ["gulp"]

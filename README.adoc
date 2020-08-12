@@ -1,9 +1,5 @@
 # OpenShift and Container Storage for Administrators
 
-ifdef::env-github[]
-:rotating_light: :warning:
-endif::[]
-
 WARNING: THIS BRANCH IS A WIP
 
 To build this and test first clone the repo and `cd` into the directory

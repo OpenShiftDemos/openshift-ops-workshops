@@ -22,6 +22,14 @@ podman run -dt --name=courseware-workspace -p 3000:3000 -p 3001:3001 --rm localh
 You should be able to open it on `http://localhost:3000`
 
 
+Once you're done, you can stop the container with...
+
+[source,bash,role="execute"]
+----
+podman stop courseware-workspace
+----
+
+
 
 Check the build courseware https://redhat-scholars.github.io/build-course[documentation]  on how folder structure, how to use macros and other gotchas
 

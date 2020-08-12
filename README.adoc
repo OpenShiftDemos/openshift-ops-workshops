@@ -1,13 +1,17 @@
 # OpenShift and Container Storage for Administrators
 
-:rotating_light: THIS BRANCH IS A WIP
+ifdef::env-github[]
+:rotating_light: :warning:
+endif::[]
+
+WARNING: THIS BRANCH IS A WIP
 
 To build this and test first clone the repo and `cd` into the directory
 
 [source,bash,role="execute"]
 ----
 git clone https://github.com/openshift/openshift-cns-testdrive
-cd 
+cd openshift-cns-testdrive
 ----
 
 

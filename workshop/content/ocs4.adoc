@@ -232,7 +232,7 @@ watch oc -n openshift-storage get csv
 .Example output:
 ----
 NAME                            DISPLAY                       VERSION   REPLACES   PHASE
-ocs-operator.v4.4.0             OpenShift Container Storage   4.4.2                Succeeded
+ocs-operator.v4.4.2             OpenShift Container Storage   4.4.2                Succeeded
 ----
 
 You can exit by pressing kbd:[Ctrl+C].

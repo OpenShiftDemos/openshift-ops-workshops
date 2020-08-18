@@ -232,8 +232,7 @@ watch oc -n openshift-storage get csv
 .Example output:
 ----
 NAME                            DISPLAY                       VERSION   REPLACES   PHASE
-lib-bucket-provisioner.v1.0.0   lib-bucket-provisioner        1.0.0                Succeeded
-ocs-operator.v4.4.0             OpenShift Container Storage   4.4.0                Succeeded
+ocs-operator.v4.4.2             OpenShift Container Storage   4.4.2                Succeeded
 ----
 
 You can exit by pressing kbd:[Ctrl+C].
@@ -255,7 +254,6 @@ oc -n openshift-storage get pods
 .Example output:
 ----
 NAME                                     READY   STATUS    RESTARTS   AGE
-lib-bucket-provisioner-dc8cb8bfd-5sr9w   1/1     Running   0          2m14s
 noobaa-operator-58d8fbb457-hg495         1/1     Running   0          2m6s
 ocs-operator-66c778887d-8qkqm            1/1     Running   0          2m6s
 rook-ceph-operator-98b4c45c9-zxlxz       1/1     Running   0          2m6s
@@ -1843,7 +1841,7 @@ image::ocs/metrics-simplecephquery.png[Ceph Simple Query]
 The window should refresh with a graph similar to the one below.
 
 .Simple Ceph Graph
-image::ocs/metrics-simplecephgraph.png[Ceph Simple Graph]
+image::/ocs/metrics-simplecephgraph.png[Ceph Simple Graph]
 
 Then let's try a more relevant query example and enter the following text
 `rate(ceph_osd_op[5m])` or `irate(ceph_osd_op[5m])` in the query field. When

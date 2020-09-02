@@ -8,7 +8,7 @@ cluster admin:
 
 [source,bash,role="execute"]
 ----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc login -u kubeadmin -p %%KUBEADMIN_PASSWORD%%
 ----
 
 You will see by now that there are pods running on almost all of your nodes:
@@ -23,23 +23,23 @@ at the *Pods* that are on `node02`:
 
 [source,bash,role="execute"]
 ----
-oc adm manage-node --list-pods {{ NODE2_INTERNAL_FQDN }}
+oc adm manage-node --list-pods %%NODE2_INTERNAL_FQDN%%
 ----
 
 Firstly, we probably want to ensure that no new workload can be put on this
-host. Mark node `{{ NODE2_INTERNAL_FQDN }}` as non-schedulable to prevent the
+host. Mark node `%%NODE2_INTERNAL_FQDN%%` as non-schedulable to prevent the
 schedulers in the system to place any new workloads on it:
 
 [source,bash,role="execute"]
 ----
-oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=false
+oc adm manage-node %%NODE2_INTERNAL_FQDN%% --schedulable=false
 ----
 
 The output of the command will show that the node is now not schedulable:
 
 ----
 NAME                                          STATUS                     ROLES     AGE       VERSION
-{{ NODE2_INTERNAL_FQDN }}   Ready,SchedulingDisabled   compute   1h        v1.11.0+d4cacc0
+%%NODE2_INTERNAL_FQDN%%   Ready,SchedulingDisabled   compute   1h        v1.11.0+d4cacc0
 ----
 
 Marking the node as non-schedulable did not impact the pods it is running. List those
@@ -47,7 +47,7 @@ pods:
 
 [source,bash,role="execute"]
 ----
-oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
+oc adm manage-node %%NODE2_INTERNAL_FQDN%% --list-pods
 ----
 
 Other than a *Pod* for Container Native Storage and a Fluentd instance (there is
@@ -68,19 +68,19 @@ Start the drain process like this:
 
 [source,bash,role="execute"]
 ----
-oc adm drain {{ NODE2_INTERNAL_FQDN }} --ignore-daemonsets
+oc adm drain %%NODE2_INTERNAL_FQDN%% --ignore-daemonsets
 ----
 
 After a few moments, all of the *Pods*, except those for Fluentd, Container
-Native Storage, and Prometheus previously running on `{{ NODE2_INTERNAL_FQDN
-}}` should have terminated and been launched elsewhere.
+Native Storage, and Prometheus previously running on `%%NODE2_INTERNAL_FQDN%%`
+should have terminated and been launched elsewhere.
 
 [source,bash,role="execute"]
 ----
-oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --list-pods
+oc adm manage-node %%NODE2_INTERNAL_FQDN%% --list-pods
 ----
 
-The node `{{ NODE2_INTERNAL_FQDN }}` is now ready for an administrator to
+The node `%%NODE2_INTERNAL_FQDN%%` is now ready for an administrator to
 start maintenance operations. If those include a reboot of the system or
 upgrading OpenShift components, the *Pods* associated with
 OCS and logging will come back up automatically.
@@ -90,12 +90,12 @@ fix that:
 
 [source,bash,role="execute"]
 ----
-oc adm manage-node {{ NODE2_INTERNAL_FQDN }} --schedulable=true
+oc adm manage-node %%NODE2_INTERNAL_FQDN%% --schedulable=true
 ----
 
 Now the node will be able to have workload scheduled on it again:
 
 ----
 NAME                                          STATUS    ROLES     AGE       VERSION
-{{ NODE2_INTERNAL_FQDN }}   Ready     compute   1h        v1.11.0+d4cacc0
+%%NODE2_INTERNAL_FQDN%%   Ready     compute   1h        v1.11.0+d4cacc0
 ----

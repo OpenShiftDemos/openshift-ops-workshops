@@ -75,7 +75,7 @@ for you already. Use `cat`, `less`, or your favorite editor to view the modified
 
 [source,bash,role="execute"]
 ----
-cat {{ HOME_PATH }}/support/project_request_template.yaml
+cat %%HOME_PATH%%/support/project_request_template.yaml
 ----
 
 Please take note that there are two new sections added: *ResourceQuota* and
@@ -113,8 +113,8 @@ volume claims, and *Pods*. Take a look at the `ResourceQuota` section from the
       resourcequotas: 1
       requests.storage: 50Gi <5>
       persistentvolumeclaims: 5 <6>
-      {{ CNS_STORAGECLASS }}.storageclass.storage.k8s.io/requests.storage: 25Gi <7>
-      {{ CNS_BLOCK_STORAGECLASS }}.storageclass.storage.k8s.io/persistentvolumeclaims: 0 <8>
+      %%CNS_STORAGECLASS%%.storageclass.storage.k8s.io/requests.storage: 25Gi <7>
+      %%CNS_BLOCK_STORAGECLASS%%.storageclass.storage.k8s.io/persistentvolumeclaims: 0 <8>
 ----
 
 <1> While only one quota can be defined in a *Project*, it still needs a unique
@@ -129,7 +129,7 @@ when we get to the *LimitRange* object.
 <5> Across all persistent volume claims in a project, the sum of storage requested cannot exceed this value.
 <6> The total number of persistent volume claims in a project.
 <7> This setting limits the amount of storage that can be provisioned using the `glusterfs-storage` *StorageClass*.
-<8> This setting limits the number of **PersistentVolumeClaims** for a **StorageClass** called `{{ CNS_BLOCK_STORAGECLASS }}`. A value of 0 means that creating **PersistentVolumeClaims** from this storage class is not allowed in this project.
+<8> This setting limits the number of **PersistentVolumeClaims** for a **StorageClass** called `%%CNS_BLOCK_STORAGECLASS%%`. A value of 0 means that creating **PersistentVolumeClaims** from this storage class is not allowed in this project.
 
 For more details on the available quota options, refer back to the
 // FIXME: 4.0 Doc Link Needed
@@ -245,7 +245,7 @@ Go ahead and execute the following:
 
 [source,bash,role="execute"]
 ----
-oc create -f {{ HOME_PATH }}/support/project_request_template.yaml -n openshift-config
+oc create -f %%HOME_PATH%%/support/project_request_template.yaml -n openshift-config
 ----
 
 This will create the *Template* object in the `openshift-config` *Project*.
@@ -307,7 +307,7 @@ changes. To create the *CustomResource*, issue this command:
 
 [source,bash,role="execute"]
 ----
-oc apply -f {{ HOME_PATH }}/support/cr_project_request.yaml -n openshift-config
+oc apply -f %%HOME_PATH%%/support/cr_project_request.yaml -n openshift-config
 ----
 
 Once this command is run, the OpenShift API Server configurations will be

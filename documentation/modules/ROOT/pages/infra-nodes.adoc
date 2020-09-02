@@ -145,7 +145,7 @@ will do the hard work for you:
 
 [source,bash,role="execute"]
 ----
-bash {{ HOME_PATH }}/support/machineset-generator.sh 1 infra 0 | oc create -f -
+bash %%HOME_PATH%%/support/machineset-generator.sh 1 infra 0 | oc create -f -
 export MACHINESET=$(oc get machineset -n openshift-machine-api -l machine.openshift.io/cluster-api-machine-role=infra -o jsonpath='{.items[0].metadata.name}')
 oc patch machineset $MACHINESET -n openshift-machine-api --type='json' -p='[{"op": "add", "path": "/spec/template/spec/metadata/labels", "value":{"node-role.kubernetes.io/worker":"", "node-role.kubernetes.io/infra":""} }]'
 oc scale machineset $MACHINESET -n openshift-machine-api --replicas=3
@@ -322,7 +322,7 @@ metadata:
   selfLink: /apis/config.openshift.io/v1/ingresses/cluster
   uid: e1ec463c-5a0b-11e9-93e8-028b0fb1636c
 spec:
-  domain: {{ ROUTE_SUBDOMAIN }}
+  domain: %%ROUTE_SUBDOMAIN%%
 status: {}
 ```
 
@@ -368,7 +368,7 @@ infrastructure nodes, we can apply the following configuration:
 
 [source,bash,role="execute"]
 ----
-oc apply -f {{ HOME_PATH }}/support/ingresscontroller.yaml
+oc apply -f %%HOME_PATH%%/support/ingresscontroller.yaml
 ----
 
 
@@ -555,7 +555,7 @@ You can create the new monitoring config with the following command:
 
 [source,bash,role="execute"]
 ----
-oc create -f {{ HOME_PATH }}/support/cluster-monitoring-configmap.yaml
+oc create -f %%HOME_PATH%%/support/cluster-monitoring-configmap.yaml
 ----
 
 Watch the monitoring pods move from `worker` to `infra` `Nodes` with:

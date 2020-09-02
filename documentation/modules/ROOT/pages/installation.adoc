@@ -16,14 +16,14 @@ To inspect the cluster installation, you can simply SSH to the bastion host wher
 
 [source,bash,role="execute"]
 ----
-ssh -l {{ SSH_USERNAME }} {{ BASTION_FQDN }} -o ServerAliveInterval=120
+ssh -l %%SSH_USERNAME%% %%BASTION_FQDN%% -o ServerAliveInterval=120
 ----
 
 Here is your ssh password:
 
 [source,bash,role="copypaste"]
 ----
-{{ SSH_PASSWORD }}
+%%SSH_PASSWORD%%
 ----
 
 You'll notice that there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This
@@ -284,7 +284,7 @@ environment and is exposed via the OpenShift Router. You will learn more
 about the router in a subsequent exercise. For now, you can simply
 control+click the link:
 
-{{ MASTER_URL }}
+%%MASTER_URL%%
 
 #### You will now exit the ssh session
 [source,role="execute"]

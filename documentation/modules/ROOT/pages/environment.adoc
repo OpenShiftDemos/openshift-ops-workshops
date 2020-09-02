@@ -1,7 +1,7 @@
 ## Environment Overview
 
-You will be interacting with an OpenShift 4 cluster that is running on {{
-ENVIRONMENT }}. During the lab you will also install OpenShift Container
+You will be interacting with an OpenShift 4 cluster that is running on
+%%ENVIRONMENT%%. During the lab you will also install OpenShift Container
 Storage, based on Rook/Ceph.
 
 The basics of the OpenShift 4 installation have been completed in advance.

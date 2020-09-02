@@ -2,7 +2,7 @@ runtime:
   cache_dir: ./.cache/antora
 
 site:
-  title: Template Tutorial(Dev Mode)
+  title: OCP4 and Container Storage for Admins
   url: http://localhost:3000/rhs-openshift-ocs-admins/index.html
   start_page: rhs-openshift-ocs-admins::index.adoc
 
@@ -13,7 +13,7 @@ content:
       start_path: documentation
 asciidoc:
   attributes:
-    title: Template Tutorial(Dev Mode)
+    title: OCP4 and Container Storage for Admins (Dev Mode)
   extensions:
     - ./lib/remote-include-processor.js
     - ./lib/tab-block.js

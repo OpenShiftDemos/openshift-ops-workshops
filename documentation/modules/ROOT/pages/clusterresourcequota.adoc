@@ -23,7 +23,7 @@ In order to set a `clusterresourcequota` to a user you need to be `kubeadmin`
 
 [source,bash,role="execute"]
 ----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc login -u kubeadmin -p %%KUBEADMIN_PASSWORD%%
 ----
 
 Now, set a quota for the `normaluser1`. We will be using the `annotation` key of `openshift.io/requester=` to identify the projects that will have these quotas assigned to. For this exercise, we will set a hard quota against creating more than 10 pods.
@@ -130,7 +130,7 @@ Now we can check the quota by first becoming `kubeadmin`:
 
 [source,bash,role="execute"]
 ----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc login -u kubeadmin -p %%KUBEADMIN_PASSWORD%%
 ----
 
 Now run `oc describe clusterresourcequotas for-user-normaluser1` to see the status of the quota:
@@ -224,7 +224,7 @@ To see the status, switch to the `kubeadmin` account and run the `describe` comm
 
 [source,bash,role="execute"]
 ----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc login -u kubeadmin -p %%KUBEADMIN_PASSWORD%%
 oc describe clusterresourcequotas for-user-normaluser1
 ----
 
@@ -249,7 +249,7 @@ In order to set a quota by application stacks that may span multiple projects, y
 
 [source,bash,role="execute"]
 ----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc login -u kubeadmin -p %%KUBEADMIN_PASSWORD%%
 ----
 
 Now set a quota based on a label. For this lab we will use `appstack=pricelist` key/value based label to identify projects.
@@ -320,7 +320,7 @@ Check the status of the quota by logging in as `kubeadmin` and running the `desc
 
 [source,bash,role="execute"]
 ----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc login -u kubeadmin -p %%KUBEADMIN_PASSWORD%%
 oc describe clusterresourcequotas for-pricelist
 ----
 
@@ -373,7 +373,7 @@ Clean up the work you did by first becoming `kubeadmin`:
 
 [source,bash,role="execute"]
 ----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc login -u kubeadmin -p %%KUBEADMIN_PASSWORD%%
 ----
 
 These quotas may interfere with other labs; so delete both of the `clusterresourcequota` we created in this lab:
@@ -394,5 +394,5 @@ Make sure you login as `kubeadmin` for the next lab.
 
 [source,bash,role="execute"]
 ----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc login -u kubeadmin -p %%KUBEADMIN_PASSWORD%%
 ----

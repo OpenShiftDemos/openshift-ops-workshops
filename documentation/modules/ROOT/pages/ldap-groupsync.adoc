@@ -167,9 +167,9 @@ As the `kubeadmin` user apply the OAuth configuration with `oc`.
 [source,bash,role="execute"]
 ----
 oc create secret generic ldap-secret --from-literal=bindPassword=b1ndP^ssword -n openshift-config
-wget https://ssl-ccp.godaddy.com/repository/gd-class2-root.crt -O {{ HOME_PATH }}/support/ca.crt
-oc create configmap ca-config-map --from-file={{ HOME_PATH }}/support/ca.crt -n openshift-config
-oc apply -f {{ HOME_PATH }}/support/oauth-cluster.yaml
+wget https://ssl-ccp.godaddy.com/repository/gd-class2-root.crt -O %%HOME_PATH%%/support/ca.crt
+oc create configmap ca-config-map --from-file=%%HOME_PATH%%/support/ca.crt -n openshift-config
+oc apply -f %%HOME_PATH%%/support/oauth-cluster.yaml
 ----
 
 [NOTE]
@@ -193,7 +193,7 @@ We have provided a `groupsync` configuration file for you:
 View configuration file
 [source,bash,role="execute"]
 ----
-cat {{ HOME_PATH }}/support/groupsync.yaml
+cat %%HOME_PATH%%/support/groupsync.yaml
 ----
 
 Without going into too much detail (you can look at the documentation), the
@@ -211,7 +211,7 @@ Execute the `groupsync`:
 
 [source,bash,role="execute"]
 ----
-oc adm groups sync --sync-config={{ HOME_PATH }}/support/groupsync.yaml --confirm
+oc adm groups sync --sync-config=%%HOME_PATH%%/support/groupsync.yaml --confirm
 ----
 
 You will see output like the following:
@@ -518,7 +518,7 @@ You will see something like the following:
 
 ----
 NAME             HOST/PORT                                                                      PATH   SERVICES         PORT   TERMINATION          WILDCARD
-prometheus-k8s   prometheus-k8s-openshift-monitoring.{{ ROUTE_SUBDOMAIN }}          prometheus-k8s   web    reencrypt/Redirect   None
+prometheus-k8s   prometheus-k8s-openshift-monitoring.%%ROUTE_SUBDOMAIN%%          prometheus-k8s   web    reencrypt/Redirect   None
 ----
 
 [WARNING]
@@ -531,8 +531,8 @@ authentication. While it will work, it doesn't demonstrate the
 ====
 
 The installer configured a `Route` for Prometheus by default. Go ahead and
-control+click the link:https://prometheus-k8s-openshift-monitoring.{{
-ROUTE_SUBDOMAIN }}[Prometheus link] to open it in your browser. You'll be
+control+click the link:https://prometheus-k8s-openshift-monitoring.%%ROUTE_SUBDOMAIN%%[Prometheus link]
+to open it in your browser. You'll be
 greeted with a login screen. Click the *Log in with OpenShift* button, then
 select the `ldap` auth mechanism, and use the `fancyuser1` user that you gave
 `cluster-reader` privileges to earlier. More specifically, the

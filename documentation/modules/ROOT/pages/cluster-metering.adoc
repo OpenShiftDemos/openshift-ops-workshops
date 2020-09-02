@@ -45,7 +45,7 @@ The output should reflect that no Metering projects currently exist.
 
 #### Login to the OpenShift Web Console
 
-Login to the link:{{ MASTER_URL }}[OpenShift Web Console] with the kubeadmin credentials.
+Login to the link:%%MASTER_URL%%[OpenShift Web Console] with the kubeadmin credentials.
 
 [source,role="copypaste"]
 ----
@@ -54,7 +54,7 @@ kubeadmin
 
 [source,role="copypaste"]
 ----
-{{ KUBEADMIN_PASSWORD }}
+%%KUBEADMIN_PASSWORD%%
 ----
 
 [WARNING]

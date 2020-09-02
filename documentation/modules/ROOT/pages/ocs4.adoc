@@ -75,7 +75,7 @@ run storage-specific nodes for your OCP cluster:
 
 [source,role="execute"]
 ----
-bash {{ HOME_PATH }}/support/machineset-generator.sh 3 workerocs 0 | oc create -f -
+bash %%HOME_PATH%%/support/machineset-generator.sh 3 workerocs 0 | oc create -f -
 oc get machineset -n openshift-machine-api -l machine.openshift.io/cluster-api-machine-role=workerocs -o name | xargs oc patch -n openshift-machine-api --type='json' -p '[{"op": "add", "path": "/spec/template/spec/metadata/labels", "value":{"node-role.kubernetes.io/worker":"", "role":"storage-node", "cluster.ocs.openshift.io/openshift-storage":""} }]'
 oc get machineset -n openshift-machine-api -l machine.openshift.io/cluster-api-machine-role=workerocs -o name | xargs oc scale -n openshift-machine-api --replicas=1
 ----
@@ -182,13 +182,13 @@ oc label namespace openshift-storage "openshift.io/cluster-monitoring=true"
 
 Now switch over to your *Openshift Web Console*:
 
-{{ MASTER_URL }}
+%%MASTER_URL%%
 
 Remember that the login is `kubeadmin` and the password is:
 
 [source,role="copypaste"]
 ----
-{{ KUBEADMIN_PASSWORD }}
+%%KUBEADMIN_PASSWORD%%
 ----
 
 Once you are logged in, navigate to the *Operators* -> *OperatorHub* menu.
@@ -557,7 +557,7 @@ start the Rails + PostgreSQL deployment.
 [source,role="execute"]
 ----
 oc new-project my-database-app
-oc new-app -f {{ HOME_PATH }}/support/ocslab_rails-app.yaml -p STORAGE_CLASS=ocs-storagecluster-ceph-rbd -p VOLUME_CAPACITY=5Gi
+oc new-app -f %%HOME_PATH%%/support/ocslab_rails-app.yaml -p STORAGE_CLASS=ocs-storagecluster-ceph-rbd -p VOLUME_CAPACITY=5Gi
 ----
 
 After the deployment is started you can monitor with these commands.
@@ -1003,7 +1003,7 @@ If you are missing the *ConfigMap*, create it using this command:
 
 [source,role="execute"]
 ----
-oc apply -f {{ HOME_PATH }}/support/ocslab_cluster-monitoring-noinfra.yaml
+oc apply -f %%HOME_PATH%%/support/ocslab_cluster-monitoring-noinfra.yaml
 ----
 .Sample output:
 ----
@@ -1018,7 +1018,7 @@ If the *ConfigMap* already exists because of completing prior module
 
 [source,role="execute"]
 ----
-oc apply -f {{ HOME_PATH }}/support/ocslab_cluster-monitoring-withinfra.yaml
+oc apply -f %%HOME_PATH%%/support/ocslab_cluster-monitoring-withinfra.yaml
 ----
 .Sample output:
 ----
@@ -1464,7 +1464,7 @@ Let's try this out:
 .Deploy the Manifest:
 [source,role="execute"]
 ----
-oc apply -f {{ HOME_PATH }}/support/ocslab_obc-app-example.yaml
+oc apply -f %%HOME_PATH%%/support/ocslab_obc-app-example.yaml
 ----
 .Example output:
 ----

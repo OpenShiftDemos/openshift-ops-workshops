@@ -17,7 +17,7 @@ Container Platform clusters.
 
 #### Examine Alerting Configuration
 
-1. Login to the link:{{ MASTER_URL }}[OpenShift Web Console] with the kubeadmin credentials.
+1. Login to the link:%%MASTER_URL%%[OpenShift Web Console] with the kubeadmin credentials.
 +
 [source,role="copypaste"]
 ----
@@ -26,7 +26,7 @@ kubeadmin
 +
 [source,role="copypaste"]
 ----
-{{ KUBEADMIN_PASSWORD }}
+%%KUBEADMIN_PASSWORD%%
 ----
 +
 [WARNING]
@@ -125,7 +125,7 @@ kubeadmin
 +
 [source,role="copypaste"]
 ----
-{{ KUBEADMIN_PASSWORD }}
+%%KUBEADMIN_PASSWORD%%
 ----
 +
 1. On the "Authorize Access" page, click the "Allow selected permissions" button.

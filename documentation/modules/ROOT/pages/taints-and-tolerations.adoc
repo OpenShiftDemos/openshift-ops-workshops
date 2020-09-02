@@ -39,7 +39,7 @@ In order to examine the nodes, make sure you're running as `kubeadmin`
 
 [source,bash,role="execute"]
 ----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc login -u kubeadmin -p %%KUBEADMIN_PASSWORD%%
 ----
 
 List the current worker nodes, ignoring infra nodes and storage nodes.
@@ -291,7 +291,7 @@ Make sure you login as `kubeadmin` for the next lab.
 
 [source,bash,role="execute"]
 ----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc login -u kubeadmin -p %%KUBEADMIN_PASSWORD%%
 ----
 
 Other labs may be affected by taints, so let's undo what we did:

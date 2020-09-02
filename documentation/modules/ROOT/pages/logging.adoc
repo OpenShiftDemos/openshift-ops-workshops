@@ -83,7 +83,7 @@ To create the namespace, run the following command:
 
 [source,bash,role="execute"]
 ----
-oc create -f {{ HOME_PATH }}/support/openshift_logging_namespace.yaml
+oc create -f %%HOME_PATH%%/support/openshift_logging_namespace.yaml
 ----
 
 
@@ -111,7 +111,7 @@ and/or what to configure. For installing `openshift-logging`, we will follow
 this pattern.
 
 To begin, log-in to the OpenShift Cluster's GUI.
-`{{ MASTER_URL }}`
+`%%MASTER_URL%%`
 
 Then follow the following steps:
 
@@ -363,12 +363,12 @@ You will see something like:
 
 ----
 NAME     HOST/PORT                                                           PATH   SERVICES   PORT    TERMINATION          WILDCARD
-kibana   kibana-openshift-logging.{{ ROUTE_SUBDOMAIN }}          kibana     <all>   reencrypt/Redirect   None
+kibana   kibana-openshift-logging.%%ROUTE_SUBDOMAIN%%          kibana     <all>   reencrypt/Redirect   None
 ----
 
 Or, you can control+click the link:
 
-https://kibana-openshift-logging.{{ ROUTE_SUBDOMAIN }}
+https://kibana-openshift-logging.%%ROUTE_SUBDOMAIN%%
 
 There is a special authentication proxy that is configured as part of the EFK
 installation that results in Kibana requiring OpenShift credentials for

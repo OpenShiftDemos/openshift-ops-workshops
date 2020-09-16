@@ -1652,30 +1652,18 @@ oc get pod -o=custom-columns=NAME:.metadata.name,STATUS:.status.phase,NODE:.spec
 ----
 .Example output:
 ----
-rook-ceph-osd-0-5dd77b475-zn7fq                                   Running     ip-10-0-
-136-250.us-east-2.compute.internal
-rook-ceph-osd-1-686f5dff76-tlr9r                                  Running     ip-10-0-
-162-88.us-east-2.compute.internal
-rook-ceph-osd-2-fb48fb96-b8dv6                                    Running     ip-10-0-
-154-203.us-east-2.compute.internal
-rook-ceph-osd-3-77f95c4bbc-gc8nt                                  Running     ip-10-0-
-150-158.us-east-2.compute.internal
-rook-ceph-osd-4-64dcb564db-t5w82                                  Running     ip-10-0-
-143-214.us-east-2.compute.internal
-rook-ceph-osd-5-6b4b8bbf44-9jfjq                                  Running     ip-10-0-
-174-206.us-east-2.compute.internal
-rook-ceph-osd-prepare-ocs-deviceset-0-data-0-l4b6w-qqxfc          Succeeded   ip-10-0-
-136-250.us-east-2.compute.internal
-rook-ceph-osd-prepare-ocs-deviceset-0-data-1-wfw6d-9tnk8          Succeeded   ip-10-0-
-143-214.us-east-2.compute.internal
-rook-ceph-osd-prepare-ocs-deviceset-1-data-0-hvrdt-gcd7v          Succeeded   ip-10-0-
-154-203.us-east-2.compute.internal
-rook-ceph-osd-prepare-ocs-deviceset-1-data-1-vrvs7-d5ff7          Succeeded   ip-10-0-
-150-158.us-east-2.compute.internal
-rook-ceph-osd-prepare-ocs-deviceset-2-data-0-v7gnf-8nrrd          Succeeded   ip-10-0-
-162-88.us-east-2.compute.internal
-rook-ceph-osd-prepare-ocs-deviceset-2-data-1-t5hqf-s2cqs          Succeeded   ip-10-0-
-174-206.us-east-2.compute.internal
+rook-ceph-osd-0-5dd77b475-zn7fq                                   Running     ip-10-0-136-250.us-east-2.compute.internal
+rook-ceph-osd-1-686f5dff76-tlr9r                                  Running     ip-10-0-162-88.us-east-2.compute.internal
+rook-ceph-osd-2-fb48fb96-b8dv6                                    Running     ip-10-0-154-203.us-east-2.compute.internal
+rook-ceph-osd-3-77f95c4bbc-gc8nt                                  Running     ip-10-0-150-158.us-east-2.compute.internal
+rook-ceph-osd-4-64dcb564db-t5w82                                  Running     ip-10-0-143-214.us-east-2.compute.internal
+rook-ceph-osd-5-6b4b8bbf44-9jfjq                                  Running     ip-10-0-174-206.us-east-2.compute.internal
+rook-ceph-osd-prepare-ocs-deviceset-0-data-0-l4b6w-qqxfc          Succeeded   ip-10-0-136-250.us-east-2.compute.internal
+rook-ceph-osd-prepare-ocs-deviceset-0-data-1-wfw6d-9tnk8          Succeeded   ip-10-0-143-214.us-east-2.compute.internal
+rook-ceph-osd-prepare-ocs-deviceset-1-data-0-hvrdt-gcd7v          Succeeded   ip-10-0-154-203.us-east-2.compute.internal
+rook-ceph-osd-prepare-ocs-deviceset-1-data-1-vrvs7-d5ff7          Succeeded   ip-10-0-150-158.us-east-2.compute.internal
+rook-ceph-osd-prepare-ocs-deviceset-2-data-0-v7gnf-8nrrd          Succeeded   ip-10-0-162-88.us-east-2.compute.internal
+rook-ceph-osd-prepare-ocs-deviceset-2-data-1-t5hqf-s2cqs          Succeeded   ip-10-0-174-206.us-east-2.compute.internal
 ----
 
 This is everything that you need to do to extend the OCS storage.

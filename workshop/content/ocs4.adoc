@@ -1230,10 +1230,7 @@ g-store]}]}   Ready   1h55m36s
 #- Bucket Claims -#
 #-----------------#
 
-NAMESPACE           NAME        BUCKET-NAME                                      STORA
-GE-CLASS                 BUCKET-CLASS                  PHASE
-openshift-storage   test21obc   test21obc-62051f88-4463-420f-9d38-459763dfd055   opens
-hift-storage.noobaa.io   noobaa-default-bucket-class   Bound
+No OBCs found.
 ----
 
 As you can see - the NooBaa CLI will first check on the environment and will

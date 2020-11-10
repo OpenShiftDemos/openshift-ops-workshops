@@ -6,6 +6,7 @@ RUN wget https://github.com/noobaa/noobaa-operator/releases/download/v2.3.0/noob
     wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.6.1/openshift-client-linux-4.6.1.tar.gz -P /opt/app-root/src/ && \
     tar -xzvf /opt/app-root/src/openshift-client-linux-4.6.1.tar.gz -C /opt/workshop/bin/ && \
     rm -f /opt/workshop/bin/README.md && \
+    ln -s /opt/workshop/bin/noobaa /opt/app-root/bin/noobaa && \
     chmod +x /opt/workshop/bin/{oc,kubectl,noobaa}
 
 COPY . /tmp/src

@@ -75,25 +75,25 @@ First, clone the repo
 git clone https://github.com/openshift/openshift-cns-testdrive
 ```
 
-Next, Build a container (using `docker` or `podman`) using the repo/branch you checked out.
+Next, Build a container using the repo/branch you checked out.
 
 ```shell
 cd openshift-cns-testdrive
 export QUAY_USER=myusername
 export BRANCH=$(git branch --show-current)
-docker build -t quay.io/${QUAY_USER}/lab-sample-workshop:${BRANCH} .
+podman build -t quay.io/${QUAY_USER}/lab-sample-workshop:${BRANCH} .
 ```
 
 Now, login to quay (it's free to sign up) or another registry your cluster has access to.
 
 ```shell
-docker login quay.io
+podman login quay.io
 ```
 
 Next push your container to your repo.
 
 ```shell
-docker push quay.io/${QUAY_USER}/lab-sample-workshop:${BRANCH}
+podman push quay.io/${QUAY_USER}/lab-sample-workshop:${BRANCH}
 ```
 
 You will use this image to deploy the lab. The following command will log you in as `kubeadmin` on systems with `oc` client installed:

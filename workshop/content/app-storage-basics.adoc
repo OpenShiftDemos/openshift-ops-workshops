@@ -27,6 +27,14 @@ image. The writable layer is disposed of once the container is deleted which
 can happen regularly in a dynamic container orchestration environment.
 ====
 
+You should be in the `app-management` project from the previous lab. To
+make sure, run the following command:
+
+[source,bash,role="execute"]
+----
+oc project app-management
+----
+
 ### Adding Persistent Volume Claims
 Here's how you would instruct OpenShift to create a `PersistentVolume`
 object, which represents external, persistent storage, and have it *mounted*
@@ -34,37 +42,37 @@ inside the container's filesystem:
 
 [source,bash,role="execute"]
 ----
-oc set volume dc/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteOnce --claim-size=1Gi --claim-name=mapit-storage --mount-path=/app-storage
+oc set volume deploy/mapit --add --name=mapit-storage -t pvc --claim-mode=ReadWriteOnce --claim-size=1Gi --claim-name=mapit-storage --mount-path=/app-storage
 ----
 
 The output looks like this:
 
 ----
-deploymentconfig.apps.openshift.io/mapit volume updated
+deployment.apps/mapit volume updated
 ----
 
 In the first step a *PersistentVolumeClaim* was created. This object
 represents a request for storage of a certain kind, with a certain capacity
 from the user to OpenShift.
 
-Next the `DeploymentConfig` of `mapit` is updated to reference this storage
+Next the `Deployment` of `mapit` is updated to reference this storage
 and make it available under the `/app-storage` directory inside the pod.
 
-You can see the new `DeploymentConfig` like this:
+You can see the new `Deployment` like this:
 
 [source,bash,role="execute"]
 ----
-oc get dc mapit
+oc get deploy mapit
 ----
 
-The output will show that a new revision was created as part of the update with storage.
+The output will show that a new deployment was created by inspecting the `AGE` column.
 
 ----
-NAME      REVISION   DESIRED   CURRENT   TRIGGERED BY
-mapit     4          1         1         config,image(mapit:latest)
+NAME    READY   UP-TO-DATE   AVAILABLE   AGE
+mapit   1/1     1            1           14m
 ----
 
-Likely, depending when you ran the command you may or may not see that the new pod is still being spawned:
+Likely, depending when you ran the command, you may or may not see that the new pod is still being spawned:
 
 [source,bash,role="execute"]
 ----
@@ -78,11 +86,11 @@ mapit-4-d872b    0/1       ContainerCreating   0          5s
 mapit-4-deploy   1/1       Running             0          10s
 ----
 
-Take a look at the `DeploymentConfig` now:
+Take a look at the `Deployment` now:
 
 [source,bash,role="execute"]
 ----
-oc describe dc mapit
+oc describe deploy mapit
 ----
 
 You will see there is now both `Mounts` and `Volumes` details about the new storage:
@@ -93,10 +101,10 @@ You will see there is now both `Mounts` and `Volumes` details about the new stor
       /app-storage from mapit-storage (rw)
   Volumes:
    mapit-storage:
-    Type:	PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
-    ClaimName:	mapit-storage
-    ReadOnly:	false
-....
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  mapit-storage
+    ReadOnly:   false
+...
 ----
 
 But what is happening under the covers?
@@ -113,14 +121,24 @@ oc get storageclass
 And you will see something like:
 
 ----
-NAME            PROVISIONER             AGE
-gp2 (default)   kubernetes.io/aws-ebs   4d4h
+NAME            PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+gp2 (default)   kubernetes.io/aws-ebs   Delete          WaitForFirstConsumer   true                   47m
+gp2-csi         ebs.csi.aws.com         Delete          WaitForFirstConsumer   true                   47m
 ----
 
 Any time a request for a volume is made (`PersistentVolumeClaim`) that
 doesn't specify a `StorageClass`, the default will be used. In this case, the
 default is an EBS provisioner that will create an EBS GP2 volume of the
 requested size (in our example, 1Gi).
+
+[Note]
+====
+You'll note that there is also a `gp2-csi`. This implements the
+https://github.com/container-storage-interface/spec[CSI interface],
+which stands for "Container Storage Interface". This specification enables
+storage vendors to develop their plugins once, and have it work across
+various container orchestration systems.
+====
 
 ### Persistent Volume (Claims)
 The command you ran earlier referenced a `claim`. Storage in a Kubernetes
@@ -141,7 +159,7 @@ You will see something like the following:
 
 ----
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                          STORAGECLASS   REASON   AGE
-pvc-9ac61701-5d56-11e9-9fbd-0a1014b36356   1Gi        RWO            Delete           Bound    app-management/mapit-storage   gp2                     114s
+pvc-4397c6be-9f53-490e-960d-c1b77de6000c   1Gi        RWO            Delete           Bound    app-management/mapit-storage   gp2                     12m
 ----
 This is the volume that was created as a result of your earlier claim. Note
 that the volume is *bound* to the claim that exists in the `app-management`
@@ -158,17 +176,16 @@ You will see something like:
 
 ----
 NAME            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-mapit-storage   Bound    pvc-9ac61701-5d56-11e9-9fbd-0a1014b36356   1Gi        RWO            gp2            32m
+mapit-storage   Bound    pvc-4397c6be-9f53-490e-960d-c1b77de6000c   1Gi        RWO            gp2            14m
 ----
 
 ### Testing Persistent Storage
 
-Get the name of your pod using `oc get pods` and then log on to the pod using
-the remote-shell capability of the `oc` client:
+Log on to the pod using the remote-shell capability of the `oc` client:
 
-[source,none,role="copypaste copypaste-warning"]
+[source,bash,role="execute"]
 ----
-oc rsh mapit-4-d872b
+oc rsh $(oc get pods -l deployment=mapit -o name)
 ----
 
 *Being in the container's shell session*, list the content of the root
@@ -225,24 +242,24 @@ exit
 
 Then, make sure your file is present:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="execute"]
 ----
-oc rsh mapit-4-t4mnv cat /app-storage/hello.txt
+oc rsh $(oc get pods -l deployment=mapit -o name) cat /app-storage/hello.txt
 ----
 
 Now, to verify that persistent storage really works, delete your pod:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="execute"]
 ----
-oc delete pod mapit-4-t4mnv && oc get pod
+oc delete pods -l deployment=mapit && oc get pod
 ----
 
-After some time, your new pod will be ready and running. Find its name, and
-again check the file:
+After some time, your new pod will be ready and running. Once it's
+running, check the file:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="execute"]
 ----
-oc rsh mapit-4-lpqd5 cat /app-storage/hello.txt
+oc rsh $(oc get pods -l deployment=mapit -o name) cat /app-storage/hello.txt
 ----
 
 It's still there. In fact, the new pod may not even be running on the same

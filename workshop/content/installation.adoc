@@ -26,6 +26,13 @@ Here is your ssh password:
 {{ SSH_PASSWORD }}
 ----
 
+Once you've SSH-ed into the bastion host, become the `ec2-user`:
+
+[source,bash,role="execute"]
+----
+sudo su - ec2-user
+----
+
 You'll notice that there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This
 string is your `GUID`. Since you will often use `GUID`, it makes sense to
 export it as an environment variable:
@@ -86,7 +93,7 @@ load balancer.
 
 For more information on the OpenShift Master's areas of responsibility, please refer to
 the
-link:https://docs.openshift.com/container-platform/3.11/architecture/infrastructure_components/kubernetes_infrastructure.html[infrastructure components section] of the product documentation.
+link:https://docs.openshift.com/container-platform/4.6/architecture/control-plane.html[infrastructure components section] of the product documentation.
 
 ### Examining the installation artifacts
 OpenShift 4 installs with two effective superusers:
@@ -121,17 +128,19 @@ ls -al ~/cluster-$GUID
 You'll see something like the following:
 
 ----
-total 3348
-drwxrwxr-x. 4 ec2-user ec2-user     199 May  3 08:13 .
-drwx------. 7 lab-user users        134 May  3 13:46 ..
-drwxr-xr-x. 2 ec2-user ec2-user      50 May  3 08:00 auth
--rw-r--r--. 1 ec2-user ec2-user     271 May  3 07:54 metadata.json
--rw-rw-r--. 1 ec2-user ec2-user  576663 May  3 08:18 .openshift_install.log
--rw-r--r--. 1 ec2-user ec2-user 2351869 May  3 08:00 .openshift_install_state.json
--rw-r--r--. 1 ec2-user ec2-user     623 May  3 07:54 terraform.aws.auto.tfvars
--rw-rw-r--. 1 ec2-user ec2-user  170852 May  3 08:13 terraform.tfstate
--rw-r--r--. 1 ec2-user ec2-user  312196 May  3 07:54 terraform.tfvars
-drwxr-xr-x. 2 ec2-user ec2-user      62 May  3 07:54 tls
+total 3008
+drwxrwxr-x.  4 ec2-user ec2-user     273 Nov 18 01:48 .
+drwx------. 13 ec2-user ec2-user    4096 Nov 18 02:55 ..
+drwxr-x---.  2 ec2-user ec2-user      50 Nov 18 01:15 auth
+-rw-rw----.  1 ec2-user ec2-user    4197 Nov 18 01:15 install-config.yaml.bak
+-rw-r-----.  1 ec2-user ec2-user     283 Nov 18 01:15 metadata.json
+-rw-rw-r--.  1 ec2-user ec2-user  149886 Nov 18 01:48 .openshift_install.log
+-rw-rw-r--.  1 ec2-user ec2-user   11746 Nov 18 01:48 .openshift_install.log.gz
+-rw-r-----.  1 ec2-user ec2-user 2403044 Nov 18 01:21 .openshift_install_state.json
+-rw-r-----.  1 ec2-user ec2-user    1576 Nov 18 01:15 terraform.aws.auto.tfvars.json
+-rw-r--r--.  1 ec2-user ec2-user  168006 Nov 18 01:30 terraform.tfstate
+-rw-r-----.  1 ec2-user ec2-user  318587 Nov 18 01:15 terraform.tfvars.json
+drwxr-x---.  2 ec2-user ec2-user      62 Nov 18 01:15 tls
 ----
 
 The OpenShift 4 IPI installation embeds Terraform in order to create some of
@@ -183,7 +192,7 @@ And you will see some output like:
 
 ```
 NAME      VERSION   AVAILABLE   PROGRESSING   SINCE   STATUS
-version   4.3.1     True        False         15m     Cluster version is 4.3.1
+version   4.6.3     True        False         71m     Cluster version is 4.6.3
 ```
 
 For more details, you can execute the following command:
@@ -202,46 +211,82 @@ Annotations:  <none>
 API Version:  config.openshift.io/v1
 Kind:         ClusterVersion
 Metadata:
-  Creation Timestamp:  2020-03-03T13:46:19Z
+  Creation Timestamp:  2020-11-10T15:59:59Z
   Generation:          1
-  Resource Version:    17564
-  Self Link:           /apis/config.openshift.io/v1/clusterversions/version
-  UID:                 0cf1369c-0cdf-4be8-85a1-86e4f5611746
+  Managed Fields:
+    API Version:  config.openshift.io/v1
+    Fields Type:  FieldsV1
+    fieldsV1:
+      f:spec:
+        .:
+        f:channel:
+        f:clusterID:
+        f:upstream:
+    Manager:      cluster-bootstrap
+    Operation:    Update
+    Time:         2020-11-10T15:59:59Z
+    API Version:  config.openshift.io/v1
+    Fields Type:  FieldsV1
+    fieldsV1:
+      f:status:
+        .:
+        f:availableUpdates:
+        f:conditions:
+        f:desired:
+          .:
+          f:channels:
+          f:image:
+          f:url:
+          f:version:
+        f:history:
+        f:observedGeneration:
+        f:versionHash:
+    Manager:         cluster-version-operator
+    Operation:       Update
+    Time:            2020-11-10T16:30:21Z
+  Resource Version:  26775
+  Self Link:         /apis/config.openshift.io/v1/clusterversions/version
+  UID:               aeecffc3-c364-425a-a324-01d32f019630
 Spec:
-  Channel:     stable-4.3
-  Cluster ID:  b10d095f-03fe-41c8-985e-75d4d82bfc5e
+  Channel:     stable-4.6
+  Cluster ID:  e4ab25a7-7729-4b81-8770-274a531ea0d3
   Upstream:    https://api.openshift.com/api/upgrades_info/v1/graph
 Status:
   Available Updates:  <nil>
   Conditions:
-    Last Transition Time:  2020-03-03T14:06:32Z
-    Message:               Done applying 4.3.1
+    Last Transition Time:  2020-11-10T16:30:21Z
+    Message:               Done applying 4.6.1
     Status:                True
     Type:                  Available
-    Last Transition Time:  2020-03-03T14:02:02Z
+    Last Transition Time:  2020-11-10T16:30:21Z
     Status:                False
     Type:                  Failing
-    Last Transition Time:  2020-03-03T14:06:32Z
-    Message:               Cluster version is 4.3.1
+    Last Transition Time:  2020-11-10T16:30:21Z
+    Message:               Cluster version is 4.6.1
     Status:                False
     Type:                  Progressing
-    Last Transition Time:  2020-03-03T13:46:28Z
+    Last Transition Time:  2020-11-10T15:59:59Z
     Status:                True
     Type:                  RetrievedUpdates
   Desired:
-    Force:    false
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:ea7ac3ad42169b39fce07e5e53403a028644810bee9a212e7456074894df40f3
-    Version:  4.3.1
+    Channels:
+      candidate-4.6
+      fast-4.6
+      stable-4.6
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:d78292e9730dd387ff6198197c8b0598da340b
+e7678e8e1e4810b557a926c2b9
+    URL:      https://access.redhat.com/errata/RHBA-2020:4196
+    Version:  4.6.1
   History:
-    Completion Time:    2020-03-03T14:06:32Z
-    Image:              quay.io/openshift-release-dev/ocp-release@sha256:ea7ac3ad42169b39fce07e5e53403a028644810bee9a212e745607
-4894df40f3
-    Started Time:       2020-03-03T13:46:28Z
+    Completion Time:    2020-11-10T16:30:21Z
+    Image:              quay.io/openshift-release-dev/ocp-release@sha256:d78292e9730dd387ff6198197c8b
+0598da340be7678e8e1e4810b557a926c2b9
+    Started Time:       2020-11-10T15:59:59Z
     State:              Completed
     Verified:           false
-    Version:            4.3.1
+    Version:            4.6.1
   Observed Generation:  1
-  Version Hash:         7VzR42wcDZ4=
+  Version Hash:         l4WEdVTgp58=
 Events:                 <none>
 ```
 
@@ -257,13 +302,13 @@ oc get nodes
 The output should look something like the following:
 
 ----
-NAME                                         STATUS   ROLES    AGE    VERSION
-ip-10-0-133-191.us-east-2.compute.internal   Ready    worker   44m   v1.16.2
-ip-10-0-129-109.us-east-2.compute.internal   Ready    master   59m   v1.16.2
-ip-10-0-133-205.us-east-2.compute.internal   Ready    worker   49m   v1.16.2
-ip-10-0-146-235.us-east-2.compute.internal   Ready    worker   49m   v1.16.2
-ip-10-0-153-202.us-east-2.compute.internal   Ready    master   58m   v1.16.2
-ip-10-0-165-150.us-east-2.compute.internal   Ready    master   59m   v1.16.2
+NAME                                         STATUS   ROLES    AGE     VERSION
+ip-10-0-128-29.us-west-2.compute.internal    Ready    worker   4h16m   v1.19.0+d59ce34
+ip-10-0-154-253.us-west-2.compute.internal   Ready    master   4h26m   v1.19.0+d59ce34
+ip-10-0-162-126.us-west-2.compute.internal   Ready    worker   4h17m   v1.19.0+d59ce34
+ip-10-0-164-110.us-west-2.compute.internal   Ready    master   4h26m   v1.19.0+d59ce34
+ip-10-0-197-0.us-west-2.compute.internal     Ready    worker   4h17m   v1.19.0+d59ce34
+ip-10-0-203-93.us-west-2.compute.internal    Ready    master   4h26m   v1.19.0+d59ce34
 ----
 
 You have 3 masters and 3 workers. The OpenShift *Master* is also a *Node*
@@ -272,6 +317,12 @@ need additional nodes for additional purposes, you can create them very
 easily when using IPI and leveraging the cloud provider operators. You will
 create nodes to run OpenShift infrastructure components (registry, router,
 etc.) in a subsequent exercise.
+
+Exit out of the `ec2-user` user shell.
+[source,role="execute"]
+----
+exit
+----
 
 #### Check the Web Console
 OpenShift provides a web console for users, developers, application
@@ -295,8 +346,10 @@ If you accidentally hit exit more than once and connection to the console closed
 
 [WARNING]
 ====
-You will receive a self-signed certificate error in your browser when you
+You might receive a self-signed certificate error in your browser when you
 first visit the web console. When OpenShift is installed, by default, a CA
 and SSL certificates are generated for all inter-component communication
-within OpenShift, including the web console.
+within OpenShift, including the web console. Some lab instances were
+installed with Let's Encrypt certificates, so not all will get this
+warning.
 ====

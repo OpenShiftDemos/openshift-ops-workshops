@@ -41,20 +41,18 @@ oc new-app quay.io/thoraxe/mapit
 The output will look like:
 
 ----
---> Found Docker image 7ce7ade (20 months old) from quay.io for "quay.io/thoraxe/mapit"
+--> Found container image 7ce7ade (3 years old) from quay.io for "quay.io/thoraxe/mapit"
 
     * An image stream tag will be created as "mapit:latest" that will track this image
-    * This image will be deployed in deployment config "mapit"
-    * Ports 8080/tcp, 8778/tcp, 9779/tcp will be load balanced by service "mapit"
-      * Other containers can access this service through the hostname "mapit"
 
 --> Creating resources ...
     imagestream.image.openshift.io "mapit" created
-    deploymentconfig.apps.openshift.io "mapit" created
+    deployment.apps "mapit" created
     service "mapit" created
 --> Success
-    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
-     'oc expose svc/mapit'
+    Application is not exposed. You can expose services to the outside world by executin
+g one or more of the commands below:
+     'oc expose service/mapit'
     Run 'oc status' to view your app.
 ----
 
@@ -88,68 +86,79 @@ oc get pods
 And you will see something like the following:
 
 ----
-NAME             READY   STATUS      RESTARTS   AGE
-mapit-1-5qmgw    1/1     Running     0          24s
-mapit-1-deploy   0/1     Completed   0          32s
+NAME                     READY   STATUS    RESTARTS   AGE
+mapit-764c5bf8b8-l49z7   1/1     Running   0          2m53s
 ----
 
 NOTE: Pod names are dynamically generated as part of the deployment process,
 which you will learn about shortly. Your name will be slightly different.
 
-NOTE: The `-deploy` pod is related to the `DeploymentConfig` which will be discussed later.
 
 The `describe` command will give you more information on the details of a pod.
 In the case of the pod name above:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="execute"]
 ----
-oc describe pod mapit-1-5qmgw
+oc describe pod -l deployment=mapit
 ----
+
+NOTE: The `-l deployment=mapit` selects the pod that is related to the
+`Deployment` which will be discussed later.
 
 And you will see output similar to the following:
 
 ----
-Name:               mapit-1-5qmgw
-Namespace:          app-management
-Priority:           0
-PriorityClassName:  <none>
-Node:               ip-10-0-139-135.ec2.internal/10.0.139.135
-Start Time:         Mon, 08 Apr 2019 19:38:55 +0000
-Labels:             app=mapit
-                    deployment=mapit-1
-                    deploymentconfig=mapit
-Annotations:        k8s.v1.cni.cncf.io/networks-status:
-                      [{
-                          "name": "openshift-sdn",
-                          "interface": "eth0",
-                          "ips": [
-                              "10.128.4.13"
-                          ],
-                          "default": true,
-                          "dns": {}
-                      }]
-                    openshift.io/deployment-config.latest-version: 1
-                    openshift.io/deployment-config.name: mapit
-                    openshift.io/deployment.name: mapit-1
-                    openshift.io/generated-by: OpenShiftNewApp
-                    openshift.io/scc: restricted
-Status:             Running
-IP:                 10.128.4.13
-Controlled By:      ReplicationController/mapit-1
+Name:         mapit-764c5bf8b8-l49z7
+Namespace:    app-management
+Priority:     0
+Node:         ip-10-0-128-29.us-west-2.compute.internal/10.0.128.29
+Start Time:   Tue, 10 Nov 2020 21:01:09 +0000
+Labels:       deployment=mapit
+              pod-template-hash=764c5bf8b8
+Annotations:  k8s.v1.cni.cncf.io/network-status:
+                [{
+                    "name": "",
+                    "interface": "eth0",
+                    "ips": [
+                        "10.129.2.99"
+                    ],
+                    "default": true,
+                    "dns": {}
+                }]
+              k8s.v1.cni.cncf.io/networks-status:
+                [{
+                    "name": "",
+                    "interface": "eth0",
+                    "ips": [
+                        "10.129.2.99"
+                    ],
+                    "default": true,
+                    "dns": {}
+                }]
+              openshift.io/generated-by: OpenShiftNewApp
+              openshift.io/scc: restricted
+Status:       Running
+IP:           10.129.2.99
+IPs:
+  IP:           10.129.2.99
+Controlled By:  ReplicaSet/mapit-764c5bf8b8
 Containers:
   mapit:
-    Container ID:   cri-o://77b0d785c73faf96d911b4fb7732f4f2f75666f9377e488b59bfee3fd6a5ede6
-    Image:          quay.io/thoraxe/mapit@sha256:8c7e0349b6a016e3436416f3c54debda4594ba09fd34b8a0dee0c4497102590d
-    Image ID:       quay.io/thoraxe/mapit@sha256:8c7e0349b6a016e3436416f3c54debda4594ba09fd34b8a0dee0c4497102590d
+    Container ID:   cri-o://fb708e659c19c6aaf8211bf7e3029f8adc8cf14959bcaefa5c7e6df17d37
+feaf
+    Image:          quay.io/thoraxe/mapit@sha256:8c7e0349b6a016e3436416f3c54debda4594ba0
+9fd34b8a0dee0c4497102590d
+    Image ID:       quay.io/thoraxe/mapit@sha256:8c7e0349b6a016e3436416f3c54debda4594ba0
+9fd34b8a0dee0c4497102590d
     Ports:          9779/TCP, 8080/TCP, 8778/TCP
     Host Ports:     0/TCP, 0/TCP, 0/TCP
     State:          Running
-      Started:      Mon, 08 Apr 2019 19:39:13 +0000
+      Started:      Tue, 10 Nov 2020 21:01:29 +0000
     Ready:          True
     Restart Count:  0
     Environment:    <none>
     Mounts:
-      /var/run/secrets/kubernetes.io/serviceaccount from default-token-nfwnb (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-v7fpq (ro)
 Conditions:
   Type              Status
   Initialized       True
@@ -157,22 +166,27 @@ Conditions:
   ContainersReady   True
   PodScheduled      True
 Volumes:
-  default-token-nfwnb:
+  default-token-v7fpq:
     Type:        Secret (a volume populated by a Secret)
-    SecretName:  default-token-nfwnb
+    SecretName:  default-token-v7fpq
     Optional:    false
 QoS Class:       BestEffort
 Node-Selectors:  <none>
-Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
-                 node.kubernetes.io/unreachable:NoExecute for 300s
+Tolerations:     node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                 node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
 Events:
-  Type    Reason     Age    From                                   Message
-  ----    ------     ----   ----                                   -------
-  Normal  Scheduled  2m16s  default-scheduler                      Successfully assigned app-management/mapit-1-5qmgw to ip-10-0-139-135.ec2.internal
-  Normal  Pulling    2m7s   kubelet, ip-10-0-139-135.ec2.internal  Pulling image "quay.io/thoraxe/mapit@sha256:8c7e0349b6a016e3436416f3c54debda4594ba09fd34b8a0dee0c4497102590d"
-  Normal  Pulled     118s   kubelet, ip-10-0-139-135.ec2.internal  Successfully pulled image "quay.io/thoraxe/mapit@sha256:8c7e0349b6a016e3436416f3c54debda4594ba09fd34b8a0dee0c4497102590d"
-  Normal  Created    118s   kubelet, ip-10-0-139-135.ec2.internal  Created container mapit
-  Normal  Started    118s   kubelet, ip-10-0-139-135.ec2.internal  Started container mapit
+  Type    Reason          Age    From               Message
+  ----    ------          ----   ----               -------
+  Normal  Scheduled       6m50s  default-scheduler  Successfully assigned app-management
+/mapit-764c5bf8b8-l49z7 to ip-10-0-128-29.us-west-2.compute.internal
+  Normal  AddedInterface  6m48s  multus             Add eth0 [10.129.2.99/23]
+  Normal  Pulling         6m48s  kubelet            Pulling image "quay.io/thoraxe/mapit
+@sha256:8c7e0349b6a016e3436416f3c54debda4594ba09fd34b8a0dee0c4497102590d"
+  Normal  Pulled          6m31s  kubelet            Successfully pulled image "quay.io/t
+horaxe/mapit@sha256:8c7e0349b6a016e3436416f3c54debda4594ba09fd34b8a0dee0c4497102590d" in
+ 16.762028989s
+  Normal  Created         6m31s  kubelet            Created container mapit
+  Normal  Started         6m31s  kubelet            Started container mapit
 ----
 
 This is a more detailed description of the pod that is running. You can see what
@@ -203,7 +217,7 @@ The way that a *Service* maps to a set of *Pods* is via a system of *Labels* and
 protocols can be mapped.
 
 There is a lot more information about
-https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/pods_and_services.html#services[Services],
+https://docs.openshift.com/container-platform/4.6/architecture/understanding-development.html#understanding-kubernetes-pods[Services],
 including the YAML format to make one by hand, in the official documentation.
 
 You can see the current list of services in a project with:
@@ -216,8 +230,8 @@ oc get services
 You will see something like the following:
 
 ----
-NAME      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
-mapit     ClusterIP   172.30.48.204   <none>        8080/TCP,8778/TCP,9779/TCP   3m
+NAME    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
+mapit   ClusterIP   172.30.167.160   <none>        8080/TCP,8778/TCP,9779/TCP   26
 ----
 
 NOTE: Service IP addresses are dynamically assigned on creation and are
@@ -238,19 +252,21 @@ You will see something like the following:
 Name:              mapit
 Namespace:         app-management
 Labels:            app=mapit
+                   app.kubernetes.io/component=mapit
+                   app.kubernetes.io/instance=mapit
 Annotations:       openshift.io/generated-by: OpenShiftNewApp
-Selector:          app=mapit,deploymentconfig=mapit
+Selector:          deployment=mapit
 Type:              ClusterIP
-IP:                172.30.1.208
+IP:                172.30.167.160
 Port:              8080-tcp  8080/TCP
 TargetPort:        8080/TCP
-Endpoints:         10.128.4.13:8080
+Endpoints:         10.129.2.99:8080
 Port:              8778-tcp  8778/TCP
 TargetPort:        8778/TCP
-Endpoints:         10.128.4.13:8778
+Endpoints:         10.129.2.99:8778
 Port:              9779-tcp  9779/TCP
 TargetPort:        9779/TCP
-Endpoints:         10.128.4.13:9779
+Endpoints:         10.129.2.99:9779
 Session Affinity:  None
 Events:            <none>
 ----
@@ -274,16 +290,60 @@ kind: Service
 metadata:
   annotations:
     openshift.io/generated-by: OpenShiftNewApp
-  creationTimestamp: 2019-04-08T19:38:45Z
+  creationTimestamp: "2020-11-10T21:01:09Z"
   labels:
     app: mapit
+    app.kubernetes.io/component: mapit
+    app.kubernetes.io/instance: mapit
+  managedFields:
+  - apiVersion: v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:annotations:
+          .: {}
+          f:openshift.io/generated-by: {}
+        f:labels:
+          .: {}
+          f:app: {}
+          f:app.kubernetes.io/component: {}
+          f:app.kubernetes.io/instance: {}
+      f:spec:
+        f:ports:
+          .: {}
+          k:{"port":8080,"protocol":"TCP"}:
+            .: {}
+            f:name: {}
+            f:port: {}
+            f:protocol: {}
+            f:targetPort: {}
+          k:{"port":8778,"protocol":"TCP"}:
+            .: {}
+            f:name: {}
+            f:port: {}
+            f:protocol: {}
+            f:targetPort: {}
+          k:{"port":9779,"protocol":"TCP"}:
+            .: {}
+            f:name: {}
+            f:port: {}
+            f:protocol: {}
+            f:targetPort: {}
+        f:selector:
+          .: {}
+          f:deployment: {}
+        f:sessionAffinity: {}
+        f:type: {}
+    manager: oc
+    operation: Update
+    time: "2020-11-10T21:01:09Z"
   name: mapit
   namespace: app-management
-  resourceVersion: "189058"
+  resourceVersion: "106194"
   selfLink: /api/v1/namespaces/app-management/services/mapit
-  uid: ec6ab96f-5a35-11e9-97f0-0a1014b36356
+  uid: 921c2e2c-a53e-4f83-8e76-9df962069314
 spec:
-  clusterIP: 172.30.1.208
+  clusterIP: 172.30.167.160
   ports:
   - name: 8080-tcp
     port: 8080
@@ -298,8 +358,7 @@ spec:
     protocol: TCP
     targetPort: 9779
   selector:
-    app: mapit
-    deploymentconfig: mapit
+    deployment: mapit
   sessionAffinity: None
   type: ClusterIP
 status:
@@ -312,27 +371,27 @@ It is also of interest to view the YAML of the *Pod* to understand how OpenShift
 wires components together. Go back and find the name of your `mapit` *Pod*, and
 then execute the following:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="execute"]
 ----
-oc get pod mapit-1-5qmgw -o yaml
-----
-
-Under the `metadata` section you should see the following:
-
-----
-  labels:
-    app: mapit
-    deployment: mapit-1
-    deploymentconfig: mapit
-  name: mapit-1-5qmgw
+oc get pod -l deployment=mapit -o jsonpath='{.items[*].metadata.labels}' | jq -r
 ----
 
-* The *Service* has a `selector` stanza that refers to `app: mapit` and
-  `deploymentconfig: mapit`.
+NOTE: The `-o jsonpath` selects a specific field. In this case we are asking
+for the `labels` section in the manifest.
+
+The output should look something like this:
+
+----
+{
+  "deployment": "mapit",
+  "pod-template-hash": "764c5bf8b8"
+}
+----
+
+* The *Service* has a `selector` stanza that refers to `deployment: mapit`.
 * The *Pod* has multiple *Labels*:
-** `deploymentconfig: mapit`
-** `app: mapit`
-** `deployment: mapit-1`
+** `deployment: mapit`
+** `pod-template-hash: 764c5bf8b8`
 
 *Labels* are just key/value pairs. Any *Pod* in this *Project* that has a *Label* that
 matches the *Selector* will be associated with the *Service*. If you look at the
@@ -343,70 +402,74 @@ The default behavior of `new-app` is to create just one instance of the item
 requested. We will see how to modify/adjust this in a moment, but there are a
 few more concepts to learn first.
 
-### Background: Deployment Configurations and Replication Controllers
+### Background: Deployment Configurations and Replica Sets
 
 While *Services* provide routing and load balancing for *Pods*, which may go in
-and out of existence, *ReplicationControllers* (RC) are used to specify and then
+and out of existence, *ReplicaSets* (RS) are used to specify and then
 ensure the desired number of *Pods* (replicas) are in existence. For example, if
 you always want an application to be scaled to 3 *Pods* (instances), a
-*ReplicationController* is needed. Without an RC, any *Pods* that are killed or
-somehow die/exit are not automatically restarted. *ReplicationControllers* are
+*ReplicaSet* is needed. Without an RS, any *Pods* that are killed or
+somehow die/exit are not automatically restarted. *ReplicaSets* are
 how OpenShift "self heals".
 
-A *DeploymentConfiguration* (DC) defines how something in OpenShift should be
-deployed. From the https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/deployments.html[deployments documentation^]:
+A *Deployments* (deploy) defines how something in OpenShift should be
+deployed. From the https://docs.openshift.com/container-platform/4.6/applications/deployments/what-deployments-are.html#deployments-kube-deployments_what-deployments-are[deployments documentation]:
 
 ----
-Building on replication controllers, OpenShift adds expanded support for the
-software development and deployment lifecycle with the concept of deployments.
-In the simplest case, a deployment just creates a new replication controller and
-lets it start up pods. However, OpenShift deployments also provide the ability
-to transition from an existing deployment of an image to a new one and also
-define hooks to be run before or after creating the replication controller.
+Deployments describe the desired state of a particular component of an
+application as a Pod template. Deployments create ReplicaSets, which
+orchestrate Pod lifecycles.
 ----
 
 In almost all cases, you will end up using the *Pod*, *Service*,
-*ReplicationController* and *DeploymentConfiguration* resources together. And, in
+*ReplicaSet* and *Deployment* resources together. And, in
 almost all of those cases, OpenShift will create all of them for you.
 
-There are some edge cases where you might want some *Pods* and an *RC* without a *DC*
+There are some edge cases where you might want some *Pods* and an *RS* without a *Deployments*
 or a *Service*, and others, but these are advanced topics not covered in these
 exercises.
 
+NOTE: Earlier versions of OpenShift used something called a *DeploymentConfig*.
+While still a valid deployment mechanism, moving forward the *Deployment* will
+be what will be created with `oc new-app`. See the
+https://docs.openshift.com/container-platform/4.6/applications/deployments/what-deployments-are.html#deployments-comparing-deploymentconfigs_what-deployments-are[official
+documentation] for more details.
+
+
 ### Exploring Deployment-related Objects
 
-Now that we know the background of what a *ReplicatonController* and
-*DeploymentConfig* are, we can explore how they work and are related. Take a
-look at the *DeploymentConfig* (DC) that was created for you when you told
+Now that we know the background of what a *ReplicaSet* and
+*Deployment* are, we can explore how they work and are related. Take a
+look at the *Deployment* (deploy) that was created for you when you told
 OpenShift to stand up the `mapit` image:
 
 [source,bash,role="execute"]
 ----
-oc get dc
+oc get deploy
 ----
 
 You will see something like the following:
 
 ----
-NAME      REVISION   DESIRED   CURRENT   TRIGGERED BY
-mapit     1          1         1         config,image(mapit:latest)
+NAME    READY   UP-TO-DATE   AVAILABLE   AGE
+mapit   1/1     1            1           76m
 ----
 
-To get more details, we can look into the *ReplicationController* (*RC*).
+To get more details, we can look into the *ReplicaSet* (*RS*).
 
-Take a look at the *ReplicationController* (RC) that was created for you when
+Take a look at the *ReplicaSet* (RS) that was created for you when
 you told OpenShift to stand up the `mapit` image:
 
 [source,bash,role="execute"]
 ----
-oc get rc
+oc get rs
 ----
 
 You will see something like the following:
 
 ----
-NAME      DESIRED   CURRENT   READY     AGE
-mapit-1   1         1         1         4h
+NAME               DESIRED   CURRENT   READY   AGE
+mapit-764c5bf8b8   1         1         1       77m
 ----
 
 This lets us know that, right now, we expect one *Pod* to be deployed
@@ -420,22 +483,26 @@ the `scale` command.
 
 [source,bash,role="execute"]
 ----
-oc scale --replicas=2 dc/mapit
+oc scale --replicas=2 deploy/mapit
 ----
 
 To verify that we changed the number of replicas, issue the following command:
 
 [source,bash,role="execute"]
 ----
-oc get rc
+oc get rs
 ----
 
 You will see something like the following:
 
 ----
-NAME         DESIRED   CURRENT   READY     AGE
-mapit-1      2         2         1         4h
+NAME               DESIRED   CURRENT   READY   AGE
+mapit-764c5bf8b8   2         2         2       79m
+mapit-8695cb9c67   0         0         0       79m
 ----
+
+NOTE: The "older" version was kept. This is to we can "rollback" to a previous
+version of the application.
 
 You can see that we now have 2 replicas. Let's verify the number of pods with
 the `oc get pods` command:
@@ -448,9 +515,9 @@ oc get pods
 You will see something like the following:
 
 ----
-NAME            READY     STATUS    RESTARTS   AGE
-mapit-1-6lczv   1/1       Running   0          4h
-mapit-1-rq6t6   1/1       Running   0          1m
+NAME                     READY   STATUS    RESTARTS   AGE
+mapit-764c5bf8b8-b4vpn   1/1     Running   0          112s
+mapit-764c5bf8b8-l49z7   1/1     Running   0          81m
 ----
 
 And lastly, let's verify that the *Service* that we learned about in the
@@ -467,22 +534,23 @@ You will see something like the following:
 Name:              mapit
 Namespace:         app-management
 Labels:            app=mapit
-Annotations:       openshift.io/generated-by=OpenShiftNewApp
-Selector:          app=mapit,deploymentconfig=mapit
+                   app.kubernetes.io/component=mapit
+                   app.kubernetes.io/instance=mapit
+Annotations:       openshift.io/generated-by: OpenShiftNewApp
+Selector:          deployment=mapit
 Type:              ClusterIP
-IP:                172.30.48.204
+IP:                172.30.167.160
 Port:              8080-tcp  8080/TCP
 TargetPort:        8080/TCP
-Endpoints:         10.129.0.2:8080,10.130.0.3:8080
+Endpoints:         10.128.2.19:8080,10.129.2.99:8080
 Port:              8778-tcp  8778/TCP
 TargetPort:        8778/TCP
-Endpoints:         10.129.0.2:8778,10.130.0.3:8778
+Endpoints:         10.128.2.19:8778,10.129.2.99:8778
 Port:              9779-tcp  9779/TCP
 TargetPort:        9779/TCP
-Endpoints:         10.129.0.2:9779,10.130.0.3:9779
+Endpoints:         10.128.2.19:9779,10.129.2.99:9779
 Session Affinity:  None
 Events:            <none>
-
 ----
 
 Another way to look at a *Service*'s endpoints is with the following:
@@ -495,8 +563,8 @@ oc get endpoints mapit
 And you will see something like the following:
 
 ----
-NAME      ENDPOINTS                                                     AGE
-mapit     10.128.2.3:9779,10.129.0.3:9779,10.128.2.3:8080 + 3 more...   4h
+NAME    ENDPOINTS                                                        AGE
+mapit   10.128.2.19:8080,10.129.2.99:8080,10.128.2.19:9779 + 3 more...   81m
 ----
 
 Your IP addresses will likely be different, as each pod receives a unique IP
@@ -524,34 +592,47 @@ them into the *Pods*.
 
 ### Application "Self Healing"
 
-Because OpenShift's *RCs* are constantly monitoring to see that the desired number
+Because OpenShift's *RSs* are constantly monitoring to see that the desired number
 of *Pods* are actually running, you might also expect that OpenShift will "fix" the
 situation if it is ever not right. You would be correct!
 
-Since we have two *Pods* running right now, let's see what happens if we
-"accidentally" kill one. Run the `oc get pods` command again, and choose a *Pod*
-name. Then, do the following:
+Now that we have two *Pods* running right now, let's see what happens when we
+delete them. Frist, run the `oc get pods` command, and make note of the *Pod*
+names:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="execute"]
 ----
-oc delete pod mapit-1-6lczv && oc get pods
-----
-
-And you will see something like the following:
-
-----
-pod "mapit-1-lhqgq" deleted
-NAME            READY     STATUS              RESTARTS   AGE
-mapit-1-7dw5t   1/1       Running             0          3m
-mapit-1-rgnht   0/1       ContainerCreating   0          2s
+oc get pods
 ----
 
-Did you notice anything? There's a new container already being created.
+You will see something like the following:
 
-Also, the `ContainerCreating` *Pod* has a different name. That's because
-OpenShift almost immediately detected that the current state (1 *Pod*,
-because one was deleted) didn't match the desired state (2 *Pods*), and it
-fixed it by scheduling another *Pod*.
+----
+NAME                     READY   STATUS    RESTARTS   AGE
+mapit-764c5bf8b8-lxnvw   1/1     Running   0          2m28s
+mapit-764c5bf8b8-rscss   1/1     Running   0          2m54s
+----
+
+Now, delete the pods that belog to the *Deployment* `mapit`:
+
+[source,bash,role="execute"]
+----
+oc delete pods -l deployment=mapit
+----
+
+Run the `oc get pods` command once again:
+
+[source,bash,role="execute"]
+----
+oc get pods
+----
+
+Did you notice anything? There are new containers already running!
+
+The *Pods* has a different name. That's because OpenShift almost immediately
+detected that the current state (0 *Pods*, because they were deleted) didn't
+match the desired state (2 *Pods*), and it
+fixed it by scheduling the *Pods*.
 
 ### Background: Routes
 .OpenShift Route
@@ -578,10 +659,6 @@ router for you! The router lives in the `openshift-ingress`
 ----
 oc describe deployment router-default -n openshift-ingress
 ----
-
-NOTE: A *Deployment* is a Kubernetes native object, whereas a
-*DeploymentConfig* is an OpenShift-specific object with a few extra features,
-namely around `triggers` and what caues new deployments to take place.
 
 You will explore the Operator for the router more in a subsequent exercise.
 
@@ -612,8 +689,8 @@ oc get route
 You will see something like:
 
 ----
-NAME    HOST/PORT                                                           PATH   SERVICES   PORT       TERMINATION   WILDCARD
-mapit   mapit-app-management.{{ ROUTE_SUBDOMAIN }}              mapit      8080-tcp
+NAME    HOST/PORT                                             PATH   SERVICES   PORT       TERMINATION   WILDCARD
+mapit   mapit-app-management.{{ ROUTE_SUBDOMAIN }}                   mapit      8080-tcp                 None
 ----
 
 If you take a look at the `HOST/PORT` column, you'll see a familiar looking
@@ -645,7 +722,7 @@ outside world:
 
 ----
 oc new-app quay.io/thoraxe/mapit
-oc scale --replicas=2 dc/mapit
+oc scale --replicas=2 deploy/mapit
 oc expose service mapit
 ----
 
@@ -655,7 +732,7 @@ instance:
 
 [source,bash,role="execute"]
 ----
-oc scale --replicas=1 dc/mapit
+oc scale --replicas=1 deploy/mapit
 ----
 
 ### Application Probes
@@ -682,7 +759,7 @@ readiness probe can be used to signal to the endpoint's controller that even
 though a container is running, it should not receive any traffic.
 
 More information on probing applications is available in the
-https://docs.openshift.com/container-platform/4.2/nodes/containers/nodes-containers-health.html[Application
+https://docs.openshift.com/container-platform/4.6/applications/application-health.html[Application
 Health] section of the documentation.
 
 ### Add Probes to the Application
@@ -708,14 +785,14 @@ command:
 
 [source,bash,role="execute"]
 ----
-oc set probe dc/mapit --liveness --get-url=http://:8080/health --initial-delay-seconds=30
+oc set probe deploy/mapit --liveness --get-url=http://:8080/health --initial-delay-seconds=30
 ----
 
 You can then see that this probe is defined in the `oc describe` output:
 
 [source,bash,role="execute"]
 ----
-oc describe dc mapit
+oc describe deploy mapit
 ----
 
 You will see a section like:
@@ -724,13 +801,15 @@ You will see a section like:
 ...
   Containers:
    mapit:
-    Image:		quay.io/thoraxe/mapit@sha256:8c7e0349b6a016e3436416f3c54debda4594ba09fd34b8a0dee0c4497102590d
-    Ports:		9779/TCP, 8080/TCP, 8778/TCP
-    Host Ports:		0/TCP, 0/TCP, 0/TCP
-    Liveness:		http-get http://:8080/health delay=30s timeout=1s period=10s #success=1 #failure=3
-    Environment:	<none>
-    Mounts:		<none>
-  Volumes:		<none>
+    Image:        quay.io/thoraxe/mapit@sha256:8c7e0349b6a016e3436416f3c54debda
+4594ba09fd34b8a0dee0c4497102590d
+    Ports:        9779/TCP, 8080/TCP, 8778/TCP
+    Host Ports:   0/TCP, 0/TCP, 0/TCP
+    Liveness:     http-get http://:8080/health delay=30s timeout=1s period=10s
+#success=1 #failure=3
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
 ...
 ----
 
@@ -738,71 +817,53 @@ Similarly, you can set a readiness probe in the same manner:
 
 [source,bash,role="execute"]
 ----
-oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30
+oc set probe deploy/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30
 ----
 
-### Examining DeploymentConfigs and ReplicationControllers
+### Examining Deployments and ReplicaSets
+
+Each change to the *Deployment* is counted as a _configuration_ change, which
+_triggers_ a new _deployment_. The *Deployment* in in charge of which
+*ReplicaSet* to deploy. The _newest_ is always deployed.
 
 Execute the following:
 
 [source,bash,role="execute"]
 ----
-oc get pods
+oc get deployments
 ----
 
 You should see something like:
 
 ----
-NAME             READY   STATUS      RESTARTS   AGE
-mapit-1-deploy   0/1     Completed   0          18h
-mapit-2-deploy   0/1     Completed   0          112s
-mapit-3-deploy   0/1     Completed   0          75s
-mapit-3-kkwxq    1/1     Running     0          66s
+NAME    READY   UP-TO-DATE   AVAILABLE   AGE
+mapit   1/1     1            1           131m
 ----
 
-Notice that there are 3 `-deploy` pods? And that the name of the current
-`mapit` pod has the number 3 in it? This is because each change to the
-*DeploymentConfig* is counted as a _configuration_ change, which _triggered_ a
-new _deployment_. The `-deploy` pod is responsible for ensuring the new
-deployment happens.
+You made two material configuration changes (plus a scale), after the initial deployment,
+thus you are now on the fourth revision of the *Deployment*.
 
 Execute the following:
 
 [source,bash,role="execute"]
 ----
-oc get deploymentconfigs
+oc get replicasets
 ----
 
 You should see something like:
 
 ----
-NAME    REVISION   DESIRED   CURRENT   TRIGGERED BY
-mapit   3          1         1         config,image(mapit:latest)
-----
-
-You made two material configuration changes after the initial deployment,
-thus you are now on the third revision of the *DeploymentConfiguration*.
-
-Execute the following:
-
-[source,bash,role="execute"]
-----
-oc get replicationcontrollers
-----
-
-You should see something like:
-
-----
-NAME      DESIRED   CURRENT   READY   AGE
-mapit-1   0         0         0       18h
-mapit-2   0         0         0       5m14s
-mapit-3   1         1         1       4m37s
+NAME               DESIRED   CURRENT   READY   AGE
+mapit-5f695ff4b8   1         1         1       4m19s
+mapit-668f69cdd5   0         0         0       6m18s
+mapit-764c5bf8b8   0         0         0       133m
+mapit-8695cb9c67   0         0         0       133m
 ----
 
 Each time a new deployment is triggered, the deployer pod creates a new
-*ReplicationController* which then is responsible for ensuring that pods
-exist. Notice that the old RCs have a desired scale of zero, and the most
-recent RC has a desired scale of 1.
+*ReplicaSet* which then is responsible for ensuring that pods
+exist. Notice that the old RSs have a desired scale of zero, and the most
+recent RS has a desired scale of 1.
 
-If you `oc describe` each of these RCs you will see how `-1` has no probes,
-and then `-2` and `-3` have the new probes, respectively.
+If you `oc describe` each of these RSs you will see how earlier versions have
+no probes, and the latest running RS has the new probes.

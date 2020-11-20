@@ -735,7 +735,7 @@ Next deploy the example PHP application called `file-uploader`:
 
 [source,role="execute"]
 ----
-oc new-app openshift/php:7.2~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
+oc new-app openshift/php~https://github.com/christianh814/openshift-php-upload-demo --name=file-uploader
 ----
 
 .Sample Output:
@@ -829,7 +829,7 @@ oc expose svc/file-uploader -n my-shared-storage
 ----
 [source,role="execute"]
 ----
-oc scale --replicas=3 dc/file-uploader -n my-shared-storage
+oc scale --replicas=3 deploy/file-uploader -n my-shared-storage
 ----
 [source,role="execute"]
 ----
@@ -854,7 +854,7 @@ the `oc set volume` command. Execute the following
 
 [source,role="execute"]
 ----
-oc set volume dc/file-uploader --add --name=my-shared-storage \
+oc set volume deploy/file-uploader --add --name=my-shared-storage \
 -t pvc --claim-mode=ReadWriteMany --claim-size=1Gi \
 --claim-name=my-shared-storage --claim-class=ocs-storagecluster-cephfs \
 --mount-path=/opt/app-root/src/uploaded \

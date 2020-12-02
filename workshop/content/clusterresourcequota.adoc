@@ -35,7 +35,7 @@ oc create clusterquota for-user-normaluser1 \
     --hard pods=10
 ----
 
-[NOTE]
+[Note]
 ====
 The syntax is `openshift.io/requester=<username>`.
 ====
@@ -51,15 +51,39 @@ The configuration should look something like this:
 
 [source,yaml]
 ----
-apiVersion: quota.openshift.io/v1
+piVersion: quota.openshift.io/v1
 kind: ClusterResourceQuota
 metadata:
-  creationTimestamp: "2019-11-22T01:29:06Z"
+  creationTimestamp: "2020-12-02T22:48:38Z"
   generation: 1
+  managedFields:
+  - apiVersion: quota.openshift.io/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        .: {}
+        f:quota:
+          .: {}
+          f:hard:
+            .: {}
+            f:pods: {}
+        f:selector:
+          .: {}
+          f:annotations:
+            .: {}
+            f:openshift.io/requester: {}
+          f:labels: {}
+      f:status:
+        .: {}
+        f:namespaces: {}
+        f:total: {}
+    manager: oc
+    operation: Update
+    time: "2020-12-02T22:48:38Z"
   name: for-user-normaluser1
-  resourceVersion: "73824"
+  resourceVersion: "55396"
   selfLink: /apis/quota.openshift.io/v1/clusterresourcequotas/for-user-normaluser1
-  uid: 79764862-0cc7-11ea-bba7-0640f541f946
+  uid: 21670296-e0af-4572-8141-832217531cc3
 spec:
   quota:
     hard:
@@ -67,6 +91,7 @@ spec:
   selector:
     annotations:
       openshift.io/requester: normaluser1
+    labels: null
 ----
 
 This user, `normaluser1`, can create no more than 10 pods accross all the projects he creates. This applies only to projects that he as created (based on the `openshift.io/requester: normaluser1` annotation), not any projects he has access to. More on this later.
@@ -111,17 +136,17 @@ After the deployment, you should have two running pods. One in each namespace. C
 
 [source,bash,role="execute"]
 ----
-oc get pods -n welcome1 -l deploymentconfig=php1
-oc get pods -n welcome2 -l deploymentconfig=php2
+oc get pods -n welcome1 -l deployment=php1
+oc get pods -n welcome2 -l deployment=php2
 ----
 
 The output should look something like this:
 
 ----
-[~] $ oc get pods -n welcome1 -l deploymentconfig=php1
+[~] $ oc get pods -n welcome1 -l deployment=php1
 NAME           READY   STATUS    RESTARTS   AGE
 php1-1-nww4m   1/1     Running   0          4m20s
-[~] $ oc get pods -n welcome2 -l deploymentconfig=php2
+[~] $ oc get pods -n welcome2 -l deployment=php2
 NAME           READY   STATUS    RESTARTS   AGE
 php2-1-ljw9w   1/1     Running   0          4m20s
 ----
@@ -166,25 +191,59 @@ The output should look something like this. Take special note of the annotations
 
 [source,yaml]
 ----
-apiVersion: v1
-kind: Namespace
-metadata:
-  annotations:
-    openshift.io/description: ""
-    openshift.io/display-name: ""
-    openshift.io/requester: normaluser1
-    openshift.io/sa.scc.mcs: s0:c26,c20
-    openshift.io/sa.scc.supplemental-groups: 1000690000/10000
-    openshift.io/sa.scc.uid-range: 1000690000/10000
-  creationTimestamp: "2019-11-22T01:40:10Z"
-  name: welcome1
-  resourceVersion: "76604"
-  selfLink: /api/v1/namespaces/welcome1
-  uid: 058b7e91-0cc9-11ea-8361-0a190b75e8c6
-spec:
-  finalizers:
-  - kubernetes
-status:
+apiVersion: v1                                                                                                              
+kind: Namespace                                                                                                             
+metadata:                                                                                                                   
+  annotations:                                                                                                              
+    openshift.io/description: ""                                                                                            
+    openshift.io/display-name: ""                                                                                           
+    openshift.io/requester: normaluser1                                                                                     
+    openshift.io/sa.scc.mcs: s0:c26,c5                                                                                      
+    openshift.io/sa.scc.supplemental-groups: 1000660000/10000                                                               
+    openshift.io/sa.scc.uid-range: 1000660000/10000                                                                         
+  creationTimestamp: "2020-12-02T22:49:46Z"                                                                                 
+  managedFields:                                                                                                            
+  - apiVersion: v1                                                                                                          
+    fieldsType: FieldsV1                                                                                                    
+    fieldsV1:                                                                                                               
+      f:metadata:                                                                                                           
+        f:annotations:                                                                                                      
+          f:openshift.io/sa.scc.mcs: {}                                                                                     
+          f:openshift.io/sa.scc.supplemental-groups: {}                                                                     
+          f:openshift.io/sa.scc.uid-range: {}                                                                               
+    manager: cluster-policy-controller                                                                                      
+    operation: Update                                                                                                       
+    time: "2020-12-02T22:49:46Z"                                                                                            
+  - apiVersion: v1                                                                                                          
+    fieldsType: FieldsV1                                                                                                    
+    fieldsV1:                                                                                                               
+      f:metadata:                                                                                                           
+        f:annotations:                                                                                                      
+          .: {}                                                                                                             
+          f:openshift.io/description: {}                                                                                    
+          f:openshift.io/display-name: {}                                                                                   
+          f:openshift.io/requester: {}                                                                                      
+      f:status:                                                                                                             
+        f:phase: {}                                                                                                         
+    manager: openshift-apiserver                                                                                            
+    operation: Update                                                                                                       
+    time: "2020-12-02T22:49:46Z"                                                                                            
+  - apiVersion: v1                                                                                                          
+    fieldsType: FieldsV1                                                                                                    
+    fieldsV1:                                                                                                               
+      f:spec:                                                                                                               
+        f:finalizers: {}                                                                                                    
+    manager: openshift-controller-manager                                                                                   
+    operation: Update                                                                                                       
+    time: "2020-12-02T22:49:46Z"                                                                                            
+  name: welcome1                                                                                                            
+  resourceVersion: "55712"                                                                                                  
+  selfLink: /api/v1/namespaces/welcome1                                                                                     
+  uid: fe1ceda9-51aa-4222-b47b-e25181291f5e                                                                                 
+spec:                                                                                                                       
+  finalizers:                                                                                                               
+  - kubernetes                                                                                                              
+status:                                                                                                                     
   phase: Active
 ----
 
@@ -194,30 +253,31 @@ Now as `normaluser1`, try to scale your apps beyond 10 pods:
 [source,bash,role="execute"]
 ----
 oc login -u normaluser1 -p Op#nSh1ft
-oc scale dc/php1 -n welcome1 --replicas=5
-oc scale dc/php2 -n welcome2 --replicas=6
+oc scale deploy/php1 -n welcome1 --replicas=5
+oc scale deploy/php2 -n welcome2 --replicas=6
 ----
 
 Take a note of how many pods are running:
 
 [source,bash,role="execute"]
 ----
-oc get pods --no-headers -n welcome1 -l deploymentconfig=php1 | wc -l
-oc get pods --no-headers -n welcome2 -l deploymentconfig=php2 | wc -l
+oc get pods --no-headers -n welcome1 -l deployment=php1 | wc -l
+oc get pods --no-headers -n welcome2 -l deployment=php2 | wc -l
 ----
 
 Both of these commands should return no more than 10 added up together. Check the events to see the quota in action!
 
 [source,bash,role="execute"]
 ----
-oc get events -n welcome1 | grep "Error creating" | head -1
-oc get events -n welcome2 | grep "Error creating" | head -1
+oc get events -n welcome1 | grep "quota" | head -1
+oc get events -n welcome2 | grep "quota" | head -1
 ----
 
 You should see a message like the following.
 
 ----
-3m31s       Warning   FailedCreate                  replicationcontroller/php2-1   Error creating: pods "php2-1-wn22s" is forbidden: exceeded quota: for-user-normaluser1, requested: pods=1, used: pods=10, limited: pods=10
+3m24s       Warning   FailedCreate        replicaset/php1-89fcb8d8b    Error creating: pods "php1-89fcb8d8b-spdw2" is forbid
+den: exceeded quota: for-user-normaluser1, requested: pods=1, used: pods=10, limited: pods=10
 ----
 
 To see the status, switch to the `kubeadmin` account and run the `describe` command from before:
@@ -231,16 +291,16 @@ oc describe clusterresourcequotas for-user-normaluser1
 You should see that the hard pod limit has been reached
 
 ----
-Name:		for-user-normaluser1
-Created:	45 minutes ago
-Labels:		<none>
-Annotations:	<none>
+Name:           for-user-normaluser1
+Created:        15 minutes ago
+Labels:         <none>
+Annotations:    <none>
 Namespace Selector: ["welcome1" "welcome2"]
-Label Selector: 
+Label Selector:
 AnnotationSelector: map[openshift.io/requester:normaluser1]
-Resource	Used	Hard
---------	----	----
-pods		10	10
+Resource        Used    Hard
+--------        ----    ----
+pods            10      10
 ----
 
 #### Setting quota by label
@@ -295,16 +355,16 @@ oc describe clusterresourcequotas for-pricelist
 You should see that both of the projects are now being tracked:
 
 ----
-Name:		for-pricelist
-Created:	6 minutes ago
-Labels:		<none>
-Annotations:	<none>
+Name:           for-pricelist
+Created:        21 seconds ago
+Labels:         <none>
+Annotations:    <none>
 Namespace Selector: ["pricelist-frontend" "pricelist-backend"]
 Label Selector: appstack=pricelist
 AnnotationSelector: map[]
-Resource	Used	Hard
---------	----	----
-pods		0	5
+Resource        Used    Hard
+--------        ----    ----
+pods            0       5
 ----
 
 Login as `normaluser1` and create the applications in their respective projects:
@@ -327,19 +387,19 @@ oc describe clusterresourcequotas for-pricelist
 You should see that 2 out of 5 pods are being used against this quota:
 
 ----
-Name:		for-pricelist
-Created:	21 minutes ago
-Labels:		<none>
-Annotations:	<none>
+Name:           for-pricelist
+Created:        About a minute ago
+Labels:         <none>
+Annotations:    <none>
 Namespace Selector: ["pricelist-frontend" "pricelist-backend"]
 Label Selector: appstack=pricelist
 AnnotationSelector: map[]
-Resource	Used	Hard
---------	----	----
-pods		2	5
+Resource        Used    Hard
+--------        ----    ----
+pods            2       5
 ----
 
-[NOTE]
+[Note]
 ====
 The user `normaluser1` can create more pods because `pricelist-frontend` and `pricelist-backend` were assigned to the user by `kubeadmin`. They don't have the `openshift.io/requester=normaluser1` annotation since `normaluser1` didn't create them. You can already see how you can mix and match quota polices to fit your envrionment.
 ====
@@ -349,22 +409,23 @@ Test this by logging back in as `normaluser1` and try to scale the applications 
 [source,bash,role="execute"]
 ----
 oc login -u normaluser1 -p Op#nSh1ft
-oc scale -n pricelist-frontend dc/frontend --replicas=3
-oc scale -n pricelist-backend dc/backend --replicas=3
+oc scale -n pricelist-frontend deploy/frontend --replicas=3
+oc scale -n pricelist-backend deploy/backend --replicas=3
 ----
 
 Just like before, you should see an error about not being able to scale:
 
 [source,bash,role="execute"]
 ----
-oc get events -n pricelist-frontend | grep "Error creating" | head -1
-oc get events -n pricelist-backend | grep "Error creating" | head -1
+oc get events -n pricelist-frontend | grep "quota" | head -1
+oc get events -n pricelist-backend | grep "quota" | head -1
 ----
 
 The output should be like the other exercise:
 
 ----
-2m51s       Warning   FailedCreate                  replicationcontroller/backend-1   Error creating: pods "backend-1-r78gk" is forbidden: exceeded quota: for-pricelist, requested: pods=1, used: pods=5, limited: pods=5
+39s         Warning   FailedCreate        replicaset/backend-577cf89b68   Error creating: pods "backend-577cf89b68-l5svw" is
+ forbidden: exceeded quota: for-pricelist, requested: pods=1, used: pods=5, limited: pods=5
 ----
 
 #### Clean Up
@@ -390,9 +451,11 @@ Also delete the projects we created for this lab:
 oc delete projects pricelist-backend pricelist-frontend welcome1 welcome2
 ----
 
-Make sure you login as `kubeadmin` for the next lab.
+Make sure you login as `kubeadmin` in an existing project for the
+next lab.
 
 [source,bash,role="execute"]
 ----
 oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+oc project default
 ----

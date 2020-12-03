@@ -4,7 +4,7 @@ we would need to supply a **persistent** volume to the pod. This type of
 storage outlives the container, i.e. it persists when the pod dies. It
 typically comes from an external storage system.
 
-[WARNING]
+[Warning]
 ====
 Doing these exercises requires that you already have deployed the application
 featured in the Application Management Basics exercises. You should do those
@@ -18,7 +18,7 @@ We will talk about this concept in more detail later. But let's imagine for a
 moment, the `mapit` application needs persistent storage available under the
 `/app-storage` directory inside the container.
 
-[NOTE]
+[Note]
 ====
 The directories that make up the container's internal filesystem are a blend
 of the read-only layers of the container image and the top-most writable

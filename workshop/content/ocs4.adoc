@@ -813,7 +813,7 @@ Push successful
 
 The command prompt returns out of the tail mode once you see _Push successful_.
 
-[NOTE]
+[Note]
 ====
 This use of the `new-app` command directly asked for application code to be
 built and did not involve a template. That's why it only created a *single
@@ -1014,7 +1014,7 @@ oc apply -f {{ HOME_PATH }}/support/ocslab_cluster-monitoring-noinfra.yaml
 configmap/cluster-monitoring-config created
 ----
 
-[NOTE]
+[Note]
 ====
 If the *ConfigMap* already exists because of completing prior module
 `OpenShift Infrastructure Nodes`, you will apply changes to the existing
@@ -1068,7 +1068,7 @@ Once you create this new *ConfigMap* `cluster-monitoring-config`, the
 affected *Pods* will automatically be restarted and the new storage will be
 mounted in the Pods.
 
-[NOTE]
+[Note]
 ====
 It is not possible to retain data that was written on the default
 EmptyDir-based or ephemeral installation. Thus you will start with an empty
@@ -1529,7 +1529,7 @@ for each application. In our example we used CLI flags of s3cmd for this.
 Adding storage to OCS adds capacity and performance to your already present
 cluster.
 
-[NOTE]
+[Note]
 ====
 The reason for adding more OCP worker nodes for storage is because the
 existing nodes do not have adequate CPU and/or Memory available.
@@ -1884,7 +1884,7 @@ image::images/ocs/metrics-complexocpgraph.png[OCP Complex Graph]
 
 Have a look at the difference between `sum(irate(process_cpu_seconds_total[5m]))` and the last query `irate(process_cpu_seconds_total[5m])`.
 
-[NOTE]
+[Note]
 ====
 For more information on the Prometheus query language visit the
 link:https://prometheus.io/docs/prometheus/latest/querying/basics/[Prometheus
@@ -1974,7 +1974,7 @@ This section will go through Ceph fundamental knowledge for a better
 understanding of the underlying storage solution
 used by OCS 4.
 
-[NOTE]
+[Note]
 ====
 The content in this Appendix is relevant to learning about the critical
 components of Ceph and how Ceph works. OCS 4 uses Ceph in a prescribed manner
@@ -2202,7 +2202,7 @@ image::images/ocs/ceph101-thefullpicture.png[From Object to OSD]
 The diagram above shows the relationship end to end between the object at the
 access method level down to the OSDs at the physical layer.
 
-[NOTE]
+[Note]
 ====
 A Ceph pool has no size and is able to consume the space available any OSD
 where its PGs are created. A Placement Group or PG belongs to only one pool.
@@ -2245,7 +2245,7 @@ in multiple objects.
 .Data Distribution
 image::images/ocs/ceph101-rbdlayout.png[RADOS Block Device Layout]
 
-[NOTE]
+[Note]
 ====
 By default, each access method uses an object size of 4MB. The above diagram
 details how a 32MB RBD (Block Device) supporting a RWO PVC will be scattered

@@ -1,6 +1,6 @@
 ## Cluster resource quotas
 
-[WARNING]
+[Warning]
 ====
 Before continuing, make sure you've done the LDAP lab.
 ====

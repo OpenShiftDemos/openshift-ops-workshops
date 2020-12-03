@@ -31,7 +31,7 @@ The icon beside the command blocks should tell you if the commands will be execu
 ----
 some command to modify
 ----
-[NOTE]
+[Note]
 ====
 To paste the copied command try the following
 

@@ -64,7 +64,7 @@ masters. They are not part of a `MachineSet` because they are somewhat
 stateful and their management is handled by different operators and through a
 different process.
 
-[WARNING]
+[Warning]
 ====
 There is currently no protection for the master `Machines`. Do not
 accidentally or intentionally delete them, as this will potentially break
@@ -151,7 +151,7 @@ You should see your fresh and happy new node as the one with a very young age:
 ip-10-0-166-103.us-east-2.compute.internal   Ready    worker   1m   v1.16.2
 ----
 
-[NOTE]
+[Note]
 ====
 It can take several minutes for a `Machine` to be prepared and added as a `Node`.
 ====

@@ -16,13 +16,13 @@ aggregated data. Administrators can see and search through all logs.
 Application owners and developers can allow access to logs that belong to
 their projects. The EFK stack runs on top of OpenShift.
 
-[WARNING]
+[Warning]
 ====
 This lab requires that you have completed the infra-nodes lab. The logging
 stack will be installed on the `infra` nodes that were created in that lab.
 ====
 
-[NOTE]
+[Note]
 ====
 More information may be found on the official OpenShift documentation site
 found here:
@@ -30,7 +30,7 @@ found here:
  https://docs.openshift.com/container-platform/4.1/logging/efk-logging.html
 ====
 
-[NOTE]
+[Note]
 ====
 This exercise is done almost entirely using the OpenShift web console. All of
 the interactions with the web console are effectively creating or
@@ -127,7 +127,7 @@ OpenShift Container Platform cluster.
 
 2. Install the Cluster Logging Operator:
 +
-[NOTE]
+[Note]
 ====
 The `Cluster Logging` operator needs to be installed in the
 `openshift-logging` namespace. Please ensure that the `openshift-logging`
@@ -151,7 +151,7 @@ namespace was created from the previous steps
   c. In the _Status_ column you should see green checks with either
      `InstallSucceeded` or `Copied` and the text _Up to date_.
 +
-[NOTE]
+[Note]
 ====
 During installation an operator might display a `Failed` status. If the
 operator then installs with an `InstallSucceeded` message, you can safely
@@ -186,7 +186,7 @@ we want to install and configure logging.
 
 3. On the `Custom Resource Definition Overview` page, select `View Instances` from the `Actions` menu.
 +
-[NOTE]
+[Note]
 ====
 If you see a `404` error, don't panic. While the operator installation
 succeeded, the operator itself has not finished installing and the
@@ -196,7 +196,7 @@ and then refresh the page.
 +
 4. On the `Cluster Loggings` page, click `Create Cluster Logging`.
 +
-[WARNING]
+[Warning]
 ====
 This step requires that you have completed the `Deploying and Managing OpenShift Container Storage` Module. If you have not completed the `OCS` module, you will need to substitute `storageClassName: ocs-storagecluster-ceph-rbd` with `storageClassName: gp2` in the `YAML` below before copying to the editor. 
 ====
@@ -324,7 +324,7 @@ elasticsearch-elasticsearch-cdm-ggzilasv-3   Bound    pvc-f326aa7d-389c-11ea-bab
         ocs-storagecluster-ceph-rbd   15m
 ----		
 
-[NOTE]
+[Note]
 ====
 Much like with the Metrics solution, we defined the appropriate
 `NodeSelector` in the Logging configuration (`CR`) to ensure that the Logging

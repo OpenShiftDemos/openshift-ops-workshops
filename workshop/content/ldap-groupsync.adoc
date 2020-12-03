@@ -172,7 +172,7 @@ oc create configmap ca-config-map --from-file={{ HOME_PATH }}/support/ca.crt -n 
 oc apply -f {{ HOME_PATH }}/support/oauth-cluster.yaml
 ----
 
-[NOTE]
+[Note]
 ====
 We use `apply` because there is an existing `OAuth` object. If you used
 `create` you would get an outright error that the object already exists. You
@@ -311,7 +311,7 @@ Change the policy for the `ose-fancy-dev` *Group*:
 oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
 ----
 
-[NOTE]
+[Note]
 ====
 If you are interested in the different roles that come with OpenShift, you can
 learn more about them in the
@@ -385,7 +385,7 @@ You have now created several *Projects* that represent a typical Software
 Development Lifecycle setup. Next, you will configure *Groups* to grant
 collaborative access to these projects.
 
-[NOTE]
+[Note]
 ====
 Creating projects with `oc adm new-project` does *not* use the project request
 process or the project request template. These projects will not have quotas or
@@ -521,7 +521,7 @@ NAME             HOST/PORT                                                      
 prometheus-k8s   prometheus-k8s-openshift-monitoring.{{ ROUTE_SUBDOMAIN }}          prometheus-k8s   web    reencrypt/Redirect   None
 ----
 
-[WARNING]
+[Warning]
 ====
 Before continuing, make sure to go to the OpenShift web console and log out
 by using the dropdown menu at the upper right where it says `kube:admin`.

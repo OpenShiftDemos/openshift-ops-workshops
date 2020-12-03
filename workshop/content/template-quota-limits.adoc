@@ -383,7 +383,7 @@ Resource limits:
 
 ----
 
-[NOTE]
+[Note]
 ====
 If you don't see the Quota and Resource limits sections, you may have been
 too quick. Remember that the operator takes a moment to do everything it

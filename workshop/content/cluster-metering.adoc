@@ -16,7 +16,7 @@ This hands-on workshop is for both system administrators and application develop
 
 OpenShift Container Platform (OCP) 4.2 made Operator Metering generally available. Operator Metering is a chargeback and reporting tool to provide accountability for how resources are used across a cluster. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster wide. Operator Metering is part of the link:https://coreos.com/blog/introducing-operator-framework-metering[Operator Framework].
 
-[NOTE]
+[Note]
 ====
 This exercise is done with a mix of CLI and the OpenShift web console. All of
 the interactions with the web console are effectively creating or
@@ -27,7 +27,7 @@ not covered in the exercise or documentation at this time.
 
 ### Installing Operator Metering 
 
-[NOTE]
+[Note]
 ====
 This lab assumes you have logged into an existing cluster with the `oc login` command
 ====
@@ -57,7 +57,7 @@ kubeadmin
 {{ KUBEADMIN_PASSWORD }}
 ----
 
-[WARNING]
+[Warning]
 ====
 You will receive a self-signed certificate error in your browser when you
 first visit the OpenShift Web console. When OpenShift is installed, by default, a CA
@@ -89,7 +89,7 @@ Then click Create.
 
 6. On the *Installed Operators* screen the *Status* displays *InstallSucceeded* when metering has finished installing. Click the name of the operator (Metering) in the first column to view the *Operator Details* page.
 
-[NOTE]
+[Note]
 ====
 It may take a few minutes for the metering operator to appear.
 ====

@@ -25,7 +25,7 @@ node, we want to create additional `Machines` that have specific Kubernetes
 labels. Then, we can configure the various infrastructure components to run
 specifically on nodes with those labels.
 
-[NOTE]
+[Note]
 ====
 Currently the operators that are used to control infrastructure components do
 not all support the use of taints and tolerations. This means that
@@ -67,7 +67,7 @@ metadata:
   uid: 591b4d06-20ba-11e9-a880-068acb199400
 ```
 
-[NOTE]
+[Note]
 ====
 You might see some `annotations` on your `MachineSet` if you dumped
 one that had a `MachineAutoScaler` defined.
@@ -171,7 +171,7 @@ machine -n openshift-machine-api` to see when the instance finally starts
 running. Then, you can use `oc get node` to see when the actual node is
 joined and ready.
 
-[NOTE]
+[Note]
 ====
 It can take several minutes for a `Machine` to be prepared and added as a `Node`.
 ====
@@ -379,7 +379,7 @@ Run:
 oc get pod -n openshift-ingress -o wide
 ----
 
-[NOTE]
+[Note]
 ====
 Your session may timeout during the router move. Please refresh the page to
 get your session back. You will not lose your terminal session but may have
@@ -456,7 +456,7 @@ oc patch configs.imageregistry.operator.openshift.io/cluster -p '{"spec":{"nodeS
 
 It will modify the `.spec` of the registry CR in order to add the desired `nodeSelector`.
 
-[NOTE]
+[Note]
 ====
 At this time the image registry is not using a separate project for its
 operator. Both the operator and the operand are housed in the

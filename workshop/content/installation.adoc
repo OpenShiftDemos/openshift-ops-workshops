@@ -69,7 +69,7 @@ other components watch etcd for changes to bring themselves into the desired
 state. etcd can be optionally configured for high availability, typically
 deployed with 2n+1 peer services.
 
-[NOTE]
+[Note]
 ====
 etcd stores the cluster's state. It is not used to store user application data.
 ====
@@ -344,7 +344,7 @@ exit
 ----
 If you accidentally hit exit more than once and connection to the console closed, refresh the webpage to reconnect.
 
-[WARNING]
+[Warning]
 ====
 You might receive a self-signed certificate error in your browser when you
 first visit the web console. When OpenShift is installed, by default, a CA

@@ -1,6 +1,6 @@
 ## Disabling Project Self-Provisioning
 
-[WARNING]
+[Warning]
 ====
 Before continuing, make sure you've done the LDAP lab.
 ====
@@ -25,7 +25,7 @@ them. Some of these use cases may be:
 * General Administrative Control - Administrators may want total control in
   what goes in an environment.
 
-[NOTE]
+[Note]
 ====
 There are other ways to gain this type of control besides disabling Project self-provisioning.
 ====
@@ -47,7 +47,7 @@ Kubernetes Namespace.
 In order to examine the `clusterrolebinding` for `self-provisioners`; you
 need to be *kubeadmin*.
 
-[NOTE]
+[Note]
 ====
 You could also use the serviceaccount user that we've used in previous labs.
 Since `kubeadmin` and the service account user both have the `cluster-admin`
@@ -86,7 +86,7 @@ group that every user that has authenticated is a part of, by default), is
 bound to the `self-provisioners` role. This role is a built-in role in
 OpenShift that allows the users to create projects.
 
-[NOTE]
+[Note]
 ====
 If you are interested in the different roles that come with OpenShift, you
 can learn more about them in the

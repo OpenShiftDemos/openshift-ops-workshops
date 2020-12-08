@@ -111,11 +111,27 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     rbac.authorization.kubernetes.io/autoupdate: "true"
-  creationTimestamp: "2019-10-30T22:08:21Z"
+  creationTimestamp: "2020-12-07T23:29:30Z"
+  managedFields:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:annotations:
+          .: {}
+          f:rbac.authorization.kubernetes.io/autoupdate: {}
+      f:roleRef:
+        f:apiGroup: {}
+        f:kind: {}
+        f:name: {}
+      f:subjects: {}
+    manager: openshift-apiserver
+    operation: Update
+    time: "2020-12-07T23:29:30Z"
   name: self-provisioners
-  resourceVersion: "6712"
+  resourceVersion: "10302"
   selfLink: /apis/rbac.authorization.k8s.io/v1/clusterrolebindings/self-provisioners
-  uid: c9117fdf-fb61-11e9-96cb-00505693eda8
+  uid: 1bbfe87b-697c-4702-81d1-00e7f8e98207
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -161,11 +177,33 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     rbac.authorization.kubernetes.io/autoupdate: "false"
-  creationTimestamp: "2019-10-30T22:08:21Z"
+  creationTimestamp: "2020-12-07T23:29:30Z"
+  managedFields:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:annotations: {}
+      f:roleRef:
+        f:apiGroup: {}
+        f:kind: {}
+        f:name: {}
+    manager: openshift-apiserver
+    operation: Update
+    time: "2020-12-07T23:29:30Z"
+  - apiVersion: rbac.authorization.k8s.io/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:annotations:
+          f:rbac.authorization.kubernetes.io/autoupdate: {}
+    manager: kubectl-patch
+    operation: Update
+    time: "2020-12-08T00:15:02Z"
   name: self-provisioners
-  resourceVersion: "4408134"
+  resourceVersion: "36456"
   selfLink: /apis/rbac.authorization.k8s.io/v1/clusterrolebindings/self-provisioners
-  uid: c9117fdf-fb61-11e9-96cb-00505693eda8
+  uid: 1bbfe87b-697c-4702-81d1-00e7f8e98207
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -209,12 +247,27 @@ oc patch --type=merge project.config.openshift.io cluster -p '{"spec":{"projectR
 Here, you are adding the `projectRequestMessage` and the value `Please visit
 https://ticket.example.com to request a project` to the specification.
 
+Before you can see this new message, you'll need to wait for the `apiserver`
+application to rollout the changes. This can take some time to rollout,
+especially on a busy cluster.
+
+[source,bash,role="execute"]
+----
+oc rollout status -n  openshift-apiserver deploy/apiserver
+----
+
 Now, the user will get this message when trying to create a project. Test
-this by becoming `fancyuser1` and try to create a project.
+this by becoming the `fancyuser1` user.
 
 [source,bash,role="execute"]
 ----
 oc login -u fancyuser1 -p Op#nSh1ft
+----
+
+And try to create a project.
+
+[source,bash,role="execute"]
+----
 oc new-project fancyuserproject
 ----
 
@@ -222,15 +275,6 @@ You should see the following message:
 
 ----
 Error from server (Forbidden): Please visit https://ticket.example.com to request a project
-----
-
-It may take some time before the operator updates the master config, which
-means it could take some time before you see the new message. Wait a few
-moments and try again.
-
-[source,bash,role="execute"]
-----
-oc new-project fancyuserproject
 ----
 
 #### Clean Up

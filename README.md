@@ -103,6 +103,9 @@ oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
 
 oc new-project lab-ocp-cns
 
+# This part is needed if you're running on a "local" or "self-provisioned" cluster
+oc adm policy add-role-to-user admin kube:admin -n lab-ocp-cns
+
 # Create deployment.
 oc new-app -n lab-ocp-cns https://raw.githubusercontent.com/redhat-cop/agnosticd/development/ansible/roles/ocp4-workload-workshop-admin-storage/files/production-cluster-admin.json \
 --param TERMINAL_IMAGE="quay.io/${QUAY_USER}/lab-sample-workshop:${BRANCH}" --param PROJECT_NAME="lab-ocp-cns" \
@@ -112,8 +115,6 @@ oc new-app -n lab-ocp-cns https://raw.githubusercontent.com/redhat-cop/agnosticd
 
 oc rollout status dc/dashboard -n lab-ocp-cns
 ```
-
-> NOTE: In some cases you might need to do: `oc adm policy add-role-to-user admin kube:admin -n lab-ocp-cns`
 
 If you made changes to the container image and want to refresh your deployed Homeroom quickly, execute this:
 

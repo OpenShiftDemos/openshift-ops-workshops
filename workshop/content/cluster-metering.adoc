@@ -169,7 +169,7 @@ You can follow the instantiation of the Pods by waiting for all the `StatefulSet
 +
 [source,bash,role="execute"]
 ----
-until [[ $(oc get sts -n openshift-metering -o name | wc -l) -gt 4 ]]; do echo "waiting for statefulsets..." ; sleep 2 ; done
+until [[ $(oc get sts -n openshift-metering -o name | wc -l) -gt 4 ]]; do echo "waiting for statefulsets..." ; sleep 10 ; done
 oc rollout status sts/hdfs-datanode -n openshift-metering
 oc rollout status sts/hdfs-namenode -n openshift-metering
 oc rollout status sts/hive-metastore -n openshift-metering

@@ -87,7 +87,7 @@ image::images/metering-operator-image.png[Metering Operator Logo]
 
 4. Click the *Metering* card, review the package description, and then click *Install*.
 
-5. On the *Install Operator* screen, make sure the `4.6` *Update Channel is selected. Also, verify that `A specific namespace on the cluster` is selected as the *Installation Mode*. The *Installed Namespace* should already be set  to `Operator recommended namespace` with `openshift-metering` selected. Keep the *Approval Strategy* to `Automatic`.
+5. On the *Install Operator* screen, make sure the `4.6` *Update Channel* is selected. Also, verify that `A specific namespace on the cluster` is selected as the *Installation Mode*. The *Installed Namespace* should already be set  to `Operator recommended namespace` with `openshift-metering` selected. Keep the *Approval Strategy* to `Automatic`.
 +
 image::images/metering-install-operator.png[Metering Operator Install]
 +
@@ -113,7 +113,7 @@ It may take a few minutes for the metering operator to install, be patient.
 
 1. From the web console, ensure you are on the *Operator Details* page for the Metering Operator in the `openshift-metering` project. If you've navigated away from this page, you can get back to this page by clicking *Operators* → *Installed Operators*, then selecting the Metering Operator.
 
-2. Under *Provided APIs*, click *Create Instance* on the **Metering Configuration** card. This opens a YAML editor with the default MeteringConfig file where you can define your configuration.
+2. Under *Provided APIs*, click *Create Instance* on the **Metering Configuration** card.
 +
 image::images/metering-config-card.png[Metering Config Card]
 
@@ -169,6 +169,7 @@ You can follow the instantiation of the Pods by waiting for all the `StatefulSet
 +
 [source,bash,role="execute"]
 ----
+until [[ $(oc get sts -n openshift-metering -o name | wc -l) -gt 4 ]]; do echo "waiting for statefulsets..." ; sleep 2 ; done
 oc rollout status sts/hdfs-datanode -n openshift-metering
 oc rollout status sts/hdfs-namenode -n openshift-metering
 oc rollout status sts/hive-metastore -n openshift-metering

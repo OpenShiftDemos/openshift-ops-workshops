@@ -27,7 +27,7 @@ stack will be installed on the `infra` nodes that were created in that lab.
 More information may be found on the official OpenShift documentation site
 found here:
 
- https://docs.openshift.com/container-platform/4.1/logging/efk-logging.html
+ https://docs.openshift.com/container-platform/4.6/logging/cluster-logging.html
 ====
 
 [Note]
@@ -119,7 +119,7 @@ Then follow the following steps:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Choose `Elasticsearch Operator` from the list of available Operators,
     and click `Install`.
-  c. On the `Create Operator Subscription` page, *select Update Channel 4.2*, leave all other defaults
+  c. On the `Create Operator Subscription` page, *select Update Channel 4.6*, leave all other defaults
      and then click `Subscribe`.
 +
 This makes the Operator available to all users and projects that use this
@@ -139,7 +139,7 @@ namespace was created from the previous steps
     `Install`.
   c. On the `Create Operator Subscription` page, Under ensure `Installation
      Mode` that `A specific namespace on the cluster` is selected, and choose
-     `openshift-logging`. In addition, *select Update Channel 4.2* and leave all other defaults
+     `openshift-logging`. In addition, *select Update Channel 4.6* and leave all other defaults
      and then click `Subscribe`.
 
 3. Verify the operator installations:

@@ -432,10 +432,13 @@ NAME                   CREATED AT
 template-test-limits   2020-12-16T00:16:39Z
 ----
 
-NOTE: Please make sure that the `project-request` template is created in the
+[Note]
+====
+Please make sure that the `project-request` template is created in the
 `openshift-config` project. Defining it in the OpenShift API server
 configurion without having the template in place will cause new projects to
 fail to create.
+====
 
 ### Clean Up
 If you wish, you can deploy the application from the Application Management

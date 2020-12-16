@@ -400,14 +400,22 @@ You can also see that the *Quota* and *LimitRange* objects were created:
 
 [source,bash,role="execute"]
 ----
-oc get quota -n template-test
+oc describe quota -n template-test
 ----
 
 You will see:
 
 ----
-NAME                  CREATED AT
-template-test-quota   2019-03-30T14:26:43Z
+Name:                   template-test-quota
+Namespace:              template-test
+Resource                Used  Hard
+--------                ----  ----
+persistentvolumeclaims  0     5
+pods                    0     10
+requests.cpu            0     4
+requests.memory         0     8Gi
+requests.storage        0     50Gi
+resourcequotas          1     1
 ----
 
 And:

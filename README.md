@@ -152,7 +152,9 @@ where you installed OpenShift from.
 ## Troubleshooting
 Make sure you are logged-in as kubeadmin when creating the project
 
-If you are getting _too many redirects_ error then clearing cookies and re-login as kubeadmin
+If you are getting _too many redirects_ error then clearing cookies and
+re-login as kubeadmin. This usually happens if you're using RHPDS and
+stopped/started a cluster.
 
 ## Cleaning up
 To delete deployment run

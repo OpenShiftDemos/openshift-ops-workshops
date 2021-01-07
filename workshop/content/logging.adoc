@@ -378,6 +378,27 @@ Because you've already authenticated to the OpenShift Console as a
 cluster-admin user, you will see an administrative view of what Kibana has to
 show you (which you authorized by clicking the button).
 
+#### Setting up Index Patterns
+
+Once you open Kibana, before being able to view logs, we need to define an `index pattern` that will be used by Kibana to query ElasticSearch.
+
+1. On the following screen, input `app*` as the index pattern, as shown below and hit `Next Step`.
++
+image::images/logging-kibana-indexpattern.png[Kibana Index Pattern]
++
+
+2. On the following screen, input `infra*` as the index pattern, as shown below and hit `Next Step`.
++
+image::images/logging-kibana-indexpattern-infra.png[Kibana Index Pattern]
++
+
+3. On the next screen, select `Timestamp` in the drop-down box, as shown below:
++
+image::images/logging-kibana-indexpattern-timestamp.png[Kibana Index Pattern]
++
+
+4. Hit Create Index Pattern
+
 #### Queries with _Kibana_
 
 Once the _Kibana_ web interface is up, we are now able to do queries.

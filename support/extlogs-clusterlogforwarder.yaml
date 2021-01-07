@@ -1,0 +1,40 @@
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: instance
+  namespace: openshift-logging
+spec:
+  outputs:
+  - name: rsyslog-east
+    syslog:
+      facility: user
+      payloadKey: message
+      rfc: RFC3164
+      severity: informational
+    type: syslog
+    url: udp://syslog-ng.external-logs.svc:514
+  - name: rsyslog-infra
+    syslog:
+      facility: user
+      payloadKey: message
+      rfc: RFC3164
+      severity: informational
+    type: syslog
+    url: udp://syslog-ng-infra.external-logs.svc:514
+  pipelines:
+  - inputRefs:
+    - application
+    labels:
+      syslog: east
+    name: syslog-east
+    outputRefs:
+    - rsyslog-east
+    - default
+  - inputRefs:
+    - infrastructure
+    labels:
+      syslog: infra
+    name: syslog-infra
+    outputRefs:
+    - rsyslog-infra
+    - default

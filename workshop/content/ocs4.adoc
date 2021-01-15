@@ -211,7 +211,7 @@ Select `OpenShift Container Storage Operator` and then select *Install*.
 .OCP OperatorHub Install OpenShift Container Storage
 image::images/ocs/OCS4-OCP4-OperatorHub-Install.png[OCP OperatorHub Install]
 
-On the next screen make sure the settings are as shown in this figure.  
+On the next screen make sure the settings are as shown in this figure.
 
 .OCP Subscribe to OpenShift Container Storage
 image::images/ocs/OCS4-OCP4-OperatorHub-Subscribe.png[OCP OperatorHub Subscribe]
@@ -454,6 +454,8 @@ image::images/ocs/OCS-noobaa-dashboard-healthy.png[OCS Multi-Cloud-Gateway Dashb
 |<2> | Details | Overview of the deployed MCG version and backend provider including a link to the MCG Dashboard
 |<3> | Buckets | List of all the ObjectBucket with are offered and ObjectBucketClaims which are connected to them
 |<4> | Resource Providers | Shows the list of configured Resource Providers that are available as backing storage in the MCG
+|<5> | Counters | Shows the numbers of reads and writes issued against each provider
+|<6> | Events | Live overview of all the changes that are being done affecting the MCG
 |===
 
 // On the left side of this *Dashboard* you see a blue link labelled `noobaa`, which will get you to the NooBaa Management Console. We will discuss this Management Console later in more detail.
@@ -483,7 +485,7 @@ creating a PVC for mounting to it's `db` container.
 === Using the Rook-Ceph toolbox to check on the Ceph backing storage
 
 Since the Rook-Ceph *toolbox* is not shipped with OCS, we need to deploy it
-manually. 
+manually.
 
 You can patch the `OCSInitialization ocsinit` using the following command line:
 
@@ -1808,7 +1810,7 @@ spec:
       containers:
         - image: mesosphere/aws-cli:latest
           command: ["sh"]
-          args: 
+          args:
             - '-c'
             - 'set -x && s3cmd --no-check-certificate --signature-v2 --host $BUCKET_HOST:$BUCKET_PORT --host-bucket $BUCKET_HOST:$BUCKET_PORT du'
           name: obc-test
@@ -1968,7 +1970,7 @@ six.
 
 NOTE: The OCS label `cluster.ocs.openshift.io/openshift-storage=` is already
 applied because it is configured in the workerocs *machinesets* that you used to
-create the new worker nodes. 
+create the new worker nodes.
 
 [source,role="execute"]
 ----
@@ -2016,9 +2018,9 @@ The storage class should be set to `gp2`. The added provisioned capacity will be
 NOTE: *The size chosen for OCS Service Capacity during the initial deployment of OCS is greyed out and cannot be changed.*
 
 Once you are done with your setting, proceed by clicking on `Add`. You will
-see the Status of the Storage Cluster in `Progressing` until it reaches `Ready` again. 
+see the Status of the Storage Cluster in `Progressing` until it reaches `Ready` again.
 
-CAUTION: It may take more than 5 minutes for new OSD pods to be in a `Running` state. 
+CAUTION: It may take more than 5 minutes for new OSD pods to be in a `Running` state.
 
 Use this command to see the new OSD pods:
 
@@ -2066,7 +2068,7 @@ sh-4.2# ceph status
   cluster:
     id:     e3398039-f8c6-4937-ba9d-655f5c01e0ae
     health: HEALTH_OK
- 
+
   services:
     mon: 3 daemons, quorum a,b,c (age 25m)
     mgr: a(active, since 24m)
@@ -2083,7 +2085,7 @@ sh-4.2# ceph status
     objects: 92 objects, 81 MiB
     usage:   6.1 GiB used, 12 TiB / 12 TiB avail
     pgs:     192 active+clean
- 
+
   io:
     client:   1.2 KiB/s rd, 1.7 KiB/s wr, 2 op/s rd, 0 op/s wr
 ----
@@ -2165,51 +2167,54 @@ This will take you to the *Alerting* homepage as illustrated below.
 .OCP Alerting Homepage
 image::images/ocs/metrics-alertinghomepage.png[OCP Alerting Homepage]
 
-You can display the alerts in the main window by state. To do so you must
-highlight the states you want to display. The states are:
+You can display the alerts in the main window using the filters at your disposal.
+
+* 1 - Will let you select alerts by State, Severity and Source
+* 2 - Will let you select if you want to search a specific character string on either the `Name` or the `Label`
+* 3 - Will let you enter the character string you are looking for
+
+The alert `State` can be.
 
 * `Firing` - Alert has been confirmed
 * `Silenced` - Alerts that have been silenced while they were in `Pending` or `Firing` state
 * `Pending` - Alerts that have been triggered but not confirmed
-* `Not Firing` - Alerts that have not been triggered
 
 NOTE: An alert transitions from `Pending` to `Firing` state if it persists
 for more than the amount of time configured in the alert definition (e.g. 10
 minutes for the `CephClusterWarningState` alert).
 
-As illustrated below, you can filter the alerts being displayed based on
-their state. Just click on the states to display to toggle the filter. The
-states highlighted in blue will be displayed.
+The alert `Severity` can be.
 
-NOTE: You need at least one state highlighted.
+* `Critical` - Alert is tagged as critical
+* `Warning` - Alert is tagged as warning
+* `Info` - Alert is tagged as informational
+* `None` - The alert has no `Severity` assigned
+
+The alert `Source` can be.
+
+* `Platform` - Alert is generated by an OCP component
+* `User` - Alert is generated by a user application
+
+As illustrated below, alerts can be filtered precisely using multiple criteria.
 
 .OCP Alerting Status Filtering
 image::images/ocs/metrics-alertingstatusfilter.png[OCP Alert Status Filtering]
 
-As illustrated below, you can also filter alerts by name using the *Filter*
-area on the top right of the window to search for a particular alert or set
-of alerts.
-
-.OCP Alerting Name Filtering
-image::images/ocs/metrics-alertingnamefilter.png[OCP Alert Name Filtering]
-
-Through the 3 dot icon on the right hand side of each alert line you have
-access to a contextual menu to either view the alert definition or to silence
-the alert.
-
-.OCP Alert Contextual Menu
-image::images/ocs/metrics-alertingcontextualmenu.png[OCP Alert Contextual Menu]
+NOTE: You can clear all filters to view all the existing alerts.
 
 If you select `View Alerting Rule` you will get access to the details of the
 rule that triggered the alert. The details include the Prometheus query used
 by the alert to perform the detection of the condition.
+
+.OCP Alert Contextual Menu
+image::images/ocs/metrics-alertingcontextualmenu.png[OCP Alert Contextual Menu]
 
 .OCP Alert Detail Display
 image::images/ocs/metrics-alertingviewrule.png[OCP Alert Detailed Display]
 
 NOTE: If desired, you can click the Prometheus query embedded in the alert.
 Doing so will take you to the *Metrics* page where you will be able to
-execute the alert and to test updates to the alert.
+execute the query for the alert and if desired make changes to the rule.
 
 === Metrics
 

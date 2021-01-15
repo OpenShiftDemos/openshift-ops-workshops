@@ -2202,19 +2202,19 @@ image::images/ocs/metrics-alertingstatusfilter.png[OCP Alert Status Filtering]
 
 NOTE: You can clear all filters to view all the existing alerts.
 
-.OCP Alert Contextual Menu
-image::images/ocs/metrics-alertingcontextualmenu.png[OCP Alert Contextual Menu]
-
 If you select `View Alerting Rule` you will get access to the details of the
 rule that triggered the alert. The details include the Prometheus query used
 by the alert to perform the detection of the condition.
+
+.OCP Alert Contextual Menu
+image::images/ocs/metrics-alertingcontextualmenu.png[OCP Alert Contextual Menu]
 
 .OCP Alert Detail Display
 image::images/ocs/metrics-alertingviewrule.png[OCP Alert Detailed Display]
 
 NOTE: If desired, you can click the Prometheus query embedded in the alert.
 Doing so will take you to the *Metrics* page where you will be able to
-execute the alert and to test updates to the alert.
+execute the query for the alert and if desired make changes to the rule.
 
 === Metrics
 

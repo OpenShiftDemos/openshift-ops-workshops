@@ -861,7 +861,6 @@ In the file `pvc.yaml` that was created, search for the following section using
 your favorite editor.
 
 .Example output:
-[source,yaml]
 ----
 [truncated]
 spec:
@@ -1382,7 +1381,7 @@ If you are missing the *ConfigMap*, create it using this command:
 ----
 oc apply -f {{ HOME_PATH }}/support/ocslab_cluster-monitoring-noinfra.yaml
 ----
-.Sample output:
+.Example output:
 ----
 configmap/cluster-monitoring-config created
 ----
@@ -1397,7 +1396,7 @@ If the *ConfigMap* already exists because of completing prior module
 ----
 oc apply -f {{ HOME_PATH }}/support/ocslab_cluster-monitoring-withinfra.yaml
 ----
-.Sample output:
+.Example output:
 ----
 configmap/cluster-monitoring-config updated
 ----
@@ -1414,7 +1413,6 @@ oc -n openshift-monitoring get configmap cluster-monitoring-config -o yaml | mor
 ----
 
 .ConfigMap sample output:
-[source,yaml]
 ----
 [...]
       volumeClaimTemplate:
@@ -1649,8 +1647,8 @@ test21obc   openshift-storage.noobaa.io   Bound   38s
 ----
 oc get obc test21obc -o yaml -n openshift-storage
 ----
+
 .Example output:
-[source,yaml,linenums]
 ----
 apiVersion: objectbucket.io/v1alpha1
 kind: ObjectBucketClaim
@@ -1689,8 +1687,8 @@ same name as the *OBC*:
 ----
 oc get secret test21obc -o yaml -n openshift-storage
 ----
+
 .Example output:
-[source,yaml]
 ----
 apiVersion: v1
 data:
@@ -1727,8 +1725,8 @@ metadata:
 ----
 oc get cm test21obc -o yaml -n openshift-storage
 ----
+
 .Example output:
-[source,yaml]
 ----
 apiVersion: v1
 data:
@@ -1774,7 +1772,6 @@ use the provided S3 configuration in an example application.
 
 To deploy the *OBC* and the example application we apply this YAML file:
 
-[source,yaml]
 ----
 apiVersion: v1
 kind: Namespace

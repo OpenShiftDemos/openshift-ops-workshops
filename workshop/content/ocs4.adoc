@@ -1,6 +1,7 @@
 = Deploying and Managing OpenShift Container Storage
 // Activate experimental attribute for Keyboard Shortcut keys
 :experimental:
+:source-highlighter: pygments
 
 == Lab Overview
 
@@ -861,6 +862,7 @@ In the file `pvc.yaml` that was created, search for the following section using
 your favorite editor.
 
 .Example output:
+[source,yaml]
 ----
 [truncated]
 spec:
@@ -879,6 +881,7 @@ Edit `storage: 5Gi` and replace it with `storage: 10Gi`. The resulting section
 in your file should look like the output below.
 
 .Example output:
+[source,yaml]
 ----
 [truncated]
 spec:
@@ -1413,6 +1416,7 @@ oc -n openshift-monitoring get configmap cluster-monitoring-config -o yaml | mor
 ----
 
 .ConfigMap sample output:
+[source,yaml]
 ----
 [...]
       volumeClaimTemplate:
@@ -1649,6 +1653,7 @@ oc get obc test21obc -o yaml -n openshift-storage
 ----
 
 .Example output:
+[source,yaml]
 ----
 apiVersion: objectbucket.io/v1alpha1
 kind: ObjectBucketClaim
@@ -1689,6 +1694,7 @@ oc get secret test21obc -o yaml -n openshift-storage
 ----
 
 .Example output:
+[source,yaml]
 ----
 apiVersion: v1
 data:
@@ -1727,6 +1733,7 @@ oc get cm test21obc -o yaml -n openshift-storage
 ----
 
 .Example output:
+[source,yaml]
 ----
 apiVersion: v1
 data:
@@ -1772,6 +1779,7 @@ use the provided S3 configuration in an example application.
 
 To deploy the *OBC* and the example application we apply this YAML file:
 
+[source,yaml]
 ----
 apiVersion: v1
 kind: Namespace

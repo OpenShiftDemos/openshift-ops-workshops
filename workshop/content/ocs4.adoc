@@ -773,7 +773,7 @@ just created.
 
 [source,role="execute"]
 ----
-oc rsh $(oc get pods -n my-database-app|grep postgresql|grep -v deploy|awk {'print $1}')
+oc rsh -n my-database-app $(oc get pods -n my-database-app|grep postgresql|grep -v deploy|awk {'print $1}')
 ----
 [source,role="execute"]
 ----

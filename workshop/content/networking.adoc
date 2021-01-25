@@ -13,7 +13,7 @@ SDN plugin is able to isolate pods in projects using pod and namespace label sel
 
 The network policy SDN plugin was introduced in OpenShift 3.7, and more
 information about it and its configuration can be found in the
-link:https://docs.openshift.com/container-platform/3.11/architecture/networking/sdn.html[networking
+link:https://docs.openshift.com/container-platform/4.6/networking/understanding-networking.html[networking
 documentation^]. Additionally, other vendors are working with the upstream
 Kubernetes community to implement their own SDN plugins, and several of these
 are supported by the vendors for use with OpenShift. These plugin
@@ -30,10 +30,13 @@ oc project default
 ----
 
 ### Execute the Creation Script
+[Note]
+====
 Only users with project or cluster administration privileges can manipulate *Project*
-networks.
+network policies.
+====
 
-Then, execute a script that we have prepared for you. It will create two
+Execute a script that we have prepared for you. It will create two
 *Projects* and then deploy a *DeploymentConfig* with a *Pod* for you:
 
 [source,bash,role="execute"]
@@ -160,6 +163,21 @@ Note the last line that says `FAILED!`. This means that the pod in the
 `netproj-a` *Project* was unable to connect to the pod in the `netproj-b`
 *Project* (as expected).
 
+To list all the `NetworkPolicy` objects, run the following:
+
+[source,bash,role="execute"]
+----
+oc get networkpolicy -n netproj-b
+----
+
+You should see something like the following:
+
+[source]
+----
+NAME              POD-SELECTOR   AGE
+deny-by-default   <none>         3m19s
+----
+
 ### Allow Access
 With the Network Policy based SDN, it's possible to allow access to
 individual or groups of pods in a project by creating multiple
@@ -206,6 +224,22 @@ To allow access to the pod in the `netproj-b` *Project* from all pods in the
 [source,bash,role="execute"]
 ----
 oc create -n netproj-b -f {{ HOME_PATH }}/support/network-policy-allow-all-from-netproj-a.yaml
+----
+
+Listing the *NetworkPolicies*:
+
+[source,bash,role="execute"]
+----
+oc get networkpolicy -n netproj-b
+----
+
+This should show the new policy in place
+
+[source]
+----
+NAME                                      POD-SELECTOR   AGE
+allow-tcp-5000-from-netproj-a-namespace   run=ose        81s
+deny-by-default                           <none>         7m11s
 ----
 
 ### Test Connectivity #3 (should work again)

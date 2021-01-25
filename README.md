@@ -75,25 +75,25 @@ First, clone the repo
 git clone https://github.com/openshift/openshift-cns-testdrive
 ```
 
-Next, Build a container (using `docker` or `podman`) using the repo/branch you checked out.
+Next, Build a container using the repo/branch you checked out.
 
 ```shell
 cd openshift-cns-testdrive
 export QUAY_USER=myusername
 export BRANCH=$(git branch --show-current)
-docker build -t quay.io/${QUAY_USER}/lab-sample-workshop:${BRANCH} .
+podman build -t quay.io/${QUAY_USER}/lab-sample-workshop:${BRANCH} .
 ```
 
 Now, login to quay (it's free to sign up) or another registry your cluster has access to.
 
 ```shell
-docker login quay.io
+podman login quay.io
 ```
 
 Next push your container to your repo.
 
 ```shell
-docker push quay.io/${QUAY_USER}/lab-sample-workshop:${BRANCH}
+podman push quay.io/${QUAY_USER}/lab-sample-workshop:${BRANCH}
 ```
 
 You will use this image to deploy the lab. The following command will log you in as `kubeadmin` on systems with `oc` client installed:
@@ -102,6 +102,9 @@ You will use this image to deploy the lab. The following command will log you in
 oc login -u kubeadmin -p $KUBEADMIN_PASSWORD
 
 oc new-project lab-ocp-cns
+
+# This part is needed if you're running on a "local" or "self-provisioned" cluster
+oc adm policy add-role-to-user admin kube:admin -n lab-ocp-cns
 
 # Create deployment.
 oc new-app -n lab-ocp-cns https://raw.githubusercontent.com/redhat-cop/agnosticd/development/ansible/roles/ocp4-workload-workshop-admin-storage/files/production-cluster-admin.json \
@@ -112,8 +115,6 @@ oc new-app -n lab-ocp-cns https://raw.githubusercontent.com/redhat-cop/agnosticd
 
 oc rollout status dc/dashboard -n lab-ocp-cns
 ```
-
-> NOTE: In some cases you might need to do: `oc adm policy add-role-to-user admin kube:admin -n lab-ocp-cns`
 
 If you made changes to the container image and want to refresh your deployed Homeroom quickly, execute this:
 
@@ -151,7 +152,9 @@ where you installed OpenShift from.
 ## Troubleshooting
 Make sure you are logged-in as kubeadmin when creating the project
 
-If you are getting _too many redirects_ error then clearing cookies and re-login as kubeadmin
+If you are getting _too many redirects_ error then clearing cookies and
+re-login as kubeadmin. This usually happens if you're using RHPDS and
+stopped/started a cluster.
 
 ## Cleaning up
 To delete deployment run

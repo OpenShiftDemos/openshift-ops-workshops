@@ -1,0 +1,239 @@
+apiVersion: v1
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: syslog-ng
+      app.kubernetes.io/component: syslog-ng
+      app.kubernetes.io/instance: syslog-ng
+      app.kubernetes.io/part-of: syslog-ng-app
+      app.openshift.io/runtime-version: 3.30.1
+    name: syslog-ng
+  spec:
+    ports:
+    - name: 514-udp
+      port: 514
+      protocol: UDP
+      targetPort: 514
+    - name: 601-tcp
+      port: 601
+      protocol: TCP
+      targetPort: 601
+    - name: 6514-tcp
+      port: 6514
+      protocol: TCP
+      targetPort: 6514
+    selector:
+      app: syslog-ng
+      deploymentconfig: syslog-ng
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: syslog-ng
+      app.kubernetes.io/component: syslog-ng
+      app.kubernetes.io/instance: syslog-ng
+      app.kubernetes.io/part-of: syslog-ng-app
+      app.openshift.io/runtime-namespace: external-logs
+    name: syslog-ng
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: syslog-ng
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: syslog-ng
+          deploymentconfig: syslog-ng
+      spec:
+        containers:
+        - image: balabit/syslog-ng@sha256:131fa2d5187d317d8fe85a60bfe6f328d5ff3480fd72da631d621cee47003157
+          imagePullPolicy: IfNotPresent
+          name: syslog-ng
+          ports:
+          - containerPort: 514
+            protocol: UDP
+          - containerPort: 601
+            protocol: TCP
+          - containerPort: 6514
+            protocol: TCP
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: syslog-ng
+      app.kubernetes.io/component: syslog-ng
+      app.kubernetes.io/instance: syslog-ng
+      app.kubernetes.io/part-of: syslog-ng-app
+    name: syslog-ng
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: balabit/syslog-ng:3.30.1
+      from:
+        kind: DockerImage
+        name: balabit/syslog-ng:3.30.1
+      importPolicy: {}
+      name: 3.30.1
+      referencePolicy:
+        type: Source
+---
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegeEscalation: true
+allowPrivilegedContainer: false
+allowedCapabilities: null
+apiVersion: security.openshift.io/v1
+defaultAddCapabilities: null
+fsGroup:
+  type: RunAsAny
+groups:
+- system:cluster-admins
+kind: SecurityContextConstraints
+metadata:
+  annotations:
+    kubernetes.io/description: syslog anyuid used for external logs lab
+  name: syslog-scc
+priority: 10
+readOnlyRootFilesystem: false
+requiredDropCapabilities:
+- MKNOD
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: MustRunAs
+supplementalGroups:
+  type: RunAsAny
+users:
+- system:serviceaccount:external-logs:default
+- system:serviceaccount:mypr:default
+volumes:
+- configMap
+- downwardAPI
+- emptyDir
+- persistentVolumeClaim
+- projected
+- secret
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app: syslog-ng-infra
+    app.kubernetes.io/component: syslog-ng-infra
+    app.kubernetes.io/instance: syslog-ng-infra
+    app.kubernetes.io/part-of: syslog-ng-infra
+  name: syslog-ng-infra 
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+  - annotations:
+      openshift.io/imported-from: balabit/syslog-ng:3.30.1
+    from:
+      kind: DockerImage
+      name: balabit/syslog-ng:3.30.1
+    importPolicy: {}
+    name: 3.30.1
+    referencePolicy:
+      type: Source
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: syslog-ng-infra
+    app.kubernetes.io/component: syslog-ng-infra
+    app.kubernetes.io/instance: syslog-ng-infra
+    app.kubernetes.io/part-of: syslog-ng-infra
+    app.openshift.io/runtime: other-unknown
+    app.openshift.io/runtime-namespace: external-logs
+  name: syslog-ng-infra
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: syslog-ng-infra
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: syslog-ng-infra
+        deploymentconfig: syslog-ng-infra
+    spec:
+      containers:
+      - image: balabit/syslog-ng@sha256:131fa2d5187d317d8fe85a60bfe6f328d5ff3480fd72da631d621cee47003157
+        imagePullPolicy: IfNotPresent
+        name: syslog-ng-infra
+        ports:
+        - containerPort: 514
+          protocol: UDP
+        - containerPort: 601
+          protocol: TCP
+        - containerPort: 6514
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: syslog-ng-infra
+    app.kubernetes.io/component: syslog-ng-infra
+    app.kubernetes.io/instance: syslog-ng-infra
+    app.kubernetes.io/part-of: syslog-ng-infra
+    app.openshift.io/runtime-version: 3.30.1
+  name: syslog-ng-infra
+spec:
+  ports:
+  - name: 514-udp
+    port: 514
+    protocol: UDP
+    targetPort: 514
+  - name: 601-tcp
+    port: 601
+    protocol: TCP
+    targetPort: 601
+  - name: 6514-tcp
+    port: 6514
+    protocol: TCP
+    targetPort: 6514
+  selector:
+    app: syslog-ng-infra
+    deploymentconfig: syslog-ng-infra
+  sessionAffinity: None

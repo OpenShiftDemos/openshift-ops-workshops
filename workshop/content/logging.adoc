@@ -16,21 +16,21 @@ aggregated data. Administrators can see and search through all logs.
 Application owners and developers can allow access to logs that belong to
 their projects. The EFK stack runs on top of OpenShift.
 
-[WARNING]
+[Warning]
 ====
 This lab requires that you have completed the infra-nodes lab. The logging
 stack will be installed on the `infra` nodes that were created in that lab.
 ====
 
-[NOTE]
+[Note]
 ====
 More information may be found on the official OpenShift documentation site
 found here:
 
- https://docs.openshift.com/container-platform/4.1/logging/efk-logging.html
+ https://docs.openshift.com/container-platform/4.6/logging/cluster-logging.html
 ====
 
-[NOTE]
+[Note]
 ====
 This exercise is done almost entirely using the OpenShift web console. All of
 the interactions with the web console are effectively creating or
@@ -119,7 +119,7 @@ Then follow the following steps:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Choose `Elasticsearch Operator` from the list of available Operators,
     and click `Install`.
-  c. On the `Create Operator Subscription` page, *select Update Channel 4.2*, leave all other defaults
+  c. On the `Create Operator Subscription` page, *select Update Channel 4.6*, leave all other defaults
      and then click `Subscribe`.
 +
 This makes the Operator available to all users and projects that use this
@@ -127,7 +127,7 @@ OpenShift Container Platform cluster.
 
 2. Install the Cluster Logging Operator:
 +
-[NOTE]
+[Note]
 ====
 The `Cluster Logging` operator needs to be installed in the
 `openshift-logging` namespace. Please ensure that the `openshift-logging`
@@ -139,7 +139,7 @@ namespace was created from the previous steps
     `Install`.
   c. On the `Create Operator Subscription` page, Under ensure `Installation
      Mode` that `A specific namespace on the cluster` is selected, and choose
-     `openshift-logging`. In addition, *select Update Channel 4.2* and leave all other defaults
+     `openshift-logging`. In addition, *select Update Channel 4.6* and leave all other defaults
      and then click `Subscribe`.
 
 3. Verify the operator installations:
@@ -151,7 +151,7 @@ namespace was created from the previous steps
   c. In the _Status_ column you should see green checks with either
      `InstallSucceeded` or `Copied` and the text _Up to date_.
 +
-[NOTE]
+[Note]
 ====
 During installation an operator might display a `Failed` status. If the
 operator then installs with an `InstallSucceeded` message, you can safely
@@ -186,7 +186,7 @@ we want to install and configure logging.
 
 3. On the `Custom Resource Definition Overview` page, select `View Instances` from the `Actions` menu.
 +
-[NOTE]
+[Note]
 ====
 If you see a `404` error, don't panic. While the operator installation
 succeeded, the operator itself has not finished installing and the
@@ -196,7 +196,7 @@ and then refresh the page.
 +
 4. On the `Cluster Loggings` page, click `Create Cluster Logging`.
 +
-[WARNING]
+[Warning]
 ====
 This step requires that you have completed the `Deploying and Managing OpenShift Container Storage` Module. If you have not completed the `OCS` module, you will need to substitute `storageClassName: ocs-storagecluster-ceph-rbd` with `storageClassName: gp2` in the `YAML` below before copying to the editor. 
 ====
@@ -324,7 +324,7 @@ elasticsearch-elasticsearch-cdm-ggzilasv-3   Bound    pvc-f326aa7d-389c-11ea-bab
         ocs-storagecluster-ceph-rbd   15m
 ----		
 
-[NOTE]
+[Note]
 ====
 Much like with the Metrics solution, we defined the appropriate
 `NodeSelector` in the Logging configuration (`CR`) to ensure that the Logging
@@ -377,6 +377,27 @@ access.
 Because you've already authenticated to the OpenShift Console as a
 cluster-admin user, you will see an administrative view of what Kibana has to
 show you (which you authorized by clicking the button).
+
+#### Setting up Index Patterns
+
+Once you open Kibana, before being able to view logs, we need to define an `index pattern` that will be used by Kibana to query ElasticSearch.
+
+1. On the following screen, input `app*` as the index pattern, as shown below and hit `Next Step`.
++
+image::images/logging-kibana-indexpattern.png[Kibana Index Pattern]
++
+
+2. On the following screen, input `infra*` as the index pattern, as shown below and hit `Next Step`.
++
+image::images/logging-kibana-indexpattern-infra.png[Kibana Index Pattern]
++
+
+3. On the next screen, select `Timestamp` in the drop-down box, as shown below:
++
+image::images/logging-kibana-indexpattern-timestamp.png[Kibana Index Pattern]
++
+
+4. Hit Create Index Pattern
 
 #### Queries with _Kibana_
 
@@ -439,3 +460,188 @@ Please take time to explore the _Kibana_ page and get experience by adding
 and doing more queries. This will be helpful when using a production cluster,
 you will be able to get the exact logs that you are looking for in a single
 place.
+
+### Forwarding logs to external systems
+In this section we will show you how to use a new feature in OpenShift 4.6 to ease forwarding logs to external log systems.
+
+A new CustomResourceDefinition (CRD) named `ClusterLogForwarder` is used by the `Cluster Logging Operator` to create or modify internal Fluentd configmaps to forward logs to external (or internal) systems.
+Only one `ClusterLogForwarder` can exist in a cluster, and it combines all of the log forwarding rules.
+
+Forwarding cluster logs to external third-party systems requires a combination of `outputs` and `pipelines` specified in a `ClusterLogForwarder` custom resource (CR) to send logs to specific endpoints inside and outside of your OpenShift Container Platform cluster. You can also use `inputs` to forward the application logs associated with a specific project to an endpoint. Let's learn more about these concepts.
+
+* An `output` is the destination for log data that you define, or where you want the logs sent. An output can be one of the following types:
+
+** `elasticsearch`: An external Elasticsearch v5.x or v6.x instance. The elasticsearch output can use a TLS connection.
+
+** `fluentdForward`: An external log aggregation solution that supports Fluentd. This option uses the Fluentd forward protocols. The fluentForward output can use a TCP or TLS connection and supports shared-key authentication by providing a shared_key field in a secret. Shared-key authentication can be used with or without TLS.
+
+** `syslog`: An external log aggregation solution that supports the syslog RFC3164 or RFC5424 protocols. The syslog output can use a UDP, TCP, or TLS connection.
+
+** `kafka`: A Kafka broker. The kafka output can use a TCP or TLS connection.
+
+** `default`: The internal OpenShift Container Platform Elasticsearch instance. You are not required to configure the default output. If you do configure a default output, you receive an error message because the default output is reserved for the Cluster Logging Operator.
+
+If the output URL scheme requires TLS (HTTPS, TLS, or UDPS), then TLS server-side authentication is enabled. To also enable client authentication, the output must name a secret in the openshift-logging project. The secret must have keys of: tls.crt, tls.key, and ca-bundle.crt that point to the respective certificates that they represent.
+
+* A `pipeline` defines simple routing from one log type to one or more outputs, or which logs you want to send. The log types are one of the following:
+
+** `application`: Container logs generated by user applications running in the cluster, except infrastructure container applications.
+
+** `infrastructure`: Container logs from pods that run in the openshift*, kube*, or default projects and journal logs sourced from node file system.
+
+** `audit`: Logs generated by the node audit system (auditd) and the audit logs from the Kubernetes API server and the OpenShift API server.
+
+You can add labels to outbound log messages by using key:value pairs in the pipeline. For example, you might add a label to messages that are forwarded to others data centers or label the logs by type. Labels that are added to objects are also forwarded with the log message.
+
+* An input forwards the application logs associated with a specific project to a pipeline.
+
+
+
+[Note]
+====
+More information may be found on the official OpenShift documentation site
+found here:
+
+
+https://docs.openshift.com/container-platform/4.6/logging/cluster-logging-external.html
+====
+
+
+#### Sending logs to an external Syslog server
+For the sake of simplification, we will emulate an external Syslog server by deploying a containerized Syslog server in a namespace called `external-logs`.
+
+Since we also want to show how to separate application logs from infrastructure logs, we will deploy 2 'external' (containerized) Syslogs, one to receive forwarded application logs, and one to receive forwarded infrastructure logs.
+
+First, let's create a namespace called `external-logs` where we will deploy the Syslog server.
+
+[source,bash,role="execute"]
+----
+oc new-project external-logs
+----
+
+Now, let's deploy the `Syslog` servers on that namespace. For that, we'll be using a YAML file containing all the required resources:
+[source,bash,role="execute"]
+----
+oc create -f /opt/app-root/src/support/extlogs-syslog.yaml -n external-logs
+----
+
+Let's check that everything is working fine, which can take a minute until the image is pulled for an external registry. When everything is OK, we should get an output similar to this:
+```
+NAME                              READY   STATUS    RESTARTS   AGE
+syslog-ng-7cff7dd94-t5hh7         1/1     Running   0          1m
+```
+
+Now that our external Syslog server is available, let's setup a log forwarding rule by creating a `ClusterLogForwarder`.
+First let's look at the YAML file:
+
+```YAML
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: instance
+  namespace: openshift-logging
+spec:
+  outputs: <1>
+  - name: rsyslog-app
+    syslog:
+      facility: user
+      payloadKey: message
+      rfc: RFC3164
+      severity: informational
+    type: syslog <2>
+    url: udp://syslog-ng.external-logs.svc:514 <3>
+  - name: rsyslog-infra
+    syslog:
+      facility: user
+      payloadKey: message
+      rfc: RFC3164
+      severity: informational
+    type: syslog
+    url: udp://syslog-ng-infra.external-logs.svc:514 <4>
+  pipelines: <5>
+  - inputRefs: <6>
+    - application <7>
+    labels:
+      syslog: app
+    name: syslog-app
+    outputRefs:
+    - rsyslog-app <8>
+    - default
+  - inputRefs:
+    - infrastructure <8>
+    labels:
+      syslog: infra
+    name: syslog-infra
+    outputRefs:
+    - rsyslog-infra <9>
+    - default
+```
+
+In this YAML file, there are some notable fields:
+
+ The `outputs` (1) section defines all the remote log systems, in our case we have 2 Syslog servers:
+
+** (3) This is the url for the one to store application-related logs. It is pointing to the service that is in the `external-logs` namespace.
+** (4) This is the url one for infrastructure-related logs. It is pointing to the service that is in the `external-logs` namespace.
+
+The `pipelines` section defines the sources and nature of logs that should be sent to the outputs defined before.
+`inputRefs` are used to describe the nature of the log to be sent, and as a reminder they can be either `application`, `infrastructure`, or `audit` for OpenShift audit logs (API access, etc).
+
+We have 2 inputsRefs, (7) is for application logs and (8) is for infrastructure logs.
+Each inputRefs section contains an outRefs to tell where the logs should be sent, referring the outputs (1) defined in the beginning of the spec section.
+
+Now let's create the ClusterLogForwareder resource using the YAML file:
+
+[source,bash,role="execute"]
+----
+oc create -f /opt/app-root/src/support/extlogs-clusterlogforwarder.yaml
+----
+
+Once the CR is created, the Cluster Logging Operator redeploys the Fluentd pods. 
+If the pods do not redeploy, you can delete the Fluentd pods to force them to redeploy.
+
+[source,bash,role="execute"]
+----
+oc delete pod --selector logging-infra=fluentd -n openshift-logging
+----
+
+Let's check that all the Fluentd pods are now in Running state:
+
+[source,bash,role="execute"]
+----
+oc get pod --selector logging-infra=fluentd -n openshift-logging
+----
+
+You should see something like this in the output:
+```
+NAME            READY   STATUS        RESTARTS   AGE
+fluentd-274bx   1/1     Running       0          1m
+fluentd-5bqx8   1/1     Running       0          1m
+fluentd-67qld   1/1     Running       0          1m
+fluentd-m9v2f   1/1     Running       0          1m
+fluentd-vs8bb   1/1     Running       0          1m
+fluentd-x98gk   1/1     Running       0          1m
+```
+
+Now let's check that the logs are being forwarded to the 2 Syslog servers. 
+The Syslog server stores it's logs in the /var/log/messages file within the container, so we need to check it's content by doing an oc exec into the container. `Make sure you put the correct pod name in the command`:
+
+We will be using the OpenShift Console Terminal to access the pod and check the `/var/log/messages` content.
+
+1. Open the Administrator View and go to `workloads->Pods`
++
+image::images/logging-syslog-pods.png[Syslog Pods]
++
+
+2. Click on the syslog infrastructure pod, which name looks like `syslog-ng-infra-xyz`, and go the the `Terminal` tab
++
+image::images/logging-syslog-terminal-infra.png[Syslog Terminal]
++
+
+3. In the Terminal box, enter this command: `tail -f /var/log/messages`. The forwarded logs should then appear in the terminal.
++
+image::images/logging-syslog-logs.png[Syslog logs]
++
+
+And voilà! You can repeat this procedure with the other pod to check that the application logs are correctly forwarded too. 
+

@@ -29,7 +29,7 @@ kubeadmin
 {{ KUBEADMIN_PASSWORD }}
 ----
 +
-[WARNING]
+[Warning]
 ====
 You will receive a self-signed certificate error in your browser when you
 first visit the OpenShift Web console. When OpenShift is installed, by default, a CA
@@ -107,7 +107,7 @@ multiple metrics in easy to consume form graphed over time.
 
 1. Click the "Dashboards" link under the "Monitoring" section on the left hand side.
 +
-[WARNING]
+[Warning]
 ====
 You will receive a self-signed certificate error in your browser when you
 first visit the Dashboards UI console. When OpenShift is installed, by default, a CA

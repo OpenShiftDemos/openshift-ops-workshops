@@ -16,7 +16,7 @@ This hands-on workshop is for both system administrators and application develop
 
 OpenShift Container Platform (OCP) 4.2 made Operator Metering generally available. Operator Metering is a chargeback and reporting tool to provide accountability for how resources are used across a cluster. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster wide. Operator Metering is part of the link:https://coreos.com/blog/introducing-operator-framework-metering[Operator Framework].
 
-[NOTE]
+[Note]
 ====
 This exercise is done with a mix of CLI and the OpenShift web console. All of
 the interactions with the web console are effectively creating or
@@ -27,7 +27,7 @@ not covered in the exercise or documentation at this time.
 
 ### Installing Operator Metering 
 
-[NOTE]
+[Note]
 ====
 This lab assumes you have logged into an existing cluster with the `oc login` command
 ====
@@ -57,9 +57,9 @@ kubeadmin
 {{ KUBEADMIN_PASSWORD }}
 ----
 
-[WARNING]
+[Warning]
 ====
-You will receive a self-signed certificate error in your browser when you
+You might receive a self-signed certificate error in your browser when you
 first visit the OpenShift Web console. When OpenShift is installed, by default, a CA
 and SSL certificates are generated for all inter-component communication
 within OpenShift, including the web console.
@@ -72,7 +72,7 @@ To install the Metering Operator using the OpenShift Web Console first create an
 
 1. In the OpenShift Container Platform web console, click *Administration* → *Namespaces* → *Create Namespace*.
 
-2. Set the name to `openshift-metering`. No other namespace is supported. Label the namespace with 
+2. Set the name to `openshift-metering` and make sure to label the namespace with 
 +
 [source,role="copypaste"]
 ----
@@ -82,25 +82,42 @@ openshift.io/cluster-monitoring=true
 Then click Create.
 
 3. Next, click *Operators* → *OperatorHub*, and filter for `metering` to find the Metering Operator.
++
+image::images/metering-operator-image.png[Metering Operator Logo]
 
 4. Click the *Metering* card, review the package description, and then click *Install*.
 
-5. On the *Create Operator Subscription* screen, select the `openshift-metering` namespace you created above. Specify `4.2` as the Update Channel and `Automatic` as the Approval Strategy, then click *Subscribe* to install metering.
+5. On the *Install Operator* screen, make sure the `4.6` *Update Channel* is selected. Also, verify that `A specific namespace on the cluster` is selected as the *Installation Mode*. The *Installed Namespace* should already be set  to `Operator recommended namespace` with `openshift-metering` selected. Keep the *Approval Strategy* to `Automatic`.
++
+image::images/metering-install-operator.png[Metering Operator Install]
++
+Once you've verified these options, click "Install".
 
-6. On the *Installed Operators* screen the *Status* displays *InstallSucceeded* when metering has finished installing. Click the name of the operator (Metering) in the first column to view the *Operator Details* page.
+6. This will take you the the "Installing Operator" progress page.
++
+image::images/metering-installing-progress.png[Metering Operator Install Progress]
++
+Once the page displays *Installed operator - ready for use*, go ahead and click on `View Operator`.
 
-[NOTE]
+7. This will take you to the *Operator Details* page.
++
+image::images/metering-details-page.png[Metering Operator Install Progress]
+
+
+[Note]
 ====
-It may take a few minutes for the metering operator to appear.
+It may take a few minutes for the metering operator to install, be patient.
 ====
 
 ### Install the Metering stack
 
-1. From the web console, ensure you are on the *Operator Details* page for the Metering Operator in the `openshift-metering` project. You can navigate to this page by clicking *Operators* → *Installed Operators*, then selecting the Metering Operator.
+1. From the web console, ensure you are on the *Operator Details* page for the Metering Operator in the `openshift-metering` project. If you've navigated away from this page, you can get back to this page by clicking *Operators* → *Installed Operators*, then selecting the Metering Operator.
 
-2. Under *Provided APIs*, click *Create Instance* on the **Metering Configuration** card. This opens a YAML editor with the default MeteringConfig file where you can define your configuration.
+2. Under *Provided APIs*, click *Create Instance* on the **Metering Configuration** card.
++
+image::images/metering-config-card.png[Metering Config Card]
 
-3. Replace the default configuration by copying and pasting the following MeteringConfig into the YAML editor and click Create:
+3. Click on *YAML View* in the *Configure via* section; and replace the default configuration by copying and pasting the following MeteringConfig into the YAML editor and click `Create`:
 +
 [source,role="copypaste"]
 ----
@@ -111,7 +128,6 @@ metadata:
 spec:
   unsupportedFeatures:
     enableHDFS: true
-
   storage:
     type: "hive"
     hive:
@@ -149,7 +165,20 @@ reporting-operator-56c6c878fb-2zbhp   0/2     ContainerCreating   0          4s
 
 2. Continue to check your Pods until they show `Ready`. This can take several minutes. Many Pods rely on other components to function before they themselves can be considered ready. Some Pods may restart if other Pods take too long to start, this is okay and can be expected during installation.
 +
-Using the `oc` CLI, the same check shows output similar to the following:
+You can follow the instantiation of the Pods by waiting for all the `StatefulSet` rollouts:
++
+[source,bash,role="execute"]
+----
+until [[ $(oc get sts -n openshift-metering -o name | wc -l) -gt 4 ]]; do echo "waiting for statefulsets..." ; sleep 10 ; done
+oc rollout status sts/hdfs-datanode -n openshift-metering
+oc rollout status sts/hdfs-namenode -n openshift-metering
+oc rollout status sts/hive-metastore -n openshift-metering
+oc rollout status sts/hive-server -n openshift-metering
+oc rollout status sts/presto-coordinator -n openshift-metering
+oc rollout status sts/presto-worker -n openshift-metering
+----
++
+Once done, you can use the `oc` CLI, to see them running:
 +
 [source,bash,role="execute"]
 ----
@@ -158,13 +187,13 @@ oc -n openshift-metering get pods
 +
 ----
 NAME                                  READY   STATUS    RESTARTS   AGE
-hdfs-datanode-0                       1/1     Running   0          13m
-hdfs-namenode-0                       1/1     Running   0          13m
-hive-metastore-0                      2/2     Running   0          12m
-hive-server-0                         3/3     Running   0          12m
-metering-operator-6465b49f8c-487tg    2/2     Running   0          1h30m
-presto-coordinator-0                  2/2     Running   0          12m
-reporting-operator-787868bfcc-w8qs6   2/2     Running   0          11m
+hdfs-datanode-0                       1/1     Running   0          6m32s
+hdfs-namenode-0                       1/1     Running   0          6m32s
+hive-metastore-0                      2/2     Running   0          6m9s
+hive-server-0                         3/3     Running   0          6m9s
+metering-operator-6f7fb6f6fd-dfk6w    1/1     Running   0          22m
+presto-coordinator-0                  2/2     Running   0          5m43s
+reporting-operator-57c5b4d577-flsqb   2/2     Running   0          5m13s
 ----
 
 3. Next, use the `oc` CLI to verify that the ReportDataSources are beginning to import data, indicated by a valid timestamp in the `EARLIEST METRIC` column (this may take a few minutes). We filter out the "-raw" ReportDataSources which do not import data:
@@ -180,7 +209,9 @@ After all Pods are ready and you have verified that data is being imported, you 
 
 The Report custom resource is used to manage the execution and status of reports. Metering produces reports derived from usage data sources, which can be used in further analysis and filtering.
 
-A single Report resource represents a job that manages a database table and updates it with new information according to a schedule. The Report exposes the data in that table via the reporting-operator HTTP API. Reports with a `spec.schedule` field set are always running and track what time periods it has collected data for. This ensures that if metering is shutdown or unavailable for an extended period of time, it will backfill the data starting where it left off. If the schedule is unset, then the Report will run once for the time specified by the `reportingStart` and `reportingEnd`. By default, reports wait for ReportDataSources to have fully imported any data covered in the reorting peroid. If the Report has a schedule, it will wait to run until the data in the period currently being processed has finished importing.
+A single Report resource represents a job that manages a database table and updates it with new information according to a schedule. The Report exposes the data in that table via the reporting-operator HTTP API. Reports with a `spec.schedule` field set are always running and track what time periods it has collected data for. This ensures that if metering is shutdown or unavailable for an extended period of time, it will backfill the data starting where it left off. If the schedule is unset, then the Report will run once for the time specified by the `reportingStart` and `reportingEnd`.
+
+By default, reports wait for `ReportDataSources` to have fully imported any data covered in the reorting peroid. If the Report has a schedule, it will wait to run until the data in the period currently being processed has finished importing.
 
 Use the `oc` CLI to get ReportQueries to see what reports are available:
 
@@ -189,15 +220,24 @@ Use the `oc` CLI to get ReportQueries to see what reports are available:
 oc get reportqueries -n openshift-metering | grep -v raw
 ----
 
-ReportQueries with the `-raw` suffix are used by other ReportQueries to build more complex queries, and should not be used directly for reports.
+[Note]
+====
+ReportQueries with the `-raw` suffix are used by other ReportQueries to build more complex queries, and should not be used directly for reports. Therefore, we omitted them with the `grep -v raw` command.
+====
 
 #### Create Report with a Schedule
 
 The following example Report will contain information on every Pod’s CPU requests, and will run every hour, adding the last hours worth of data each time it runs.
 
-1. In the OpenShift Container Platform web console, click *Operators* → *Installed Operators*. On the *Installed Operators* click the Metering operator.
+1. In the OpenShift Container Platform web console, click *Operators* → *Installed Operators*. On the *Installed Operators* click the Metering operator. This will bring you to the details page again.
++
+image::images/metering-details-page.png[Metering Details Page]
 
-2. Under *Metering Report*, click *Create Instance*. This opens a YAML editor with the default MeteringConfig file where you can define your configuration.
+2. Under the *Metering Report* card, click *Create Instance*.
++
+image::images/metering-report-card.png[Metering Report card]
++
+This opens the *Create Report* page. Click `YAML View` to get the YAML editor
 
 3. Replace the default configuration by copying and pasting the following MeteringConfig into the YAML editor and click Create:
 +
@@ -233,9 +273,15 @@ cluster-cpu-usage-hourly   cluster-cpu-usage   hourly     ReportingPeriodWaiting
 
 The following example Report will contain information on every Namespace’s CPU requests, and will run one time.
 
-1. In the OpenShift Container Platform web console, click *Operators* → *Installed Operators*. On the *Installed Operators* click the Metering operator.
+1. In the OpenShift Container Platform web console, click *Operators* → *Installed Operators*. On the *Installed Operators* click the Metering operator. This will, once again, bring you to the details page.
++
+image::images/metering-details-page.png[Metering Details Page]
 
-2. Under *Metering Report*, click *Create Instance*. This opens a YAML editor with the default MeteringConfig file where you can define your configuration.
+2. Under the *Metering Report* card, click *Create Instance*.
++
+image::images/metering-report-card.png[Metering Report card]
++
+This opens the *Create Report* page. Click `YAML View` to get the YAML editor
 
 3. Replace the default configuration by copying and pasting the following MeteringConfig into the YAML editor and click Create:
 +
@@ -272,8 +318,14 @@ namespace-cpu-request-2020   namespace-cpu-request              Finished        
 
 To view reports complete the following: 
 
-1. In the OpenShift Container Platform web console, click *Administration* → *Chargeback*
+1. In the OpenShift Container Platform web console, click *Administration* → *Chargeback*. This opens the `Chargeback Reporting` page.
++
+image::images/chargeback-rep.png[Chargeback Reporting]
 
-2. Select the one-time report created in the previous section titled namespace-cpu-request-2020
+2. Select the one-time report created in the previous section titled `namespace-cpu-request-2020`
 
-3. From this screen the report can be downloaded as a CSV file by clicking the Download button. The report is also displayed in the lower part of the screen.
+3. From this screen the report can be downloaded as a CSV file by scolling down, and clicking the Download button. The report is also displayed in the lower part of the screen.
++
+image::images/download-csv.png[Download CSV]
++
+This file can be imported to any metering application that accepts CSV format.

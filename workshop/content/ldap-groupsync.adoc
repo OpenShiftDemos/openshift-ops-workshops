@@ -2,7 +2,7 @@
 
 OpenShift supports a number of different authentication providers, and you can
 find the complete list in the
-link:https://docs.openshift.com/container-platform/4.0/authentication/understanding-identity-provider.html[understanding
+link:https://docs.openshift.com/container-platform/4.6/authentication/understanding-identity-provider.html[understanding
 identity provider configuration]. One of the most commonly used authentication
 providers is LDAP, whether provided by Microsoft Active Directory or by other
 sources.
@@ -39,20 +39,33 @@ oc get oauth cluster -o yaml
 
 You will see something like:
 
-```YAML
+[source,yaml]
+----
 apiVersion: config.openshift.io/v1
 kind: OAuth
 metadata:
   annotations:
     release.openshift.io/create-only: "true"
-  creationTimestamp: "2020-03-17T18:12:52Z"
+  creationTimestamp: "2021-01-04T18:09:16Z"
   generation: 1
+  managedFields:
+  - apiVersion: config.openshift.io/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:annotations:
+          .: {}
+          f:release.openshift.io/create-only: {}
+      f:spec: {}
+    manager: cluster-version-operator
+    operation: Update
+    time: "2021-01-04T18:09:16Z"
   name: cluster
-  resourceVersion: "1563"
+  resourceVersion: "1807"
   selfLink: /apis/config.openshift.io/v1/oauths/cluster
-  uid: ebb0582d-b0e4-4c40-a33f-12459593f8e2
+  uid: 8090316c-209e-425c-9ed6-39930337f557
 spec: {}
-```
+----
 
 There are a few things to note here. Firstly, there's basically nothing here!
 How does the `kubeadmin` user work, then? The OpenShift OAuth system knows to
@@ -66,20 +79,32 @@ oc get secret -n kube-system kubeadmin -o yaml
 
 You will see something like:
 
-```YAML
+[source,yaml]
+----
 apiVersion: v1
 data:
-  kubeadmin: JDJhJDEwJDdQNHZtbXMxdmpDa3FsNlJMLjJBcC5BSWdBazB6d09IWUdXZEdrRXBERGRwWXNmVVcxanpX
+  kubeadmin: JDJhJDEwJDNyLjhRNUdzdzExSFFyckFMeEF5NU9RT0hILzZYSEVpNHIxYURpNks3WVZPLnlxRGVnaHpx
 kind: Secret
 metadata:
-  creationTimestamp: "2019-04-29T17:30:51Z"
+  creationTimestamp: "2021-01-04T18:08:15Z"
+  managedFields:
+  - apiVersion: v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:data:
+        .: {}
+        f:kubeadmin: {}
+      f:type: {}
+    manager: cluster-bootstrap
+    operation: Update
+    time: "2021-01-04T18:08:15Z"
   name: kubeadmin
   namespace: kube-system
-  resourceVersion: "2065"
+  resourceVersion: "98"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubeadmin
-  uid: 892945dc-6aa4-11e9-9959-02774c6d6b2e
+  uid: b5177429-c0db-443e-bbed-8d0912779a96
 type: Opaque
-```
+----
 
 That *Secret* contains the encoded hash of the `kubeadmin` password. This
 account will continue to work even after we configure a new `OAuth`. If you
@@ -133,7 +158,7 @@ able to distinguish between them.
 <2> `mappingMethod: claim`: This section has to do with how usernames are
 assigned within an OpenShift cluster when multiple providers are configured. See
 the
-link:https://docs.openshift.com/container-platform/4.0/authentication/understanding-identity-provider.html#identity-provider-parameters-understanding-identity-provider[Identity provider parameters] section for more information.
+link:https://docs.openshift.com/container-platform/4.6/authentication/understanding-identity-provider.html#identity-provider-parameters_understanding-identity-provider[Identity provider parameters] section for more information.
 
 <3> `attributes`: This section defines the LDAP fields to iterate over and
 assign to the fields in the OpenShift user's "account". If any attributes are
@@ -153,7 +178,7 @@ validating the SSL certificate of the LDAP server.
 
 For more information on the specific details of LDAP authentication in
 OpenShift you can refer to the
-link:https://docs.openshift.com/container-platform/4.1/authentication/identity_providers/configuring-ldap-identity-provider.html[Configuring
+link:https://docs.openshift.com/container-platform/4.6/authentication/identity_providers/configuring-ldap-identity-provider.html[Configuring
 an LDAP identity provider^] documentation.
 
 To setup the LDAP identity provider we must:
@@ -172,7 +197,7 @@ oc create configmap ca-config-map --from-file={{ HOME_PATH }}/support/ca.crt -n 
 oc apply -f {{ HOME_PATH }}/support/oauth-cluster.yaml
 ----
 
-[NOTE]
+[Note]
 ====
 We use `apply` because there is an existing `OAuth` object. If you used
 `create` you would get an outright error that the object already exists. You
@@ -182,7 +207,7 @@ still get a warning, but that's OK.
 #### Syncing LDAP Groups to OpenShift Groups
 In OpenShift, groups can be used to manage users and control permissions for
 multiple users at once. There is a section in the documentation on how to
-link:https://docs.openshift.com/container-platform/3.11/install_config/syncing_groups_with_ldap.html[sync
+link:https://docs.openshift.com/container-platform/4.6/authentication/ldap-syncing.html[sync
 groups with LDAP^]. Syncing groups involves running a program called `groupsync`
 when logged into OpenShift as a user with `cluster-admin` privileges, and using
 a configuration file that tells OpenShift what to do with the users it finds in
@@ -259,16 +284,17 @@ apiVersion: user.openshift.io/v1
 kind: Group
 metadata:
   annotations:
-    openshift.io/ldap.sync-time: 2020-03-11T10:57:03-0400
-    openshift.io/ldap.uid: cn=ose-fancy-dev,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com
+    openshift.io/ldap.sync-time: "2021-01-04T21:43:40Z"
+    openshift.io/ldap.uid: cn=ose-fancy-dev,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=co
+m
     openshift.io/ldap.url: ldap.jumpcloud.com:636
-  creationTimestamp: "2020-03-11T14:57:03Z"
+  creationTimestamp: "2021-01-04T21:43:40Z"
   labels:
     openshift.io/ldap.host: ldap.jumpcloud.com
   name: ose-fancy-dev
-  resourceVersion: "48481"
+  resourceVersion: "80943"
   selfLink: /apis/user.openshift.io/v1/groups/ose-fancy-dev
-  uid: 630a9d2b-b577-46bd-8294-6b26e7f9a6e1
+  uid: 652f296a-b2ea-41ca-9b1e-5cfd98389438
 users:
 - fancyuser1
 - fancyuser2
@@ -311,11 +337,11 @@ Change the policy for the `ose-fancy-dev` *Group*:
 oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
 ----
 
-[NOTE]
+[Note]
 ====
 If you are interested in the different roles that come with OpenShift, you can
 learn more about them in the
-link:https://docs.openshift.com/container-platform/4.1/authentication/using-rbac.html[role-based access control (RBAC)^] documentation.
+link:https://docs.openshift.com/container-platform/4.6/authentication/using-rbac.html[role-based access control (RBAC)^] documentation.
 ====
 
 #### Examine `cluster-reader` policy
@@ -346,8 +372,14 @@ Now, login as a member of `ose-fancy-dev`:
 oc login -u fancyuser1 -p Op#nSh1ft
 ----
 
-And then perform the same `oc get projects` and you will now see the list of all
-of the projects in the cluster:
+And then perform the same `oc get projects` command: 
+
+[source,bash,role="execute"]
+----
+oc get projects
+----
+
+You will now see the list of all of the projects in the cluster:
 
 ----
 NAME                                                    DISPLAY NAME                        STATUS
@@ -369,7 +401,7 @@ Make sure you login as the cluster administrator:
 
 [source,bash,role="execute"]
 ----
-oc login -u system:serviceaccount:lab-ocp-cns:dashboard-user
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
 
 Then, create several *Projects* for people to collaborate:
@@ -385,7 +417,7 @@ You have now created several *Projects* that represent a typical Software
 Development Lifecycle setup. Next, you will configure *Groups* to grant
 collaborative access to these projects.
 
-[NOTE]
+[Note]
 ====
 Creating projects with `oc adm new-project` does *not* use the project request
 process or the project request template. These projects will not have quotas or
@@ -511,17 +543,16 @@ Find the `prometheus` `Route` with the following command:
 
 [source,bash,role="execute"]
 ----
-oc get route prometheus-k8s -n openshift-monitoring
+oc get route prometheus-k8s -n openshift-monitoring -o jsonpath='{.spec.host}{"\n"}'
 ----
 
 You will see something like the following:
 
 ----
-NAME             HOST/PORT                                                                      PATH   SERVICES         PORT   TERMINATION          WILDCARD
-prometheus-k8s   prometheus-k8s-openshift-monitoring.{{ ROUTE_SUBDOMAIN }}          prometheus-k8s   web    reencrypt/Redirect   None
+prometheus-k8s-openshift-monitoring.{{ ROUTE_SUBDOMAIN }}
 ----
 
-[WARNING]
+[Warning]
 ====
 Before continuing, make sure to go to the OpenShift web console and log out
 by using the dropdown menu at the upper right where it says `kube:admin`.
@@ -535,11 +566,17 @@ control+click the link:https://prometheus-k8s-openshift-monitoring.{{
 ROUTE_SUBDOMAIN }}[Prometheus link] to open it in your browser. You'll be
 greeted with a login screen. Click the *Log in with OpenShift* button, then
 select the `ldap` auth mechanism, and use the `fancyuser1` user that you gave
-`cluster-reader` privileges to earlier. More specifically, the
-`ose-fancy-dev` group has `cluster-reader` permissions, and `fancyuser1` is a
-member. Remember that the password for all of these users is `openshift`. You
-will probably get a certificate error because of the self-signed certificate.
-Make sure to accept it.
+`cluster-reader` privileges to earlier.
+
+More specifically, the `ose-fancy-dev` group has `cluster-reader`
+permissions, and `fancyuser1` is a member. Remember that the password
+for all of these users is `Op#nSh1ft`.
+
+[Warning]
+====
+You might get a certificate error because of a self-signed certificate
+(depending on how the cluster was installed).  Make sure to accept it.
+====
 
 After logging in, the first time you will be presented with an auth proxy
 permissions acknowledgement:
@@ -561,5 +598,5 @@ After you are done, make sure to login again as the admin user:
 
 [source,bash,role="execute"]
 ----
-oc login -u system:serviceaccount:lab-ocp-cns:dashboard-user
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----

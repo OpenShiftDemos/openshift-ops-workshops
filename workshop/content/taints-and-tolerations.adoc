@@ -1,6 +1,6 @@
 ## Taints and Tolerations
 
-In a previous lab, you created "infra" nodes leveraging https://docs.openshift.com/container-platform/4.3/nodes/scheduling/nodes-scheduler-node-selectors.html[nodeSelector]
+In a previous lab, you created "infra" nodes leveraging https://docs.openshift.com/container-platform/latest/nodes/scheduling/nodes-scheduler-node-selectors.html[nodeSelector]
 to control where the workload lands. You saw how you can set nodes to perform
 certain tasks. The `nodeSelector` in  the `nodePlacement` attracts pods to a
 set of nodes. But what if you want the opposite? What if you want to repel
@@ -27,7 +27,7 @@ accept any workload that does not tolerate the taint(s). Tolerations that are
 applied to these workloads will allow (but do not require) the corresponding
 pods to schedule onto nodes with matching taints.
 
-[NOTE]
+[Note]
 ====
 You will have to use `nodeSelector` along with taints and tolerations to have
 workloads ALWAYS land on a specific node.
@@ -73,7 +73,12 @@ this exercise. The application deploys on nodes labeled `appnode=welcome-php`.
 oc get nodes -l 'node-role.kubernetes.io/worker,!node-role.kubernetes.io/infra,!cluster.ocs.openshift.io/openshift-storage' -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}' | xargs -I{} oc label node {} appnode=welcome-php
 ----
 
-Verify that the nodes were labeled, taking note of the name of the node.
+[Note]
+====
+To label a node, you pass the node name with a `key=value` pair. Example: `oc label node worker.example.com appnode=welcome-php`
+====
+
+Verify that the nodes were labeled, taking note of the name of the node(s).
 
 [source,bash,role="execute"]
 ----
@@ -113,14 +118,11 @@ oc scale deploy welcome-php --replicas=${NODE_NUMBER}
 oc rollout status deploy welcome-php
 ----
 
-Once the application is rolled out, let's delete the pods so they can
-re-balance on all nodes.
-
-[source,bash,role="execute"]
-----
-oc delete pods --all
-oc rollout status deploy welcome-php
-----
+[Note]
+====
+If the pods are not evenly distributed between nodes, you may have to run
+`oc delete pods --all` to let them rebalance.
+====
 
 Verify that the pods are spread evenly accross workers. There should be one pod
 for each node.
@@ -128,15 +130,9 @@ for each node.
 [source,bash,role="execute"]
 ----
 clear
-oc get po -o wide
+oc get pods -o=custom-columns=NAME:.metadata.name,NODE:.spec.nodeName
 oc get nodes -l appnode=welcome-php
 ----
-
-[NOTE]
-====
-You may have to run `oc delete pods --all` a few times to get the pods to
-spread evenly.
-====
 
 #### Tainting nodes
 
@@ -173,6 +169,11 @@ with `welcome-php=run:NoSchedule`.  This makes it to where all new pods
 TTNODE=$(oc get nodes -l 'node-role.kubernetes.io/worker,!node-role.kubernetes.io/infra,!cluster.ocs.openshift.io/openshift-storage' -o jsonpath='{range .items[0]}{.metadata.name}')
 oc adm taint node ${TTNODE} welcome-php=run:NoSchedule
 ----
+
+[Note]
+====
+The syntax is: `oc adm taint node ${nodename} key=value:Effect`
+====
 
 Examine the nodes we deployed on and see that the taint is applied to one of
 the nodes.
@@ -212,7 +213,7 @@ Examine where the pods are running.
 [source,bash,role="execute"]
 ----
 clear
-oc get po -o wide
+oc get pods -o=custom-columns=NAME:.metadata.name,NODE:.spec.nodeName
 oc get nodes -l appnode=welcome-php
 ----
 
@@ -279,7 +280,7 @@ Now when you list all pods, they should be now spread evenly.
 [source,bash,role="execute"]
 ----
 clear
-oc get po -o wide
+oc get pods -o=custom-columns=NAME:.metadata.name,NODE:.spec.nodeName
 oc get nodes -l appnode=welcome-php
 ----
 

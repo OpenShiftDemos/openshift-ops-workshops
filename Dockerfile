@@ -11,6 +11,9 @@ RUN wget https://github.com/noobaa/noobaa-operator/releases/download/v5.6.0/noob
 
 COPY . /tmp/src
 
+RUN wget https://github.com/red-hat-storage/demo-apps/raw/main/packaged/photo-album.tgz && \
+    tar -xzvf /opt/app-root/src/photo-album.tgz -C /tmp/src/support/
+
 RUN rm -rf /tmp/src/.git* && \
     chown -R 1001 /tmp/src && \
     chgrp -R 0 /tmp/src && \

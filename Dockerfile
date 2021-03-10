@@ -10,8 +10,9 @@ RUN wget https://github.com/noobaa/noobaa-operator/releases/download/v5.6.0/noob
     chmod +x /opt/workshop/bin/{oc,kubectl,noobaa}
 
 COPY . /tmp/src
+
 RUN wget https://github.com/red-hat-storage/demo-apps/raw/main/packaged/photo-album.tgz && \
-    tar -xzvf /opt/app-root/src/photo-album.tgz -C /opt/app-root/src/support/
+    tar -xzvf /opt/app-root/src/photo-album.tgz -C /tmp/src/support/
 
 RUN rm -rf /tmp/src/.git* && \
     chown -R 1001 /tmp/src && \

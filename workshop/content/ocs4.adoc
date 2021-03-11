@@ -1941,7 +1941,7 @@ Run the application startup script which will build and deploy the application t
 
 [source,role="execute"]
 ----
-cd photo-album
+cd {{ HOME_PATH }}/support/photo-album
 ./demo.sh
 ----
 

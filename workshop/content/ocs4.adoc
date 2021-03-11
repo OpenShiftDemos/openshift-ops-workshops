@@ -1307,6 +1307,9 @@ oc get pvc -n my-database-app | awk {'print $1}'
 NAME
 postgresql
 ----
+
+CAUTION: Make sure you expanded the `postgresql` *PVC* to 15Gi before proceeding. If not expanded go back and complete this section <<Expand RBD based PVCs>>.
+
 Before creating the PVC clone make sure to create and save at least one new article so there is new data in the `postgresql` *PVC*.
 
 [source,role="execute"]
@@ -1583,7 +1586,7 @@ my-shared-storage-snapshot   true         my-shared-storage                     
 
 ==== Restoring Volume Snapshot to clone PVC
 
-You can now restore the new *VolumeSnapshot* in the *OpenShift Web Console*. Navigate to `Storage` -> `Volume Snapshots`. Select `Restore as new PVC`.
+You can now restore the new *VolumeSnapshot* in the *OpenShift Web Console*. Navigate to `Storage` -> `Volume Snapshots`. Select `Restore as new PVC`. Make sure to have the `my-shared-storage` project selected at the top left.
 
 .Persistent Volume Claim snapshot restore in UI
 image::images/ocs/OCP4-OCS4-Snapshot-restore.png[Persistent Volume Claim snapshot restore in UI]
@@ -2032,7 +2035,7 @@ To view the *ConfigMap* created by the OBC, run the following:
 
 [source,role="execute"]
 ----
-oc -n demo get cm photo-album -o yaml
+oc -n demo get cm photo-album -o yaml | more
 ----
 .Example output:
 [source,yaml]
@@ -2054,7 +2057,7 @@ To view the *Secret* created for the OBC run the following:
 
 [source,role="execute"]
 ----
-oc -n demo get secret photo-album -o yaml
+oc -n demo get secret photo-album -o yaml | more
 ----
 .Example output:
 [source,yaml]

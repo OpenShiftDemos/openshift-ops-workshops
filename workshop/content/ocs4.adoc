@@ -1783,12 +1783,15 @@ section of this lab guide.
 
 == Using the Multi-Cloud-Gateway
 
-This section discusses the usage of the Multi-Cloud-Gateway (MCG). Currently
-the best way to configure the MCG is to use the `NooBaa client` or `oc CLI`.
+In this section, you will deploy a new OCP application that uses `Object Bucket
+Claims` (OBCs) to create dynamic buckets via the `Multicloud Object Gateway`
+(MCG). You will also use the `MCG Console` to validate new objects in the
+`Object Bucket`.
 
-NOTE: While the NooBaa Web Management Console is accessible, it should not be
-used to create any resources, since they are currently not synchronized back
-to the Openshift cluster.
+NOTE: The `MCG Console` is not fully integrated with the *Openshift Web Console*
+and resources created in the `MCG Console` are not synchronized back to the
+Openshift Cluster. For MCG features such as Namespace buckets, please use the
+MCG console to configure.
 
 === Checking on the MCG status
 
@@ -1910,309 +1913,244 @@ noobaa-default-bucket-class   {Tiers:[{Placement: BackingStores:[noobaa-default-
 No OBCs found.
 ----
 
-As you can see - the NooBaa CLI will first check on the environment and will
-then print all the information about the environment. Besides the status of
-the MCG, the second most intersting information for us are the available S3
-addresses that we can use to connect to our MCG buckets. We can chose between
-using the external DNS which incurs DNS traffic cost, or route internally
-inside of our Openshift cluster.
+The NooBaa status command will first check on the environment and will then
+print all the information about the environment. Besides the status of the MCG,
+the second most intersting information for us are the available S3 addresses
+that we can use to connect to our MCG buckets. We can chose between using the
+external DNS which incurs DNS traffic cost, or route internally inside of our
+Openshift cluster.
 
-You can get a more basic overview of the MCG status using the Object Service
+You can get a more basic overview of the MCG status using the `Object Service`
 *Dashboard*. To reach this, log into the *Openshift Web Console*, click on
 `Home` and select the `Overview` item. In the main view, select `Object
 Service` in the top navigation bar. This dashboard does not give you connection
 information for your S3 endpoint, but offers Graphs and runtime information
-about the usage of your S3 backend as well as a link to the MCG console.
+about the usage of your S3 backend as well as a link to the `MCG Console`.
 
-=== Creating an Object Bucket Claim
+=== Creating and Using Object Bucket Claims
 
-An Object Bucket Claim, *OBC*, can be used to request a S3 compatible bucket
-backend for your workloads. When creating an OBC you get a ConfigMap (CM) and
-a Secret that together contain all the information your application needs to
-use the object storage service.
+MCG *ObjectBucketClaims* (OBCs) are used to dynamically create S3 compatible
+buckets that can be used by an OCP application. When an OBC is created MCG
+creates a new *ObjectBucket* (OB), *ConfigMap* (CM) and *Secret* that together
+contain all the information your application needs to connect to the new bucket
+from within your deployment.
 
-Creating an OBC is as simple as using the NooBaa CLI:
+To demonstrate this feature we will use the Photo-Album demo application. 
 
-[source,role="execute"]
-----
-noobaa obc create test21obc -n openshift-storage
-----
-.Example output:
-----
-INFO[0000] ✅ Exists: StorageClass "openshift-storage.noobaa.io"
-INFO[0000] ✅ Created: ObjectBucketClaim "test21obc"
-[...]
-----
-
-The NooBaa CLI has created the necessary configuration inside of NooBaa and
-has informed Openshift about the new *OBC*:
+Run the application startup script which will build and deploy the application to your cluster. 
 
 [source,role="execute"]
 ----
-oc get obc -n openshift-storage
-----
-.Example output:
-----
-NAME        STORAGE-CLASS                 PHASE   AGE
-test21obc   openshift-storage.noobaa.io   Bound   38s
+cd photo-album
+./demo.sh
 ----
 
-[source,role="execute"]
-----
-oc get obc test21obc -o yaml -n openshift-storage
-----
+NOTE: Please make sure you follow the continuation prompts by pressing enter. 
 
 .Example output:
-[source,yaml]
 ----
-apiVersion: objectbucket.io/v1alpha1
-kind: ObjectBucketClaim
-metadata:
-  creationTimestamp: "2021-01-14T01:53:15Z"
-  finalizers:
-  - objectbucket.io/finalizer
-  generation: 2
-  labels:
-    app: noobaa
-    bucket-provisioner: openshift-storage.noobaa.io-obc
-    noobaa-domain: openshift-storage.noobaa.io
-  managedFields:
+[ OK    ] Using apps.cluster-7c31.7c31.sandbox905.opentlc.com as our base domain
+
+Object Bucket Demo
+
+ * Cleanup existing environment
+
+Press any key to continue...
+[ OK    ] oc delete --ignore-not-found=1 -f app.yaml
+
+[ OK    ] oc delete --ignore-not-found=1 bc photo-album -n demo
+buildconfig.build.openshift.io "photo-album" deleted
+
+ * Import dependencies and create build config
+-./demo.sh
+[ OK    ] Using apps.cluster-7c31.7c31.sandbox905.opentlc.com as our base domain
+
+Object Bucket Demo
+
+ * Cleanup existing environment
+
+Press any key to continue...
+[ OK    ] oc delete --ignore-not-found=1 -f app.yaml
+
+[ OK    ] oc delete --ignore-not-found=1 bc photo-album -n demo
+buildconfig.build.openshift.io "photo-album" deleted
+
+ * Import dependencies and create build config
 
 [...]
-
-  name: test21obc
-  namespace: openshift-storage
-  resourceVersion: "879458"
-  selfLink: /apis/objectbucket.io/v1alpha1/namespaces/openshift-storage/objectbucketclaims/test21obc
-  uid: 0c8e288a-047a-4e9a-83d2-5dddf8e4af2a
-spec:
-  ObjectBucketName: obc-openshift-storage-test21obc
-  bucketName: test21obc-d87b9eec-3842-43ed-abd9-18aa4a3a9e48
-  generateBucketName: test21obc
-  storageClassName: openshift-storage.noobaa.io
-status:
-  phase: Bound
+ OK    ] oc start-build photo-album --from-dir . -F -n demo
+photo-album setup
+/opt/app-root/src/demo-apps/photo-album
 ----
 
-Inside of your `openshift-storage` namespace, you will now find the
-*ConfigMap* and the *Secret* to use this OBC. The CM and the secret have the
-same name as the *OBC*:
+IMPORTANT: *Deployment might take up to 5 minutes or more to complete.*
 
+Check the photo-album deployment is complete by running:
 [source,role="execute"]
 ----
-oc get secret test21obc -o yaml -n openshift-storage
+oc -n demo get pods
 ----
-
 .Example output:
-[source,yaml]
 ----
-apiVersion: v1
-data:
-  AWS_ACCESS_KEY_ID: TTZybEVOY01qR3FnaXZpdk1rQXo=
-  AWS_SECRET_ACCESS_KEY: aHNNdVJxSGFDV0hZdUpOOXZEbFpkc2tZaklKL21MKzN4WTRRKzc3YQ==
-kind: Secret
-metadata:
-  creationTimestamp: "2021-01-14T01:53:16Z"
-  finalizers:
-  - objectbucket.io/finalizer
-  labels:
-    app: noobaa
-    bucket-provisioner: openshift-storage.noobaa.io-obc
-    noobaa-domain: openshift-storage.noobaa.io
-  managedFields:
-
-[...]
-
-  name: test21obc
-  namespace: openshift-storage
-  ownerReferences:
-  - apiVersion: objectbucket.io/v1alpha1
-    blockOwnerDeletion: true
-    controller: true
-    kind: ObjectBucketClaim
-    name: test21obc
-    uid: 0c8e288a-047a-4e9a-83d2-5dddf8e4af2a
-  resourceVersion: "879450"
-  selfLink: /api/v1/namespaces/openshift-storage/secrets/test21obc
-  uid: 1c7cdcdd-f449-4dec-b2e6-32a2e9ea03e3
+NAME                   READY   STATUS      RESTARTS   AGE
+photo-album-1-build    0/1     Completed   0          10m
+photo-album-1-deploy   0/1     Completed   0          10m
+photo-album-1-rtplt    1/1     Running     0          10m
 ----
+
+Now that the photo-album application has been deployed you can view the *ObjectBucketClaim* it created. Run the following:
 
 [source,role="execute"]
 ----
-oc get cm test21obc -o yaml -n openshift-storage
+oc -n demo get obc 
+----
+.Example output:
+----
+NAME          STORAGE-CLASS                 PHASE   AGE
+photo-album   openshift-storage.noobaa.io   Bound   23m
 ----
 
+To view the *ObjectBucket* (OB) that was created by the *OBC* above run the following:
+
+[source,role="execute"]
+----
+oc get ob 
+----
+.Example output:
+----
+NAME                   STORAGE-CLASS                 CLAIM-NAMESPACE   CLAIM-NAME    RECLAIM-POLICY   PHASE   AGE
+obc-demo-photo-album   openshift-storage.noobaa.io   demo              photo-album   Delete           Bound   23m
+----
+
+NOTE: *OBs*, similar to *PVs*, are cluster-scoped resources so therefore adding the namespace is not needed.
+
+You can also view the new bucket *ConfigMap* and *Secret* using the following commands.
+
+The *ConfigMap* will contain important information such as the bucket name, service and port. All are used to configure the connection from within the deployment to the s3 endpoint.
+
+To view the *ConfigMap* created by the OBC, run the following:
+
+[source,role="execute"]
+----
+oc -n demo get cm photo-album -o yaml
+----
 .Example output:
 [source,yaml]
 ----
 apiVersion: v1
 data:
   BUCKET_HOST: s3.openshift-storage.svc
-  BUCKET_NAME: test21obc-d87b9eec-3842-43ed-abd9-18aa4a3a9e48
+  BUCKET_NAME: photo-album-2c0d8504-ae02-4632-af83-b8b458b9b923
   BUCKET_PORT: "443"
   BUCKET_REGION: ""
   BUCKET_SUBREGION: ""
 kind: ConfigMap
-metadata:
-  creationTimestamp: "2021-01-14T01:53:16Z"
-  finalizers:
-  - objectbucket.io/finalizer
-  labels:
-    app: noobaa
-    bucket-provisioner: openshift-storage.noobaa.io-obc
-    noobaa-domain: openshift-storage.noobaa.io
-  managedFields:
-
 [...]
-
-  name: test21obc
-  namespace: openshift-storage
-  ownerReferences:
-  - apiVersion: objectbucket.io/v1alpha1
-    blockOwnerDeletion: true
-    controller: true
-    kind: ObjectBucketClaim
-    name: test21obc
-    uid: 0c8e288a-047a-4e9a-83d2-5dddf8e4af2a
-  resourceVersion: "879453"
-  selfLink: /api/v1/namespaces/openshift-storage/configmaps/test21obc
-  uid: 9c29e56c-03fd-4ae8-9260-370fcfe46547
 ----
 
-As you can see, the secret gives us the S3 access credentials, while the CM
-contains the S3 endpoint information for our application.
+The *Secret* will contain the credentials required for the application to connect and access the new object bucket. The credentials or keys are `base64` encoded in the *Secret*.
 
-=== Using an OBC inside a container
+To view the *Secret* created for the OBC run the following:
 
-In this section we will see how one can create an *OBC* using a YAML file and
-use the provided S3 configuration in an example application.
-
-To deploy the *OBC* and the example application we apply this YAML file:
-
+[source,role="execute"]
+----
+oc -n demo get secret photo-album -o yaml
+----
+.Example output:
 [source,yaml]
 ----
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: obc-test
+data:
+  AWS_ACCESS_KEY_ID: MTAyc3pJNnBsM3dXV0hOUzUyTEk=
+  AWS_SECRET_ACCESS_KEY: cWpyWWhuendDcjNaR1ZyVkZVN1p4c2hRK2xicy9XVW1ETk50QmJpWg==
+kind: Secret
+[...]
+----
+
+As you can see when the new *OBC* and *OB* are created, MCG creates an associated *Secret* and *ConfigMap* which contain all the information required for our photo-album application to use the new bucket.
+
+To view exactly how the application uses the information in the new *Secret* and *ConfigMap* have a look at the file `photo-album/app.yaml` after you have deployed the app. 
+
+In order to view the details of the *ObjectBucketClaim* view the start of `photo-album/app.yaml`. In the *DeploymentConfig* specification section, find `env:` and you can see how the *ConfigMap* and *Secret* details are mapped to environment variables. 
+
+[source,role="execute"]
+---- 
+cat {{ HOME_PATH }}/support/photo-album/app.yaml | more
+----
+.Example output:
+[source,yaml]
+----
 ---
 apiVersion: objectbucket.io/v1alpha1
 kind: ObjectBucketClaim
 metadata:
-  name: obc-test
-  namespace: obc-test
+  name: "photo-album"
+  namespace: demo
 spec:
-  generateBucketName: "obc-test-noobaa"
+  generateBucketName: "photo-album"
   storageClassName: openshift-storage.noobaa.io
 ---
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: obc-test
-  namespace: obc-test
-  labels:
-    app: obc-test
-spec:
-  template:
-    metadata:
-      labels:
-        app: obc-test
-    spec:
-      restartPolicy: OnFailure
-      containers:
-        - image: mesosphere/aws-cli:latest
-          command: ["sh"]
-          args:
-            - '-c'
-            - 'set -x && s3cmd --no-check-certificate --signature-v2 --host $BUCKET_HOST:$BUCKET_PORT --host-bucket $BUCKET_HOST:$BUCKET_PORT du'
-          name: obc-test
+[...]
+     spec:
+        containers:
+        - image: image-registry.openshift-image-registry.svc:5000/default/photo-album
+          name: photo-album
           env:
+            - name: ENDPOINT_URL
+              value: 'https://s3-openshift-storage.apps.cluster-7c31.7c31.sandbox905.opentlc.com'
             - name: BUCKET_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: obc-test
+                  name: photo-album
                   key: BUCKET_NAME
-            - name: BUCKET_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: obc-test
-                  key: BUCKET_HOST
-            - name: BUCKET_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: obc-test
-                  key: BUCKET_PORT
-            - name: AWS_DEFAULT_REGION
-              valueFrom:
-                configMapKeyRef:
-                  name: obc-test
-                  key: BUCKET_REGION
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: obc-test
+                  name: photo-album
                   key: AWS_ACCESS_KEY_ID
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: obc-test
+                  name: photo-album
                   key: AWS_SECRET_ACCESS_KEY
+[...]
 ----
 
-The first part creates an *OBC* that will create a *ConfigMap* and a *Secret*
-that have the same name as the *OBC* (`obc-test`). The second part of the file
-(after the `---`), creates a Job that deploys a container with the s3cmd
-pre-installed. It will execute s3cmd with the appropriate command line
-arguments and exit. S3cmd will in this case report the current disk usage of
-our S3 endpoint and exit, which will mark our *Pod* as `Completed`.
-
-Let's try this out:
-
-.Deploy the Manifest:
-[source,role="execute"]
-----
-oc apply -f {{ HOME_PATH }}/support/ocslab_obc-app-example.yaml
-----
-.Example output:
-----
-namespace/obc-test created
-objectbucketclaim.objectbucket.io/obc-test created
-job.batch/obc-test created
-----
-
-Afterwards watch the *Pod* be Created, Run and finally be marked `Completed`
-like below - be aware that your Pod name will differ:
+In order to create objects in your new bucket you must first find the route for the `photo-album` application.
 
 [source,role="execute"]
 ----
-oc get pods -n obc-test -l app=obc-test
+oc get route photo-album -n demo -o jsonpath --template="http://{.spec.host}{'\n'}"
 ----
 .Example output:
 ----
-NAME             READY   STATUS      RESTARTS   AGE
-obc-test-bvg8h   0/1     Completed   0          22s
+http://photo-album.apps.cluster-7c31.7c31.sandbox905.opentlc.com
 ----
 
-Then you can check the `obc-test` *Pod* logs for the contents of the S3 bucket
-using the command below (in this case there are zero objects in the bucket).
+Copy and paste this route into a web browser tab. 
 
-[source,role="execute"]
-----
-oc logs -n obc-test $(oc get pods -n obc-test -l app=obc-test -o jsonpath='{.items[0].metadata.name}')
-----
-.Example output:
-----
-+ s3cmd --no-check-certificate --signature-v2 --host s3.openshift-storage.svc:443 --host-bucket s3.openshift-storage.svc:443 du
-0        0 objects s3://obc-test-noobaa-1ec979bc-c53f-42e0-b551-ffaa895c06a6/
---------
-0        Total
-----
+.Select Photo and Upload
+image::images/ocs/photo-album-select-upload.png[Select Photo and Upload]
 
-This proves that the access credentials from the OBC work and are set up
-correctly inside of the container. Most applications support reading out the
-`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables
-natively, but you will have to figure out how to set the host and bucket name
-for each application. In our example we used CLI flags of s3cmd for this.
+Select one or more photos of your choosing on your local machine. Then make sure to click the `Upload` button for each photo.
+
+.View photos after uploading
+image::images/ocs/photo-album-images.png[View photos after uploading]
+
+To view the photos in your object bucket navigate to the `MCG Console` by viewing the *Object Service* dashboard viewed previously. Select the `Mulitcloud Object Gateway` link under `System Name`.
+
+.Launch MCG console from Object Service dashboard
+image::images/ocs/System-Name-MCG-Console.png[Launch MCG console from Object Service dashboard]
+
+Login to the `MCG Console` using `username` kubeadmin and your `password`. You can navigate to the bucket details by selecting the `Buckets` on the far right side. Now select `Object Buckets`.
+
+.Login to MCG Console and select Buckets
+image::images/ocs/MCG-Console-photo-album-buckets.png[Login to MCG Console and select Buckets]
+
+Select your bucket name under `Object Buckets` and then select the `Objects` tab to view the individual objects create when you uploaded your photos.
+
+.Validate uploaded photos are in your Object Bucket
+image::images/ocs/MCG-Console-photo-album-objects.png[Validate uploaded photos are in your object bucket]
 
 == Adding storage to the Ceph Cluster
 

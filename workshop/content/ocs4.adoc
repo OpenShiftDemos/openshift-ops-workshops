@@ -2142,7 +2142,14 @@ To view the photos in your object bucket navigate to the `MCG Console` by viewin
 .Launch MCG console from Object Service dashboard
 image::images/ocs/System-Name-MCG-Console.png[Launch MCG console from Object Service dashboard]
 
-Login to the `MCG Console` using `username` kubeadmin and your `password`. You can navigate to the bucket details by selecting the `Buckets` on the far right side. Now select `Object Buckets`.
+Login to the `MCG Console` using `username` kubeadmin and your `password`. 
+
+[source,role="copypaste"]
+----
+{{ KUBEADMIN_PASSWORD }}
+----
+
+You can navigate to the bucket details by selecting the `Buckets` on the far right side. Now select `Object Buckets`.
 
 .Login to MCG Console and select Buckets
 image::images/ocs/MCG-Console-photo-album-buckets.png[Login to MCG Console and select Buckets]

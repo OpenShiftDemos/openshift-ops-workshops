@@ -1308,7 +1308,7 @@ NAME
 postgresql
 ----
 
-CAUTION: Make sure you expanded the `postgresql` *PVC* to 15Gi before proceeding. If not expanded go back and complete this section <<Expand RBD based PVCs>.
+CAUTION: Make sure you expanded the `postgresql` *PVC* to 15Gi before proceeding. If not expanded go back and complete this section <<Expand RBD based PVCs>>.
 
 Before creating the PVC clone make sure to create and save at least one new article so there is new data in the `postgresql` *PVC*.
 

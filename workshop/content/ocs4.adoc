@@ -1586,7 +1586,7 @@ my-shared-storage-snapshot   true         my-shared-storage                     
 
 ==== Restoring Volume Snapshot to clone PVC
 
-You can now restore the new *VolumeSnapshot* in the *OpenShift Web Console*. Navigate to `Storage` -> `Volume Snapshots`. Select `Restore as new PVC`. Make sure to have the `my-shared-storage` project selected at the top right.
+You can now restore the new *VolumeSnapshot* in the *OpenShift Web Console*. Navigate to `Storage` -> `Volume Snapshots`. Select `Restore as new PVC`. Make sure to have the `my-shared-storage` project selected at the top left.
 
 .Persistent Volume Claim snapshot restore in UI
 image::images/ocs/OCP4-OCS4-Snapshot-restore.png[Persistent Volume Claim snapshot restore in UI]

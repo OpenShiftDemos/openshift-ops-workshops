@@ -572,6 +572,8 @@ or:
 oc get pod -w -n openshift-monitoring
 ----
 
+You can exit by pressing kbd:[Ctrl+C].
+
 ## Logging
 OpenShift's log aggregation solution is not installed by default. There is a
 dedicated lab exercise that goes through the configuration and deployment of

@@ -13,7 +13,7 @@ Some usecases include:
 * A node (or a group of nodes) in the cluster is reserved for special purposes
 * Nodes having specialized hardware for specific tasks (like a GPU)
 * Some nodes may be licensed for some software running on it
-* Nodes can be in different network zone for compliance reasons
+* Nodes can be in different network zones for compliance reasons
 * You may want to troubleshoot a misbehaving node
 
 In this lab we'll explore how to use taints and tolerations to control where

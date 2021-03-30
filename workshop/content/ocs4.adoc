@@ -476,7 +476,7 @@ expanding the `Storage` menu in the left navigation bar and selecting
 
 [source,role="execute"]
 ----
-oc -n openshift-storage get sc
+oc get storageclasses
 ----
 
 Please make sure the three storage classes are available in your cluster

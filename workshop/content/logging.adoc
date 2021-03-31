@@ -392,7 +392,7 @@ image::images/logging-kibana-indexpattern.png[Kibana Index Pattern]
 image::images/logging-kibana-indexpattern-infra.png[Kibana Index Pattern]
 +
 
-3. On the next screen, select `Timestamp` in the drop-down box, as shown below:
+3. On the next screen, select `@timestamp` in the drop-down box, as shown below:
 +
 image::images/logging-kibana-indexpattern-timestamp.png[Kibana Index Pattern]
 +
@@ -402,14 +402,14 @@ image::images/logging-kibana-indexpattern-timestamp.png[Kibana Index Pattern]
 #### Queries with _Kibana_
 
 Once the _Kibana_ web interface is up, we are now able to do queries.
-_Kibana_ offers a the user a powerful interface to query all logs that come
+_Kibana_ offers the user a powerful interface to query all logs that come
 from the cluster.
 
 By default, _Kibana_ will show all logs that have been received within the
 the last 15 minutes. This time interval may be changed in the upper right
 hand corner. The log messages are shown in the middle of the page. All log
 messages that are received are indexed based on the log message content. Each
-message will have fields associated that are associated to that log message.
+message will have fields that are associated with that log message.
 To see the fields that make up an individual message, click on the arrow on
 the side of each message located in the center of the page. This will show
 the message fields that are contained.
@@ -590,7 +590,7 @@ The `pipelines` section defines the sources and nature of logs that should be se
 We have 2 inputsRefs, (7) is for application logs and (8) is for infrastructure logs.
 Each inputRefs section contains an outRefs to tell where the logs should be sent, referring the outputs (1) defined in the beginning of the spec section.
 
-Now let's create the ClusterLogForwareder resource using the YAML file:
+Now let's create the ClusterLogForwarder resource using the YAML file:
 
 [source,bash,role="execute"]
 ----

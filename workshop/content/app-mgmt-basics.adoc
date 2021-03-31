@@ -412,7 +412,7 @@ you always want an application to be scaled to 3 *Pods* (instances), a
 somehow die/exit are not automatically restarted. *ReplicaSets* are
 how OpenShift "self heals".
 
-A *Deployments* (deploy) defines how something in OpenShift should be
+A *Deployment* (deploy) defines how something in OpenShift should be
 deployed. From the https://docs.openshift.com/container-platform/4.6/applications/deployments/what-deployments-are.html#deployments-kube-deployments_what-deployments-are[deployments documentation]:
 
 ----
@@ -823,7 +823,7 @@ oc set probe deploy/mapit --readiness --get-url=http://:8080/health --initial-de
 ### Examining Deployments and ReplicaSets
 
 Each change to the *Deployment* is counted as a _configuration_ change, which
-_triggers_ a new _deployment_. The *Deployment* in in charge of which
+_triggers_ a new _deployment_. The *Deployment* is in charge of which
 *ReplicaSet* to deploy. The _newest_ is always deployed.
 
 Execute the following:

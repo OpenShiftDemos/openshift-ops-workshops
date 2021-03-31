@@ -455,7 +455,7 @@ image::images/ocs/OCS-noobaa-dashboard-healthy.png[OCS Multi-Cloud-Gateway Dashb
 |===
 | *1* | Health | Quick overview of the general health of the Multi-Cloud-Gateway
 | *2* | Details | Overview of the deployed MCG version and backend provider including a link to the MCG Console
-| *3* | Buckets | List of all the ObjectBucket with are offered and ObjectBucketClaims which are connected to them
+| *3* | Buckets | List of all the ObjectBuckets that are offered and ObjectBucketClaims which are connected to them
 | *4* | Resource Providers | Shows the list of configured Resource Providers that are available as backing storage in the MCG
 | *5* | Counters | Shows the current numbers of reads and writes issued against each provider
 | *6* | Events | Live overview of all the changes that are being done affecting the MCG
@@ -1439,7 +1439,7 @@ If you refresh the browser you will see the application has failed.
 .Application failed because database table removed
 image::images/ocs/rails-postgresql-failed.png[Application failed because database table removed]
 
-Remember a *PVC* clone is an exact duplica of the original *PVC* at the time the clone was created. Therefore you can use you `postgresql` clone to recover the application.
+Remember a *PVC* clone is an exact duplicate of the original *PVC* at the time the clone was created. Therefore you can use you `postgresql` clone to recover the application.
 
 First you need to scale the `rails-pgsql-persistent` deployment down to zero so the *Pod* will be deleted.
 
@@ -1504,7 +1504,7 @@ oc get route rails-pgsql-persistent -n my-database-app -o jsonpath --template="h
 
 If you refresh the browser you will see the application is back online and you have your articles. You can even add more articles now.
 
-This process shows the pratical reasons to create a *PVC* clone if you are testing an application where data corruption is a possibility and you want a known good copy or `clone`. 
+This process shows the practical reasons to create a *PVC* clone if you are testing an application where data corruption is a possibility and you want a known good copy or `clone`. 
 
 Let's next look at a similar feature, creating a *PVC* snapshot.
 
@@ -2428,7 +2428,7 @@ image::images/ocs/metrics-alertinghomepage.png[OCP Alerting Homepage]
 You can display the alerts in the main window using the filters at your
 disposal.
 
-* 1 - Will let you select alerts by State, Severity and Sourc
+* 1 - Will let you select alerts by State, Severity and Source
 * 2 - Will let you select if you want to search a specific character string
   using either the `Name` or the `Label`
 * 3 - Will let you enter the character string you are searching for
@@ -2695,7 +2695,7 @@ developed around the Manager framework are:
 The Meta Data Servers manage the metadata for the POSIX compliant shared
 filesystem such as the directory hierarchy and the file metadata (ownership,
 timestamps, mode, ...). All the metadata is stored with RADOS and they do not
-server any data to the clients. MDSs are only deployed when a shared
+serve any data to the clients. MDSs are only deployed when a shared
 filesystem is configured in the Ceph cluster.
 
 If we look at the Ceph cluster foundation layer, the full picture with the
@@ -2704,14 +2704,14 @@ different types of daemons or containers looks like this.
 .RADOS as it stands
 image::images/ocs/ceph101-rados.png[RADOS Overview]
 
-The circle represent the MONs, the 'M' represent the MGRs and the squares
+The circles represent the MONs, the Ms represent the MGRs and the squares
 with the bars represent the OSDs. In the diagram above, the cluster operates
 with 3 Monitors, 2 Managers and 23 OSDs.
 
 [.lead]
 *Access Methods*
 
-Ceph was designed to provides the IT environment with all the necessary
+Ceph was designed to provide the IT environment with all the necessary
 access methods so that any application can use what is the best solution for
 its use-case.
 
@@ -2793,7 +2793,7 @@ image::images/ocs/ceph101-rgw.png[S3 and Swift Support]
 [.lead]
 *CRUSH*
 
-The Ceph cluster being a distributed architecture some solution had to be
+The Ceph cluster, being a distributed architecture, some solution had to be
 designed to provide an efficient way to distribute the data across the
 multiple OSDs in the cluster. The technique used is called CRUSH or
 Controlled Replication Under Scalable Hashing. With CRUSH, every object is

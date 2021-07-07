@@ -204,6 +204,14 @@ We use `apply` because there is an existing `OAuth` object. If you used
 still get a warning, but that's OK.
 ====
 
+This will trigger a redployment of the oAuth Operator. You can monitor the rollout with the following command.
+
+
+[source,bash,role="execute"]
+----
+oc rollout status deployment/oauth-openshift -n openshift-authentication
+----
+
 #### Syncing LDAP Groups to OpenShift Groups
 In OpenShift, groups can be used to manage users and control permissions for
 multiple users at once. There is a section in the documentation on how to

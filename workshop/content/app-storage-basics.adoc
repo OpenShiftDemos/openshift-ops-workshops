@@ -225,7 +225,7 @@ drwxrwxrwt.   1 root  root         92 Apr 12 19:11 tmp
 drwxr-xr-x.   1 root  root         69 Dec 16  2016 usr
 drwxr-xr-x.   1 root  root         41 Dec 14  2016 var
 ----
-<1> This is where the persistent storage appears inside the container
+**<1>** This is where the persistent storage appears inside the container
 
 Amazon EBS volumes are read-write-once. In other words, because they are
 block storage, they may only be attached to one EC2 instance at a time, which

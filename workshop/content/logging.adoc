@@ -119,8 +119,8 @@ Then follow the following steps:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Choose `Elasticsearch Operator` from the list of available Operators,
     and click `Install`.
-  c. On the `Create Operator Subscription` page, *select Update Channel 4.6*, leave all other defaults
-     and then click `Subscribe`.
+  c. On the `Create Operator Subscription` page, *select Update Channel `stable`*, leave all other defaults
+     and then click `Install`.
 +
 This makes the Operator available to all users and projects that use this
 OpenShift Container Platform cluster.
@@ -135,12 +135,12 @@ namespace was created from the previous steps
 ====
 
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Choose `Cluster Logging` from the list of available Operators, and click
+  b. Choose `Red Hat OpenShift Logging` from the list of available Operators, and click
     `Install`.
   c. On the `Create Operator Subscription` page, Under ensure `Installation
      Mode` that `A specific namespace on the cluster` is selected, and choose
-     `openshift-logging`. In addition, *select Update Channel 4.6* and leave all other defaults
-     and then click `Subscribe`.
+     `Operator recommended Namespace: openshift-logging`. In addition, *select Update Channel `stable`* and leave all other defaults
+     and then click `Install`.
 
 3. Verify the operator installations:
 
@@ -184,7 +184,7 @@ we want to install and configure logging.
 
 2. On the `Custom Resource Definitions` page, click `ClusterLogging`.
 
-3. On the `Custom Resource Definition Overview` page, select `View Instances` from the `Actions` menu.
+3. On the `Custom Resource Definition Overview` page, select `Instances` from the `Actions` menu.
 +
 [Note]
 ====
@@ -387,17 +387,19 @@ Once you open Kibana, before being able to view logs, we need to define an `inde
 image::images/logging-kibana-indexpattern.png[Kibana Index Pattern]
 +
 
-2. On the following screen, input `infra*` as the index pattern, as shown below and hit `Next Step`.
-+
-image::images/logging-kibana-indexpattern-infra.png[Kibana Index Pattern]
-+
-
-3. On the next screen, select `@timestamp` in the drop-down box, as shown below:
+2. On the next screen, select `@timestamp` in the drop-down box, as shown below:
 +
 image::images/logging-kibana-indexpattern-timestamp.png[Kibana Index Pattern]
 +
 
-4. Hit Create Index Pattern
+3. Hit Create Index Pattern
+
+4. You should see the following summary screen.
++
+image::images/kibana-summary-ip.png[Kibana Index Pattern Summary]
++
+
+5. Click on "Discover" on the upper left side of the screen.
 
 #### Queries with _Kibana_
 
@@ -413,9 +415,6 @@ message will have fields that are associated with that log message.
 To see the fields that make up an individual message, click on the arrow on
 the side of each message located in the center of the page. This will show
 the message fields that are contained.
-
-First, set the default index pattern to `.all`. On the left hand side towards
-the top, in the drop down menu select the `.all` index pattern.
 
 To select fields to show for messages, look on left hand side fore the
 `Available Fields` label. Below this are fields that can be selected and
@@ -436,7 +435,7 @@ Notice all of the available fields that we can use to build the query
 
 3. Next, select `is`.
 
-4. In the `Value` field, type in `openshift-logging`
+4. In the `Value` field, type in `lab-ocp-cns`
 
 5. Click the "Save" button
 
@@ -451,7 +450,7 @@ later. To save a query do the following:
 1. click on `Save` at the top of the screen.
 
 2. Type in the name you would like to save it as. In this case, let's type in
-`openshift-logging Namespace`
+`lab-ocp-cns namespace`
 
 Once this has been saved, it can be used at a later time by hitting the
 `Open` button and selecting this query.
@@ -526,9 +525,18 @@ oc create -f /opt/app-root/src/support/extlogs-syslog.yaml -n external-logs
 ----
 
 Let's check that everything is working fine, which can take a minute until the image is pulled for an external registry. When everything is OK, we should get an output similar to this:
+
+[source,bash,role="execute"]
+----
+oc get pods -n external-logs
+----
+
+You should see the following output.
+
 ```
-NAME                              READY   STATUS    RESTARTS   AGE
-syslog-ng-7cff7dd94-t5hh7         1/1     Running   0          1m
+NAME                               READY   STATUS    RESTARTS   AGE
+syslog-ng-84c59fdc8-mdwrs          1/1     Running   0          81s
+syslog-ng-infra-697fc7597f-gwrxd   1/1     Running   0          81s
 ```
 
 Now that our external Syslog server is available, let's setup a log forwarding rule by creating a `ClusterLogForwarder`.
@@ -597,8 +605,14 @@ Now let's create the ClusterLogForwarder resource using the YAML file:
 oc create -f /opt/app-root/src/support/extlogs-clusterlogforwarder.yaml
 ----
 
-Once the CR is created, the Cluster Logging Operator redeploys the Fluentd pods. 
-If the pods do not redeploy, you can delete the Fluentd pods to force them to redeploy.
+Once the CR is created, the Cluster Logging Operator redeploys the Fluentd pods. Wait for the redeploy to happen.
+
+[source,bash,role="execute"]
+----
+oc rollout status ds/fluentd -n openshift-logging
+----
+
+If the pods do not redeploy, you can delete the Fluentd pods manually to force them to redeploy.
 
 [source,bash,role="execute"]
 ----
@@ -624,11 +638,11 @@ fluentd-x98gk   1/1     Running       0          1m
 ```
 
 Now let's check that the logs are being forwarded to the 2 Syslog servers. 
-The Syslog server stores it's logs in the /var/log/messages file within the container, so we need to check it's content by doing an oc exec into the container. `Make sure you put the correct pod name in the command`:
+The Syslog server stores it's logs in the `/var/log/messages` file within the container, so we need to check it's content by doing an `oc exec` into the container via the Web Console.
 
 We will be using the OpenShift Console Terminal to access the pod and check the `/var/log/messages` content.
 
-1. Open the Administrator View and go to `workloads->Pods`
+1. Open the Administrator View and go to `workloads->Pods`. Make sure you're on the `external-logs` Project.
 +
 image::images/logging-syslog-pods.png[Syslog Pods]
 +

@@ -232,7 +232,7 @@ watch oc -n openshift-storage get csv
 .Example output:
 ----
 NAME                  DISPLAY                       VERSION   REPLACES   PHASE
-ocs-operator.v4.6.0   OpenShift Container Storage   4.6.0                Succeeded
+ocs-operator.v4.7.2   OpenShift Container Storage   4.7.2                Succeeded
 ----
 
 You can exit by pressing kbd:[Ctrl+C].
@@ -263,30 +263,20 @@ rook-ceph-operator-59f7fb95d6-sdjd8    1/1     Running   0          108s
 Now switch back to your *Openshift Web Console* for the remainder of the
 installation for OCS 4.
 
-Select `View Operator` in figure below to get to the OCS configuration screen.
+Select `Create Storage Cluster` in figure below to get to the OCS configuration screen.
 
-.View Operator in openshift-storage namespace
-image::images/ocs/OCS4-OCP4-View-Operator.png[View Operator in openshift-storage namespacee]
-
-.OCS configuration screen
-image::images/ocs/OCS4-OCP4-config-screen-all.png[OCS configuration screen]
-
-On the top of the OCS configuration screen, scroll over to the right and click
-on `Storage Cluster` and then click on `Create Storage Cluster` to the far
-right. If you do not see `Create Storage Cluster` refresh your browser window.
-
-.Create Storage Cluster
-image::images/ocs/OCS4-OCP4-config-screen-storage-cluster.png[Create Storage Cluster]
+.Create storage cluster in openshift-storage namespace
+image::images/ocs/OCS4-OCP4-View-Operator.png[Create storage cluster in openshift-storage namespace]
 
 The `Create Storage Cluster` screen will display.
 
-.Create Storage Cluster default settings
-image::images/ocs/OCS4-config-screen-partial1.png[Create Storage Cluster default settings]
+.Configure storage cluster settings
+image::images/ocs/OCS4-config-screen-partial1.png[Configure storage cluster settings]
 
-Leave the default selection of `Internal`, `gp2`, `2 TiB` and Encryption `Disabled`.
+Leave the default selection of `Internal`, `gp2`, `2 TiB`.
 
-.Create a new storage cluster
-image::images/ocs/OCS4-config-screen-partial2.png[Create a new storage cluster]
+.Select nodes for new storage cluster
+image::images/ocs/OCS4-config-screen-partial2.png[Select nodes for new storage cluster]
 
 There should be 3 worker nodes already selected that had the OCS label
 applied in the last section. Execute command below and make sure they are all
@@ -297,8 +287,13 @@ selected.
 oc get nodes --show-labels | grep ocs | cut -d ' ' -f1
 ----
 
-Then click on the button `Create` below the dialog box with the 3 workers
-selected with a `checkmark`.
+Then click on the button `Next` below the dialog box with the 3 workers
+selected with a `checkmark`. Click `Next` one more time until you see the figure below.
+
+.Review and create new storage cluster
+image::images/ocs/OCS4-config-screen-partial3.png[Review and create new storage cluster]
+
+Click `Create`.
 
 You can watch the deployment using the *Openshift Web Console* by going
 back to the `Openshift Container Storage Operator` screen and selecting `All
@@ -1807,107 +1802,119 @@ noobaa status -n openshift-storage
 ----
 .Example output:
 ----
-INFO[0000] CLI version: 5.6.0
-INFO[0000] noobaa-image: noobaa/noobaa-core:5.6.0
-INFO[0000] operator-image: noobaa/noobaa-operator:5.6.0
-INFO[0000] Namespace: openshift-storage
-INFO[0000]
-INFO[0000] CRD Status:
-INFO[0000] ✅ Exists: CustomResourceDefinition "noobaas.noobaa.io"
-INFO[0000] ✅ Exists: CustomResourceDefinition "backingstores.noobaa.io"
-INFO[0000] ✅ Exists: CustomResourceDefinition "bucketclasses.noobaa.io"
-INFO[0000] ✅ Exists: CustomResourceDefinition "objectbucketclaims.objectbucket.io"
-INFO[0000] ✅ Exists: CustomResourceDefinition "objectbuckets.objectbucket.io"
-INFO[0000]
-INFO[0000] Operator Status:
-INFO[0000] ✅ Exists: Namespace "openshift-storage"
-INFO[0000] ✅ Exists: ServiceAccount "noobaa"
-INFO[0000] ✅ Exists: Role "ocs-operator.v4.6.0-noobaa-6649766bf4"
-INFO[0000] ✅ Exists: RoleBinding "ocs-operator.v4.6.0-noobaa-6649766bf4"
-INFO[0000] ✅ Exists: ClusterRole "ocs-operator.v4.6.0-65577bfbc"
-INFO[0000] ✅ Exists: ClusterRoleBinding "ocs-operator.v4.6.0-65577bfbc"
-INFO[0000] ✅ Exists: Deployment "noobaa-operator"
-INFO[0000]
-INFO[0000] System Status:
-INFO[0000] ✅ Exists: NooBaa "noobaa"
-INFO[0000] ✅ Exists: StatefulSet "noobaa-core"
-INFO[0000] ✅ Exists: Service "noobaa-mgmt"
-INFO[0000] ✅ Exists: Service "s3"
-INFO[0000] ✅ Exists: StatefulSet "noobaa-db"
-INFO[0000] ✅ Exists: Service "noobaa-db"
-INFO[0000] ✅ Exists: Secret "noobaa-server"
-INFO[0000] ✅ Exists: Secret "noobaa-operator"
-INFO[0000] ✅ Exists: Secret "noobaa-endpoints"
-INFO[0000] ✅ Exists: Secret "noobaa-admin"
-INFO[0000] ✅ Exists: StorageClass "openshift-storage.noobaa.io"
-INFO[0000] ✅ Exists: BucketClass "noobaa-default-bucket-class"
-INFO[0000] ✅ Exists: Deployment "noobaa-endpoint"
-INFO[0000] ✅ Exists: HorizontalPodAutoscaler "noobaa-endpoint"
-INFO[0000] ✅ (Optional) Exists: BackingStore "noobaa-default-backing-store"
-INFO[0000] ✅ (Optional) Exists: CredentialsRequest "noobaa-aws-cloud-creds"
-INFO[0000] ⬛ (Optional) Not Found: CredentialsRequest "noobaa-azure-cloud-creds"
-INFO[0000] ⬛ (Optional) Not Found: Secret "noobaa-azure-container-creds"
-INFO[0000] ⬛ (Optional) Not Found: Secret "noobaa-gcp-bucket-creds"
-INFO[0000] ⬛ (Optional) Not Found: CredentialsRequest "noobaa-gcp-cloud-creds"
-INFO[0000] ✅ (Optional) Exists: PrometheusRule "noobaa-prometheus-rules"
-INFO[0000] ✅ (Optional) Exists: ServiceMonitor "noobaa-service-monitor"
-INFO[0000] ✅ (Optional) Exists: Route "noobaa-mgmt"
-INFO[0000] ✅ (Optional) Exists: Route "s3"
-INFO[0000] ✅ Exists: PersistentVolumeClaim "db-noobaa-db-0"
-INFO[0000] ✅ System Phase is "Ready"
-INFO[0000] ✅ Exists:  "noobaa-admin"
+INFO[0001] CLI version: 5.7.0
+INFO[0001] noobaa-image: registry.redhat.io/ocs4/mcg-core-rhel8@sha256:6ff8645efdde95fa97d496084d3555b768089
+5f0b79c147f2a880b43742af3a4
+INFO[0001] operator-image: registry.redhat.io/ocs4/mcg-rhel8-operator@sha256:6faecc43b775d9083d01f11705334e2
+afdee11eb585b7761851781c94df124ee
+INFO[0001] noobaa-db-image: registry.redhat.io/rhel8/postgresql-12@sha256:f486bbe07f1ddef166bab5a2a6bdcd0e63
+e6e14d15b42d2425762f83627747bf
+INFO[0001] Namespace: openshift-storage
+INFO[0001]
+INFO[0001] CRD Status:
+INFO[0001] ✅ Exists: CustomResourceDefinition "noobaas.noobaa.io"
+INFO[0001] ✅ Exists: CustomResourceDefinition "backingstores.noobaa.io"
+INFO[0001] ✅ Exists: CustomResourceDefinition "namespacestores.noobaa.io"
+INFO[0001] ✅ Exists: CustomResourceDefinition "bucketclasses.noobaa.io"
+INFO[0001] ✅ Exists: CustomResourceDefinition "objectbucketclaims.objectbucket.io"
+INFO[0001] ✅ Exists: CustomResourceDefinition "objectbuckets.objectbucket.io"
+INFO[0001]
+INFO[0001] Operator Status:
+INFO[0001] ✅ Exists: Namespace "openshift-storage"
+INFO[0001] ✅ Exists: ServiceAccount "noobaa"
+INFO[0001] ✅ Exists: Role "ocs-operator.v4.7.2-noobaa-79b9f54f59"
+INFO[0001] ✅ Exists: RoleBinding "ocs-operator.v4.7.2-noobaa-79b9f54f59"
+INFO[0001] ✅ Exists: ClusterRole "ocs-operator.v4.7.2-6d97965cd4"
+INFO[0001] ✅ Exists: ClusterRoleBinding "ocs-operator.v4.7.2-6d97965cd4"
+INFO[0001] ✅ Exists: Deployment "noobaa-operator"
+INFO[0001]
+INFO[0001] System Status:
+INFO[0001] ✅ Exists: NooBaa "noobaa"
+INFO[0001] ✅ Exists: StatefulSet "noobaa-core"
+INFO[0001] ✅ Exists: Service "noobaa-mgmt"
+INFO[0001] ✅ Exists: Service "s3"
+INFO[0001] ✅ Exists: Secret "noobaa-db"
+INFO[0001] ✅ Exists: StatefulSet "noobaa-db-pg"
+INFO[0001] ✅ Exists: Service "noobaa-db-pg"
+INFO[0001] ✅ Exists: Secret "noobaa-server"
+INFO[0001] ✅ Exists: Secret "noobaa-operator"
+INFO[0001] ✅ Exists: Secret "noobaa-endpoints"
+INFO[0001] ✅ Exists: Secret "noobaa-admin"
+INFO[0001] ✅ Exists: Secret "noobaa-root-master-key"
+INFO[0001] ✅ Exists: StorageClass "openshift-storage.noobaa.io"
+INFO[0001] ✅ Exists: BucketClass "noobaa-default-bucket-class"
+INFO[0001] ✅ Exists: Deployment "noobaa-endpoint"
+INFO[0001] ✅ Exists: HorizontalPodAutoscaler "noobaa-endpoint"
+INFO[0001] ✅ (Optional) Exists: BackingStore "noobaa-default-backing-store"
+INFO[0001] ✅ (Optional) Exists: CredentialsRequest "noobaa-aws-cloud-creds"
+INFO[0001] ⬛ (Optional) Not Found: CredentialsRequest "noobaa-azure-cloud-creds"
+INFO[0001] ⬛ (Optional) Not Found: Secret "noobaa-azure-container-creds"
+INFO[0001] ⬛ (Optional) Not Found: Secret "noobaa-gcp-bucket-creds"
+INFO[0001] ⬛ (Optional) Not Found: CredentialsRequest "noobaa-gcp-cloud-creds"
+INFO[0001] ✅ (Optional) Exists: PrometheusRule "noobaa-prometheus-rules"
+INFO[0001] ✅ (Optional) Exists: ServiceMonitor "noobaa-mgmt-service-monitor"
+INFO[0001] ✅ (Optional) Exists: ServiceMonitor "s3-service-monitor"
+INFO[0001] ✅ (Optional) Exists: Route "noobaa-mgmt"
+INFO[0001] ✅ (Optional) Exists: Route "s3"
+INFO[0001] ✅ Exists: PersistentVolumeClaim "db-noobaa-db-pg-0"
+INFO[0001] ✅ System Phase is "Ready"
+INFO[0001] ✅ Exists:  "noobaa-admin"
 
 #------------------#
 #- Mgmt Addresses -#
 #------------------#
 
-ExternalDNS : [https://noobaa-mgmt-openshift-storage.apps.cluster-ocs4-8613.ocs4-8613.sandbox944.opentlc.com https://af3f0dd25ab0f4c7ba70f101f112ef0c-11
-5712529.us-east-2.elb.amazonaws.com:443]
+ExternalDNS : [https://noobaa-mgmt-openshift-storage.apps.cluster-ocs4-51af.ocs4-51af.sandbox899.opentlc.com
+ https://adab90f297fb14613a664b1e9265e801-915596537.us-east-2.elb.amazonaws.com:443]
 ExternalIP  : []
-NodePorts   : [https://10.0.209.53:31759]
+NodePorts   : [https://10.0.131.234:31726]
 InternalDNS : [https://noobaa-mgmt.openshift-storage.svc:443]
-InternalIP  : [https://172.30.22.156:443]
-PodPorts    : [https://10.131.2.11:8443]
+InternalIP  : [https://172.30.48.41:443]
+PodPorts    : [https://10.130.2.17:8443]
 
 #--------------------#
 #- Mgmt Credentials -#
 #--------------------#
 
 email    : admin@noobaa.io
-password : Mph5Mhg/r2lCWj99O4jWjw==
+password : 9rEEE9bjw+o9l8myraxpwQ==
 
 #----------------#
 #- S3 Addresses -#
 #----------------#
 
-ExternalDNS : [https://s3-openshift-storage.apps.cluster-ocs4-8613.ocs4-8613.sandbox944.opentlc.com https://a2087e1ee6e754d70bb96dd8922435b3-1451584877.
-us-east-2.elb.amazonaws.com:443]
+ExternalDNS : [https://s3-openshift-storage.apps.cluster-ocs4-51af.ocs4-51af.sandbox899.opentlc.com https://
+a91eba9e06d8649c684907cdac7041b1-381423410.us-east-2.elb.amazonaws.com:443]
 ExternalIP  : []
-NodePorts   : [https://10.0.147.230:32297]
+NodePorts   : [https://10.0.131.234:30496]
 InternalDNS : [https://s3.openshift-storage.svc:443]
-InternalIP  : [https://172.30.54.94:443]
-PodPorts    : [https://10.130.2.70:6443]
+InternalIP  : [https://172.30.25.11:443]
+PodPorts    : [https://10.130.2.19:6443]
 
 #------------------#
 #- S3 Credentials -#
 #------------------#
 
-AWS_ACCESS_KEY_ID     : SBC4HsLagqAy7IrGK2A3
-AWS_SECRET_ACCESS_KEY : anilMy0atqj/QlVXMwNwbGasUpRJTXDM7/Mmt/AN
+AWS_ACCESS_KEY_ID     : a0pwpf0vvE3E8U9dezYu
+AWS_SECRET_ACCESS_KEY : 4qGN6Nj47A7G7weOMINnq1fEdjby3LMC/Lfvd4lJ
 
 #------------------#
 #- Backing Stores -#
 #------------------#
 
 NAME                           TYPE     TARGET-BUCKET                                       PHASE   AGE
-noobaa-default-backing-store   aws-s3   nb.1610563076824.ocs4-8613.sandbox944.opentlc.com   Ready   7h9m5s
+
+noobaa-default-backing-store   aws-s3   nb.1626480406832.ocs4-51af.sandbox899.opentlc.com   Ready   15m43s
+
 
 #------------------#
 #- Bucket Classes -#
 #------------------#
 
-NAME                          PLACEMENT                                                             PHASE   AGE
-noobaa-default-bucket-class   {Tiers:[{Placement: BackingStores:[noobaa-default-backing-store]}]}   Ready   7h9m5s
+NAME                          PLACEMENT                                                        NAMESPACE-POL
+ICY   PHASE   AGE
+noobaa-default-bucket-class   {"tiers":[{"backingStores":["noobaa-default-backing-store"]}]}   null
+      Ready   15m43s
 
 #-----------------#
 #- Bucket Claims -#
@@ -2553,7 +2560,7 @@ Or like this for OCS specific results:
 
 [source,role="execute"]
 ----
-oc adm must-gather --image=registry.redhat.io/ocs4/ocs-must-gather-rhel8:v4.6
+oc adm must-gather --image=registry.redhat.io/ocs4/ocs-must-gather-rhel8:v4.7
 ----
 
 The output will then be saved in the current directory inside of a new folder

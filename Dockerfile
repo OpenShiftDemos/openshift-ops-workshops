@@ -2,7 +2,7 @@ FROM quay.io/openshifthomeroom/workshop-dashboard:5.0.1
 
 USER root
 
-RUN wget https://github.com/noobaa/noobaa-operator/releases/download/v5.6.0/noobaa-linux-v5.6.0 -O /opt/workshop/bin/noobaa && \
+RUN wget https://github.com/noobaa/noobaa-operator/releases/download/v5.7.0/noobaa-linux-v5.7.0 -O /opt/workshop/bin/noobaa && \
     wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.7.16/openshift-client-linux-4.7.16.tar.gz -P /opt/app-root/src/ && \
     tar -xzvf /opt/app-root/src/openshift-client-linux-4.7.16.tar.gz -C /opt/workshop/bin/ && \
     rm -f /opt/workshop/bin/README.md && \

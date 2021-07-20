@@ -150,17 +150,22 @@ contain the relevant output to figure out how to access your environment:
 
 [source,bash,role="execute"]
 ----
-tail -n5 ~/cluster-$GUID/.openshift_install.log
+tail -n10 ~/cluster-$GUID/.openshift_install.log
 ----
 
 You will see something like the following::
 
 ----
-time="2019-04-08T14:49:34Z" level=info msg="Install complete!"
-time="2019-04-08T14:49:34Z" level=info msg="Run 'export KUBECONFIG=/home/ec2-user/cluster-f4a3/auth/kubeconfig' to manage the cluster with 'oc', the OpenShift CLI."
-time="2019-04-08T14:49:34Z" level=info msg="The cluster is ready when 'oc login -u kubeadmin -p SxUr2-tQ2py-c6jq2-YtjW3' succeeds (wait a few minutes)."
-time="2019-04-08T14:49:34Z" level=info msg="Access the OpenShift web-console here: https://console-openshift-console.apps.cluster-f4a3.f4a3.openshiftworkshop.com"
-time="2019-04-08T14:49:34Z" level=info msg="Login to the console with user: kubeadmin, password: SxUr2-tQ2py-c6jq2-YtjW3"
+time="2021-07-06T19:36:30Z" level=info msg="Install complete!"
+time="2021-07-06T19:36:30Z" level=info msg="To access the cluster as the system:admin user when using 'oc', run 'export KUBECONFIG=/home/ec2-user/cluster-pdr-5434/auth/kubeconfig'"
+time="2021-07-06T19:36:30Z" level=info msg="Access the OpenShift web-console here: https://console-openshift-console.apps.cluster-pdr-5434.pdr-5434.sandbox259.opentlc.com"
+time="2021-07-06T19:36:30Z" level=info msg="Login to the console with user: \"kubeadmin\", and password: \"SfaIH-4dBE5-A95AT-ahjjd\""
+time="2021-07-06T19:36:30Z" level=debug msg="Time elapsed per stage:"
+time="2021-07-06T19:36:30Z" level=debug msg="    Infrastructure: 8m50s"
+time="2021-07-06T19:36:30Z" level=debug msg="Bootstrap Complete: 9m10s"
+time="2021-07-06T19:36:30Z" level=debug msg=" Bootstrap Destroy: 38s"
+time="2021-07-06T19:36:30Z" level=debug msg=" Cluster Operators: 14m45s"
+time="2021-07-06T19:36:30Z" level=info msg="Time elapsed: 33m33s"
 ----
 
 The installation was run as a different system user, and the artifacts folder
@@ -192,7 +197,7 @@ And you will see some output like:
 
 ```
 NAME      VERSION   AVAILABLE   PROGRESSING   SINCE   STATUS
-version   4.6.3     True        False         71m     Cluster version is 4.6.3
+version   4.7.16    True        False         70m     Cluster version is 4.7.16
 ```
 
 For more details, you can execute the following command:
@@ -211,7 +216,7 @@ Annotations:  <none>
 API Version:  config.openshift.io/v1
 Kind:         ClusterVersion
 Metadata:
-  Creation Timestamp:  2020-11-10T15:59:59Z
+  Creation Timestamp:  2021-07-06T19:08:54Z
   Generation:          1
   Managed Fields:
     API Version:  config.openshift.io/v1
@@ -221,10 +226,9 @@ Metadata:
         .:
         f:channel:
         f:clusterID:
-        f:upstream:
     Manager:      cluster-bootstrap
     Operation:    Update
-    Time:         2020-11-10T15:59:59Z
+    Time:         2021-07-06T19:08:54Z
     API Version:  config.openshift.io/v1
     Fields Type:  FieldsV1
     fieldsV1:
@@ -243,50 +247,56 @@ Metadata:
         f:versionHash:
     Manager:         cluster-version-operator
     Operation:       Update
-    Time:            2020-11-10T16:30:21Z
-  Resource Version:  26775
+    Time:            2021-07-06T19:22:59Z
+  Resource Version:  27767
   Self Link:         /apis/config.openshift.io/v1/clusterversions/version
-  UID:               aeecffc3-c364-425a-a324-01d32f019630
+  UID:               d4d86deb-1458-451a-95ed-20ee7b0ca72b
 Spec:
-  Channel:     stable-4.6
-  Cluster ID:  e4ab25a7-7729-4b81-8770-274a531ea0d3
-  Upstream:    https://api.openshift.com/api/upgrades_info/v1/graph
+  Channel:     stable-4.7
+  Cluster ID:  2ae3962b-2211-4a39-83eb-c804be32b7df
 Status:
-  Available Updates:  <nil>
+  Available Updates:
+    Channels:
+      candidate-4.7
+      candidate-4.8
+      fast-4.7
+      stable-4.7
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:afcb309425d45a240de2df8e376f9632e6144052177fd62a0347934657b3573f
+    URL:      https://access.redhat.com/errata/RHBA-2021:2502
+    Version:  4.7.18
   Conditions:
-    Last Transition Time:  2020-11-10T16:30:21Z
-    Message:               Done applying 4.6.1
+    Last Transition Time:  2021-07-06T19:36:30Z
+    Message:               Done applying 4.7.16
     Status:                True
     Type:                  Available
-    Last Transition Time:  2020-11-10T16:30:21Z
+    Last Transition Time:  2021-07-06T19:36:30Z
     Status:                False
     Type:                  Failing
-    Last Transition Time:  2020-11-10T16:30:21Z
-    Message:               Cluster version is 4.6.1
+    Last Transition Time:  2021-07-06T19:36:30Z
+    Message:               Cluster version is 4.7.16
     Status:                False
     Type:                  Progressing
-    Last Transition Time:  2020-11-10T15:59:59Z
+    Last Transition Time:  2021-07-06T19:08:54Z
     Status:                True
     Type:                  RetrievedUpdates
   Desired:
     Channels:
-      candidate-4.6
-      fast-4.6
-      stable-4.6
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:d78292e9730dd387ff6198197c8b0598da340b
-e7678e8e1e4810b557a926c2b9
-    URL:      https://access.redhat.com/errata/RHBA-2020:4196
-    Version:  4.6.1
+      candidate-4.7
+      candidate-4.8
+      fast-4.7
+      stable-4.7
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:3e59cff6101b0f0732540d9f2cf1fe9c7ea5ab1e8737df82e789eeb129d1a9af
+    URL:      https://access.redhat.com/errata/RHSA-2021:2286
+    Version:  4.7.16
   History:
-    Completion Time:    2020-11-10T16:30:21Z
-    Image:              quay.io/openshift-release-dev/ocp-release@sha256:d78292e9730dd387ff6198197c8b
-0598da340be7678e8e1e4810b557a926c2b9
-    Started Time:       2020-11-10T15:59:59Z
+    Completion Time:    2021-07-06T19:36:30Z
+    Image:              quay.io/openshift-release-dev/ocp-release@sha256:3e59cff6101b0f0732540d9f2cf1fe9c7ea5ab1e8737df82e789eeb129d1a9af
+    Started Time:       2021-07-06T19:08:54Z
     State:              Completed
     Verified:           false
-    Version:            4.6.1
+    Version:            4.7.16
   Observed Generation:  1
-  Version Hash:         l4WEdVTgp58=
+  Version Hash:         eY5iY9nt7EE=
 Events:                 <none>
 ```
 
@@ -302,13 +312,13 @@ oc get nodes
 The output should look something like the following:
 
 ----
-NAME                                         STATUS   ROLES    AGE     VERSION
-ip-10-0-128-29.us-west-2.compute.internal    Ready    worker   4h16m   v1.19.0+d59ce34
-ip-10-0-154-253.us-west-2.compute.internal   Ready    master   4h26m   v1.19.0+d59ce34
-ip-10-0-162-126.us-west-2.compute.internal   Ready    worker   4h17m   v1.19.0+d59ce34
-ip-10-0-164-110.us-west-2.compute.internal   Ready    master   4h26m   v1.19.0+d59ce34
-ip-10-0-197-0.us-west-2.compute.internal     Ready    worker   4h17m   v1.19.0+d59ce34
-ip-10-0-203-93.us-west-2.compute.internal    Ready    master   4h26m   v1.19.0+d59ce34
+NAME                                         STATUS   ROLES    AGE   VERSION
+ip-10-0-128-32.us-east-2.compute.internal    Ready    worker   86m   v1.20.0+2817867
+ip-10-0-153-62.us-east-2.compute.internal    Ready    master   95m   v1.20.0+2817867
+ip-10-0-165-57.us-east-2.compute.internal    Ready    master   95m   v1.20.0+2817867
+ip-10-0-184-84.us-east-2.compute.internal    Ready    worker   86m   v1.20.0+2817867
+ip-10-0-193-68.us-east-2.compute.internal    Ready    master   95m   v1.20.0+2817867
+ip-10-0-202-114.us-east-2.compute.internal   Ready    worker   86m   v1.20.0+2817867
 ----
 
 You have 3 masters and 3 workers. The OpenShift *Master* is also a *Node*

@@ -6,11 +6,11 @@ Before continuing, make sure you've done the LDAP lab.
 ====
 
 OpenShift, by default, allows authenticated users to create *Projects* to
-loggically house their applications. This feature enables admins to provide a
+logically house their applications. This feature enables admins to provide a
 "self service" feature that was popularized by the advent of the "PaaS"
 (Platform as a Service) model.
 
-This feature may not be suitable for all sitations, and many administrators
+This feature may not be suitable for all situations, and many administrators
 may want to have more control over Projects and who (if anyone) can create
 them. Some of these use cases may be:
 
@@ -40,7 +40,7 @@ Namespace?
 A Project directly maps to a Kubernetes Namespace. It also maps to the
 internal registry's namespace as well as to a VXLAN VNID. So giving access to
 a Project does more than let users collaborate. You are allowing network
-communications, regestry namespace access, and access to objects within a
+communications, registry namespace access, and access to objects within a
 Kubernetes Namespace.
 
 #### Examine the Clusterrolebinding
@@ -232,7 +232,7 @@ oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
 
 #### Customizing the request message
-Now any time a user tries to create a project they will be greated with the
+Now any time a user tries to create a project they will be greeted with the
 same message `You may not request a new project via this API`. You can
 customize this message to give a more meaningful call to action.
 
@@ -253,6 +253,7 @@ especially on a busy cluster.
 
 [source,bash,role="execute"]
 ----
+sleep 30
 oc rollout status -n  openshift-apiserver deploy/apiserver
 ----
 

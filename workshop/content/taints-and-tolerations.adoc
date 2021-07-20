@@ -13,7 +13,7 @@ Some usecases include:
 * A node (or a group of nodes) in the cluster is reserved for special purposes
 * Nodes having specialized hardware for specific tasks (like a GPU)
 * Some nodes may be licensed for some software running on it
-* Nodes can be in different network zone for compliance reasons
+* Nodes can be in different network zones for compliance reasons
 * You may want to troubleshoot a misbehaving node
 
 In this lab we'll explore how to use taints and tolerations to control where
@@ -161,8 +161,8 @@ There is another component called the `operator`. We'll go over the `operator`
 in detail in the "tolerations" section.
 
 For this lab we will taint the first node that's not an infra or storage node
-with `welcome-php=run:NoSchedule`.  This makes it to where all new pods
-(without a proper toleration) NOT schedule on this node.
+with `welcome-php=run:NoSchedule`.  This ensures all new pods
+(without a proper toleration) will NOT schedule to this node.
 
 [source,bash,role="execute"]
 ----

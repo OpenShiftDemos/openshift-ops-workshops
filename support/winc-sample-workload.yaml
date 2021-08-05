@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: winc-sample
+    spec: {}
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: win-webserver
+      labels:
+        app: win-webserver
+      namespace: winc-sample
+    spec:
+      ports:
+      - port: 80
+        targetPort: 80
+      selector:
+        app: win-webserver
+      type: LoadBalancer
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: win-webserver
+      name: win-webserver
+      namespace: winc-sample
+    spec:
+      selector:
+        matchLabels:
+          app: win-webserver
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: win-webserver
+          name: win-webserver
+        spec:
+          tolerations:
+          - key: "os"
+            value: "Windows"
+            Effect: "NoSchedule"
+          containers:
+          - name: windowswebserver
+            image: mcr.microsoft.com/windows/servercore:ltsc2019
+            imagePullPolicy: IfNotPresent
+            command:
+            - powershell.exe
+            - -command
+            - $listener = New-Object System.Net.HttpListener; $listener.Prefixes.Add('http://*:80/'); $listener.Start();Write-Host('Listening at http://*:80/'); while ($listener.IsListening) { $context = $listener.GetContext(); $response = $context.Response; $content='<html><body><H1>Red Hat OpenShift + Windows Container Workloads</H1></body></html>'; $buffer = [System.Text.Encoding]::UTF8.GetBytes($content); $response.ContentLength64 = $buffer.Length; $response.OutputStream.Write($buffer, 0, $buffer.Length); $response.Close(); };
+            securityContext:
+              windowsOptions:
+                runAsUserName: "ContainerAdministrator"
+          nodeSelector:
+            kubernetes.io/os: windows

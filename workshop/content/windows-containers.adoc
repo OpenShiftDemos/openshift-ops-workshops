@@ -321,7 +321,7 @@ oc logs -l name=windows-machine-config-operator -n openshift-windows-machine-con
 
 You can exit by pressing kbd:[Ctrl+C].
 
-NOTE: If you wish, you can wait until you see "Bootstrapping completed successfully" log message. Otherwise, go ahead and break out of following the log.
+NOTE: If you wish, you can wait until you see "Windows VM has been configured as a worker node" log message. Otherwise, go ahead and break out of following the log.
 
 This Machine will create a Windows Node and the WMCO will add it to the cluster. You
 can see the node with the following command.

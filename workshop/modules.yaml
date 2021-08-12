@@ -31,6 +31,8 @@ modules:
     name: Cluster Resource Quotas
   taints-and-tolerations:
     name: Taints and Tolerations
+  windows-containers:
+    name: Windows Containers
 config:
     template_engine: liquid.js  
     vars:

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: winc-ssh
+  name: winc-ssh
+  namespace: openshift-windows-machine-config-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: winc-ssh
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: winc-ssh
+    spec:
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - |
+          sleep infinity
+        image: quay.io/redhatworkshops/winc-ssh:latest
+        name: winc-ssh-container
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        volumeMounts:
+          - mountPath: /tmp/ssh
+            name: sshkey
+            readOnly: true
+      volumes:
+      - name: sshkey
+        secret:
+          defaultMode: 256
+          secretName: cloud-private-key

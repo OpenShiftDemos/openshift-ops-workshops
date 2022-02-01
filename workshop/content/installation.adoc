@@ -66,8 +66,8 @@ authorized (the user has rights to make the requested API calls).
 #### Data Store
 The OpenShift Data Store (etcd) stores the persistent master state while
 other components watch etcd for changes to bring themselves into the desired
-state. etcd can be optionally configured for high availability, typically
-deployed with 2n+1 peer services.
+state. etcd is configured for high availability, and is deployed with
+2n+1 peer services.
 
 [Note]
 ====
@@ -93,7 +93,7 @@ load balancer.
 
 For more information on the OpenShift Master's areas of responsibility, please refer to
 the
-link:https://docs.openshift.com/container-platform/4.6/architecture/control-plane.html[infrastructure components section] of the product documentation.
+link:https://docs.openshift.com/container-platform/4.9/architecture/control-plane.html[infrastructure components section] of the product documentation.
 
 ### Examining the installation artifacts
 OpenShift 4 installs with two effective superusers:
@@ -197,7 +197,7 @@ And you will see some output like:
 
 ```
 NAME      VERSION   AVAILABLE   PROGRESSING   SINCE   STATUS
-version   4.7.16    True        False         70m     Cluster version is 4.7.16
+version   4.9.11    True        False         3h11m   Cluster version is 4.9.11
 ```
 
 For more details, you can execute the following command:
@@ -216,8 +216,8 @@ Annotations:  <none>
 API Version:  config.openshift.io/v1
 Kind:         ClusterVersion
 Metadata:
-  Creation Timestamp:  2021-07-06T19:08:54Z
-  Generation:          1
+  Creation Timestamp:  2022-01-31T21:16:57Z
+  Generation:          2
   Managed Fields:
     API Version:  config.openshift.io/v1
     Fields Type:  FieldsV1
@@ -228,7 +228,7 @@ Metadata:
         f:clusterID:
     Manager:      cluster-bootstrap
     Operation:    Update
-    Time:         2021-07-06T19:08:54Z
+    Time:         2022-01-31T21:16:57Z
     API Version:  config.openshift.io/v1
     Fields Type:  FieldsV1
     fieldsV1:
@@ -247,56 +247,86 @@ Metadata:
         f:versionHash:
     Manager:         cluster-version-operator
     Operation:       Update
-    Time:            2021-07-06T19:22:59Z
-  Resource Version:  27767
-  Self Link:         /apis/config.openshift.io/v1/clusterversions/version
-  UID:               d4d86deb-1458-451a-95ed-20ee7b0ca72b
+    Subresource:     status
+    Time:            2022-01-31T21:29:24Z
+  Resource Version:  83732
+  UID:               b2c4f11b-6200-4d19-b3b8-1d8b743eede2
 Spec:
-  Channel:     stable-4.7
-  Cluster ID:  2ae3962b-2211-4a39-83eb-c804be32b7df
+  Channel:     stable-4.9
+  Cluster ID:  20b3751f-aff9-4eaf-81ca-62930812e82d
 Status:
   Available Updates:
     Channels:
-      candidate-4.7
-      candidate-4.8
-      fast-4.7
-      stable-4.7
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:afcb309425d45a240de2df8e376f9632e6144052177fd62a0347934657b3573f
-    URL:      https://access.redhat.com/errata/RHBA-2021:2502
-    Version:  4.7.18
+      candidate-4.10
+      candidate-4.9
+      fast-4.9
+      stable-4.9
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:7b67b0cb5ab016528b8efdb6130c000398efc58f55e2226f3cf4e3be59c
+78443
+    URL:      https://access.redhat.com/errata/RHBA-2022:0195
+    Version:  4.9.17
+    Channels:
+      candidate-4.10
+      candidate-4.9
+      fast-4.9
+      stable-4.9
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:bb1987fb718f81fb30bec4e0e1cd5772945269b77006576b02546cf84c7
+7498e
+    URL:      https://access.redhat.com/errata/RHBA-2022:0110
+    Version:  4.9.15
+    Channels:
+      candidate-4.10
+      candidate-4.9
+      fast-4.9
+      stable-4.9
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:dd71b3cd08ce1e859e0e740a585827c9caa1341819d1121d92879873a12
+7f5e2
+    URL:      https://access.redhat.com/errata/RHBA-2021:5214
+    Version:  4.9.12
+    Channels:
+      candidate-4.10
+      candidate-4.9
+      fast-4.9
+      stable-4.9
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:0ff5adc1199c77c2814c2030642109b24039087a2621b19e553a2315bcd
+c4801
+    URL:      https://access.redhat.com/errata/RHBA-2022:0029
+    Version:  4.9.13
   Conditions:
-    Last Transition Time:  2021-07-06T19:36:30Z
-    Message:               Done applying 4.7.16
+    Last Transition Time:  2022-01-31T21:41:09Z
+    Message:               Done applying 4.9.11
     Status:                True
     Type:                  Available
-    Last Transition Time:  2021-07-06T19:36:30Z
+    Last Transition Time:  2022-01-31T21:41:09Z
     Status:                False
     Type:                  Failing
-    Last Transition Time:  2021-07-06T19:36:30Z
-    Message:               Cluster version is 4.7.16
+    Last Transition Time:  2022-01-31T21:41:09Z
+    Message:               Cluster version is 4.9.11
     Status:                False
     Type:                  Progressing
-    Last Transition Time:  2021-07-06T19:08:54Z
+    Last Transition Time:  2022-01-31T21:16:57Z
     Status:                True
     Type:                  RetrievedUpdates
   Desired:
     Channels:
-      candidate-4.7
-      candidate-4.8
-      fast-4.7
-      stable-4.7
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:3e59cff6101b0f0732540d9f2cf1fe9c7ea5ab1e8737df82e789eeb129d1a9af
-    URL:      https://access.redhat.com/errata/RHSA-2021:2286
-    Version:  4.7.16
+      candidate-4.10
+      candidate-4.9
+      fast-4.9
+      stable-4.9
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:0f72e150329db15279a1aeda1286c9495258a4892bc5bf1bf5bb89942cd
+432de
+    URL:      https://access.redhat.com/errata/RHBA-2021:5003
+    Version:  4.9.11
   History:
-    Completion Time:    2021-07-06T19:36:30Z
-    Image:              quay.io/openshift-release-dev/ocp-release@sha256:3e59cff6101b0f0732540d9f2cf1fe9c7ea5ab1e8737df82e789eeb129d1a9af
-    Started Time:       2021-07-06T19:08:54Z
+    Completion Time:    2022-01-31T21:41:09Z
+    Image:              quay.io/openshift-release-dev/ocp-release@sha256:0f72e150329db15279a1aeda1286c9495258a4892bc5bf1bf
+5bb89942cd432de
+    Started Time:       2022-01-31T21:16:57Z
     State:              Completed
     Verified:           false
-    Version:            4.7.16
-  Observed Generation:  1
-  Version Hash:         eY5iY9nt7EE=
+    Version:            4.9.11
+  Observed Generation:  2
+  Version Hash:         TAWX_HO9fK4=
 Events:                 <none>
 ```
 
@@ -312,13 +342,13 @@ oc get nodes
 The output should look something like the following:
 
 ----
-NAME                                         STATUS   ROLES    AGE   VERSION
-ip-10-0-128-32.us-east-2.compute.internal    Ready    worker   86m   v1.20.0+2817867
-ip-10-0-153-62.us-east-2.compute.internal    Ready    master   95m   v1.20.0+2817867
-ip-10-0-165-57.us-east-2.compute.internal    Ready    master   95m   v1.20.0+2817867
-ip-10-0-184-84.us-east-2.compute.internal    Ready    worker   86m   v1.20.0+2817867
-ip-10-0-193-68.us-east-2.compute.internal    Ready    master   95m   v1.20.0+2817867
-ip-10-0-202-114.us-east-2.compute.internal   Ready    worker   86m   v1.20.0+2817867
+NAME                           STATUS   ROLES    AGE     VERSION
+ip-10-0-132-57.ec2.internal    Ready    master   3h36m   v1.22.3+ffbb954
+ip-10-0-136-126.ec2.internal   Ready    worker   3h23m   v1.22.3+ffbb954
+ip-10-0-155-84.ec2.internal    Ready    worker   3h28m   v1.22.3+ffbb954
+ip-10-0-158-48.ec2.internal    Ready    master   3h36m   v1.22.3+ffbb954
+ip-10-0-166-207.ec2.internal   Ready    worker   3h22m   v1.22.3+ffbb954
+ip-10-0-169-24.ec2.internal    Ready    master   3h35m   v1.22.3+ffbb954
 ----
 
 You have 3 masters and 3 workers. The OpenShift *Master* is also a *Node*
@@ -342,8 +372,17 @@ be performed simply by using the web console.
 
 The web console actually runs as an application inside the OpenShift
 environment and is exposed via the OpenShift Router. You will learn more
-about the router in a subsequent exercise. For now, you can simply
-control+click the link:
+about the router in a subsequent exercise.
+
+This lab comes with an integrated webconsole so you don't have to open
+the web console in another tab.
+
+image::images/consoletab.png[]
+
+This web console works for most things in the lab. If you find that
+something isn't working (or simply not there); please feel free to open
+the web console in another tab. You can do this by simply control+click
+the following link:
 
 {{ MASTER_URL }}
 

@@ -19,9 +19,23 @@ To inspect the cluster installation, you can simply SSH to the bastion host wher
 ssh -l {{ SSH_USERNAME }} {{ BASTION_FQDN }} -o ServerAliveInterval=120
 ----
 
-Here is your ssh password:
+You might see the following message:
+----
+The authenticity of host 'bastion.xxxxx.sandbox000.opentlc.com (x.x.x.x.' can't be established.
+ECDSA key fingerprint is SHA256:ZZZZzzzzzzZZZZZzzzzzzZZZZZZzzzzzzzZZZZzzZZz.
+ECDSA key fingerprint is MD5:12:34:56:78:9a:bc:de:f1:23:45:67:89:ab:cd:ef:10.
+Are you sure you want to continue connecting (yes/no)?
+----
 
-[source,bash,role="copypaste"]
+If so, type `yes`:
+
+[source,bash,role="execute"]
+----
+yes
+----
+
+Here is your ssh password (you need to type it in):
+
 ----
 {{ SSH_PASSWORD }}
 ----

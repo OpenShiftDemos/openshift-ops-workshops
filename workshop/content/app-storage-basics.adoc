@@ -251,11 +251,17 @@ Now, to verify that persistent storage really works, delete your pod:
 
 [source,bash,role="execute"]
 ----
-oc delete pods -l deployment=mapit && oc get pod
+oc delete pods -l deployment=mapit && oc rollout status deployment/mapit
 ----
 
-After some time, your new pod will be ready and running. Once it's
-running, check the file:
+The `deployment` automatically rollsout a new `pod`:
+
+[source,bash,role="execute"]
+----
+oc get pods
+----
+
+Your new pod is ready and running. Now that it's running, check the file:
 
 [source,bash,role="execute"]
 ----

@@ -617,7 +617,7 @@ Now, delete the pods that belog to the *Deployment* `mapit`:
 
 [source,bash,role="execute"]
 ----
-oc delete pods -l deployment=mapit
+oc delete pods -l deployment=mapit --wait=false
 ----
 
 Run the `oc get pods` command once again:

@@ -179,6 +179,14 @@ NAME            STATUS   VOLUME                                     CAPACITY   A
 mapit-storage   Bound    pvc-4397c6be-9f53-490e-960d-c1b77de6000c   1Gi        RWO            gp2            14m
 ----
 
+A rollout is taking place, since the `pod` needs to mount the created
+storage.
+
+[source,bash,role="execute"]
+----
+oc rollout status deployment mapit -n app-management
+----
+
 ### Testing Persistent Storage
 
 Log on to the pod using the remote-shell capability of the `oc` client:

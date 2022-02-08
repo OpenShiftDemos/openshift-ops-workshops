@@ -43,9 +43,12 @@ In order to understand how `MachineSets` work, run the following.
 
 This will allow you to follow along with some of the following discussion.
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="execute"]
 ----
-oc get machineset -n openshift-machine-api -o yaml cluster-5fa6-hx2ml-worker-us-east-2c
+CLUSTERNAME=$(oc get  infrastructures.config.openshift.io cluster  -o jsonpath='{.status.infra
+reName}')
+ZONENAME=$(oc get nodes -L topology.kubernetes.io/zone  --no-headers  | awk '{print $NF}' | ta
+oc get machineset -n openshift-machine-api -o yaml ${CLUSTERNAME}-worker-${ZONENAME}
 ----
 
 #### Metadata
@@ -96,8 +99,7 @@ make sure that things match here when we make changes:
 
 ```YAML
   template:
-    metadata:
-      creationTimestamp: null
+    metadata: {}
       labels:
         machine.openshift.io/cluster-api-cluster: 190125-3
         machine.openshift.io/cluster-api-machine-role: worker
@@ -140,7 +142,7 @@ rules for creating one, at least for a simple change like we're making:
 5. Add labels you want on the nodes to `.spec.template.spec.metadata.labels`
 6. Even though you're changing `MachineSet` `name` references, be sure not to change the `subnet`.
 
-This sounds complicated, but we have a little program and some steps that
+This sounds complicated, but we have a little script and some steps that
 will do the hard work for you:
 
 [source,bash,role="execute"]

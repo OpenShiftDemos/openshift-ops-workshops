@@ -24,10 +24,9 @@ stack will be installed on the `infra` nodes that were created in that lab.
 
 [Note]
 ====
-More information may be found on the official OpenShift documentation site
-found here:
-
- https://docs.openshift.com/container-platform/4.6/logging/cluster-logging.html
+More information may be found on the official
+link:https://docs.openshift.com/container-platform/4.9/logging/cluster-logging.html[OpenShift
+documentation site]
 ====
 
 [Note]
@@ -86,6 +85,19 @@ To create the namespace, run the following command:
 oc create -f {{ HOME_PATH }}/support/openshift_logging_namespace.yaml
 ----
 
+Verify that it has been created:
+
+[source,bash,role="execute"]
+----
+oc get ns openshift-logging
+----
+
+You should see the following output:
+
+```
+NAME                STATUS   AGE
+openshift-logging   Active   11s
+```
 
 #### Install the `Elasticsearch` and  `Cluster Logging` Operators in the cluster
 
@@ -110,16 +122,16 @@ create the `CR` which will tell the operator how to act, what to install,
 and/or what to configure. For installing `openshift-logging`, we will follow
 this pattern.
 
-To begin, log-in to the OpenShift Cluster's GUI.
+To begin, click on the `Console` tab or use the following link to log-in
+to the OpenShift Cluster's GUI.
 `{{ MASTER_URL }}`
 
 Then follow the following steps:
 
 1. Install the Elasticsearch Operator:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Choose `Elasticsearch Operator` from the list of available Operators,
-    and click `Install`.
-  c. On the `Create Operator Subscription` page, *select Update Channel `stable`*, leave all other defaults
+  b. Type `Elasticsearch Operator` in the search field and click the `OpenShift Elasticsearch Operator` card from the list of available Operators, and then click `Install`.
+  c. On the `Create Operator Subscription` page, select *Update Channel `stable`*, leave all other defaults
      and then click `Install`.
 +
 This makes the Operator available to all users and projects that use this
@@ -135,11 +147,10 @@ namespace was created from the previous steps
 ====
 
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Choose `Red Hat OpenShift Logging` from the list of available Operators, and click
+  b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators, and click
     `Install`.
-  c. On the `Create Operator Subscription` page, Under ensure `Installation
-     Mode` that `A specific namespace on the cluster` is selected, and choose
-     `Operator recommended Namespace: openshift-logging`. In addition, *select Update Channel `stable`* and leave all other defaults
+  c. On the `Install Operator` page, *select Update Channel `stable`*. Under ensure `Installation Mode` ensure that `A specific namespace on the cluster` is selected, and choose
+     `Operator recommended Namespace: openshift-logging` under `Installed Namespace`. Leave all other defaults
      and then click `Install`.
 
 3. Verify the operator installations:
@@ -155,10 +166,12 @@ namespace was created from the previous steps
 ====
 During installation an operator might display a `Failed` status. If the
 operator then installs with an `InstallSucceeded` message, you can safely
-ignore the `Failed` message.
+ignore the `Failed` message. Also, if you're using the `Console` tab, you may
+or maynot see the `Status` column. When in doubt, visit the console via the
+link.
 ====
 
-4. Troubleshooting (optional)
+4. Troubleshooting (optional/if needed)
 +
 If either operator does not appear as installed, to troubleshoot further:
 +
@@ -182,7 +195,7 @@ we want to install and configure logging.
 
 1. In the OpenShift Console, switch to the the `Administration` → `Custom Resource Definitions` page.
 
-2. On the `Custom Resource Definitions` page, click `ClusterLogging`.
+2. On the `Custom Resource Definitions` page, search for `Logging` in the search field and click `ClusterLogging`.
 
 3. On the `Custom Resource Definition Overview` page, select `Instances` from the `Actions` menu.
 +
@@ -350,7 +363,7 @@ To find and access the _Kibana_ route:
 
 4. In the `Location` field, click on the URL presented.
 
-5. Click through and accept the SSL certificates
+5. Click through and accept the SSL certificates (if needed)
 
 Alternatively, this can be obtained from the command line:
 
@@ -382,7 +395,7 @@ show you (which you authorized by clicking the button).
 
 Once you open Kibana, before being able to view logs, we need to define an `index pattern` that will be used by Kibana to query ElasticSearch.
 
-1. On the following screen, input `app*` as the index pattern, as shown below and hit `Next Step`.
+1. On the following screen, input `app*` as the index pattern, as shown below and click `Next Step`.
 +
 image::images/logging-kibana-indexpattern.png[Kibana Index Pattern]
 +
@@ -392,7 +405,7 @@ image::images/logging-kibana-indexpattern.png[Kibana Index Pattern]
 image::images/logging-kibana-indexpattern-timestamp.png[Kibana Index Pattern]
 +
 
-3. Hit Create Index Pattern
+3. Click `Create Index Pattern`
 
 4. You should see the following summary screen.
 +
@@ -426,7 +439,7 @@ button for `kubernetes.pod_name` and also for `message`.
 To create a query for logs, the `Add a filter +` link right below the search
 box may be used. This will allow us to build queries using the fields of the
 messages. For example, if we wanted to see all log messages from the
-`openshift-logging` namespace, we can do the following:
+`lab-ocp-cns` namespace, we can do the following:
 
 1. Click on `Add a filter +`.
 
@@ -440,7 +453,7 @@ Notice all of the available fields that we can use to build the query
 5. Click the "Save" button
 
 Now, in the center of the screen you will see all of the logs from all the
-pods in the `openshift-logging` namespace.
+pods in the `lab-ocp-cns` namespace.
 
 Of course, you may add more filters to refine the query.
 
@@ -461,7 +474,7 @@ you will be able to get the exact logs that you are looking for in a single
 place.
 
 ### Forwarding logs to external systems
-In this section we will show you how to use a new feature in OpenShift 4.6 to ease forwarding logs to external log systems.
+In this section we will show you how to forward logs to external log systems.
 
 A new CustomResourceDefinition (CRD) named `ClusterLogForwarder` is used by the `Cluster Logging Operator` to create or modify internal Fluentd configmaps to forward logs to external (or internal) systems.
 Only one `ClusterLogForwarder` can exist in a cluster, and it combines all of the log forwarding rules.
@@ -472,7 +485,7 @@ Forwarding cluster logs to external third-party systems requires a combination o
 
 ** `elasticsearch`: An external Elasticsearch v5.x or v6.x instance. The elasticsearch output can use a TLS connection.
 
-** `fluentdForward`: An external log aggregation solution that supports Fluentd. This option uses the Fluentd forward protocols. The fluentForward output can use a TCP or TLS connection and supports shared-key authentication by providing a shared_key field in a secret. Shared-key authentication can be used with or without TLS.
+** `fluentdForward`: An external log aggregation solution that supports Fluentd. This option uses the Fluentd forward protocols. The `fluentForward` output can use a TCP or TLS connection and supports *shared-key* authentication by providing a shared_key field in a secret. Shared-key authentication can be used with or without TLS.
 
 ** `syslog`: An external log aggregation solution that supports the syslog RFC3164 or RFC5424 protocols. The syslog output can use a UDP, TCP, or TLS connection.
 
@@ -480,7 +493,7 @@ Forwarding cluster logs to external third-party systems requires a combination o
 
 ** `default`: The internal OpenShift Container Platform Elasticsearch instance. You are not required to configure the default output. If you do configure a default output, you receive an error message because the default output is reserved for the Cluster Logging Operator.
 
-If the output URL scheme requires TLS (HTTPS, TLS, or UDPS), then TLS server-side authentication is enabled. To also enable client authentication, the output must name a secret in the openshift-logging project. The secret must have keys of: tls.crt, tls.key, and ca-bundle.crt that point to the respective certificates that they represent.
+If the output URL scheme requires TLS (HTTPS, TLS, or UDPS), then TLS server-side authentication is enabled. To also enable client authentication, the output must name a secret in the `openshift-logging` project. The secret must have keys of: *tls.crt*, *tls.key*, and *ca-bundle.crt* that point to the respective certificates that they represent.
 
 * A `pipeline` defines simple routing from one log type to one or more outputs, or which logs you want to send. The log types are one of the following:
 
@@ -498,11 +511,9 @@ You can add labels to outbound log messages by using key:value pairs in the pipe
 
 [Note]
 ====
-More information may be found on the official OpenShift documentation site
-found here:
-
-
-https://docs.openshift.com/container-platform/4.6/logging/cluster-logging-external.html
+More information may be found on the official
+link:https://docs.openshift.com/container-platform/4.9/logging/cluster-logging-external.html[OpenShift
+documentation site]
 ====
 
 
@@ -538,6 +549,12 @@ NAME                               READY   STATUS    RESTARTS   AGE
 syslog-ng-84c59fdc8-mdwrs          1/1     Running   0          81s
 syslog-ng-infra-697fc7597f-gwrxd   1/1     Running   0          81s
 ```
+
+[Note]
+====
+If one of your pods is in a `CrashLoopBackOff` state, recycle the pods
+by running: `oc delete pods --all -n external-logs`
+====
 
 Now that our external Syslog server is available, let's setup a log forwarding rule by creating a `ClusterLogForwarder`.
 First let's look at the YAML file:
@@ -587,16 +604,16 @@ spec:
 
 In this YAML file, there are some notable fields:
 
- The `outputs` (1) section defines all the remote log systems, in our case we have 2 Syslog servers:
-
+** The `outputs` (1) section defines all the remote log systems, in our case we have 2 Syslog servers:
+** (2) This defines the type of log aggragator that is being used.
 ** (3) This is the url for the one to store application-related logs. It is pointing to the service that is in the `external-logs` namespace.
 ** (4) This is the url one for infrastructure-related logs. It is pointing to the service that is in the `external-logs` namespace.
+** The `pipelines` (5) section defines the sources and nature of logs that should be sent to the outputs defined before.
+** The `inputRefs` (6) are used to describe the nature of the log to be sent, and as a reminder they can be either `application`, `infrastructure`, or `audit` for OpenShift audit logs (API access, etc).
 
-The `pipelines` section defines the sources and nature of logs that should be sent to the outputs defined before.
-`inputRefs` are used to describe the nature of the log to be sent, and as a reminder they can be either `application`, `infrastructure`, or `audit` for OpenShift audit logs (API access, etc).
+** We have 2 inputsRefs, (7) is for application logs and (8) is for infrastructure logs.
 
-We have 2 inputsRefs, (7) is for application logs and (8) is for infrastructure logs.
-Each inputRefs section contains an outRefs to tell where the logs should be sent, referring the outputs (1) defined in the beginning of the spec section.
+Each `inputRefs` section contains an `outRefs` to tell where the logs should be sent, referring the outputs (1) defined in the beginning of the spec section.
 
 Now let's create the ClusterLogForwarder resource using the YAML file:
 
@@ -605,36 +622,39 @@ Now let's create the ClusterLogForwarder resource using the YAML file:
 oc create -f /opt/app-root/src/support/extlogs-clusterlogforwarder.yaml
 ----
 
-Once the CR is created, the Cluster Logging Operator redeploys the Fluentd pods. Wait for the redeploy to happen.
+Once the CR is created, the Cluster Logging Operator deploys the `collector` pods. Wait for the deploy to happen.
 
 [source,bash,role="execute"]
 ----
-oc rollout status ds/fluentd -n openshift-logging
+oc rollout status ds/collector -n openshift-logging
 ----
 
-If the pods do not redeploy, you can delete the Fluentd pods manually to force them to redeploy.
-
-[source,bash,role="execute"]
-----
-oc delete pod --selector logging-infra=fluentd -n openshift-logging
-----
-
-Let's check that all the Fluentd pods are now in Running state:
+If the pods do not redeploy, you can delete the `collector` pods manually to force them to redeploy.
 
 [source,bash,role="execute"]
 ----
-oc get pod --selector logging-infra=fluentd -n openshift-logging
+oc delete pod --selector logging-infra=collector -n openshift-logging
+----
+
+Let's check that all the `collector` pods are now in Running state:
+
+[source,bash,role="execute"]
+----
+oc get pod --selector logging-infra=collector -n openshift-logging
 ----
 
 You should see something like this in the output:
 ```
-NAME            READY   STATUS        RESTARTS   AGE
-fluentd-274bx   1/1     Running       0          1m
-fluentd-5bqx8   1/1     Running       0          1m
-fluentd-67qld   1/1     Running       0          1m
-fluentd-m9v2f   1/1     Running       0          1m
-fluentd-vs8bb   1/1     Running       0          1m
-fluentd-x98gk   1/1     Running       0          1m
+NAME              READY   STATUS    RESTARTS   AGE
+collector-2mk4h   2/2     Running   0          37s
+collector-4dfnc   2/2     Running   0          38s
+collector-99rh4   2/2     Running   0          37s
+collector-c7msc   2/2     Running   0          38s
+collector-gb7nh   2/2     Running   0          38s
+collector-k8khn   2/2     Running   0          37s
+collector-lt8j4   2/2     Running   0          38s
+collector-pzqxw   2/2     Running   0          37s
+collector-w54c5   2/2     Running   0          37s
 ```
 
 Now let's check that the logs are being forwarded to the 2 Syslog servers. 
@@ -647,7 +667,7 @@ We will be using the OpenShift Console Terminal to access the pod and check the 
 image::images/logging-syslog-pods.png[Syslog Pods]
 +
 
-2. Click on the syslog infrastructure pod, which name looks like `syslog-ng-infra-xyz`, and go the the `Terminal` tab
+2. Click on the syslog infrastructure pod, which name looks like `syslog-ng-infra-xyz`, and go the the `Terminal` tab (you may have to hit enter a few times to see the `#` prompt)
 +
 image::images/logging-syslog-terminal-infra.png[Syslog Terminal]
 +

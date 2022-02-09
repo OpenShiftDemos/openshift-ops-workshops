@@ -45,9 +45,8 @@ This will allow you to follow along with some of the following discussion.
 
 [source,bash,role="execute"]
 ----
-CLUSTERNAME=$(oc get  infrastructures.config.openshift.io cluster  -o jsonpath='{.status.infra
-reName}')
-ZONENAME=$(oc get nodes -L topology.kubernetes.io/zone  --no-headers  | awk '{print $NF}' | ta
+CLUSTERNAME=$(oc get  infrastructures.config.openshift.io cluster  -o jsonpath='{.status.infrastructureName}')
+ZONENAME=$(oc get nodes -L topology.kubernetes.io/zone  --no-headers  | awk '{print $NF}' | tail -1)
 oc get machineset -n openshift-machine-api -o yaml ${CLUSTERNAME}-worker-${ZONENAME}
 ----
 
@@ -201,14 +200,21 @@ one, take a look at the `AGE` column. It will be the youngest! Also, in the
 `ROLES` column you will notice that the new node has both a `worker` and an
 `infra` role.
 
+Alternatively you can list the node by role.
+[source,bash,role="execute"]
+----
+oc get nodes -l node-role.kubernetes.io/infra
+----
+
 ### Check the Labels
 In our case, the youngest node was named
 `ip-10-0-128-138.us-east-1.compute.internal`, so we can ask what its labels
 are:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="execute"]
 ----
-oc get node ip-10-0-139-81.us-east-2.compute.internal --show-labels
+YOUNG_INFRA_NODE=$(oc get nodes -l node-role.kubernetes.io/infra  --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[0].metadata.name}')
+oc get nodes ${YOUNG_INFRA_NODE} --show-labels | grep --color node-role
 ----
 
 And, in the `LABELS` column we see:
@@ -239,7 +245,7 @@ actually make the nodes come into existence.
 ## Quick Operator Background
 Operators are just `Pods`. But they are special `Pods`. They are software
 that understands how to deploy and manage applications in a Kubernetes
-environment. The power of Operators relies on a recent Kubernetes feature
+environment. The power of Operators relies on a  Kubernetes feature
 called `CustomResourceDefinitions` (`CRD`). A `CRD` is exactly what it sounds
 like. They are a way to define a custom resource which is essentially
 extending the Kubernetes API with new objects.
@@ -284,9 +290,10 @@ router-default-7bc4c9c5cd-fq7m2   1/1     Running   0          9h    10.131.0.7 
 
 Review a `Node` on which a router is running:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="execute"]
 ----
-oc get node ip-10-0-144-70.us-east-2.compute.internal
+ROUTER_POD_NODE=$(oc get pods -n openshift-ingress -o jsonpath='{.items[0].spec.nodeName}')
+oc get node ${ROUTER_POD_NODE}
 ----
 
 You will see that it has the role of `worker`.
@@ -372,6 +379,16 @@ infrastructure nodes, we can apply the following configuration:
 ----
 oc apply -f {{ HOME_PATH }}/support/ingresscontroller.yaml
 ----
+
+[Note]
+====
+You may see an error that says `Warning: resource is missing the kubectl.kubernetes.io/last-applied-config`.
+This is normal, an `apply` envokes a
+link:https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/#kubectl-apply["3
+way diff merge"] on the resource. Since the ingress controller was only
+just created on install, there was no "last applied" configuration for
+it. If you run that command again, you shouldn't see that warning.
+====
 
 
 Run:

@@ -1,23 +1,24 @@
 ## OpenShift Network Policy Based SDN
-OpenShift has a software defined network (SDN) inside the platform that is based
-on Open vSwitch. This SDN is used to provide connectivity between application
+OpenShift's default software defined network (SDN) inside the platform is based
+on Open vSwitch and is called OpenShiftSDN.
+
+However, this cluster has been installed with the CNI compliant OVNKubernetes
+SDN. This SDN is based on Open Virtual Network. Moving forward,
+this is the perfered SDN to use on OpenShift, and will be the
+default in future releases. OVNKubernetes is backwards compatable
+with OpenShiftSDN. To read more about OVNKubernetes, please read
+link:https://docs.openshift.com/container-platform/4.9/networking/ovn_kubernetes_network_provider/about-ovn-kubernetes.html[the official documentation].
+
+The SDN is used to provide connectivity between application
 components inside of the OpenShift environment. It comes with default network
 ranges pre-configured, although you can make changes to these should they
 conflict with your existing infrastructure, or for whatever other reason you may
 have.
 
-The OpenShift Network Policy SDN plug-in allows projects to truly isolate their
+Kubernetes `NetworkPolicy` allows projects to truly isolate their
 network infrastructure inside OpenShift’s software defined network. While you
 have seen projects isolate resources through OpenShift’s RBAC, the network policy
 SDN plugin is able to isolate pods in projects using pod and namespace label selectors.
-
-The network policy SDN plugin was introduced in OpenShift 3.7, and more
-information about it and its configuration can be found in the
-link:https://docs.openshift.com/container-platform/4.6/networking/understanding-networking.html[networking
-documentation^]. Additionally, other vendors are working with the upstream
-Kubernetes community to implement their own SDN plugins, and several of these
-are supported by the vendors for use with OpenShift. These plugin
-implementations make use of appc/CNI, which is outside the scope of this lab.
 
 ### Switch Your Project
 Before continuing, make sure you are using a project that actually exists. If
@@ -37,7 +38,7 @@ network policies.
 ====
 
 Execute a script that we have prepared for you. It will create two
-*Projects* and then deploy a *DeploymentConfig* with a *Pod* for you:
+*Projects* and then deploy a *Deployment* with a *Pod* for you:
 
 [source,bash,role="execute"]
 ----
@@ -103,11 +104,11 @@ Note that the last line says `worked`. This means that the pod in the
 `netproj-a` *Project* was able to connect to the pod in the `netproj-b`
 *Project*.
 
-This worked because, by default, with the network policy SDN, all pods in all
+This worked because, by default, the networkpolicy lets all pods in all
 projects can connect to each other.
 
 ### Restricting Access
-With the Network Policy based SDN, it's possible to restrict access in a
+With NetworkPolicy, it's possible to restrict access in a
 project by creating a `NetworkPolicy` custom resource (CR).
 
 For example, the following restricts all access to all pods in a *Project*
@@ -179,7 +180,7 @@ deny-by-default   <none>         3m19s
 ----
 
 ### Allow Access
-With the Network Policy based SDN, it's possible to allow access to
+With NetworkPolicy, it's possible to allow access to
 individual or groups of pods in a project by creating multiple
 `NetworkPolicy` CRs.
 
@@ -219,7 +220,7 @@ ingress access for the pods in the project. In this specific case the "deny
 all" policy is combined with the "allow TCP 5000" policy.
 
 To allow access to the pod in the `netproj-b` *Project* from all pods in the
-`netproj-a` *Project*, simply apply the above NetworkPolicy CR with:
+`netproj-a` *Project*, apply the above NetworkPolicy CR with:
 
 [source,bash,role="execute"]
 ----

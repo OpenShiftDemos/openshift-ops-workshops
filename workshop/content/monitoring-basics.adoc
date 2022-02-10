@@ -31,14 +31,14 @@ kubeadmin
 +
 [Warning]
 ====
-You will receive a self-signed certificate error in your browser when you
+You may receive a self-signed certificate error in your browser when you
 first visit the OpenShift Web console. When OpenShift is installed, by default, a CA
 and SSL certificates are generated for all inter-component communication
-within OpenShift, including the web console.
+within OpenShift, including the web console
 ====
 +
-1. On the left hand side, click on the "Monitoring" drop down.
-1. Click on "Alerting". This is the OpenShift console's view of the alert configuration.
+1. On the left hand side, click on the "Observe" drop down.
+1. Click on "Alerting rules". This is the OpenShift console's view of the alert configuration.
 
 The Alerting tab shows you information about currently configured and/or
 active alerts. You can see and do several things:
@@ -62,7 +62,7 @@ In addition to the Alerting screen, OpenShift's built-in monitoring provides
 an interface to access metrics collected by Prometheus using the link:https://prometheus.io/docs/prometheus/latest/querying/basics/[Prometheus
 Query Language (PromQL)].
 
-1. On the left hand side of the OpenShift Console, under the "Monitoring" section, click the link for "Metrics".
+1. On the left hand side of the OpenShift Console, under the "Observe" section, click the link for "Metrics".
 
 ##### Running Prometheus Queries
 Let's run a query to see the resources memory limit all pod definitions have defined.
@@ -71,13 +71,12 @@ Let's run a query to see the resources memory limit all pod definitions have def
 +
 [source,role="copypaste"]
 ----
-sum(kube_pod_container_resource_limits_memory_bytes)/(1024^3)
+node_netstat_Udp6_OutDatagrams
 ----
 +
 1. Click the "Run Queries" button
-1. You should now see a timeseries with a value in the list. This value is
-  the latest gathered value for the timeseries as defined by this query.
-  You will also see a graph showing the value over the last time period (defaults to 30m).
+1. You should now see a timeseries with a value in the list. You will also
+   see a graph showing the value over the last time period (defaults to 30m).
 
 Now let's run a query to see the cpu usage for the entire cluster.
 
@@ -105,36 +104,11 @@ In addition to the Metrics UI, OpenShift monitoring provides a preconfigured
 "Dashboards" UI (aka "Grafana"). The purpose of these Dashboards is to show
 multiple metrics in easy to consume form graphed over time.
 
-1. Click the "Dashboards" link under the "Monitoring" section on the left hand side.
-+
-[Warning]
-====
-You will receive a self-signed certificate error in your browser when you
-first visit the Dashboards UI console. When OpenShift is installed, by default, a CA
-and SSL certificates are generated for all inter-component communication
-within OpenShift, including the Grafana dashboard.
-====
-+
-1. Click "Log in with OpenShift" button.
-1. Click "kube:admin" if the option is provided.
-+
-[source,role="copypaste"]
-----
-kubeadmin
-----
-+
-[source,role="copypaste"]
-----
-{{ KUBEADMIN_PASSWORD }}
-----
-+
-1. On the "Authorize Access" page, click the "Allow selected permissions" button.
-1. This is the Grafana "Home Dashboard" page.
-1. Click on the "Home" dropdown at the top of the page
-1. Select the "Kubernetes / Compute Resources / Cluster" dashboard.
-  The "Kubernetes / Compute Resources / Cluster" dashbard shows an overview
-  of the resources currently committed and actively being used by the
-  cluster.
-+
-.Dashboards UI (Grafana)
-image::images/grafana_dashboard.png[]
+Click the "Dashboards" link under the "Observe" section on the left hand side.
+
+.Dashboards OpenShift
+image::images/ocp-grafana-replacement.png[]
+
+Here you can click on the "Dashboard" arrow and select different metrics
+to visualize. Go ahead and play around with this view. Note that this
+is a visualization of the information that is provided by Prometheus.

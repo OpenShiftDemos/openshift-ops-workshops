@@ -2,7 +2,7 @@
 
 OpenShift supports a number of different authentication providers, and you can
 find the complete list in the
-link:https://docs.openshift.com/container-platform/4.6/authentication/understanding-identity-provider.html[understanding
+link:https://docs.openshift.com/container-platform/4.9/authentication/understanding-identity-provider.html[understanding
 identity provider configuration]. One of the most commonly used authentication
 providers is LDAP, whether provided by Microsoft Active Directory or by other
 sources.
@@ -45,25 +45,20 @@ apiVersion: config.openshift.io/v1
 kind: OAuth
 metadata:
   annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
     release.openshift.io/create-only: "true"
-  creationTimestamp: "2021-01-04T18:09:16Z"
+  creationTimestamp: "2022-02-09T23:06:59Z"
   generation: 1
-  managedFields:
-  - apiVersion: config.openshift.io/v1
-    fieldsType: FieldsV1
-    fieldsV1:
-      f:metadata:
-        f:annotations:
-          .: {}
-          f:release.openshift.io/create-only: {}
-      f:spec: {}
-    manager: cluster-version-operator
-    operation: Update
-    time: "2021-01-04T18:09:16Z"
   name: cluster
-  resourceVersion: "1807"
-  selfLink: /apis/config.openshift.io/v1/oauths/cluster
-  uid: 8090316c-209e-425c-9ed6-39930337f557
+  ownerReferences:
+  - apiVersion: config.openshift.io/v1
+    kind: ClusterVersion
+    name: version
+    uid: c9cbd13c-99bf-4e82-b2ad-690810a01f2f
+  resourceVersion: "1715"
+  uid: 1bedd82d-b235-4e39-af98-e40f411c3c8e
 spec: {}
 ----
 
@@ -83,26 +78,14 @@ You will see something like:
 ----
 apiVersion: v1
 data:
-  kubeadmin: JDJhJDEwJDNyLjhRNUdzdzExSFFyckFMeEF5NU9RT0hILzZYSEVpNHIxYURpNks3WVZPLnlxRGVnaHpx
+  kubeadmin: JDJhJDEwJFYwcVBXRjZGTlNOOU1RYUN6SGtJVGV4T3I5Ym9DbGRTT0VmNS44UGl2cWZOUGdsTnkvb3hT
 kind: Secret
 metadata:
-  creationTimestamp: "2021-01-04T18:08:15Z"
-  managedFields:
-  - apiVersion: v1
-    fieldsType: FieldsV1
-    fieldsV1:
-      f:data:
-        .: {}
-        f:kubeadmin: {}
-      f:type: {}
-    manager: cluster-bootstrap
-    operation: Update
-    time: "2021-01-04T18:08:15Z"
+  creationTimestamp: "2022-02-09T23:06:14Z"
   name: kubeadmin
   namespace: kube-system
-  resourceVersion: "98"
-  selfLink: /api/v1/namespaces/kube-system/secrets/kubeadmin
-  uid: b5177429-c0db-443e-bbed-8d0912779a96
+  resourceVersion: "576"
+  uid: 834a86fd-96e6-4d6a-8c16-6eca251b10f0
 type: Opaque
 ----
 
@@ -158,7 +141,7 @@ able to distinguish between them.
 <2> `mappingMethod: claim`: This section has to do with how usernames are
 assigned within an OpenShift cluster when multiple providers are configured. See
 the
-link:https://docs.openshift.com/container-platform/4.6/authentication/understanding-identity-provider.html#identity-provider-parameters_understanding-identity-provider[Identity provider parameters] section for more information.
+link:https://docs.openshift.com/container-platform/4.9/authentication/understanding-identity-provider.html#identity-provider-parameters_understanding-identity-provider[Identity provider parameters] section for more information.
 
 <3> `attributes`: This section defines the LDAP fields to iterate over and
 assign to the fields in the OpenShift user's "account". If any attributes are
@@ -178,7 +161,7 @@ validating the SSL certificate of the LDAP server.
 
 For more information on the specific details of LDAP authentication in
 OpenShift you can refer to the
-link:https://docs.openshift.com/container-platform/4.6/authentication/identity_providers/configuring-ldap-identity-provider.html[Configuring
+link:https://docs.openshift.com/container-platform/4.9/authentication/identity_providers/configuring-ldap-identity-provider.html[Configuring
 an LDAP identity provider^] documentation.
 
 To setup the LDAP identity provider we must:
@@ -215,7 +198,7 @@ oc rollout status deployment/oauth-openshift -n openshift-authentication
 #### Syncing LDAP Groups to OpenShift Groups
 In OpenShift, groups can be used to manage users and control permissions for
 multiple users at once. There is a section in the documentation on how to
-link:https://docs.openshift.com/container-platform/4.6/authentication/ldap-syncing.html[sync
+link:https://docs.openshift.com/container-platform/4.9/authentication/ldap-syncing.html[sync
 groups with LDAP^]. Syncing groups involves running a program called `groupsync`
 when logged into OpenShift as a user with `cluster-admin` privileges, and using
 a configuration file that tells OpenShift what to do with the users it finds in
@@ -292,17 +275,15 @@ apiVersion: user.openshift.io/v1
 kind: Group
 metadata:
   annotations:
-    openshift.io/ldap.sync-time: "2021-01-04T21:43:40Z"
-    openshift.io/ldap.uid: cn=ose-fancy-dev,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=co
-m
+    openshift.io/ldap.sync-time: "2022-02-10T01:49:07Z"
+    openshift.io/ldap.uid: cn=ose-fancy-dev,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com
     openshift.io/ldap.url: ldap.jumpcloud.com:636
-  creationTimestamp: "2021-01-04T21:43:40Z"
+  creationTimestamp: "2022-02-10T01:49:07Z"
   labels:
     openshift.io/ldap.host: ldap.jumpcloud.com
   name: ose-fancy-dev
-  resourceVersion: "80943"
-  selfLink: /apis/user.openshift.io/v1/groups/ose-fancy-dev
-  uid: 652f296a-b2ea-41ca-9b1e-5cfd98389438
+  resourceVersion: "68628"
+  uid: 374c463a-bdd2-4da1-ae1a-619eca0994f6
 users:
 - fancyuser1
 - fancyuser2
@@ -349,7 +330,7 @@ oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
 ====
 If you are interested in the different roles that come with OpenShift, you can
 learn more about them in the
-link:https://docs.openshift.com/container-platform/4.6/authentication/using-rbac.html[role-based access control (RBAC)^] documentation.
+link:https://docs.openshift.com/container-platform/4.9/authentication/using-rbac.html[role-based access control (RBAC)^] documentation.
 ====
 
 #### Examine `cluster-reader` policy
@@ -390,14 +371,15 @@ oc get projects
 You will now see the list of all of the projects in the cluster:
 
 ----
-NAME                                                    DISPLAY NAME                        STATUS
-    app-management
-  * default
-    kube-public
-    kube-system
-    labguide
-    openshift
-    openshift-apiserver
+[~] $ oc get projects
+NAME                                               DISPLAY NAME   STATUS
+default                                                           Active
+kube-node-lease                                                   Active
+kube-public                                                       Active
+kube-system                                                       Active
+lab-ocp-cns                                                       Active
+openshift                                                         Active
+openshift-apiserver                                               Active
 ...
 ----
 

@@ -34,7 +34,7 @@ kubeadmin
 You may receive a self-signed certificate error in your browser when you
 first visit the OpenShift Web console. When OpenShift is installed, by default, a CA
 and SSL certificates are generated for all inter-component communication
-within OpenShift, including the web consolemay
+within OpenShift, including the web console
 ====
 +
 1. On the left hand side, click on the "Observe" drop down.

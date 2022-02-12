@@ -13,8 +13,8 @@ modules:
     name: MachineSets, Machines, and Nodes
   infra-nodes:
     name: Infrastructure Nodes and Operators
-  ocs4:
-    name: Deploying and Managing OpenShift Container Storage
+  odf4:
+    name: Deploying and Managing OpenShift Data Foundation
   logging:
     name: OpenShift Log Aggregation
   ldap-groupsync:

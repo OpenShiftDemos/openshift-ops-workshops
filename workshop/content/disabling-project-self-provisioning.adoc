@@ -90,7 +90,7 @@ OpenShift that allows the users to create projects.
 ====
 If you are interested in the different roles that come with OpenShift, you
 can learn more about them in the
-link:https://docs.openshift.com/container-platform/4.1/authentication/using-rbac.html[role-based
+link:https://docs.openshift.com/container-platform/4.9/authentication/using-rbac.html[role-based
 access control (RBAC)^] documentation.
 ====
 
@@ -111,27 +111,10 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     rbac.authorization.kubernetes.io/autoupdate: "true"
-  creationTimestamp: "2020-12-07T23:29:30Z"
-  managedFields:
-  - apiVersion: rbac.authorization.k8s.io/v1
-    fieldsType: FieldsV1
-    fieldsV1:
-      f:metadata:
-        f:annotations:
-          .: {}
-          f:rbac.authorization.kubernetes.io/autoupdate: {}
-      f:roleRef:
-        f:apiGroup: {}
-        f:kind: {}
-        f:name: {}
-      f:subjects: {}
-    manager: openshift-apiserver
-    operation: Update
-    time: "2020-12-07T23:29:30Z"
+  creationTimestamp: "2022-02-14T22:25:08Z"
   name: self-provisioners
-  resourceVersion: "10302"
-  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterrolebindings/self-provisioners
-  uid: 1bbfe87b-697c-4702-81d1-00e7f8e98207
+  resourceVersion: "10620"
+  uid: a0098c02-b9cb-4815-aebd-7dc44ef4d163
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -177,33 +160,10 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     rbac.authorization.kubernetes.io/autoupdate: "false"
-  creationTimestamp: "2020-12-07T23:29:30Z"
-  managedFields:
-  - apiVersion: rbac.authorization.k8s.io/v1
-    fieldsType: FieldsV1
-    fieldsV1:
-      f:metadata:
-        f:annotations: {}
-      f:roleRef:
-        f:apiGroup: {}
-        f:kind: {}
-        f:name: {}
-    manager: openshift-apiserver
-    operation: Update
-    time: "2020-12-07T23:29:30Z"
-  - apiVersion: rbac.authorization.k8s.io/v1
-    fieldsType: FieldsV1
-    fieldsV1:
-      f:metadata:
-        f:annotations:
-          f:rbac.authorization.kubernetes.io/autoupdate: {}
-    manager: kubectl-patch
-    operation: Update
-    time: "2020-12-08T00:15:02Z"
+  creationTimestamp: "2022-02-14T22:25:08Z"
   name: self-provisioners
-  resourceVersion: "36456"
-  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterrolebindings/self-provisioners
-  uid: 1bbfe87b-697c-4702-81d1-00e7f8e98207
+  resourceVersion: "55489"
+  uid: a0098c02-b9cb-4815-aebd-7dc44ef4d163
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

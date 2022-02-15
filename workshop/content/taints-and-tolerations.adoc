@@ -260,7 +260,8 @@ out.
 oc rollout status deploy welcome-php
 ----
 
-You can see the toleration config by inspecting the deployment YAML
+You can see the toleration config under `.spec.template.spec.tolerations`
+in the deployment YAML
 
 [source,bash,role="execute"]
 ----
@@ -284,7 +285,7 @@ oc get pods -o=custom-columns=NAME:.metadata.name,NODE:.spec.nodeName
 oc get nodes -l appnode=welcome-php
 ----
 
-To read more about taints and tolerations, you can take a look at the https://docs.openshift.com/container-platform/4.2/nodes/scheduling/nodes-scheduler-taints-tolerations.html[Official Documentation].
+To read more about taints and tolerations, you can take a look at the https://docs.openshift.com/container-platform/4.9/nodes/scheduling/nodes-scheduler-taints-tolerations.html[Official Documentation].
 
 #### Clean Up
 

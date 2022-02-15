@@ -51,39 +51,14 @@ The configuration should look something like this:
 
 [source,yaml]
 ----
-piVersion: quota.openshift.io/v1
+apiVersion: quota.openshift.io/v1
 kind: ClusterResourceQuota
 metadata:
-  creationTimestamp: "2020-12-02T22:48:38Z"
+  creationTimestamp: "2022-02-15T00:17:49Z"
   generation: 1
-  managedFields:
-  - apiVersion: quota.openshift.io/v1
-    fieldsType: FieldsV1
-    fieldsV1:
-      f:spec:
-        .: {}
-        f:quota:
-          .: {}
-          f:hard:
-            .: {}
-            f:pods: {}
-        f:selector:
-          .: {}
-          f:annotations:
-            .: {}
-            f:openshift.io/requester: {}
-          f:labels: {}
-      f:status:
-        .: {}
-        f:namespaces: {}
-        f:total: {}
-    manager: oc
-    operation: Update
-    time: "2020-12-02T22:48:38Z"
   name: for-user-normaluser1
-  resourceVersion: "55396"
-  selfLink: /apis/quota.openshift.io/v1/clusterresourcequotas/for-user-normaluser1
-  uid: 21670296-e0af-4572-8141-832217531cc3
+  resourceVersion: "59411"
+  uid: 6ab015c7-fd19-4867-9ef3-0b23b60b2efd
 spec:
   quota:
     hard:
@@ -92,6 +67,25 @@ spec:
     annotations:
       openshift.io/requester: normaluser1
     labels: null
+status:
+  namespaces:
+  - namespace: welcome1
+    status:
+      hard:
+        pods: "10"
+      used:
+        pods: "1"
+  - namespace: welcome2
+    status:
+      hard:
+        pods: "10"
+      used:
+        pods: "1"
+  total:
+    hard:
+      pods: "10"
+    used:
+      pods: "2"
 ----
 
 This user, `normaluser1`, can create no more than 10 pods accross all the projects he creates. This applies only to projects that he as created (based on the `openshift.io/requester: normaluser1` annotation), not any projects he has access to. More on this later.
@@ -191,59 +185,26 @@ The output should look something like this. Take special note of the annotations
 
 [source,yaml]
 ----
-apiVersion: v1                                                                                                              
-kind: Namespace                                                                                                             
-metadata:                                                                                                                   
-  annotations:                                                                                                              
-    openshift.io/description: ""                                                                                            
-    openshift.io/display-name: ""                                                                                           
-    openshift.io/requester: normaluser1                                                                                     
-    openshift.io/sa.scc.mcs: s0:c26,c5                                                                                      
-    openshift.io/sa.scc.supplemental-groups: 1000660000/10000                                                               
-    openshift.io/sa.scc.uid-range: 1000660000/10000                                                                         
-  creationTimestamp: "2020-12-02T22:49:46Z"                                                                                 
-  managedFields:                                                                                                            
-  - apiVersion: v1                                                                                                          
-    fieldsType: FieldsV1                                                                                                    
-    fieldsV1:                                                                                                               
-      f:metadata:                                                                                                           
-        f:annotations:                                                                                                      
-          f:openshift.io/sa.scc.mcs: {}                                                                                     
-          f:openshift.io/sa.scc.supplemental-groups: {}                                                                     
-          f:openshift.io/sa.scc.uid-range: {}                                                                               
-    manager: cluster-policy-controller                                                                                      
-    operation: Update                                                                                                       
-    time: "2020-12-02T22:49:46Z"                                                                                            
-  - apiVersion: v1                                                                                                          
-    fieldsType: FieldsV1                                                                                                    
-    fieldsV1:                                                                                                               
-      f:metadata:                                                                                                           
-        f:annotations:                                                                                                      
-          .: {}                                                                                                             
-          f:openshift.io/description: {}                                                                                    
-          f:openshift.io/display-name: {}                                                                                   
-          f:openshift.io/requester: {}                                                                                      
-      f:status:                                                                                                             
-        f:phase: {}                                                                                                         
-    manager: openshift-apiserver                                                                                            
-    operation: Update                                                                                                       
-    time: "2020-12-02T22:49:46Z"                                                                                            
-  - apiVersion: v1                                                                                                          
-    fieldsType: FieldsV1                                                                                                    
-    fieldsV1:                                                                                                               
-      f:spec:                                                                                                               
-        f:finalizers: {}                                                                                                    
-    manager: openshift-controller-manager                                                                                   
-    operation: Update                                                                                                       
-    time: "2020-12-02T22:49:46Z"                                                                                            
-  name: welcome1                                                                                                            
-  resourceVersion: "55712"                                                                                                  
-  selfLink: /api/v1/namespaces/welcome1                                                                                     
-  uid: fe1ceda9-51aa-4222-b47b-e25181291f5e                                                                                 
-spec:                                                                                                                       
-  finalizers:                                                                                                               
-  - kubernetes                                                                                                              
-status:                                                                                                                     
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/description: ""
+    openshift.io/display-name: ""
+    openshift.io/requester: normaluser1
+    openshift.io/sa.scc.mcs: s0:c27,c9
+    openshift.io/sa.scc.supplemental-groups: 1000720000/10000
+    openshift.io/sa.scc.uid-range: 1000720000/10000
+  creationTimestamp: "2022-02-15T00:18:30Z"
+  labels:
+    kubernetes.io/metadata.name: welcome1
+  name: welcome1
+  resourceVersion: "59245"
+  uid: 75612ea5-aa5d-4c99-a28c-0604efe0f457
+spec:
+  finalizers:
+  - kubernetes
+status:
   phase: Active
 ----
 

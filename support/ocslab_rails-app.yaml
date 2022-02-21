@@ -94,7 +94,7 @@ objects:
           value: ${RUBYGEM_MIRROR}
         from:
           kind: ImageStreamTag
-          name: ruby:2.6
+          name: ruby:2.7-ubi8
           namespace: ${NAMESPACE}
       type: Source
     triggers:

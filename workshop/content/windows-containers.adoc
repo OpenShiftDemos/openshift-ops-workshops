@@ -10,8 +10,9 @@ following providers:
 * Amazon Web Services (AWS)
 * Microsoft Azure
 * VMware vSphere
+* Bare Metal (via link:https://docs.openshift.com/container-platform/4.9/windows_containers/byoh-windows-instance.html[BYOH])
 
-NOTE: For more information  about what versions of Windows Server are supported, please see the link:https://docs.openshift.com/container-platform/4.7/windows_containers/understanding-windows-container-workloads.html[official documentation].
+NOTE: For more information  about what versions of Windows Server are supported, please see the link:https://docs.openshift.com/container-platform/4.9/windows_containers/understanding-windows-container-workloads.html[official documentation].
 
 In this lab, you'll get hands on experence on how to deploy a Windows
 worker node and how to deploy workloads onto an OpenShift platform with
@@ -44,7 +45,7 @@ During setup, the WMCO will:
 * Confiugre the CNI on the Kubelet.
 * Set up kube-proxy.
 
-For more information please see the link:https://docs.openshift.com/container-platform/4.7/windows_containers/understanding-windows-container-workloads.html[official documentation].
+For more information please see the link:https://docs.openshift.com/container-platform/4.9/windows_containers/understanding-windows-container-workloads.html[official documentation].
 
 #### Prerequisites
 
@@ -79,7 +80,7 @@ oc extract cm/cluster-config-v1 -n kube-system --to=- | yq e '.networking.networ
 
 This should output `OVNKubernetes` as the network type.
 
-NOTE: Learn more about the `install-config.yaml` file at the link:https://docs.openshift.com/container-platform/4.7/installing/installing_aws/installing-aws-customizations.html#installation-aws-config-yaml_installing-aws-customizations[official documentation page].
+NOTE: Learn more about the `install-config.yaml` file at the link:https://docs.openshift.com/container-platform/4.9/installing/installing_aws/installing-aws-customizations.html#installation-aws-config-yaml_installing-aws-customizations[official documentation page].
 
 The next requisite is the cluster must be set up with overlay hybrid
 networking. This is another step that can only be done at install
@@ -104,10 +105,15 @@ ovnKubernetesConfig:
       - cidr: 10.132.0.0/14
         hostPrefix: 23
   mtu: 8901
+  policyAuditConfig:
+    destination: "null"
+    maxFileSize: 50
+    rateLimit: 20
+    syslogFacility: local0
 type: OVNKubernetes
 ----
 
-NOTE: To read more about how to setup HybridNetworking, please see the link:https://docs.openshift.com/container-platform/4.7/networking/ovn_kubernetes_network_provider/configuring-hybrid-networking.html#configuring-hybrid-ovnkubernetes_configuring-hybrid-networking[official doc].
+NOTE: To read more about how to setup HybridNetworking, please see the link:https://docs.openshift.com/container-platform/4.9/networking/ovn_kubernetes_network_provider/configuring-hybrid-networking.html#configuring-hybrid-ovnkubernetes_configuring-hybrid-networking[official doc].
 
 To summarize, in order to use Windows Containers on OpenShift. You will need the following:
 
@@ -124,7 +130,7 @@ WARNING: If you're not seeing the above output, you will not be able to continue
 
 Before you can deploy a Windows Node, you will need to install the Windows
 Machine Config Operator (WMCO). This can be done via the OpenShift Web
-Console. Open the console in another tab if it isn't open already.
+Console. Use the "Console" tab, or open the console in another tab if it isn't open already.
 
 {{ MASTER_URL }}
 
@@ -234,7 +240,7 @@ explore important sections of the YAML.
 ${HOME}/support/generate-windows-ms.sh
 ----
 
-NOTE: For more information on how to create a Windows MachineSet YAML see the link:https://docs.openshift.com/container-platform/4.7/windows_containers/creating_windows_machinesets/creating-windows-machineset-aws.html[official docs].
+NOTE: For more information on how to create a Windows MachineSet YAML see the link:https://docs.openshift.com/container-platform/4.9/windows_containers/creating_windows_machinesets/creating-windows-machineset-aws.html[official docs].
 
 This should create the `windows-ms.yaml` file in your home directory.
 
@@ -267,7 +273,7 @@ The AMI ID is of a Windows Server 2019 AMI.
 yq e '.spec.template.spec.providerSpec.value.ami.id' ~/windows-ms.yaml
 ----
 
-NOTE: You will need to use an AMI of a supported version of Windows Server. For more information, consult the link:https://docs.openshift.com/container-platform/4.7/windows_containers/windows-containers-release-notes-2-x.html#supported-windows-server-versions[official documentation].
+NOTE: You will need to use an AMI of a supported version of Windows Server. For more information, consult the link:https://docs.openshift.com/container-platform/4.9/windows_containers/windows-containers-release-notes-4-x.html#supported-windows-server-versions[official documentation].
 
 One last thing to note, is the user data secret.
 
@@ -403,7 +409,7 @@ ip-10-0-143-146.ec2.internal   Ready    worker   3h18m   v1.20.0-1081+d0b1ad449a
 You can see how easy it is to manage a Windows Machine
 with the MachineAPI on OpenShift. It is managed by the
 same system as your Linux Nodes. You can even attach the Windows
-link:https://docs.openshift.com/container-platform/4.7/machine_management/applying-autoscaling.html[MachineSet Autoscaler] as well
+link:https://docs.openshift.com/container-platform/4.9/machine_management/applying-autoscaling.html[MachineSet Autoscaler] as well
 
 Remove this node by scaling the Windows MachineSet back down to 1.
 

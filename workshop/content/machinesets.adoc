@@ -81,18 +81,18 @@ oc get nodes
 You will see something like:
 
 ----
-NAME                                         STATUS   ROLES    AGE   VERSION
-ip-10-0-133-191.us-east-2.compute.internal   Ready    worker   44m   v1.16.2
-ip-10-0-136-83.us-east-2.compute.internal    Ready    master   51m   v1.16.2
-ip-10-0-152-132.us-east-2.compute.internal   Ready    worker   44m   v1.16.2
-ip-10-0-157-139.us-east-2.compute.internal   Ready    master   51m   v1.16.2
-ip-10-0-167-9.us-east-2.compute.internal     Ready    worker   44m   v1.16.2
-ip-10-0-169-121.us-east-2.compute.internal   Ready    master   51m   v1.16.2
+NAME                                         STATUS   ROLES    AGE     VERSION
+ip-10-0-186-197.us-east-2.compute.internal   Ready    master   4h5m    v1.22.3+e790d7f
+ip-10-0-190-214.us-east-2.compute.internal   Ready    master   4h6m    v1.22.3+e790d7f
+ip-10-0-199-60.us-east-2.compute.internal    Ready    worker   3h53m   v1.22.3+e790d7f
+ip-10-0-216-121.us-east-2.compute.internal   Ready    worker   3h53m   v1.22.3+e790d7f
+ip-10-0-231-224.us-east-2.compute.internal   Ready    worker   3h53m   v1.22.3+e790d7f
+ip-10-0-244-159.us-east-2.compute.internal   Ready    master   4h6m    v1.22.3+e790d7f
 ----
 
 Each `Machine` ends up corresponding to a `Node`. With IPI, there is a
 bootstrap process where the machine operator will create an EC2 instance and
-then Ignition inside the CoreOS operating system will receive initial
+then Ignition inside the RHEL CoreOS operating system will receive initial
 instructions from the operator. This results in the EC2 instance being
 configured as an OpenShift node and joining the cluster.
 
@@ -111,17 +111,19 @@ Look at the list of `MachineSets` again:
 oc get machineset -n openshift-machine-api
 ----
 
-Within that list, find the `MachineSet` that ends in `-2c`. It should have a
-scale of one. Now, let's scale it to have two instances:
+Within that list, we will scale one of the `MachineSet` objects with the
+`oc scale` command. Run:
 
-[source,bash,role="copypaste copypaste-warning"]
+[source,bash,role="execute"]
 ----
-oc scale machineset cluster-5fa6-hx2ml-worker-us-east-2c -n openshift-machine-api --replicas=2
+CLUSTERNAME=$(oc get  infrastructures.config.openshift.io cluster  -o jsonpath='{.status.infrastructureName}')
+ZONENAME=$(oc get nodes -L topology.kubernetes.io/zone  --no-headers  | awk '{print $NF}' | tail -1)
+oc scale machineset ${CLUSTERNAME}-worker-${ZONENAME} -n openshift-machine-api --replicas=2
 ----
 
-Take special note because your `MachineSet` name is likely different from the
-one in the lab guide. You should see a note that the `MachineSet` was
-successfully scaled. Now, look at the list of `Machines`:
+Take special note the `MachineSet` scaled is likely different from
+the one that is shown in the lab guide. You should see a note that the
+`MachineSet` was successfully scaled. Now, look at the list of `Machines`:
 
 [source,bash,role="execute"]
 ----
@@ -153,12 +155,20 @@ ip-10-0-166-103.us-east-2.compute.internal   Ready    worker   1m   v1.16.2
 
 [Note]
 ====
-It can take several minutes for a `Machine` to be prepared and added as a `Node`.
+It can take several minutes for a `Machine` to be prepared and added
+as a `Node`. You can follow the process by running a `watch` against
+`oc get nodes` if you wish.
 ====
 
 Scale the `MachineSet` from two back down to one before continuing.
 
-[source,bash,role="copypaste copypaste-warning"]
+[Warning]
+====
+Make sure you've set the ${CLUSTERNAME} and ${ZONENAME} varaible from
+when you scaled up, a few steps ago.
+====
+
+[source,bash,role="execute"]
 ----
-oc scale machineset cluster-5fa6-hx2ml-worker-us-east-2c -n openshift-machine-api --replicas=1
+oc scale machineset ${CLUSTERNAME}-worker-${ZONENAME} -n openshift-machine-api --replicas=1
 ----

@@ -217,7 +217,7 @@ The way that a *Service* maps to a set of *Pods* is via a system of *Labels* and
 protocols can be mapped.
 
 There is a lot more information about
-https://docs.openshift.com/container-platform/4.6/architecture/understanding-development.html#understanding-kubernetes-pods[Services],
+https://docs.openshift.com/container-platform/4.9/architecture/understanding-development.html#understanding-kubernetes-pods[Services],
 including the YAML format to make one by hand, in the official documentation.
 
 You can see the current list of services in a project with:
@@ -413,7 +413,7 @@ somehow die/exit are not automatically restarted. *ReplicaSets* are
 how OpenShift "self heals".
 
 A *Deployment* (deploy) defines how something in OpenShift should be
-deployed. From the https://docs.openshift.com/container-platform/4.6/applications/deployments/what-deployments-are.html#deployments-kube-deployments_what-deployments-are[deployments documentation]:
+deployed. From the https://docs.openshift.com/container-platform/4.9/applications/deployments/what-deployments-are.html#deployments-kube-deployments_what-deployments-are[deployments documentation]:
 
 ----
 Deployments describe the desired state of a particular component of an
@@ -432,7 +432,7 @@ exercises.
 NOTE: Earlier versions of OpenShift used something called a *DeploymentConfig*.
 While still a valid deployment mechanism, moving forward the *Deployment* will
 be what will be created with `oc new-app`. See the
-https://docs.openshift.com/container-platform/4.6/applications/deployments/what-deployments-are.html#deployments-comparing-deploymentconfigs_what-deployments-are[official
+https://docs.openshift.com/container-platform/4.9/applications/deployments/what-deployments-are.html#deployments-comparing-deploymentconfigs_what-deployments-are[official
 documentation] for more details.
 
 
@@ -617,7 +617,7 @@ Now, delete the pods that belog to the *Deployment* `mapit`:
 
 [source,bash,role="execute"]
 ----
-oc delete pods -l deployment=mapit
+oc delete pods -l deployment=mapit --wait=false
 ----
 
 Run the `oc get pods` command once again:
@@ -759,7 +759,7 @@ readiness probe can be used to signal to the endpoint's controller that even
 though a container is running, it should not receive any traffic.
 
 More information on probing applications is available in the
-https://docs.openshift.com/container-platform/4.6/applications/application-health.html[Application
+https://docs.openshift.com/container-platform/4.9/applications/application-health.html[Application
 Health] section of the documentation.
 
 ### Add Probes to the Application

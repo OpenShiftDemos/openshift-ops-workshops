@@ -283,20 +283,26 @@ You should eventually see something like:
 
 ----
 NAME                                            READY   STATUS    RESTARTS   AGE
-cluster-logging-operator-cb795f8dc-xkckc        1/1     Running   0          32m
-elasticsearch-cdm-b3nqzchd-1-5c6797-67kfz       2/2     Running   0          14m
-elasticsearch-cdm-b3nqzchd-2-6657f4-wtprv       2/2     Running   0          14m
-elasticsearch-cdm-b3nqzchd-3-588c65-clg7g       2/2     Running   0          14m
-fluentd-2c7dg                                   1/1     Running   0          14m
-fluentd-9z7kk                                   1/1     Running   0          14m
-fluentd-br7r2                                   1/1     Running   0          14m
-fluentd-fn2sb                                   1/1     Running   0          14m
-fluentd-pb2f8                                   1/1     Running   0          14m
-fluentd-zqgqx                                   1/1     Running   0          14m
-kibana-7fb4fd4cc9-bvt4p                         2/2     Running   0          14m
+cluster-logging-operator-5d4b6f7b99-ksr5s       1/1     Running   0          113s
+collector-2p5fx                                 2/2     Running   0          26s
+collector-7lw5r                                 2/2     Running   0          42s
+collector-8stvf                                 2/2     Running   0          32s
+collector-b7qs8                                 2/2     Running   0          27s
+collector-clfsc                                 2/2     Running   0          16s
+collector-f2tzf                                 2/2     Running   0          31s
+collector-j6hxp                                 2/2     Running   0          10s
+collector-kdvj8                                 2/2     Running   0          30s
+collector-q6wck                                 2/2     Running   0          21s
+collector-sgndk                                 2/2     Running   0          17s
+collector-w5ds9                                 2/2     Running   0          29s
+collector-zswpb                                 2/2     Running   0          34s
+elasticsearch-cdm-mnc985r3-1-5c45b9bd9f-4nx56   2/2     Running   0          70s
+elasticsearch-cdm-mnc985r3-2-779989b7bb-z9dpp   1/2     Running   0          69s
+elasticsearch-cdm-mnc985r3-3-6d754c8cbf-fx8wd   1/2     Running   0          68s
+kibana-655877db88-njsqq                         2/2     Running   0          70s
 ----
 
-The _Fluentd_ *Pods* are deployed as part of a *DaemonSet*, which is a mechanism
+The _Collector_ *Pods* are deployed as part of a *DaemonSet*, which is a mechanism
 to ensure that specific *Pods* run on specific *Nodes* in the cluster at all
 times:
 
@@ -308,12 +314,12 @@ oc get daemonset -n openshift-logging
 You will see something like:
 
 ----
-NAME      DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
-fluentd   9         9         9       9            9           kubernetes.io/os=linux   94s
+NAME        DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+collector   12        12        0       12           0           kubernetes.io/os=linux   1s
 ----
 
-You should expect 1 `fluentd` *Pod* for every *Node* in your cluster.
-Remember that *Masters* are still *Nodes* and `fluentd` will run there, too,
+You should expect 1 `collector` *Pod* for every *Node* in your cluster.
+Remember that *Masters* are still *Nodes* and `collector` will run there, too,
 to slurp the various logs.
 
 You will also see the storage for ElasticSearch has been automatically

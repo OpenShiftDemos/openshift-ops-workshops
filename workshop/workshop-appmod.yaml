@@ -16,3 +16,6 @@ modules:
   - disabling-project-self-provisioning
   - clusterresourcequota
   - taints-and-tolerations
+  - acs-vulnerability
+  - acs-devsecops
+  - acm-multicluster

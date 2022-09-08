@@ -34,7 +34,8 @@ workload is not specifically prevented from running on the infrastructure
 nodes. In other words, user workload may commingle with infrastructure
 workload until full taint/toleration support is implemented in all operators.
 
-The use of taints/tolerations is not covered in any of these exercises.
+Taints and tolerations work in tandem to ensure that workloads are not scheduled 
+onto certian nodes. They’ll be explored later on.
 ====
 
 To accomplish this, you will create additional `MachineSets`.
@@ -593,7 +594,3 @@ oc get pod -w -n openshift-monitoring
 
 You can exit by pressing kbd:[Ctrl+C].
 
-## Logging
-OpenShift's log aggregation solution is not installed by default. There is a
-dedicated lab exercise that goes through the configuration and deployment of
-logging.

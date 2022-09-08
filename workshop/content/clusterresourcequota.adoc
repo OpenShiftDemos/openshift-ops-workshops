@@ -7,7 +7,7 @@ Before continuing, make sure you've done the LDAP lab.
 
 In a previous lab, you worked with quotas and saw how they could be applied to projects. You also set up default quotas, so anytime someone requests a new project; they get assigned the default quota. These project quotas are great for maintaining control over the resources in your cluster.
 
-But what if you want to apply a quota not to individual projects, but accross projects?
+But what if you want to apply a quota not to individual projects, but across projects?
 
 ### Use cases
 

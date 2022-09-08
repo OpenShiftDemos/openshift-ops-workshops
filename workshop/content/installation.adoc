@@ -1,6 +1,6 @@
 ## Installation and Verification
 
-The scope of the new installer-provisioned infrastructure (IPI) OpenShift 4
+The scope of the installer-provisioned infrastructure (IPI) OpenShift 4
 installation is purposefully narrow. It is designed for simplicity and
 ensured success. Many of the items and configurations that were previously
 handled by the installer are now expected to be "Day 2" operations, performed
@@ -34,7 +34,7 @@ If so, type `yes`:
 yes
 ----
 
-Here is your ssh password (you need to type it in):
+Here is your ssh password (please copy/paste):
 
 ----
 {{ SSH_PASSWORD }}
@@ -47,7 +47,7 @@ Once you've SSH-ed into the bastion host, become the `ec2-user`:
 sudo su - ec2-user
 ----
 
-You'll notice that there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This
+You'll notice that there is a 5-digit alphanumeric string (eg: b866q) in the hostname. This
 string is your `GUID`. Since you will often use `GUID`, it makes sense to
 export it as an environment variable:
 

@@ -560,7 +560,11 @@ select the `ldap` auth mechanism, and use the `fancyuser1` user that you gave
 
 More specifically, the `ose-fancy-dev` group has `cluster-reader`
 permissions, and `fancyuser1` is a member. Remember that the password
-for all of these users is `Op#nSh1ft`.
+for all of these users is:
+
+----
+Op#nSh1ft
+----
 
 [Warning]
 ====

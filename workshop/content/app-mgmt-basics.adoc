@@ -31,7 +31,7 @@ out what to do. Users will commonly use this command to get OpenShift to launch
 existing images, to create builds of source code and ultimately deploy them, to
 instantiate templates, and so on.
 
-You will now launch a specific image that exists on Dockerhub
+You will now launch a specific image that exists on Quay
 
 [source,bash,role="execute"]
 ----
@@ -613,7 +613,7 @@ mapit-764c5bf8b8-lxnvw   1/1     Running   0          2m28s
 mapit-764c5bf8b8-rscss   1/1     Running   0          2m54s
 ----
 
-Now, delete the pods that belog to the *Deployment* `mapit`:
+Now, delete the pods that belong to the *Deployment* `mapit`:
 
 [source,bash,role="execute"]
 ----

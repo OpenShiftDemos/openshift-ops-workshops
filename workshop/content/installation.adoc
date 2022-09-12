@@ -365,7 +365,7 @@ ip-10-0-166-207.ec2.internal   Ready    worker   3h22m   v1.22.3+ffbb954
 ip-10-0-169-24.ec2.internal    Ready    master   3h35m   v1.22.3+ffbb954
 ----
 
-You have 3 masters and 3 workers. The OpenShift *Master* is also a *Node*
+You have 3 masters and 2 workers. The OpenShift *Master* is also a *Node*
 because it needs to participate in the software defined network (SDN). If you
 need additional nodes for additional purposes, you can create them very
 easily when using IPI and leveraging the cloud provider operators. You will

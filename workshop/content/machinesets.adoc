@@ -28,17 +28,17 @@ oc get machineset -n openshift-machine-api
 You will see something like:
 
 ----
-NAME                                   DESIRED   CURRENT   READY   AVAILABLE   AGE
-cluster-f4a3-lpxbs-worker-us-east-2a   1         1         1       1           47h
-cluster-f4a3-lpxbs-worker-us-east-2b   1         1         1       1           47h
-cluster-f4a3-lpxbs-worker-us-east-2c   1         1         1       1           47h
+NAME                                    DESIRED   CURRENT   READY   AVAILABLE   AGE
+cluster-6ljsd-9b8vz-worker-us-east-2a   1         1         1       1           167m
+cluster-6ljsd-9b8vz-worker-us-east-2b   1         1         1       1           167m
+cluster-6ljsd-9b8vz-worker-us-east-2c   0         0                             167m
 ----
 
 When OpenShift was installed, the installer interrogated the cloud provider
 to learn about the available AZs (since this is on AWS). It then ultimately
 created a `MachineSet` for each AZ and then scaled those sets, in order,
 until it reached the desired number of `Machines`. Since the default
-installation has 3 workers, the first 3 AZs got one worker each. The rest got
+installation has 2 workers, the first 2 AZs got one worker each. The rest got
 zero.
 
 [source,bash,role="execute"]

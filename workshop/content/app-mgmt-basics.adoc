@@ -469,7 +469,8 @@ You will see something like the following:
 
 ----
 NAME               DESIRED   CURRENT   READY   AGE
-mapit-764c5bf8b8   1         1         1       77m
+mapit-7bf4f447ff   0         0         0       18m
+mapit-85fdb44576   1         1         1       18m
 ----
 
 This lets us know that, right now, we expect one *Pod* to be deployed

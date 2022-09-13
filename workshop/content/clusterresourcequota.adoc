@@ -26,7 +26,7 @@ In order to set a `clusterresourcequota` to a user you need to be `kubeadmin`
 oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
 
-Now, set a quota for the `normaluser1`. We will be using the `annotation` key of `openshift.io/requester=` to identify the projects that will have these quotas assigned to. For this exercise, we will set a hard quota against creating more than 10 pods.
+Now, set a quota for the `normaluser1`. We will be using the `annotation` key of `openshift.io/requester=` to identify the projects that will have these quotas assigned to. For this exercise, we will set a hard quota against creating more than 10 pods. Please ignore any deprecation warnings.
 
 [source,bash,role="execute"]
 ----
@@ -37,7 +37,7 @@ oc create clusterquota for-user-normaluser1 \
 
 [Note]
 ====
-The syntax is `openshift.io/requester=<username>`.
+The syntax is `openshift.io/requester=<username>`. 
 ====
 
 View the configuration.

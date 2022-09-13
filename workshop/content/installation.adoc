@@ -356,13 +356,12 @@ oc get nodes
 The output should look something like the following:
 
 ----
-NAME                           STATUS   ROLES    AGE     VERSION
-ip-10-0-132-57.ec2.internal    Ready    master   3h36m   v1.22.3+ffbb954
-ip-10-0-136-126.ec2.internal   Ready    worker   3h23m   v1.22.3+ffbb954
-ip-10-0-155-84.ec2.internal    Ready    worker   3h28m   v1.22.3+ffbb954
-ip-10-0-158-48.ec2.internal    Ready    master   3h36m   v1.22.3+ffbb954
-ip-10-0-166-207.ec2.internal   Ready    worker   3h22m   v1.22.3+ffbb954
-ip-10-0-169-24.ec2.internal    Ready    master   3h35m   v1.22.3+ffbb954
+NAME                                         STATUS   ROLES    AGE    VERSION
+ip-10-0-142-214.us-east-2.compute.internal   Ready    master   126m   v1.22.8+9e95cb9
+ip-10-0-156-248.us-east-2.compute.internal   Ready    worker   118m   v1.22.8+9e95cb9
+ip-10-0-161-130.us-east-2.compute.internal   Ready    worker   118m   v1.22.8+9e95cb9
+ip-10-0-171-45.us-east-2.compute.internal    Ready    master   126m   v1.22.8+9e95cb9
+ip-10-0-208-3.us-east-2.compute.internal     Ready    master   126m   v1.22.8+9e95cb9
 ----
 
 You have 3 masters and 2 workers. The OpenShift *Master* is also a *Node*

@@ -54,11 +54,11 @@ The configuration should look something like this:
 apiVersion: quota.openshift.io/v1
 kind: ClusterResourceQuota
 metadata:
-  creationTimestamp: "2022-02-15T00:17:49Z"
+  creationTimestamp: "2022-09-12T15:47:24Z"
   generation: 1
   name: for-user-normaluser1
-  resourceVersion: "59411"
-  uid: 6ab015c7-fd19-4867-9ef3-0b23b60b2efd
+  resourceVersion: "786378"
+  uid: 575364ba-124d-4307-9bd2-f32dfe474389
 spec:
   quota:
     hard:
@@ -67,25 +67,6 @@ spec:
     annotations:
       openshift.io/requester: normaluser1
     labels: null
-status:
-  namespaces:
-  - namespace: welcome1
-    status:
-      hard:
-        pods: "10"
-      used:
-        pods: "1"
-  - namespace: welcome2
-    status:
-      hard:
-        pods: "10"
-      used:
-        pods: "1"
-  total:
-    hard:
-      pods: "10"
-    used:
-      pods: "2"
 ----
 
 This user, `normaluser1`, can create no more than 10 pods accross all the projects he creates. This applies only to projects that he as created (based on the `openshift.io/requester: normaluser1` annotation), not any projects he has access to. More on this later.

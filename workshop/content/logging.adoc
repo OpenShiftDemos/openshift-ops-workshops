@@ -122,8 +122,8 @@ create the `CR` which will tell the operator how to act, what to install,
 and/or what to configure. For installing `openshift-logging`, we will follow
 this pattern.
 
-To begin, click on the `Console` tab or use the following link to log-in
-to the OpenShift Cluster's GUI.
+To begin, Please use the following link below to log-in
+to the OpenShift Cluster's GUI. (Please do not use built-in console)
 `{{ MASTER_URL }}`
 
 Then follow the following steps:
@@ -213,6 +213,8 @@ and then refresh the page.
 ====
 This step requires that you have completed the `Deploying and Managing OpenShift Container Storage` Module. If you have not completed the `OCS` module, you will need to substitute `storageClassName: ocs-storagecluster-ceph-rbd` with `storageClassName: gp2` in the `YAML` below before copying to the editor. 
 ====
+
+Please see above warning and change YAML file if you are part of the App Mod Roadshow - Ops Track
 
 5. In the `YAML` editor, replace the code with the following:
 

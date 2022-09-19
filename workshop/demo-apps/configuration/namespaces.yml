@@ -1,0 +1,72 @@
+# Namespace for operations
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: operations
+  labels:
+    name: operations
+---
+# Namespace for backend
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: backend
+  labels:
+    name: backend
+---
+# Namespace for frontend
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: frontend
+  labels:
+    name: frontend
+---
+    # Namespace for medical
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: medical
+  labels:
+    name: medical
+---
+# Namespace for operations
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: operations
+  labels:
+    name: operations
+---
+# Namespace for payments
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: payments
+  labels:
+    name: payments
+---
+# Namespace for log4shell app
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: log4shell
+  labels:
+    name: log4shell
+---
+# Namespace for spring4shell app
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: spring4shell
+  labels:
+    name: spring4shell
+---
+# Namespace for yelb app
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: yelb
+  labels:
+    name: yelb
+---

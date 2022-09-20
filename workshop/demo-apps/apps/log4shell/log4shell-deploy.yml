@@ -1,0 +1,27 @@
+# Deployment named "log4shell-app"
+# Listens on :8080
+# Vulnerable to log4shell
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log4shell-app
+  namespace: log4shell
+  labels:
+    app: log4shell-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+       app: log4shell-app
+  template:
+    metadata:
+     labels:
+       app: log4shell-app
+    spec:
+      containers:
+      - image: quay.io/mfoster/log4shell-demo:0.1.0
+        imagePullPolicy: Always
+        name: log4shell-app
+        ports:
+        - containerPort: 8080
+          protocol: TCP

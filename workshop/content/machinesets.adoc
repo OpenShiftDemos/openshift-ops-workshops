@@ -130,8 +130,8 @@ the one that is shown in the lab guide. You should see a note that the
 oc get machines -n openshift-machine-api
 ----
 
-You probably already have a new entry for a `Machine` with a `STATE` of
-`Pending`. After a few moments, it will have a corresponding EC2 instance ID
+You probably already have new entries for 2 new `Machine` with a `STATE` of
+`Pending`. After a few moments, both will have a corresponding EC2 instance ID
 and will look something like:
 
 ----
@@ -147,7 +147,7 @@ output of:
 oc get nodes
 ----
 
-You should see your fresh and happy new node as the one with a very young age:
+You should see your fresh and happy new nodes. They are the ones with a very young age:
 
 ----
 ip-10-0-166-103.us-east-2.compute.internal   Ready    worker   1m   v1.16.2

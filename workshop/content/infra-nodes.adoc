@@ -1,9 +1,4 @@
 ## OpenShift Infrastructure Nodes
-The OpenShift subscription model allows customers to run various core
-infrastructure components at no additional charge. In other words, a node
-that is only running core OpenShift infrastructure components is not counted
-in terms of the total number of subscriptions required to cover the
-environment.
 
 OpenShift components that fall into the infrastructure categorization
 include:

@@ -7,6 +7,7 @@ metadata:
   labels:
     app: redis-server
     tier: cache
+    demo: acs
 spec:
   type: ClusterIP
   ports:

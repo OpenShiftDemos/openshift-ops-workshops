@@ -46,6 +46,7 @@ metadata:
   namespace: payments
   labels:
     app: visa-processor
+    demo: acs
   annotations:
     "admission.stackrox.io/break-glass": "jira-3423"
 spec:

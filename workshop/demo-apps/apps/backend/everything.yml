@@ -20,6 +20,7 @@ metadata:
   namespace: backend
   labels:
     app: api-server
+    demo: acs
 spec:
   replicas: 1
   selector:

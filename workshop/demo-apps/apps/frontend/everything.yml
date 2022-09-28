@@ -21,6 +21,7 @@ metadata:
   namespace: frontend
   labels:
     app: asset-cache
+    demo: acs
 spec:
   replicas: 1
   selector:

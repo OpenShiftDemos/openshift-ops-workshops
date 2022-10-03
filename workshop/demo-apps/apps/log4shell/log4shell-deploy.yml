@@ -8,6 +8,7 @@ metadata:
   namespace: log4shell
   labels:
     app: log4shell-app
+    demo: acs
 spec:
   replicas: 3
   selector:

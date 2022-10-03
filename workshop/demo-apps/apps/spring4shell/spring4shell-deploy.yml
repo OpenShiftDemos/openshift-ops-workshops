@@ -10,6 +10,7 @@ metadata:
   namespace: spring4shell
   labels:
     app: spring4shell-app
+    demo: acs
 spec:
   replicas: 3
   selector:
@@ -21,7 +22,7 @@ spec:
        app: spring4shell-app
     spec:
       containers:
-      - image: quay.io/mfoster/spring4shell-demo:0.1.0
+      - image: quay.io/mfoster/log4shell-demo:0.1.0
         imagePullPolicy: Always
         name: spring4shell-app
         ports:

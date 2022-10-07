@@ -70,3 +70,10 @@ metadata:
   labels:
     name: yelb
 ---
+# Namespace for yelb app
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pipeline-demo
+  labels:
+    name: pipeline-demo

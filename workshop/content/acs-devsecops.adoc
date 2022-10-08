@@ -13,7 +13,7 @@ This workshop will discuss how OpenShift Pipelines, based on the Tekton open sou
 
 Red Hat Advanced Cluster Security for Kubernetes has a command line interface (roxctl) for evaluating images and resources against policy definitions held on the RHACS server. The command line interface may be downloaded from the RHACS web user interface for ad-hoc use, and in the automation steps presented here, roxctl is downloaded from the RHACS server during each execution of the analysis. This ensures that the correct version matching the server is always used.
 
-=== Roxctl Analysis Options
+=== roxctl Analysis Options
 
 The roxctl command line interface has several options for resource and image analysis. Of particular interest in this blog is the "deployment" option, which is traditionally used to check for deployment readiness of Kubernetes resources. By using this option during the build phase of development, teams can get a much earlier indication of deployment issues rather than waiting until deployment time. This enables teams to fix the problems during development, lowering costs and leading to smoother deployments.
 
@@ -52,11 +52,44 @@ The OpenShift Pipelines "pipeline" resource in the GitHub repository mentioned a
 
 The assets described below are available in a public GitHub repository https://github.com/mfosterrox/demo.git. To deploy the assets, run the following:
 
+|===
+NOTE: Skip the *git clone* command if you have the existing folder ready, But you will need to the commands after to ensure all of the resources are available. 
+|===
+
+[source,bash,role="execute"]
 ----
 git clone https://github.com/openshift/openshift-cns-testdrive.git acs-workshop
+----
+
+[source,bash,role="execute"]
+----
 export TUTORIAL_HOME="$(pwd)/acs-workshop"
+kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/configuration --recursive
 kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/ --recursive
 ----
+
+|===
+*NOTE* This command applies a plethora of manifests to your environment. The important part is that the deployments are up and running. The
+
+Run the following command and ensure that the applications are up and running
+|===
+
+[source,bash,role="execute"]
+----
+kubectl get deployments -l demo=acs -A
+----
+
+*Output*
+```bash
+NAMESPACE      NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+backend        api-server         1/1     1            1           0d
+frontend       asset-cache        1/1     1            1           0d
+log4shell      log4shell-app      3/3     3            3           0d
+medical        reporting          1/1     1            1           0d
+operations     jump-host          1/1     1            1           0d
+payments       visa-processor     1/1     1            1           0d
+spring4shell   spring4shell-app   3/3     3            3           0d
+```
 
 ==== Image Scan Pod Task
 
@@ -64,8 +97,9 @@ The first of two tasks in the pipeline is the *image scan test* task. The task s
 
 To see the *image scan* task, run the following on the command line;
 
+[source,bash,role="execute"]
 ----
-cat $TUTORIAL_HOME/pipelines/tasks/rox-image-scan-task.yml 
+cat $TUTORIAL_HOME/workshop/demo-apps/pipelines/tasks/rox-image-scan-task.yml 
 ----
 
 After the scan is completed, we must check if the container violates specific policies.
@@ -76,6 +110,7 @@ The *image check test* will tell ACS central to check the scanned image against 
 
 To see the *image check* task, run the following on the command line;
 
+[source,bash,role="execute"]
 ----
 cat $TUTORIAL_HOME/pipelines/tasks/rox-image-check-task.yml 
 ----
@@ -92,27 +127,34 @@ Access the RHACS web user interface, select "Platform Configuration" from the le
 
 image::images/ci-1.png[]
 
-Press the + sign in the top right corner and select the token role of "Continuous Integration." Give the token a name and press the green button marked "Generate." Press the green copy symbol and create a token for the pipeline. 
+Press the *Generate Token* button in the top right corner and select the token role of "Continuous Integration." Give the token a name and press the button titled "Generate".
 
 image::images/ci-2.png[]
 
 * Create a token name and click the 'Continuous Integration' role.
 
-* Next, edit the *rox-secrets.yml* file in the demo directory. Use vi/vim/nano/your favorite command line editor to add the API token to the following file.
+* Make sure to copy the token as we need to add it to the *rox-secrets.yml* file.
+
+* Next, edit the *rox-secrets.yml* file in the demo directory. Use *vi/vim/nano/your favorite command line editor* to add the API token to the following file.
 
 ----
-$TUTORIAL_HOME/pipelines/pipeline/rox-secrets.yml 
+$TUTORIAL_HOME/workshop/demo-apps/pipelines/pipeline/rox-secrets.yml 
 ----
 
 |===
-NOTE make sure to only alter the line that says *rox_api_token: "YOUR_API_TOKEN_HERE"*
+NOTE: make sure to only alter the line that says *rox_api_token: "YOUR_API_TOKEN_HERE"*
 |===
 
 Then apply the changes.
 
+[source,bash,role="execute"]
 ----
-kubectl apply -f $TUTORIAL_HOME/pipelines/pipeline/rox-secrets.yml 
+kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/pipelines/pipeline/rox-secrets.yml 
 ----
+
+|===
+NOTE: If you’re unfamiliar with text editors, you can also edit this via the OpenShift console. Go to Workloads -> Secrets, click on ‘roxsecrets’, switch to the YAML tab and make your changes there and save them.
+|===
 
 You are now ready to run your pipeline!
 
@@ -130,7 +172,7 @@ image::images/pipeline-2.png[]
 
 image::images/pipeline-3.png[]
 
-* You will need to add the image you wish to scan (quay.io/mfoster/log4shell-demo). In this case, we want to look at the image we know has the log4shell vulnerability.
+* You will need to add the image you wish to scan (quay.io/mfoster/log4shell-demo:0.1.0). In this case, we want to look at the image we know has the log4shell vulnerability.
 
 image::images/pipeline-4.png[]
 

@@ -11,48 +11,48 @@ Once you have logged in to ACM, Navigate to *Credentials menu* and then select *
 
 === You will need to provide connection details:
 
-*Cloud Provider Credentials*: Choose *Amazon Web Services* +
-*Credential Name*:  aws +
-*Namespace*: open-cluster-management +
-*Base DNS Domain*:  This information is located on the demo console under the field *rhacm_aws_subdomain*
+* Cloud Provider Credentials: Choose *Amazon Web Services* +
+* Credential Name:  aws +
+* Namespace: open-cluster-management +
+* Base DNS Domain:  This information is located on the demo console under the field *rhacm_aws_subdomain*
 
-When copy and pasting this information, make sure you omit the dot on the url, for example it should read http://sandbox1536.opentlc.com[*sandbox1536.opentlc.com]** not .*http://sandbox1536.opentlc.com[*sandbox1536.opentlc.com]*
+_When copy and pasting this information, make sure you omit the dot on the url, for example it should read http://sandbox1536.opentlc.com[*sandbox1536.opentlc.com]** not .*http://sandbox1536.opentlc.com[*sandbox1536.opentlc.com]*_
 
-*Click NEXT*
+* Click NEXT
 
-*Access Key ID*:  This information is located on the demo console under the field *rhacm_aws_access_key_id*
+* Access Key ID:  This information is located on the demo console under the field *rhacm_aws_access_key_id*
 
-*Secret Access Key ID*: This information is located on the demo console under the field *rhacm_aws_secret_key*
+* Secret Access Key ID: This information is located on the demo console under the field *rhacm_aws_secret_key*
 
-*Click NEXT* - We don’t need to configure a Proxy so we can skip this screen
+* Click NEXT - We don’t need to configure a Proxy so we can skip this screen
 
-*Click NEXT*
+* Click NEXT
 
-*Red Hat OpenShift pull secret*:  https://cloud.redhat.com/openshift/install/pull-secret[Get from your Red Hat login ]
+* Red Hat OpenShift pull secret:  https://cloud.redhat.com/openshift/install/pull-secret[Get the pull secret from cloud.redhat.com - RH login Required]
 
-*SSH private and public keys*:  Use an existing key pair or https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.3/html/credentials/credentials#aws_cred_create[*generate a new ssh key[Get from your Red Hat login ]
+* SSH private and public keys:  Use an existing key pair or https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.3/html/credentials/credentials#aws_cred_create[generate a new ssh key[Get from your Red Hat login ]
 
 _Please note you might need *console.redhat.com* access to get these keys_+
 
-*Click NEXT*
+* Click NEXT
 
-Verify the information and click *ADD*
+* Verify the information and click *ADD*
 
-=== Create a new OpenShift cluster in AWS
+== Create a new OpenShift cluster in AWS
 
 
-From the menu select *Infrastructure → Clusters* +
-Click *Create Cluster* +
-Select *Amazon Web services* +
-Select the *Infrastructure provider credential* *AWS* 
-*Click NEXT* +
-Add the desired *cluster name*.  +
-Leave the *Cluster set empty for now* +
-Select a *Release Image*, chose a 4.9 version +
-Add a label of *environment=prod* +
-Click NEXT +
-Change the region to *see table below* +
-Then select *NEXT*.
+* From the menu select *Infrastructure → Clusters* +
+* Click *Create Cluster* +
+* Select *Amazon Web services* +
+* Select the *Infrastructure provider credential* *AWS* 
+* Click NEXT +
+* Add the desired *cluster name*.  +
+* Leave the *Cluster set empty for now* +
+* Select a *Release Image*, chose a 4.9 version +
+* Add a label of *environment=prod* +
+* Click NEXT +
+
+Change the region to *see table below* 
 
 |===
 |If you are located in *NORTH AMERICA*|Select *us-west-1* or *us-west-2*
@@ -61,26 +61,27 @@ Then select *NEXT*.
 |If you are located in *ASIA PACIFIC*|Select *ap-southeast-2* or *ap-northeast-2* or *ap-east-1*
 |===
 
-*Click NEXT* on the other screens or select *7 - Review* on the menu and then click *CREATE* 
+* Click NEXT on the other screens or select *7 - Review* on the menu and then click *CREATE* 
 
-=== This process takes about 30 to 40 minutes depending on AWS traffic at the time this course is taken. Make sure you monitor for any failures and address as needed.
+_This process takes about 30 to 40 minutes depending on AWS traffic at the time this course is taken. Make sure you monitor for any failures and address as needed_
 
-=== Creating a Single Node Cluster (SNO) in AWS 
+== Creating a Single Node Cluster (SNO) in AWS 
 
 While we wait for the main cluster to provision, lets go ahead and provision a Single Node Cluster. In this exercise we will show you how to create a single node cluster (OCP 4.8 and Above required) in order to save some time and resources when building clusters for testing.
 
 *Please NOTE* that provisioning SNO clusters in public clouds is not currently supported, we only support SNO clusters as bare metal, we leverage the public cloud in the example below to showcase the functionality only.
 
-From the menu select *Infrastructure → Clusters* +
-Click *Create Cluster* +
-Select *Amazon Web services* +
-Select the *Infrastructure provider credential*  *AWS*  +
-*Click NEXT* +
-Add the desired cluster name. Leave the Cluster set empty for now +
-Select a *Release Image*, chose a *OCP 4.9 version* +
-Add a label of *environment=qa* +
-Click NEXT +
-Change the region to *see table below*
+* From the menu select *Infrastructure → Clusters* +
+* Click *Create Cluster* +
+* Select *Amazon Web services* +
+* Select the *Infrastructure provider credential*  *AWS*  +
+* Click NEXT +
+* Add the desired cluster name. Leave the Cluster set empty for now +
+* Select a *Release Image*, chose a *OCP 4.9 version* +
+* Add a label of *environment=qa* +
+* Click NEXT +
+
+* Change the region to *see table below*
 
 
 |===
@@ -90,24 +91,23 @@ Change the region to *see table below*
 |If you are located in*ASIA PACIFIC*|Select *ap-southeast-2* or *ap-northeast-2* or *ap-east-1*
 |===
 
+* Expand the *Worker Pools*, and change the worker node count to 0
 
-Expand the *Worker Pools*, and change the worker node count to 0
+* Click on step 7 to Review *before* proceeding, turn *YAML: ON at the top of the screen.*
 
-Click on step 7 to Review *before* proceeding, turn *YAML: ON at the top of the screen.*
+* Click on *install-config* in the YAML window pane and *change the master replica number to 1* (will likely be 3).  Double check that the worker replica is 0.
 
-Click on “*install-config*” in the YAML window pane and *change the master replica number to 1* (will likely be 3).  Double check that the worker replica is 0.
-
-Click on “*cluster*” in the YAML window pane and locate the section where the *kind: MachinePool*.
+* Click on *cluster* in the YAML window pane and locate the section where the *kind: MachinePool*.
 Double check that the worker replicas is set to 0.
 
-And the following add a line at the end of the *MachinePool* section right 
+* And the following add a line at the end of the *MachinePool* section right 
 ----
 +skipMachinePools:true
 ----
 
-Click on “*Create*” and the single node cluster creation will go through.
+* Click on “*Create*” and the single node cluster creation will go through.
 
-=== This process takes about 10 to 20 minutes depending on AWS traffic at the time this course is taken. Make sure you monitor for any failures and address as needed.
+_This process takes about 10 to 20 minutes depending on AWS traffic at the time this course is taken. Make sure you monitor for any failures and address as needed_
 
 
 == Creating and Managing Applications with Red Hat Advanced Cluster Management For Kubernetes 
@@ -135,7 +135,7 @@ These are all Kubernetes custom resources, defined by a Custom Resource Definiti
 
 This may seem like a lot of extra resources to manage in addition to the deployables that actually make up your application. However, they make it possible to automate the composition, placement, and overall control of your applications when you are deploying to many clusters. With a single cluster, it is easy to log in and run +oc create -f…​.+ If you need to do that on a dozen clusters, you want to make sure you do not make a mistake or miss a cluster, and you need a way to schedule and orchestrate updates to your applications. Leveraging the Application Lifecycle Builder in RHACM allows you to easily manage multi-cluster applications.
 
-=== Creating an Application
+== Creating an Application
 
 
 Prerequisites:  
@@ -220,7 +220,8 @@ This is a complex topic, and this course is only providing an overview. Please c
 * Copy the raw YAML.
 * Under the *Create Policy* screen, enable the *YAML*. Copy and Paste the *RAW YAML* from the GitHub Repo
 * *Namespace*: default
-* *Click on Step 5 and verify that everything is correct. Click Submit.
+* Click on Step 5 and verify that everything is correct. 
+* Click Submit.
 
 Navigate to the Results screen, allow the scan to complete, it shouldn’t take more than 3 minutes.
 
@@ -231,7 +232,7 @@ Once complete notice the violations you have, since we created this policy as a 
 * Select *Step 5 review that is under Remediation is set to *Enforce*
 * Click Submit
 
-Navigate to the Results screen, allow the remediation to complete, it shouldn’t take more than 3 minutes.
+Navigate to the Results screen, allow the remediation to complete, _it shouldn’t take more than 3 minutes_
 
 Now you have succesfully created a Policy to scan your clusters, if you would like to play with other policies please visit the https://github.com/stolostron/policy-collection[Policy Repo] for more Policies you can test out.
 

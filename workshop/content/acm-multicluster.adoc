@@ -99,6 +99,7 @@ While we wait for the main cluster to provision, lets go ahead and provision a S
 
 * Click on *install-config* in the YAML window pane and *change the master replica number to 1* (will likely be 3).  Double check that the worker replica is 0.
 
+
 * Click on *cluster* in the YAML window pane and locate the section that defines an object of type: *kind: MachinePool*. Add the following line at the end of the *MachinePool* section.
 ----
   skipMachinePools: true

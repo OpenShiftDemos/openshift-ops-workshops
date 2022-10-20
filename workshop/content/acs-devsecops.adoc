@@ -112,7 +112,7 @@ To see the *image check* task, run the following on the command line;
 
 [source,bash,role="execute"]
 ----
-cat $TUTORIAL_HOME/pipelines/tasks/rox-image-check-task.yml 
+cat $TUTORIAL_HOME/workshop/demo-apps/pipelines/tasks/rox-image-check-task.yml 
 ----
 
 Two variables are missing in both files: the *ROX_CENTRAL_ENDPOINT* and the *ROX_API_TOKEN*. Any automated check need to be given the correct access so that the pipeline, and cluster, cannot be breached by an external source. 

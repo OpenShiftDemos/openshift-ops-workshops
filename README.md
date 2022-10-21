@@ -13,7 +13,7 @@ sufficient permissions and limits to deploy the 3 masters, 4-6 regular nodes,
 and NVME-equipped nodes for storage.
 
 Check out the
-[documentation](https://docs.openshift.com/container-platform/4.1/welcome/index.html)
+[documentation](https://docs.openshift.com/container-platform/latest/installing/installing_aws/installing-aws-default.html)
 for _Installing on AWS_.
 
 ### OpenShift 4
@@ -72,13 +72,13 @@ First, clone the repo
 > **NOTE** Remember to checkout the branch you want to test against
 
 ```shell
-git clone https://github.com/openshift/openshift-cns-testdrive
+git clone https://github.com/openshiftdemos/openshift-ops-workshops
 ```
 
 Next, Build a container using the repo/branch you checked out.
 
 ```shell
-cd openshift-cns-testdrive
+cd openshift-ops-workshops
 export QUAY_USER=myusername
 export BRANCH=$(git branch --show-current)
 podman build -t quay.io/${QUAY_USER}/lab-sample-workshop:${BRANCH} .

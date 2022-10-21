@@ -58,7 +58,7 @@ NOTE: Skip the *git clone* command if you have the existing folder ready, But yo
 
 [source,bash,role="execute"]
 ----
-git clone https://github.com/openshift/openshift-cns-testdrive.git acs-workshop
+git clone https://github.com/openshiftdemos/openshift-ops-workshops acs-workshop
 ----
 
 [source,bash,role="execute"]

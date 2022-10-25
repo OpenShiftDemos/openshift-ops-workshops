@@ -174,6 +174,11 @@ As the `kubeadmin` user apply the OAuth configuration with `oc`.
 
 [source,bash,role="execute"]
 ----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+----
+
+[source,bash,role="execute"]
+----
 oc create secret generic ldap-secret --from-literal=bindPassword=b1ndP^ssword -n openshift-config
 wget https://ssl-ccp.godaddy.com/repository/gd-class2-root.crt -O {{ HOME_PATH }}/support/ca.crt
 oc create configmap ca-config-map --from-file={{ HOME_PATH }}/support/ca.crt -n openshift-config
@@ -334,7 +339,7 @@ link:https://docs.openshift.com/container-platform/4.9/authentication/using-rbac
 ====
 
 #### Examine `cluster-reader` policy
-Go ahead and login as a regular user:
+Go ahead and login as a regular user: (if you get an error, wait a moment and try again) 
 
 [source,bash,role="execute"]
 ----
@@ -544,8 +549,8 @@ prometheus-k8s-openshift-monitoring.{{ ROUTE_SUBDOMAIN }}
 
 [Warning]
 ====
-Before continuing, make sure to go to the OpenShift web console and log out
-by using the dropdown menu at the upper right where it says `kube:admin`.
+Before continuing, make sure to go to the {{ MASTER_URL }}[OpenShift Web Console] (Do not use built-in console)
+and log out by using the dropdown menu at the upper right where it says `kube:admin`.
 Otherwise Prometheus will try to use your `kubeadmin` user to pass through
 authentication. While it will work, it doesn't demonstrate the
 `cluster-reader` role.
@@ -560,7 +565,11 @@ select the `ldap` auth mechanism, and use the `fancyuser1` user that you gave
 
 More specifically, the `ose-fancy-dev` group has `cluster-reader`
 permissions, and `fancyuser1` is a member. Remember that the password
-for all of these users is `Op#nSh1ft`.
+for all of these users is:
+
+----
+Op#nSh1ft
+----
 
 [Warning]
 ====

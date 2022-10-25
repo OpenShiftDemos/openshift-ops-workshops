@@ -17,7 +17,7 @@ Container Platform clusters.
 
 #### Examine Alerting Configuration
 
-1. Login to the link:{{ MASTER_URL }}[OpenShift Web Console] with the kubeadmin credentials.
+1. Login to the link:{{ MASTER_URL }}[OpenShift Web Console] with the kubeadmin credentials. (Please do not use built-in console)
 +
 [source,role="copypaste"]
 ----
@@ -38,7 +38,7 @@ within OpenShift, including the web console
 ====
 +
 1. On the left hand side, click on the "Observe" drop down.
-1. Click on "Alerting rules". This is the OpenShift console's view of the alert configuration.
+1. Click on "Alerting". This is the OpenShift console's view of the alert configuration.
 
 The Alerting tab shows you information about currently configured and/or
 active alerts. You can see and do several things:
@@ -54,8 +54,7 @@ active alerts. You can see and do several things:
 1. Value of the Severity label of the alert.
 1. Actions you can do with the alert.
 
-You'll also note that you can click directly into the Alertmanager UI with a
-link that's at the top of this page.
+You'll also note that you can view alerts and associated notifications by clicking the bell icon at the top of the page.
 
 ##### Metrics UI (Prometheus Console)
 In addition to the Alerting screen, OpenShift's built-in monitoring provides

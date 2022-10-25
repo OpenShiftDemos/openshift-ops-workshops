@@ -122,15 +122,15 @@ create the `CR` which will tell the operator how to act, what to install,
 and/or what to configure. For installing `openshift-logging`, we will follow
 this pattern.
 
-To begin, click on the `Console` tab or use the following link to log-in
-to the OpenShift Cluster's GUI.
+To begin, Please use the following link below to log-in
+to the OpenShift Cluster's GUI. (Please do not use built-in console)
 `{{ MASTER_URL }}`
 
 Then follow the following steps:
 
 1. Install the Elasticsearch Operator:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Type `Elasticsearch Operator` in the search field and click the `OpenShift Elasticsearch Operator` card from the list of available Operators, and then click `Install`.
+  b. Type `Elasticsearch Operator` in the search field and click the `OpenShift Elasticsearch Operator` card from the list of available Operators (please choose the newest version you can see which should be '5.5.1'), and then click `Install`.
   c. On the `Create Operator Subscription` page, select *Update Channel `stable`*, leave all other defaults
      and then click `Install`.
 +
@@ -147,9 +147,8 @@ namespace was created from the previous steps
 ====
 
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators, and click
-    `Install`.
-  c. On the `Install Operator` page, *select Update Channel `stable`*. Under ensure `Installation Mode` ensure that `A specific namespace on the cluster` is selected, and choose
+  b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators (please choose the newest version you can see which should be '5.5.1'), and click `Install`.
+  c. On the `Install Operator` page, *select Update Channel `stable`*. Under `Installation Mode` ensure that `A specific namespace on the cluster` is selected, and choose
      `Operator recommended Namespace: openshift-logging` under `Installed Namespace`. Leave all other defaults
      and then click `Install`.
 
@@ -213,6 +212,8 @@ and then refresh the page.
 ====
 This step requires that you have completed the `Deploying and Managing OpenShift Container Storage` Module. If you have not completed the `OCS` module, you will need to substitute `storageClassName: ocs-storagecluster-ceph-rbd` with `storageClassName: gp2` in the `YAML` below before copying to the editor. 
 ====
+
+Please see above warning and change YAML file if you are part of the App Mod Roadshow - Ops Track
 
 5. In the `YAML` editor, replace the code with the following:
 
@@ -435,7 +436,7 @@ To see the fields that make up an individual message, click on the arrow on
 the side of each message located in the center of the page. This will show
 the message fields that are contained.
 
-To select fields to show for messages, look on left hand side fore the
+To select fields to show for messages, look on left hand side for the
 `Available Fields` label. Below this are fields that can be selected and
 shown in the middle of the screen. Find the `hostname` field below the
 `Available Fields` and click `add`. Notice now, in the message pain, each

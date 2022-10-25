@@ -1,6 +1,6 @@
 ## Installation and Verification
 
-The scope of the new installer-provisioned infrastructure (IPI) OpenShift 4
+The scope of the installer-provisioned infrastructure (IPI) OpenShift 4
 installation is purposefully narrow. It is designed for simplicity and
 ensured success. Many of the items and configurations that were previously
 handled by the installer are now expected to be "Day 2" operations, performed
@@ -34,7 +34,7 @@ If so, type `yes`:
 yes
 ----
 
-Here is your ssh password (you need to type it in):
+Here is your ssh password (please copy/paste):
 
 ----
 {{ SSH_PASSWORD }}
@@ -47,7 +47,7 @@ Once you've SSH-ed into the bastion host, become the `ec2-user`:
 sudo su - ec2-user
 ----
 
-You'll notice that there is a 4-digit alphanumeric string (eg: f4a3) in the hostname. This
+You'll notice that there is a 5-digit alphanumeric string (eg: b866q) in the hostname. This
 string is your `GUID`. Since you will often use `GUID`, it makes sense to
 export it as an environment variable:
 
@@ -356,16 +356,15 @@ oc get nodes
 The output should look something like the following:
 
 ----
-NAME                           STATUS   ROLES    AGE     VERSION
-ip-10-0-132-57.ec2.internal    Ready    master   3h36m   v1.22.3+ffbb954
-ip-10-0-136-126.ec2.internal   Ready    worker   3h23m   v1.22.3+ffbb954
-ip-10-0-155-84.ec2.internal    Ready    worker   3h28m   v1.22.3+ffbb954
-ip-10-0-158-48.ec2.internal    Ready    master   3h36m   v1.22.3+ffbb954
-ip-10-0-166-207.ec2.internal   Ready    worker   3h22m   v1.22.3+ffbb954
-ip-10-0-169-24.ec2.internal    Ready    master   3h35m   v1.22.3+ffbb954
+NAME                                         STATUS   ROLES    AGE    VERSION
+ip-10-0-142-214.us-east-2.compute.internal   Ready    master   126m   v1.22.8+9e95cb9
+ip-10-0-156-248.us-east-2.compute.internal   Ready    worker   118m   v1.22.8+9e95cb9
+ip-10-0-161-130.us-east-2.compute.internal   Ready    worker   118m   v1.22.8+9e95cb9
+ip-10-0-171-45.us-east-2.compute.internal    Ready    master   126m   v1.22.8+9e95cb9
+ip-10-0-208-3.us-east-2.compute.internal     Ready    master   126m   v1.22.8+9e95cb9
 ----
 
-You have 3 masters and 3 workers. The OpenShift *Master* is also a *Node*
+You have 3 masters and 2 workers. The OpenShift *Master* is also a *Node*
 because it needs to participate in the software defined network (SDN). If you
 need additional nodes for additional purposes, you can create them very
 easily when using IPI and leveraging the cloud provider operators. You will

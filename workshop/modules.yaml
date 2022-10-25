@@ -33,6 +33,12 @@ modules:
     name: Taints and Tolerations
   windows-containers:
     name: Windows Containers
+  acs-vulnerability:
+    name: Vulnerability Scanning with ACS
+  acs-devsecops:
+    name: DevSecOps with ACS
+  acm-multicluster:
+    name: Multicluster management with ACM
 config:
     template_engine: liquid.js  
     vars:

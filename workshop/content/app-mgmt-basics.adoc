@@ -31,17 +31,17 @@ out what to do. Users will commonly use this command to get OpenShift to launch
 existing images, to create builds of source code and ultimately deploy them, to
 instantiate templates, and so on.
 
-You will now launch a specific image that exists on Dockerhub
+You will now launch a specific image that exists on Quay
 
 [source,bash,role="execute"]
 ----
-oc new-app quay.io/thoraxe/mapit
+oc new-app quay.io/openshiftroadshow/mapit
 ----
 
 The output will look like:
 
 ----
---> Found container image 7ce7ade (3 years old) from quay.io for "quay.io/thoraxe/mapit"
+--> Found container image 7ce7ade (3 years old) from quay.io for "quay.io/openshiftroadshow/mapit"
 
     * An image stream tag will be created as "mapit:latest" that will track this image
 
@@ -146,9 +146,9 @@ Containers:
   mapit:
     Container ID:   cri-o://fb708e659c19c6aaf8211bf7e3029f8adc8cf14959bcaefa5c7e6df17d37
 feaf
-    Image:          quay.io/thoraxe/mapit@sha256:8c7e0349b6a016e3436416f3c54debda4594ba0
+    Image:          quay.io/openshiftroadshow/mapit@sha256:8c7e0349b6a016e3436416f3c54debda4594ba0
 9fd34b8a0dee0c4497102590d
-    Image ID:       quay.io/thoraxe/mapit@sha256:8c7e0349b6a016e3436416f3c54debda4594ba0
+    Image ID:       quay.io/openshiftroadshow/mapit@sha256:8c7e0349b6a016e3436416f3c54debda4594ba0
 9fd34b8a0dee0c4497102590d
     Ports:          9779/TCP, 8080/TCP, 8778/TCP
     Host Ports:     0/TCP, 0/TCP, 0/TCP
@@ -180,7 +180,7 @@ Events:
   Normal  Scheduled       6m50s  default-scheduler  Successfully assigned app-management
 /mapit-764c5bf8b8-l49z7 to ip-10-0-128-29.us-west-2.compute.internal
   Normal  AddedInterface  6m48s  multus             Add eth0 [10.129.2.99/23]
-  Normal  Pulling         6m48s  kubelet            Pulling image "quay.io/thoraxe/mapit
+  Normal  Pulling         6m48s  kubelet            Pulling image "quay.io/openshiftroadshow/mapit
 @sha256:8c7e0349b6a016e3436416f3c54debda4594ba09fd34b8a0dee0c4497102590d"
   Normal  Pulled          6m31s  kubelet            Successfully pulled image "quay.io/t
 horaxe/mapit@sha256:8c7e0349b6a016e3436416f3c54debda4594ba09fd34b8a0dee0c4497102590d" in
@@ -469,7 +469,8 @@ You will see something like the following:
 
 ----
 NAME               DESIRED   CURRENT   READY   AGE
-mapit-764c5bf8b8   1         1         1       77m
+mapit-7bf4f447ff   0         0         0       18m
+mapit-85fdb44576   1         1         1       18m
 ----
 
 This lets us know that, right now, we expect one *Pod* to be deployed
@@ -613,7 +614,7 @@ mapit-764c5bf8b8-lxnvw   1/1     Running   0          2m28s
 mapit-764c5bf8b8-rscss   1/1     Running   0          2m54s
 ----
 
-Now, delete the pods that belog to the *Deployment* `mapit`:
+Now, delete the pods that belong to the *Deployment* `mapit`:
 
 [source,bash,role="execute"]
 ----
@@ -721,7 +722,7 @@ commands you deployed an application, scaled it, and made it accessible to the
 outside world:
 
 ----
-oc new-app quay.io/thoraxe/mapit
+oc new-app quay.io/openshiftroadshow/mapit
 oc scale --replicas=2 deploy/mapit
 oc expose service mapit
 ----
@@ -801,7 +802,7 @@ You will see a section like:
 ...
   Containers:
    mapit:
-    Image:        quay.io/thoraxe/mapit@sha256:8c7e0349b6a016e3436416f3c54debda
+    Image:        quay.io/openshiftroadshow/mapit@sha256:8c7e0349b6a016e3436416f3c54debda
 4594ba09fd34b8a0dee0c4497102590d
     Ports:        9779/TCP, 8080/TCP, 8778/TCP
     Host Ports:   0/TCP, 0/TCP, 0/TCP

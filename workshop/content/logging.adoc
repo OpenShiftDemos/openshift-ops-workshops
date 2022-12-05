@@ -210,10 +210,8 @@ and then refresh the page.
 +
 [Warning]
 ====
-This step requires that you have completed the `Deploying and Managing OpenShift Container Storage` Module. If you have not completed the `OCS` module, you will need to substitute `storageClassName: ocs-storagecluster-ceph-rbd` with `storageClassName: gp2` in the `YAML` below before copying to the editor. 
+IMPORTANT: This step requires that you have completed the 'Deploying and Managing OpenShift Container Storage' Module. If you have not completed or don’t have this module listed as part of your workshop (Modern App Dev Roadshow - Ops Track), you will need to substitute 'storageClassName: ocs-storagecluster-ceph-rbd' with 'storageClassName: gp2' in the YAML below before copying to the editor.
 ====
-
-Please see above warning and change YAML file if you are part of the App Mod Roadshow - Ops Track
 
 5. In the `YAML` editor, replace the code with the following:
 

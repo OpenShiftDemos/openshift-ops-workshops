@@ -8,7 +8,6 @@ modules:
   - app-storage-basics
   - machinesets
   - infra-nodes
-  - odf4
   - logging
   - ldap-groupsync
   - monitoring-basics

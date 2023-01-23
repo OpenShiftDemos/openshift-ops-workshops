@@ -208,11 +208,6 @@ and then refresh the page.
 +
 4. On the `Cluster Loggings` page, click `Create Cluster Logging`.
 +
-[Warning]
-====
-IMPORTANT: This step requires that you have completed the 'Deploying and Managing OpenShift Container Storage' Module. If you have not completed or don’t have this module listed as part of your workshop (Modern App Dev Roadshow - Ops Track), you will need to substitute 'storageClassName: ocs-storagecluster-ceph-rbd' with 'storageClassName: gp2' in the YAML below before copying to the editor.
-====
-
 5. In the `YAML` editor, replace the code with the following:
 
 [source,yaml]
@@ -230,7 +225,7 @@ spec:
     elasticsearch:
       nodeCount: 3
       storage:
-         storageClassName: ocs-storagecluster-ceph-rbd
+         storageClassName: gp2
          size: 100Gi
       redundancyPolicy: "SingleRedundancy"
       nodeSelector:
@@ -333,13 +328,13 @@ You will see something like:
 
 ----
 NAME                                         STATUS   VOLUME                                     CAPACITY   ACCESS
-MODES   STORAGECLASS                  AGE
-elasticsearch-elasticsearch-cdm-ggzilasv-1   Bound    pvc-f3239564-389c-11ea-bab2-06ca7918708a   100Gi      RWO
-        ocs-storagecluster-ceph-rbd   15m
-elasticsearch-elasticsearch-cdm-ggzilasv-2   Bound    pvc-f324a252-389c-11ea-bab2-06ca7918708a   100Gi      RWO
-        ocs-storagecluster-ceph-rbd   15m
-elasticsearch-elasticsearch-cdm-ggzilasv-3   Bound    pvc-f326aa7d-389c-11ea-bab2-06ca7918708a   100Gi      RWO
-        ocs-storagecluster-ceph-rbd   15m
+ MODES   STORAGECLASS   AGE
+elasticsearch-elasticsearch-cdm-ks56pg34-1   Bound    pvc-31536af7-b512-4365-9f3d-f617327266d3   100Gi      RWO
+         gp2            63s
+elasticsearch-elasticsearch-cdm-ks56pg34-2   Bound    pvc-85f854d0-a3fa-4bb2-90a9-96655b8a0884   100Gi      RWO
+         gp2            63s
+elasticsearch-elasticsearch-cdm-ks56pg34-3   Bound    pvc-5a5ed5f3-c96d-475e-ab71-725a6b014c88   100Gi      RWO
+         gp2            63s
 ----		
 
 [Note]

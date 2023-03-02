@@ -8,7 +8,7 @@ modules:
   - app-storage-basics
   - machinesets
   - infra-nodes
-  - logging
+  - logging_with_loki
   - ldap-groupsync
   - monitoring-basics
   - template-quota-limits

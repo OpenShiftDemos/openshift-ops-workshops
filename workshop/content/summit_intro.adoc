@@ -1,1 +1,1 @@
-image::images/summit_intro.png[]
+image::images/summit_header.png[]

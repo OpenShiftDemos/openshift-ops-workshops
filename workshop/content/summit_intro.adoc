@@ -9,4 +9,4 @@ In this workshop, we aim to cover the fundamental aspects of Openshift Ops and d
 
 === Admin Ops Modules
 
-The Admin Ops part of the workshop is divided into two modules: the first module focuses on Openshift, a container application platform that uses Kubernetes for managing and automating the deployment, scaling, and operations of containerized applications. The second module provides an introduction to OpenShift Ops, covering the basics of the OpenShift 4 cluster installation and utilizing a Kubernetes feature called ServiceAccounts to interact with the OpenShift API.
+The Admin Ops section of the workshop is divided into two modules: the first module focuses on Openshift, a container application platform that uses Kubernetes for managing and automating the deployment, scaling, and operations of containerized applications. The second module provides an introduction to OpenShift Ops, covering the basics of the OpenShift 4 cluster installation and utilizing a Kubernetes feature called ServiceAccounts to interact with the OpenShift API.

@@ -7,4 +7,6 @@ image::images/summit_header.png[]
 
 In this workshop, we aim to cover the fundamental aspects of Openshift Ops and delve into the operations side of Red Hat Advanced Cluster Management for Kubernetes and Red Hat Advanced Cluster Security for Kubernetes. Participants can expect to gain a comprehensive understanding of the basics of Openshift Ops, such as Environment Overview, Installation and Verification, and Application Management Basics. Furthermore, we will explore the operational capabilities of Red Hat Advanced Cluster Management for Kubernetes and Red Hat Advanced Cluster Security for Kubernetes, providing attendees with a well-rounded understanding of how to optimize and secure their Kubernetes environments. Overall, this workshop promises to be a valuable learning experience for anyone looking to expand their knowledge of Kubernetes operations and management.
 
+=== Admin Ops Modules
 
+The Admin Ops part of the workshop is divided into two modules: the first module focuses on Openshift, a container application platform that uses Kubernetes for managing and automating the deployment, scaling, and operations of containerized applications. The second module provides an introduction to OpenShift Ops, covering the basics of the OpenShift 4 cluster installation and utilizing a Kubernetes feature called ServiceAccounts to interact with the OpenShift API.

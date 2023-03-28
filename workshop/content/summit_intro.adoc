@@ -1,1 +1,14 @@
 image::images/summit_header.png[]
+
+
+= Welcome to the Hands on with OCP Plus Workshop for Summit 2023
+
+== Using OpenShift Pipelines to Automate Red Hat Advanced Cluster Security for Kubernetes
+
+=== Introduction
+
+This workshop will discuss how OpenShift Pipelines, based on the Tekton open source project, can be used to automate the execution of Red Hat Advanced Cluster Security for Kubernetes as part of a more comprehensive continuous integration solution. The objective is to bring into the continuous integration process the validation of Kubernetes resources such that any violations against defined policy can be addressed earlier in the development life cycle. 
+
+== Pipeline Requirements and Necessary Features
+
+=== RHACS Command Line Interface

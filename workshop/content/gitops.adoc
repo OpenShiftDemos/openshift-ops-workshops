@@ -13,7 +13,7 @@ To get started with OpenShift GitOps, this guide will walk you through the step-
 
 ----
 Please do not install the Community version of the Argo CD Operator, 
-if you have already please remove the Argo CD Community Operator 
+if you have already do so please remove the Argo CD Community Operator 
 before you install the Red Hat OpenShift GitOps Operator.
 ----
 1.Now switch over to your *Openshift Web Console*:
@@ -22,7 +22,7 @@ before you install the Red Hat OpenShift GitOps Operator.
 
 2. Open the `Administrator` perspective of the web console.
 
-3. navigate to `Operators` → `OperatorHub` in the menu on the left.
+3. Navigate to `Operators` → `OperatorHub` in the menu on the left.
 
 4. Search for `OpenShift GitOps`, click the `Red Hat OpenShift GitOps` tile, and then click `Install`.
    (Red Hat OpenShift GitOps will be installed in all namespaces of the cluster)
@@ -44,15 +44,15 @@ Argo CD instances for your applications under your projects.
 + 
 image::images/9-tiles.png[]
 +
-2. Please ignore warning. `Proceed` to website using the `advanced options` when you see that the connection is not private.
+2. Please ignore the warning. `Proceed` to the website using the `advanced options` when you see that the connection is not private.
 +
 image::images/connection-private-argo.png[]
 [start=3]
-3. You can now `login` into Argo CD UI by selecting `Log in Via OpenShift`.
+3. You can now `login` into the Argo CD UI by selecting `Log in Via OpenShift`.
 +
 image::images/login-openshift.png[]
 
-Please Use the kubeadmin login details. 
+Please use the kubeadmin login details. 
 Remember that the login is `kubeadmin` 
 and the password is:
 
@@ -68,11 +68,11 @@ image::images/authorize-access-argo.png[]
 
 ### Deploy a Sample Application
 
-Once inside the the ArgoCD interface we are going to run through the steps to dpeloy a Pipelines Operator.
+Once inside the the ArgoCD interface we are going to run through the steps to deploy a Pipelines Operator.
 
 1. `Click` the `new app` in the left hand corner.
 
-2. Once the new app screen pops up please fill out the infromation as follows:
+2. Once the new app screen pops up please fill out the information as follows:
 
 ----
 Application Name: pipelines
@@ -117,7 +117,7 @@ image::images/pipelines-deployed.png[]
 Let's examine each of the descriptions of the recently deployed application to gain a better understanding of ArgoCD and the application we just added. The pipelines app has several descriptions that we will review.
 
 == Project
-The project is the top-level organizational unit within ArgoCD. It is used to group applications and manage their access control. The default project is the default location where applications are placed when created. You can create multiple projects and specify the project where you want to place an application during creation. In this specific application we made the project `default`
+The project is the top-level organizational unit within ArgoCD. It is used to group applications and manage their access control. The default project is the default location where applications are placed when created. You can create multiple projects and specify the project where you want to place an application during creation. In this specific application we made the project `default`.
 
 == Labels
 Labels are key-value pairs that provide metadata about an application. They are used to organize and group applications based on specific criteria. In this case, no labels are specified for the application.
@@ -153,7 +153,7 @@ In this section, we will add a banner to the ArgoCD login screen using GitOps. W
 
 1. Similar to the last section `Click` the `new app` in the left hand corner.
 
-2. Once the new app screen pops up please fill out the infromation as follows:
+2. Once the new app screen pops up please fill out the information as follows:
 
 ----
 Application Name: banner

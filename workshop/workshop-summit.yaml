@@ -2,6 +2,7 @@ name: Hands on with OCP Plus Workshop
 
 modules:
   activate:
+  - Introduction
   - environment
   - installation
   - app-mgmt-basics

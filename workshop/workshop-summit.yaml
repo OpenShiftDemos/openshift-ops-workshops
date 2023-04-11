@@ -2,7 +2,7 @@ name: Hands on with OCP Plus Workshop DEV
 
 modules:
   activate:
-  - Introduction
+  - summit_intro
   - environment
   - installation
   - ldap-groupsync

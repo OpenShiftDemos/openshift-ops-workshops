@@ -42,7 +42,10 @@ modules:
   acm-multicluster:
     name: Multicluster management with ACM
   summit_intro:
-    name: Introduction    
+    name: Introduction
+  gitops:
+    name: gitops-test
+  
 config:
     template_engine: liquid.js  
     vars:

@@ -296,7 +296,7 @@ You will see that it has the role of `worker`.
 
 ```
 NAME                                        STATUS   ROLES    AGE   VERSION
-ip-10-0-144-70.us-east-2.compute.internal   Ready    worker   9h    v1.12.4+509916ce1
+ip-10-0-144-70.us-east-2.compute.internal   Ready    worker   9h    v1.25.7+eab9cc9
 ```
 
 The default configuration of the router operator is to

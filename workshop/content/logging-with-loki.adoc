@@ -485,13 +485,13 @@ Replace the current displayed YAML with the new YAML:
 
 [source,yaml]
 ----
-- apiVersion: logging.openshift.io/v1
+apiVersion: logging.openshift.io/v1
 kind: ClusterLogForwarder
 metadata:
   name: instance
   namespace: openshift-logging
 spec:
-  pipelines: 
+  pipelines:
   - name: all-to-default
     inputRefs:
     - infrastructure

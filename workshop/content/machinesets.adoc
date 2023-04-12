@@ -82,12 +82,12 @@ You will see something like:
 
 ----
 NAME                                         STATUS   ROLES    AGE     VERSION
-ip-10-0-186-197.us-east-2.compute.internal   Ready    master   4h5m    v1.22.3+e790d7f
-ip-10-0-190-214.us-east-2.compute.internal   Ready    master   4h6m    v1.22.3+e790d7f
-ip-10-0-199-60.us-east-2.compute.internal    Ready    worker   3h53m   v1.22.3+e790d7f
-ip-10-0-216-121.us-east-2.compute.internal   Ready    worker   3h53m   v1.22.3+e790d7f
-ip-10-0-231-224.us-east-2.compute.internal   Ready    worker   3h53m   v1.22.3+e790d7f
-ip-10-0-244-159.us-east-2.compute.internal   Ready    master   4h6m    v1.22.3+e790d7f
+ip-10-0-186-197.us-east-2.compute.internal   Ready    master   4h5m    v1.25.7+e790d7f
+ip-10-0-190-214.us-east-2.compute.internal   Ready    master   4h6m    v1.25.7+e790d7f
+ip-10-0-199-60.us-east-2.compute.internal    Ready    worker   3h53m   v1.25.7+e790d7f
+ip-10-0-216-121.us-east-2.compute.internal   Ready    worker   3h53m   v1.25.7+e790d7f
+ip-10-0-231-224.us-east-2.compute.internal   Ready    worker   3h53m   v1.25.7+e790d7f
+ip-10-0-244-159.us-east-2.compute.internal   Ready    master   4h6m    v1.25.7+e790d7f
 ----
 
 Each `Machine` ends up corresponding to a `Node`. With IPI, there is a

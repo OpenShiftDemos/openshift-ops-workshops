@@ -211,7 +211,8 @@ And you will see some output like:
 
 ```
 NAME      VERSION   AVAILABLE   PROGRESSING   SINCE   STATUS
-version   4.9.11    True        False         3h11m   Cluster version is 4.9.11
+version   4.12.9    True        False         11h     Cluster version is 4.1
+2.9
 ```
 
 For more details, you can execute the following command:

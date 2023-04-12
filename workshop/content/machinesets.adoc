@@ -150,7 +150,7 @@ oc get nodes
 You should see your fresh and happy new nodes. They are the ones with a very young age:
 
 ----
-ip-10-0-166-103.us-east-2.compute.internal   Ready    worker   1m   v1.16.2
+ip-10-0-166-103.us-east-2.compute.internal   Ready    worker   1m   v1.25.7+e790d7f
 ----
 
 [Note]

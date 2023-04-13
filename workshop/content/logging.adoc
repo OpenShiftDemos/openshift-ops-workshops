@@ -225,7 +225,7 @@ spec:
     elasticsearch:
       nodeCount: 3
       storage:
-         storageClassName: gp2
+         storageClassName: gp3-csi
          size: 100Gi
       redundancyPolicy: "SingleRedundancy"
       nodeSelector:
@@ -330,11 +330,11 @@ You will see something like:
 NAME                                         STATUS   VOLUME                                     CAPACITY   ACCESS
  MODES   STORAGECLASS   AGE
 elasticsearch-elasticsearch-cdm-ks56pg34-1   Bound    pvc-31536af7-b512-4365-9f3d-f617327266d3   100Gi      RWO
-         gp2            63s
+         gp3-csi        63s
 elasticsearch-elasticsearch-cdm-ks56pg34-2   Bound    pvc-85f854d0-a3fa-4bb2-90a9-96655b8a0884   100Gi      RWO
-         gp2            63s
+         gp3-csi        63s
 elasticsearch-elasticsearch-cdm-ks56pg34-3   Bound    pvc-5a5ed5f3-c96d-475e-ab71-725a6b014c88   100Gi      RWO
-         gp2            63s
+         gp3-csi        63s
 ----		
 
 [Note]

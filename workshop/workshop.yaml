@@ -1,4 +1,4 @@
-name: OpenShift and Container Storage for Admins
+name: OpenShift for Admins
 
 modules:
   activate:
@@ -8,8 +8,7 @@ modules:
   - app-storage-basics
   - machinesets
   - infra-nodes
-  - odf4
-  - logging
+  - logging-with-loki
   - ldap-groupsync
   - monitoring-basics
   - template-quota-limits
@@ -18,4 +17,3 @@ modules:
   - clusterresourcequota
   - taints-and-tolerations
   - windows-containers
-  

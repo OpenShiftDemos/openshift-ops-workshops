@@ -211,7 +211,8 @@ And you will see some output like:
 
 ```
 NAME      VERSION   AVAILABLE   PROGRESSING   SINCE   STATUS
-version   4.9.11    True        False         3h11m   Cluster version is 4.9.11
+version   4.12.9    True        False         11h     Cluster version is 4.1
+2.9
 ```
 
 For more details, you can execute the following command:
@@ -230,7 +231,7 @@ Annotations:  <none>
 API Version:  config.openshift.io/v1
 Kind:         ClusterVersion
 Metadata:
-  Creation Timestamp:  2022-01-31T21:16:57Z
+  Creation Timestamp:  2023-04-11T23:33:04Z
   Generation:          2
   Managed Fields:
     API Version:  config.openshift.io/v1
@@ -242,13 +243,17 @@ Metadata:
         f:clusterID:
     Manager:      cluster-bootstrap
     Operation:    Update
-    Time:         2022-01-31T21:16:57Z
+    Time:         2023-04-11T23:33:04Z
     API Version:  config.openshift.io/v1
     Fields Type:  FieldsV1
     fieldsV1:
       f:status:
         .:
         f:availableUpdates:
+        f:capabilities:
+          .:
+          f:enabledCapabilities:
+          f:knownCapabilities:
         f:conditions:
         f:desired:
           .:
@@ -262,85 +267,96 @@ Metadata:
     Manager:         cluster-version-operator
     Operation:       Update
     Subresource:     status
-    Time:            2022-01-31T21:29:24Z
-  Resource Version:  83732
-  UID:               b2c4f11b-6200-4d19-b3b8-1d8b743eede2
+    Time:            2023-04-11T23:56:50Z
+  Resource Version:  30491
+  UID:               11a6c70c-e897-484d-9895-11d37dced524
 Spec:
-  Channel:     stable-4.9
-  Cluster ID:  20b3751f-aff9-4eaf-81ca-62930812e82d
+  Channel:     stable-4.12
+  Cluster ID:  ca86953a-866e-4a19-bb7c-06260d5376ff
 Status:
   Available Updates:
     Channels:
-      candidate-4.10
-      candidate-4.9
-      fast-4.9
-      stable-4.9
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:7b67b0cb5ab016528b8efdb6130c000398efc58f55e2226f3cf4e3be59c
-78443
-    URL:      https://access.redhat.com/errata/RHBA-2022:0195
-    Version:  4.9.17
-    Channels:
-      candidate-4.10
-      candidate-4.9
-      fast-4.9
-      stable-4.9
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:bb1987fb718f81fb30bec4e0e1cd5772945269b77006576b02546cf84c7
-7498e
-    URL:      https://access.redhat.com/errata/RHBA-2022:0110
-    Version:  4.9.15
-    Channels:
-      candidate-4.10
-      candidate-4.9
-      fast-4.9
-      stable-4.9
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:dd71b3cd08ce1e859e0e740a585827c9caa1341819d1121d92879873a12
-7f5e2
-    URL:      https://access.redhat.com/errata/RHBA-2021:5214
-    Version:  4.9.12
-    Channels:
-      candidate-4.10
-      candidate-4.9
-      fast-4.9
-      stable-4.9
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:0ff5adc1199c77c2814c2030642109b24039087a2621b19e553a2315bcd
-c4801
-    URL:      https://access.redhat.com/errata/RHBA-2022:0029
-    Version:  4.9.13
+      candidate-4.12
+      candidate-4.13
+      eus-4.12
+      fast-4.12
+      stable-4.12
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:db976910d909373b
+1136261a5479ed18ec08c93971285ff760ce75c6217d3943
+    URL:      https://access.redhat.com/errata/RHBA-2023:1508
+    Version:  4.12.10
+  Capabilities:
+    Enabled Capabilities:
+      CSISnapshot
+      Console
+      Insights
+      Storage
+      baremetal
+      marketplace
+      openshift-samples
+    Known Capabilities:
+      CSISnapshot
+      Console
+      Insights
+      Storage
+      baremetal
+      marketplace
+      openshift-samples
   Conditions:
-    Last Transition Time:  2022-01-31T21:41:09Z
-    Message:               Done applying 4.9.11
-    Status:                True
-    Type:                  Available
-    Last Transition Time:  2022-01-31T21:41:09Z
-    Status:                False
-    Type:                  Failing
-    Last Transition Time:  2022-01-31T21:41:09Z
-    Message:               Cluster version is 4.9.11
-    Status:                False
-    Type:                  Progressing
-    Last Transition Time:  2022-01-31T21:16:57Z
+    Last Transition Time:  2023-04-11T23:33:07Z
     Status:                True
     Type:                  RetrievedUpdates
+    Last Transition Time:  2023-04-11T23:33:07Z
+    Message:               Kubernetes 1.26 and therefore OpenShift 4.13 remove
+several APIs which require admin consideration. Please see the knowledge articl
+e https://access.redhat.com/articles/6958394 for details and instructions.
+    Reason:                AdminAckRequired
+    Status:                False
+    Type:                  Upgradeable
+    Last Transition Time:  2023-04-11T23:33:07Z
+    Message:               Capabilities match configured spec
+    Reason:                AsExpected
+    Status:                False
+    Type:                  ImplicitlyEnabledCapabilities
+    Last Transition Time:  2023-04-11T23:33:07Z
+    Message:               Payload loaded version="4.12.9" image="quay.io/opens
+hift-release-dev/ocp-release@sha256:96bf74ce789ccb22391deea98e0c5050c41b67cc17d
+efbb38089d32226dba0b8" architecture="amd64"
+    Reason:                PayloadLoaded
+    Status:                True
+    Type:                  ReleaseAccepted
+    Last Transition Time:  2023-04-11T23:56:50Z
+    Message:               Done applying 4.12.9
+    Status:                True
+    Type:                  Available
+    Last Transition Time:  2023-04-11T23:56:50Z
+    Status:                False
+    Type:                  Failing
+    Last Transition Time:  2023-04-11T23:56:50Z
+    Message:               Cluster version is 4.12.9
+    Status:                False
+    Type:                  Progressing
   Desired:
     Channels:
-      candidate-4.10
-      candidate-4.9
-      fast-4.9
-      stable-4.9
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:0f72e150329db15279a1aeda1286c9495258a4892bc5bf1bf5bb89942cd
-432de
-    URL:      https://access.redhat.com/errata/RHBA-2021:5003
-    Version:  4.9.11
+      candidate-4.12
+      candidate-4.13
+      eus-4.12
+      fast-4.12
+      stable-4.12
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:96bf74ce789ccb22
+391deea98e0c5050c41b67cc17defbb38089d32226dba0b8
+    URL:      https://access.redhat.com/errata/RHSA-2023:1409
+    Version:  4.12.9
   History:
-    Completion Time:    2022-01-31T21:41:09Z
-    Image:              quay.io/openshift-release-dev/ocp-release@sha256:0f72e150329db15279a1aeda1286c9495258a4892bc5bf1bf
-5bb89942cd432de
-    Started Time:       2022-01-31T21:16:57Z
+    Completion Time:    2023-04-11T23:56:50Z
+    Image:              quay.io/openshift-release-dev/ocp-release@sha256:96bf74
+ce789ccb22391deea98e0c5050c41b67cc17defbb38089d32226dba0b8
+    Started Time:       2023-04-11T23:33:07Z
     State:              Completed
     Verified:           false
-    Version:            4.9.11
+    Version:            4.12.9
   Observed Generation:  2
-  Version Hash:         TAWX_HO9fK4=
+  Version Hash:         pZYKzz8RmAo=
 Events:                 <none>
 ```
 

@@ -159,7 +159,7 @@ You will see something like the following:
 
 ----
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                          STORAGECLASS   REASON   AGE
-pvc-4397c6be-9f53-490e-960d-c1b77de6000c   1Gi        RWO            Delete           Bound    app-management/mapit-storage   gp2                     12m
+pvc-4397c6be-9f53-490e-960d-c1b77de6000c   1Gi        RWO            Delete           Bound    app-management/mapit-storage   gp3-csi                     12m
 ----
 This is the volume that was created as a result of your earlier claim. Note
 that the volume is *bound* to the claim that exists in the `app-management`
@@ -176,7 +176,7 @@ You will see something like:
 
 ----
 NAME            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-mapit-storage   Bound    pvc-4397c6be-9f53-490e-960d-c1b77de6000c   1Gi        RWO            gp2            14m
+mapit-storage   Bound    pvc-4397c6be-9f53-490e-960d-c1b77de6000c   1Gi        RWO            gp3-csi        14m
 ----
 
 A rollout is taking place, since the `pod` needs to mount the created

@@ -120,35 +120,15 @@ Let's examine each of the descriptions of the recently deployed application to g
 |*Project* | The project is the top-level organizational unit within ArgoCD. It is used to group applications and manage their access control. The default project is the default location where applications are placed when created. You can create multiple projects and specify the project where you want to place an application during creation. In this specific application we made the project `default`.
 |*Labels*|Labels are key-value pairs that provide metadata about an application. They are used to organize and group applications based on specific criteria. In this case, no labels are specified for the application.*
 
-|*EUROPE / EMEA*|Select *eu-west-2* or *eu-west-3*
-|*ASIA PACIFIC*|Select *ap-southeast-2* or *ap-northeast-2* or *ap-east-1*
+|*Status*|The status of an application in ArgoCD shows whether it is healthy and synced with its desired state. A healthy application is one that has all its resources up and running, while a synced application is one where the actual state matches the desired state. In this case, the application is healthy and synced.
+|*Repository*|The repository is the location where the application's source code is stored. In this case, the source code is stored in the Git repository located at https://github.com/jnewsome97/gitops-catalog/.
+|*Target Revision*|The target revision is the Git commit hash or branch name that ArgoCD uses to deploy the application. In this case, the target revision is set to HEAD, which means the latest commit in the main branch of the Git repository.
+|*Repository*|The repository is the location where the application's source code is stored. In this case, the source code is stored in the Git repository located at https://github.com/jnewsome97/gitops-catalog/.
+|*Path*|The path is the location within the Git repository where the application manifests are stored. In this case, the application manifests are located in the openshift-pipelines-operator/overlays/latest directory.
+|*Destination*|The destination is the location where the application will be deployed. In this case, the application will be deployed in the openshift-operators namespace within the cluster.
+|*Namespace*|The namespace is the Kubernetes namespace where the application will be deployed. In this case, the application will be deployed in the openshift-operators namespace.
+|*Created At*|The created at timestamp shows when the application was created in ArgoCD. In this case, the application was created a few seconds ago.
 |===
-
-
-
-== 
-
-
-== Status
-The status of an application in ArgoCD shows whether it is healthy and synced with its desired state. A healthy application is one that has all its resources up and running, while a synced application is one where the actual state matches the desired state. In this case, the application is healthy and synced.
-
-== Repository
-The repository is the location where the application's source code is stored. In this case, the source code is stored in the Git repository located at https://github.com/jnewsome97/gitops-catalog/.
-
-== Target Revision
-The target revision is the Git commit hash or branch name that ArgoCD uses to deploy the application. In this case, the target revision is set to HEAD, which means the latest commit in the main branch of the Git repository.
-
-== Path
-The path is the location within the Git repository where the application manifests are stored. In this case, the application manifests are located in the openshift-pipelines-operator/overlays/latest directory.
-
-== Destination
-The destination is the location where the application will be deployed. In this case, the application will be deployed in the openshift-operators namespace within the cluster.
-
-== Namespace
-The namespace is the Kubernetes namespace where the application will be deployed. In this case, the application will be deployed in the openshift-operators namespace.
-
-== Created At
-The created at timestamp shows when the application was created in ArgoCD. In this case, the application was created a few seconds ago.
 
 In addition to these descriptions, ArgoCD also supports pipelines, which can be used to automate the deployment process. Pipelines are a set of steps that define how an application is built, tested, and deployed. ArgoCD supports two types of pipelines: pre-sync and post-sync.
 

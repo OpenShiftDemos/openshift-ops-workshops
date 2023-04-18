@@ -114,7 +114,7 @@ your brand new app pop up on the ArgoCD dashboard.
 
 image::images/pipelines-deployed.png[]
 
-Let's examine each of the descriptions of the recently deployed application to gain a better understanding of ArgoCD and the application we just added. The pipelines app has several descriptions that we will review.
+Let's examine each of the descriptions of the recently deployed application to gain a better understanding of ArgoCD and the application we just added. The pipelines app has several descriptions that we will review:
 
 |===
 |*Project* | The project is the top-level organizational unit within ArgoCD. It is used to group applications and manage their access control. The default project is the default location where applications are placed when created. You can create multiple projects and specify the project where you want to place an application during creation. In this specific application we made the project `default`.

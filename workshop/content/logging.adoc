@@ -191,7 +191,7 @@ Now that we have the operators installed, along with the `CRDs`, we can now
 kick off the logging install by creating a Logging `CR`. This will define how
 we want to install and configure logging.
 
-1. Before you continue please verify that the 3 infra nodes exist before completing the following step.
+1. Please ensure that the three infrastructure nodes are present before proceeding with the next step.
 
 [source,bash,role="execute"]
 ----

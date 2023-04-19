@@ -191,12 +191,18 @@ Now that we have the operators installed, along with the `CRDs`, we can now
 kick off the logging install by creating a Logging `CR`. This will define how
 we want to install and configure logging.
 
+1. Before you continue please verify that the 3 infra nodes exist before completing the following step.
 
-1. In the OpenShift Console, switch to the the `Administration` → `Custom Resource Definitions` page.
+[source,bash,role="execute"]
+----
+oc get nodes
+----
 
-2. On the `Custom Resource Definitions` page, search for `Logging` in the search field and click `ClusterLogging`.
+2. In the OpenShift Console, switch to the the `Administration` → `Custom Resource Definitions` page.
 
-3. On the `Custom Resource Definition Overview` page, select `Instances` from the `Actions` menu.
+3. On the `Custom Resource Definitions` page, search for `Logging` in the search field and click `ClusterLogging`.
+
+4. On the `Custom Resource Definition Overview` page, select `Instances` from the `Actions` menu.
 +
 [Note]
 ====
@@ -206,9 +212,9 @@ succeeded, the operator itself has not finished installing and the
 and then refresh the page.
 ====
 +
-4. On the `Cluster Loggings` page, click `Create Cluster Logging`.
+5. On the `Cluster Loggings` page, click `Create Cluster Logging`.
 +
-5. In the `YAML` editor, replace the code with the following:
+6. In the `YAML` editor, replace the code with the following:
 
 [source,yaml]
 .openshift_logging_cr.yaml

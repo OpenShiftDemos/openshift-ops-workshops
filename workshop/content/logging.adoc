@@ -197,7 +197,7 @@ we want to install and configure logging.
 ----
 oc get nodes
 ----
-
++
 2. In the OpenShift Console, switch to the the `Administration` → `Custom Resource Definitions` page.
 
 3. On the `Custom Resource Definitions` page, search for `Logging` in the search field and click `ClusterLogging`.

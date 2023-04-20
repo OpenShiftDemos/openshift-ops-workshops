@@ -74,6 +74,7 @@ Once inside the the ArgoCD interface we are going to run through the steps to de
 
 image::images/argoaddapp.png[]
 
+[start=2]
 2. Once the new app screen pops up please fill out the information as follows:
 
 ----

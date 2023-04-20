@@ -187,7 +187,6 @@ image::images/banneryaml.png[]
 [start=3]
 3. Click `Create`
 
-image::images/banner-app.png[]
 image::images/sucessfullycreatedargo.png[]
 
 [start=4]

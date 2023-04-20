@@ -72,6 +72,8 @@ Once inside the the ArgoCD interface we are going to run through the steps to de
 
 1. `Click` the `new app` in the left hand corner.
 
+image::images/newappbutton.png[]
+
 image::images/argoaddapp.png[]
 
 [start=2]

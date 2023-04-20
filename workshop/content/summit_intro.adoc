@@ -1,4 +1,4 @@
-image::images/summit_header.png[]
+
 
 
 = Welcome to the Hands on with OCP Plus Workshop for Summit 2023

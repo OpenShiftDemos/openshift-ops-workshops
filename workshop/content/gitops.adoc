@@ -45,6 +45,7 @@ Argo CD instances for your applications under your projects.
 image::images/9-tiles.png[]
 +
 2. Please ignore the warning. `Proceed` to the website using the `advanced options` when you see that the connection is not private.
+Currently, we're performing a basic installation of Argo that doesn't involve setting up the certificate or kubeadmin for regular users. However, these configurations can be implemented later as needed.
 +
 image::images/connection-private-argo.png[]
 [start=3]

@@ -27,7 +27,7 @@ before you install the Red Hat OpenShift GitOps Operator.
 4. Search for `OpenShift GitOps`, click the `Red Hat OpenShift GitOps` tile, and then click `Install`.
    (Red Hat OpenShift GitOps will be installed in all namespaces of the cluster)
 
-5. Leave all defaults selected and click `Install`.
+5. Select the `Update channel` as `gitops-1.8`. Leave all defaults selected and click `Install`.
    
 image::images/gitops-tile.png[]
 

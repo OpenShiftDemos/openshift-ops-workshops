@@ -16,4 +16,3 @@ modules:
   - disabling-project-self-provisioning
   - clusterresourcequota
   - taints-and-tolerations
-  - windows-containers

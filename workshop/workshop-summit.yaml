@@ -6,6 +6,6 @@ modules:
   - environment
   - installation
   - ldap-groupsync
-  - acs-vulnerability
-  - acs-devsecops
-  - acm-multicluster
+  - summit_acm
+  - summit_acs
+  - summit_extra

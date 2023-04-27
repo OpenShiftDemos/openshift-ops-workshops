@@ -33,8 +33,6 @@ modules:
     name: Cluster Resource Quotas
   taints-and-tolerations:
     name: Taints and Tolerations
-  windows-containers:
-    name: Windows Containers
   acs-vulnerability:
     name: Vulnerability Scanning with ACS
   acs-devsecops:

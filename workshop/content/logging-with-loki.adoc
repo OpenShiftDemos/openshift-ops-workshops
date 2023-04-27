@@ -504,7 +504,7 @@ spec:
 [start=4]
 4. Next, click `create`.
 [start=5]
-5. You should noe be able to go back to `Observe` -> `Logs` and select `Audit` from the menu.
+5. You should now be able to go back to `Observe` -> `Logs` and select `Audit` from the menu.
 
 #### Congratulations, you have now completed the logging section!
 

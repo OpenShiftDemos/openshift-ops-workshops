@@ -1,0 +1,9 @@
+apiVersion: console.openshift.io/v1
+kind: ConsoleNotification
+metadata:
+  name: home-banner
+spec:
+  text: "Congratulations, you have successfully created a banner using ArgoCD!"
+  location: BannerTop
+  color: '#fff'
+  backgroundColor: '#0088ce'

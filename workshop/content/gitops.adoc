@@ -135,7 +135,7 @@ Let's examine each of the descriptions of the recently deployed application to g
 |*Path*|The path is the location within the Git repository where the application manifests are stored. In this case, the application manifests are located in the support/gitops-catalog/openshift-pipelines-operator/overlays/latest directory.
 |*Destination*|The destination is the location where the application will be deployed. In this case, the application will be deployed in the openshift-operators namespace within the cluster.
 |*Namespace*|The namespace is the Kubernetes namespace where the application will be deployed. In this case, the application will be deployed in the openshift-operators namespace.
-|*Created At*|The created at timestamp shows when the application was created in ArgoCD. In this case, the application was created a few seconds ago.
+|*Created At*|The created at timestamp shows when the application was created in ArgoCD. In this case, the application was created 14 minutes ago.
 |===
 
 In addition to these descriptions, ArgoCD also supports pipelines, which can be used to automate the deployment process. Pipelines are a set of steps that define how an application is built, tested, and deployed. ArgoCD supports two types of pipelines: pre-sync and post-sync.

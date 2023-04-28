@@ -186,7 +186,7 @@ spec:
       selfHeal: false
 ----
 
-image::images/banneryaml.png[]
+image::images/banner_yamlfile.png[]
 
 [start=3]
 3. Click `Create`

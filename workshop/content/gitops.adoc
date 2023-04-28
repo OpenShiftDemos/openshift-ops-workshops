@@ -99,7 +99,7 @@ If you would rather edit as YAML then please replace/paste this YAML into ArgoCD
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: pipelines-operator
+  name: pipelines
 spec:
   destination:
     name: ''
@@ -109,6 +109,7 @@ spec:
     path: support/gitops-catalog/openshift-pipelines-operator
     repoURL: 'https://github.com/OpenShiftDemos/openshift-ops-workshops/'
     targetRevision: ocp4-dev
+  sources: []
   project: default
   syncPolicy:
     automated:

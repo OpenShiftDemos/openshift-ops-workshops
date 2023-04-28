@@ -154,8 +154,8 @@ In this section, we will add a banner to the ArgoCD login screen using GitOps. W
 Application Name: banner
 Project Name: default
 SYNC POLICY: Automatic
-Repository URL: https://github.com/jnewsome97/cluster-config.git
-Path: components/configs/banner/base/
+Repository URL: https://github.com/OpenShiftDemos/openshift-ops-workshops/
+Path: support/cluster-config/components/configs/banner/base/
 Cluster URL: https://kubernetes.default.svc
 Namespace: argocd
 ----
@@ -173,9 +173,9 @@ spec:
     namespace: argocd
     server: 'https://kubernetes.default.svc'
   source:
-    path: components/configs/banner/base/
-    repoURL: 'https://github.com/jnewsome97/cluster-config.git'
-    targetRevision: HEAD
+    path: support/cluster-config/components/configs/banner/base/
+    repoURL: 'https://github.com/OpenShiftDemos/openshift-ops-workshops/'
+    targetRevision: ocp4-dev
   project: default
   syncPolicy:
     automated:

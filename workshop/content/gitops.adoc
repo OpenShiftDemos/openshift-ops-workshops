@@ -130,10 +130,9 @@ Let's examine each of the descriptions of the recently deployed application to g
 |*Labels*|Labels are key-value pairs that provide metadata about an application. They are used to organize and group applications based on specific criteria. In this case, no labels are specified for the application.*
 
 |*Status*|The status of an application in ArgoCD shows whether it is healthy and synced with its desired state. A healthy application is one that has all its resources up and running, while a synced application is one where the actual state matches the desired state. In this case, the application is healthy and synced.
-|*Repository*|The repository is the location where the application's source code is stored. In this case, the source code is stored in the Git repository located at https://github.com/jnewsome97/gitops-catalog/.
-|*Target Revision*|The target revision is the Git commit hash or branch name that ArgoCD uses to deploy the application. In this case, the target revision is set to HEAD, which means the latest commit in the main branch of the Git repository.
-|*Repository*|The repository is the location where the application's source code is stored. In this case, the source code is stored in the Git repository located at https://github.com/jnewsome97/gitops-catalog/.
-|*Path*|The path is the location within the Git repository where the application manifests are stored. In this case, the application manifests are located in the openshift-pipelines-operator/overlays/latest directory.
+|*Repository*|The repository is the location where the application's source code is stored. In this case, the source code is stored in the Git repository located at https://github.com/OpenShiftDemos/openshift-ops-workshops/.
+|*Target Revision*|The target revision is the Git commit hash or branch name that ArgoCD uses to deploy the application. In this case, the target revision is set to ocp4-dev.
+|*Path*|The path is the location within the Git repository where the application manifests are stored. In this case, the application manifests are located in the support/gitops-catalog/openshift-pipelines-operator/overlays/latest directory.
 |*Destination*|The destination is the location where the application will be deployed. In this case, the application will be deployed in the openshift-operators namespace within the cluster.
 |*Namespace*|The namespace is the Kubernetes namespace where the application will be deployed. In this case, the application will be deployed in the openshift-operators namespace.
 |*Created At*|The created at timestamp shows when the application was created in ArgoCD. In this case, the application was created a few seconds ago.

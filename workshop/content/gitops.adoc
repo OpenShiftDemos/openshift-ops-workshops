@@ -86,7 +86,7 @@ Project Name: default
 SYNC POLICY: Automatic
 Repository URL: https://github.com/OpenShiftDemos/openshift-ops-workshops/
 Revision: ocp4-dev
-Path: support/gitops-catalog/openshift-pipelines-operator
+Path: support/gitops-catalog/openshift-pipelines-operator/overlays/latest
 Cluster URL: https://kubernetes.default.svc
 Namespace: openshift-operators
 ----
@@ -106,7 +106,7 @@ spec:
     namespace: openshift-operators
     server: 'https://kubernetes.default.svc'
   source:
-    path: support/gitops-catalog/openshift-pipelines-operator
+    path: support/gitops-catalog/openshift-pipelines-operator/overlays/latest
     repoURL: 'https://github.com/OpenShiftDemos/openshift-ops-workshops/'
     targetRevision: ocp4-dev
   sources: []

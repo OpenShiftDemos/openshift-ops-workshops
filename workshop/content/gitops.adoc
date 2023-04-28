@@ -84,8 +84,9 @@ image::images/argoaddapp.png[]
 Application Name: pipelines
 Project Name: default
 SYNC POLICY: Automatic
-Repository URL: https://github.com/jnewsome97/gitops-catalog/
-Path: openshift-pipelines-operator/overlays/latest
+Repository URL: https://github.com/OpenShiftDemos/openshift-ops-workshops/
+Revision: ocp4-dev
+Path: support/gitops-catalog/openshift-pipelines-operator
 Cluster URL: https://kubernetes.default.svc
 Namespace: openshift-operators
 ----
@@ -98,22 +99,21 @@ If you would rather edit as YAML then please replace/paste this YAML into ArgoCD
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: pipelines
+  name: pipelines-operator
 spec:
   destination:
     name: ''
     namespace: openshift-operators
     server: 'https://kubernetes.default.svc'
   source:
-    path: openshift-pipelines-operator/overlays/latest
-    repoURL: 'https://github.com/jnewsome97/gitops-catalog/'
-    targetRevision: HEAD
-  sources: []
+    path: support/gitops-catalog/openshift-pipelines-operator
+    repoURL: 'https://github.com/OpenShiftDemos/openshift-ops-workshops/'
+    targetRevision: ocp4-dev
   project: default
   syncPolicy:
     automated:
       prune: false
-      selfHeal: false    
+      selfHeal: false
 ----
 
 [start=3]

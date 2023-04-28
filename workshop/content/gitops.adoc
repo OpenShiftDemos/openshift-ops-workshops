@@ -191,7 +191,7 @@ image::images/banner_yamlfile.png[]
 [start=3]
 3. Click `Create`
 
-image::images/sucessfullycreatedargo.png[]
+image::images/argo_appsdeployed.png[]
 
 [start=4]
 4. If you look back at your OpenShift Console you should now see your new banner on the top of the screen!

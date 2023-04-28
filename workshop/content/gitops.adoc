@@ -156,6 +156,7 @@ Application Name: banner
 Project Name: default
 SYNC POLICY: Automatic
 Repository URL: https://github.com/OpenShiftDemos/openshift-ops-workshops/
+Revision: ocp4-dev
 Path: support/cluster-config/components/configs/banner/base/
 Cluster URL: https://kubernetes.default.svc
 Namespace: argocd

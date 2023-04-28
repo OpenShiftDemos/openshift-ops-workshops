@@ -121,7 +121,7 @@ spec:
 3. Once you have made those changes click `Create`. You should see 
 your brand new app pop up on the ArgoCD dashboard.
 
-image::images/pipelines-gitops.png[]
+image::images/pipelines-gitops2.png[]
 
 Let's examine each of the descriptions of the recently deployed application to gain a better understanding of ArgoCD and the application we just added. The pipelines app has several descriptions that we will review:
 

@@ -199,6 +199,58 @@ image::images/banner.png[]
 
 As an OpenShift admin using GitOps, you can use the Banners feature in ArgoCD and OpenShift to show crucial information to users. Banners help you provide alerts, warnings, or other information about the cluster, applications, or other resources. For instance, you can use banners to let users know about scheduled maintenance or downtime, security alerts, or other essential announcements.
 
+===  Examining the banner
+
+[start=1]
+1. Click on the pipelines operator on Argo CD.
+
+2. You should see in the box to the right `home-banner`.
+
+3. If you `click` on `home-banner` for more information you should see that it's `KIND` is a `ConsoleNotification`
+
+4. If we go back over to the terminal we can type in the following to see it running:
+
+[source,bash,role="execute"]
+----
+oc get consolenotification
+----
+
+The output will show one console notification resource, which is named `home-banner`.
+
+----
+NAME          TEXT                                                                    LOCATION    AGE
+home-banner   Congratulations, you have successfully created a banner using ArgoCD!   BannerTop   5m33s
+----
+
+5. We are now going to change the text that the is being deployed on the banner:
+
+[source,bash,role="execute"]
+----
+oc edit consolenotification
+----
+
+We are going to change the line where the text is being deployed. Please change the following:
+
+[source,yaml]
+"/tmp/oc-edit-4028263978.yaml" 22L, 1033C
+----
+...
+spec:
+  backgroundColor: '#0088ce'
+  color: '#fff'
+  location: BannerTop
+  text: oops somebody changed this!
+...
+----
+
+
+
+
+
+
+
+
+
 
 
 

@@ -232,7 +232,6 @@ oc edit consolenotification
 We are going to change the line where the text is being deployed. Please change the following:
 
 [source,yaml]
-"/tmp/oc-edit-4028263978.yaml" 22L, 1033C
 ----
 ...
 spec:

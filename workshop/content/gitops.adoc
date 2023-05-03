@@ -4,7 +4,7 @@ As an OpenShift administrator, you can use GitOps to simplify the delivery of ap
 
 image::images/argocd-sync-flow.png[]
 
-GitOps also provides a method for managing infrastructure and application configurations using Git workflows. By treating infrastructure and application definitions like code, GitOps simplifies the process of propagating changes in configurations across multiple clusters.
+GitOps also provides a method for managing infrastructure and application configurations using Git workflows. By treating infrastructure and application definitions like code, GitOps simplifies the process of propagating changes in configurations across multiple clusters
 
 ### Installing OpenShift GitOps
 To get started with OpenShift GitOps, this guide will walk you through the step-by-step process of installing the Red Hat OpenShift GitOps Operator to your OpenShift Container Platform cluster and logging in to the Argo CD instance. With Red Hat OpenShift GitOps, you can manage specific cluster-scoped resources like cluster Operators, optional Operator Lifecycle Manager (OLM) Operators, and user management.

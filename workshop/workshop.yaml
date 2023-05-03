@@ -18,6 +18,5 @@ modules:
   - taints-and-tolerations
   - gitops
   - windows-containers
-  .
   
   

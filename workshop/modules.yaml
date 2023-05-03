@@ -52,7 +52,7 @@ modules:
   summit_extra:
     name: Extra Credit
   gitops:
-    name: GitOps Basic
+    name: GitOps Basics
     
   
 config:

@@ -50,10 +50,7 @@ modules:
   summit_acs:
     name: ACS Module
   summit_extra:
-    name: Extra Credit
-  gitops:
-    name: GitOps Basics
-    
+    name: Extra Credit 
   
 config:
     template_engine: liquid.js  

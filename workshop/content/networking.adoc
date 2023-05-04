@@ -1,13 +1,11 @@
 ## OpenShift Network Policy Based SDN
 OpenShift's default software defined network (SDN) inside the platform is based
-on Open vSwitch and is called OpenShiftSDN.
+on Open Virtual Network (OVN), and is called OVN-Kubernetes.
 
-However, this cluster has been installed with the CNI compliant OVNKubernetes
-SDN. This SDN is based on Open Virtual Network. Moving forward,
-this is the perfered SDN to use on OpenShift, and will be the
-default in future releases. OVNKubernetes is backwards compatable
-with OpenShiftSDN. To read more about OVNKubernetes, please read
-link:https://docs.openshift.com/container-platform/4.9/networking/ovn_kubernetes_network_provider/about-ovn-kubernetes.html[the official documentation].
+Older versions of OpenShift may be running a different SDN, based on Open vSwitch 
+called OpenShift SDN. As of OpenShift 4.12 OVN-Kubernetes has succeeded Openshift as the 
+default SDN. To read more about OVN-Kubernetes, please read
+link:https://access.redhat.com/documentation/en-us/openshift_container_platform/4.12/html/networking/ovn-kubernetes-network-plugin#about-ovn-kubernetes[the official documentation].
 
 The SDN is used to provide connectivity between application
 components inside of the OpenShift environment. It comes with default network

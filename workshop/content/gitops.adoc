@@ -221,9 +221,10 @@ oc get consolenotification
 
 
 The output will show one console notification resource, which is named home-banner.
-
+----
 NAME          TEXT                                                                  LOCATION AGE
 home-banner Congratulations, you have successfully created a banner using ArgoCD! BannerTop 5m33s
+----
 
 4. To change the text that is being deployed on the banner, type in the following command:
 

@@ -214,14 +214,14 @@ In the box to the right, look for `home-banner`.
 image::images/consolenotification.png[]
 
 [start=3]
-3. To see the home-banner, switch back to the terminal and type in the following command:
+3. To see the `home-banner`, switch back to the `terminal` and type in the following command:
 
 
 [source,bash,role="execute"]
 oc get consolenotification
 
 
-The output will show one console notification resource, which is named home-banner.
+The output will show one `console notification` resource, which is named `home-banner`.
 ----
 NAME          TEXT                                                                  LOCATION AGE
 home-banner Congratulations, you have successfully created a banner using ArgoCD! BannerTop 5m33s
@@ -234,7 +234,7 @@ home-banner Congratulations, you have successfully created a banner using ArgoCD
 oc edit consolenotification
 
 [start=5]
-5. Change the line where the text is being deployed to the following:
+5. `Change` the line where the text is being deployed to the following:
 
 [source,yaml]
 ...
@@ -247,27 +247,27 @@ text: oops, somebody changed this!
 
 image::images/changedtext.png[]
 
-Remember to save the changes.
+Remember to `save` the changes.
 
 [start=6]
-6. Check back on the console and see that the banner has been updated.
+6. Check back on the `console` and see that the `banner` has been updated.
 
 image::images/oops.png[]
 
 [start=7]
-7. Go back to Argo CD and notice that the resource named home-banner is now Out of Sync.
+7. Go back to Argo CD and notice that the resource named `home-banner` is now `Out of Sync`.
 
 image::images/outofsync.png[]
 
 [start=8]
-8. Select the home-banner box and select DIFF. Scroll down until you see the changes made earlier. Since self-heal is turned off, the changes won't be reverted automatically.
+8. Select the `home-banner` box and select `DIFF`. Scroll down until you see the changes made earlier. Since `self-heal` is turned off, the changes won't be reverted automatically.
 
 image::images/diff.png[]
 
 image::images/diff2.png[]
 
 [start=9]
-9 .To resync the resource, click on sync.
+9. To `resync` the resource, click on `sync`.
 
 image::images/sync.png[]
 

@@ -204,6 +204,7 @@ As an OpenShift admin using GitOps, you can use the Banners feature in ArgoCD an
 [start=1]
 
 To examine the banner, click on the banner on Argo CD.
+
 image::images/home-bannerbox.png[]
 
 In the box to the right, look for home-banner.

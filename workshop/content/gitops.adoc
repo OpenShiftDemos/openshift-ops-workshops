@@ -199,76 +199,56 @@ image::images/banner.png[]
 
 As an OpenShift admin using GitOps, you can use the Banners feature in ArgoCD and OpenShift to show crucial information to users. Banners help you provide alerts, warnings, or other information about the cluster, applications, or other resources. For instance, you can use banners to let users know about scheduled maintenance or downtime, security alerts, or other essential announcements.
 
-===  Examining the banner
+=== Examining the banner
 
 [start=1]
-1. To examine the banner, click on the `banner` on Argo CD.
 
+To examine the banner, click on the banner on Argo CD.
 image::images/home-bannerbox.png[]
 
-2. In the box to the right, look for `home-banner`.
+In the box to the right, look for home-banner.
 
-3. `Click` on `home-banner` for more information. You should see that its KIND is a `ConsoleNotification`
+Click on home-banner for more information. You should see that its KIND is a ConsoleNotification.
 
 image::images/consolenotification.png[]
 
-4. To see the `home-banner`, switch back to the terminal and type in the following command:
-
+To see the home-banner, switch back to the terminal and type in the following command:
 [source,bash,role="execute"]
-----
 oc get consolenotification
-----
+The output will show one console notification resource, which is named home-banner.
 
-The output will show one console notification resource, which is named `home-banner`.
-
-----
-NAME          TEXT                                                                    LOCATION    AGE
-home-banner   Congratulations, you have successfully created a banner using ArgoCD!   BannerTop   5m33s
-----
-
-5. To change the text that is being deployed on the banner, type in the following command:
-
+NAME TEXT LOCATION AGE
+home-banner Congratulations, you have successfully created a banner using ArgoCD! BannerTop 5m33s
+To change the text that is being deployed on the banner, type in the following command:
 [source,bash,role="execute"]
-----
 oc edit consolenotification
-----
-
 Change the line where the text is being deployed to the following:
 
 [source,yaml]
-----
 ...
 spec:
-  backgroundColor: '#0088ce'
-  color: '#fff'
-  location: BannerTop
-  text: oops, somebody changed this!
+backgroundColor: '#0088ce'
+color: '#fff'
+location: BannerTop
+text: oops, somebody changed this!
 ...
-----
-
 image::images/changedtext.png[]
 
-Save once changed
+Remember to save the changes.
 
-6. Check back on the `console` and see that the `banner` has been updated.
-
+Check back on the console and see that the banner has been updated.
 image::images/oops.png[]
 
-7. Go back to Argo CD and notice that the resource named `home-banner` is now `Out of Sync`.
-
+Go back to Argo CD and notice that the resource named home-banner is now Out of Sync.
 image::images/outofsync.png[]
 
-8. Select the `home-banner` box and select `DIFF`. Scroll down until you see red and you should see the change that was made earlier. As `self-heal` is turned off, it won't revert the changes.
-
+Select the home-banner box and select DIFF. Scroll down until you see the changes made earlier. Since self-heal is turned off, the changes won't be reverted automatically.
 image::images/diff.png[]
 
 image::images/diff2.png[]
 
-9. To resync the resource, click on `sync`.
-
+To resync the resource, click on sync.
 image::images/sync.png[]
 
-10. Go back to OpenShift and observe that it is back to normal.
-
-Note: Note: Keep in mind that OpenShift GitOps can automatically revert these changes by enabling self-heal. If interested in trying that, it can be found under app details.
-
+Go back to OpenShift and observe that everything is back to normal.
+Note: Keep in mind that OpenShift GitOps can automatically revert these changes by enabling self-heal. If you are interested in enabling self-heal, you can find the option under 'app details'.

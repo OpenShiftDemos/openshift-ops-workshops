@@ -208,10 +208,12 @@ image::images/home-bannerbox.png[]
 
 In the box to the right, look for `home-banner`.
 
+[start=2]
 2. Click on `home-banner` for more information. You should see that its `KIND` is a `ConsoleNotification`.
 
 image::images/consolenotification.png[]
 
+[start=3]
 3. To see the home-banner, switch back to the terminal and type in the following command:
 
 
@@ -225,6 +227,7 @@ NAME          TEXT                                                              
 home-banner Congratulations, you have successfully created a banner using ArgoCD! BannerTop 5m33s
 ----
 
+[start=4]
 4. To change the text that is being deployed on the banner, type in the following command:
 
 [source,bash,role="execute"]

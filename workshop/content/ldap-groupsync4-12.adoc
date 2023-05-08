@@ -182,7 +182,7 @@ oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 oc create secret generic ldap-secret --from-literal=bindPassword=b1ndP^ssword -n openshift-config
 wget https://ssl-ccp.godaddy.com/repository/gd-class2-root.crt -O {{ HOME_PATH }}/support/ca.crt
 oc create configmap ca-config-map --from-file={{ HOME_PATH }}/support/ca.crt -n openshift-config
-oc apply -f {{ HOME_PATH }}/support/oauth-cluster.yaml
+oc apply -f {{ HOME_PATH }}/support/oauth-cluster4-12.yaml
 ----
 
 [Note]

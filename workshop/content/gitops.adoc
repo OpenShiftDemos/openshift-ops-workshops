@@ -230,6 +230,7 @@ home-banner Congratulations, you have successfully created a banner using ArgoCD
 [source,bash,role="execute"]
 oc edit consolenotification
 
+[start=5]
 5. Change the line where the text is being deployed to the following:
 
 [source,yaml]
@@ -245,20 +246,24 @@ image::images/changedtext.png[]
 
 Remember to save the changes.
 
+[start=6]
 6. Check back on the console and see that the banner has been updated.
 
 image::images/oops.png[]
 
+[start=7]
 7. Go back to Argo CD and notice that the resource named home-banner is now Out of Sync.
 
 image::images/outofsync.png[]
 
+[start=8]
 8. Select the home-banner box and select DIFF. Scroll down until you see the changes made earlier. Since self-heal is turned off, the changes won't be reverted automatically.
 
 image::images/diff.png[]
 
 image::images/diff2.png[]
 
+[start=9]
 9 .To resync the resource, click on sync.
 
 image::images/sync.png[]

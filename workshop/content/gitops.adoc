@@ -214,7 +214,7 @@ In the box to the right, look for `home-banner`.
 image::images/consolenotification.png[]
 
 [start=3]
-3. To see the `home-banner`, switch back to the `terminal` and type in the following command:
+3. To see the `home-banner`, switch back to the `terminal` and click on the following command:
 
 
 [source,bash,role="execute"]
@@ -228,13 +228,12 @@ home-banner Congratulations, you have successfully created a banner using ArgoCD
 ----
 
 [start=4]
-4. To change the text that is being deployed on the banner, type in the following command:
+4. To change the text that is being deployed on the banner, click on the following command:
 
 [source,bash,role="execute"]
 oc edit consolenotification
 
-[start=5]
-5. `Change` the line where the text is being deployed to the following:
+and `change` the line where the text is being deployed to the following:
 
 [source,yaml]
 ...
@@ -272,6 +271,6 @@ image::images/diff2.png[]
 image::images/sync.png[]
 
 [start=10]
-10. Go back to OpenShift and observe that everything is back to normal.
+10. Go back to OpenShift and observe that the text in the banner has returned to it's previous state "Congratulations, you have successfully created a banner using ArgoCD!" .
 
 Note: Keep in mind that OpenShift GitOps can automatically revert these changes by enabling self-heal. If you are interested in enabling self-heal, you can find the option under 'app details'.

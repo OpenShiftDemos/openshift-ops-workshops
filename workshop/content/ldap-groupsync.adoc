@@ -177,10 +177,28 @@ As the `kubeadmin` user apply the OAuth configuration with `oc`.
 oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
 
+This command will create a Kubernetes secret named "ldap-secret" in the "openshift-config" namespace with a single data item. The data item is named "bindPassword" and its value is set to "b1ndP^ssword"
+
 [source,bash,role="execute"]
 ----
 oc create secret generic ldap-secret --from-literal=bindPassword=b1ndP^ssword -n openshift-config
-wget https://ssl-ccp.godaddy.com/repository/gd-class2-root.crt -O {{ HOME_PATH }}/support/ca.crt
+----
+
+Download the certificate and save it to the file 'ca.crt' with this command:
+
+[source,bash,role="execute"]
+----
+wget https://certs.godaddy.com/repository/gd-class2-root.crt -O {{ HOME_PATH }}/support/ca.crt
+----
+
+----
+If you see `Unable to establish SSL connection.` please click the above command again before proceeding.
+----
+
+Click this command to create a new ConfigMap named ca-config-map in the openshift-config namespace. The ConfigMap is populated with the contents of the file {{ HOME_PATH }}/support/ca.crt. It then applys the file.
+
+[source,bash,role="execute"]
+----
 oc create configmap ca-config-map --from-file={{ HOME_PATH }}/support/ca.crt -n openshift-config
 oc apply -f {{ HOME_PATH }}/support/oauth-cluster.yaml
 ----
@@ -339,7 +357,7 @@ link:https://docs.openshift.com/container-platform/4.9/authentication/using-rbac
 ====
 
 #### Examine `cluster-reader` policy
-Go ahead and login as a regular user: (if you get an error, wait a moment and try again) 
+Go ahead and login as a regular user: (if you get an error, wait a few minutes and try again) 
 
 [source,bash,role="execute"]
 ----
@@ -549,8 +567,10 @@ prometheus-k8s-openshift-monitoring.{{ ROUTE_SUBDOMAIN }}
 
 [Warning]
 ====
-Before continuing, make sure to go to the {{ MASTER_URL }}[OpenShift Web Console] (Do not use built-in console)
-and log out by using the dropdown menu at the upper right where it says `kube:admin`.
+Before continuing, make sure to go to the {{ MASTER_URL }}[OpenShift Web Console] (Do not 
+use the console that is built-in to the workshop). Instead, please use the 
+one that you will find on your credentials page and log out by 
+using the dropdown menu at the upper right where it says `kube:admin`.
 Otherwise Prometheus will try to use your `kubeadmin` user to pass through
 authentication. While it will work, it doesn't demonstrate the
 `cluster-reader` role.

@@ -65,7 +65,12 @@ payments       visa-processor     1/1     1            1           0d
 spring4shell   spring4shell-app   3/3     3            3           0d
 ```
 
+== Navigating the RHACS console and Vulnerability Management
+
+The first half of this lab will focus on navigation and vulnerability management. This work will take place in the UI and require you to use both the dashboard and the lab environment.
+
 === Access the RHACS Console
+
 In this section, you confirm that you can connect to RHACS from the command line and that you can connect to the RHACS portal. The following information will be available in the lab URL.
 
 *Requirements* 
@@ -422,9 +427,9 @@ A primary reason for the *visa-processor* deployment to be ranked so high is tha
 We will leave it to you to make risk assessments in the future. Let us get to enforcing a log4shell policy and stopping future deployments containing the vulnerability.
 |===
 
-== ACS Policies
+== Policy Management
 
-ACS has many built-in policies to detect activity related to attacker goals: gain a foothold, maintain a presence, move laterally, and exfiltrate data. The continuous runtime monitoring observes all container activity and will automatically respond to events with appropriate enforcement and notification. However, that would be missing out on an opportunity - ACS wants to go one step further, to take advantage of containers' ephemeral, immutable nature to improve security in a measurable way from now on.
+RHACS has many built-in policies to detect activity related to attacker goals: gain a foothold, maintain a presence, move laterally, and exfiltrate data. The continuous runtime monitoring observes all container activity and will automatically respond to events with appropriate enforcement and notification. However, that would be missing out on an opportunity - RHACS wants to go one step further, to take advantage of containers' ephemeral, immutable nature to improve security in a measurable way from now on.
 
 We want to use runtime incidents and vulnerabilities as a learning opportunity to improve security going forward by constraining how our containers can act.
 
@@ -434,7 +439,7 @@ We achieve this by creating policies and implementing them early in the CI/CD pr
 
 image::images/policy-1.png[]
 
-You can create policies based on rules and risks as well. Filter through the policies and find the *log4shell* policy.
+You can create policies based on rules and risks as well. Filter through the policies and find the *Package Manager Binary* policy.
 
 image::images/policy-2.png[]
 
@@ -448,23 +453,9 @@ If you click the actions button, you will see how easy it is to edit, clone, exp
 
 == Runtime Policy Features
 
-RHACS observes the processes running in containers, and collects this information to write policies.
-This information can also be used to create baseline policy configurations that can be updated by the user.
+RHACS observes the processes running in containers, and collects this information to write policies. This information can also be used to create baseline policy configurations that can be updated by the user.
 
 This allows the user to quickly assess and address novel situations.
-
-=== Clean Up Blocking Policies
-
-.Procedure
-. Navigate to *Platform Configuration -> Policy Management* and find the `No bash allowed` policy.
-+
-[TIP]
-====
-On the *System Management* page, type `Policy` and then `no bash` into the filter bar at the top.
-====
-
-. Select the three dots to the right of the policy and delete it. 
-
 
 === Prevent Execution of Package Manager Binary
 
@@ -473,6 +464,7 @@ Package managers like `apt` (Ubuntu), `apk` (Alpine), or `yum` (RedHat) are bina
 This policy demonstrates how RHACS detects and avoids a runtime violation, using Linux kernel instrumentation to detect the running process and OpenShift^(R)^ to terminate the pod for enforcement.
 
 Using OpenShift to enforce runtime policy is preferable to enforcing rules directly within containers or in the container engine, as it avoids a disconnect between the state that OpenShift is maintaining and the state in which the container is actually operating.
+
 Further, because a runtime policy may detect only part of an attacker's activity inside a container, removing the container avoids the attack.
 
 === Enable Enforcement of Policy
@@ -491,21 +483,21 @@ On the *Policy Management* page, type `Policy` + `Ubuntu` into the filter bar at
 
 image::images/10_runtime_00.png[RHACS run time Violations]
 
-=== Test Policy
+=== Test Policy (Bookbag Environment)
 
 In this section, you use `tmux` to watch OpenShift _events_ while running the test, so you can see how RHACS enforces the policy at runtime.
 
 .Procedure
 . On your student VM, start `tmux` with two panes:
 +
-[source,sh]
+[source,bash,role="execute"]
 ----
 tmux new-session \; split-window -v \; attach 
 ----
 +
 . Run a watch on OpenShift events in the first shell pane:
 +
-[source,sh]
+[source,bash,role="execute"]
 ----
 oc get events -w
 ----
@@ -513,7 +505,7 @@ oc get events -w
 . Type `Ctrl-b o` to switch to the next pane.
 . Run a temporary Ubuntu OS image using the `tmp-shell` application:
 +
-[source,sh]
+[source,bash,role="execute"]
 ----
 oc run tmp-shell --labels="app=tmp-shell" --rm -i --tty --image ubuntu:18.04 -- /bin/bash
 ----
@@ -529,9 +521,8 @@ After the cluster pulls the image and starts the pod, expect to see a Linux comm
 
 . Run the package manager in this shell:
 +
-[source,sh]
+[source,bash,role="execute"]
 ----
-
 root@tmp-shell-65c98c7766-66fpw:/# apt update
 ----
 +
@@ -617,5 +608,4 @@ After this issue is addressed--in this case by the RHACS product using the runti
 +
 image::images/rhacs_runtime_violations_tmp-shell_resolved.png[RHACS Violation Resolved]
 
-
-
+Summary needed here. 

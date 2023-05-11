@@ -13,4 +13,10 @@ The Admin Ops section of the workshop is divided into two modules: the first mod
 === Red Hat Advanced Cluster Management for Kubernetes
 
 
-=== Red Hat Advanced Cluster Security for Kubernetes
+=== Red Hat Advanced Cluster Security for Kubernetes (RHACS)
+
+The RHACS workshop section is divided into two modules: 
+
+1. The First module focuses on UI navigation and exploring vulnerable workloads, such as the log4shell or Apache struts vulnerabilities. 
+2. The second module takes this learned knowledge and extends it to runtime enforcement. Here we will create a workload that violates the Ubuntu Package Manager Execution and watch how we can stop the download of any malicious packages using RHACS. 
+

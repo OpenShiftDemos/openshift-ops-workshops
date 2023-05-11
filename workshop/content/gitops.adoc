@@ -44,7 +44,7 @@ Argo CD instances for your applications under your projects.
 + 
 image::images/9-tiles.png[]
 +
-2. Please ignore the warning. `Proceed` to the website using the `advanced options` when you see that the connection is not private.
+2. Please ignore the certificate warning as shown below. `Proceed` to the website using the `advanced options` when you see that the connection is not private.
 Currently, we're performing a basic installation of Argo that doesn't involve setting up the certificate or kubeadmin for regular users. However, these configurations can be implemented later as needed.
 +
 image::images/connection-private-argo.png[]
@@ -69,7 +69,7 @@ image::images/authorize-access-argo.png[]
 
 ### Deploy a Sample Application
 
-Once inside the the ArgoCD interface we are going to run through the steps to deploy a Pipelines Operator.
+Once inside the ArgoCD interface we are going to run through the steps to deploy the Pipelines Operator.
 
 1. `Click` the `new app` in the left hand corner.
 
@@ -254,7 +254,8 @@ Remember to `save` the changes.
 image::images/oops.png[]
 
 [start=7]
-7. Go back to Argo CD and notice that the resource named `home-banner` is now `Out of Sync`.
+7. Go back to Argo CD and notice that the resource named `home-banner` is now `Out of Sync`. Argo CD considers the application out of sync because the desired state as expressed in git no longer matches the target state in the cluster after the direct edit was performed.
+
 
 image::images/outofsync.png[]
 
@@ -274,3 +275,5 @@ image::images/sync.png[]
 10. Go back to OpenShift and observe that the text in the banner has returned to it's previous state "Congratulations, you have successfully created a banner using ArgoCD!" .
 
 Note: Keep in mind that OpenShift GitOps can automatically revert these changes by enabling self-heal. If you are interested in enabling self-heal, you can find the option under 'app details'.
+
+In this module we used GitOps to configure an operator as well as a banner in our cluster. While these are relatively small changes, GitOps can be used to configure all aspects of a cluster and is an important tool for ensuring consistent and reliable configuration across a fleet of clusters in an organization.

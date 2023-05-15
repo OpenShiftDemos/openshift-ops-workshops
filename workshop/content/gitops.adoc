@@ -42,7 +42,7 @@ Argo CD instances for your applications under your projects.
    
 1. Navigate to the nine tiles at the top of your OpenShift Console. Once you click that you should see the 'OpenShift GitOps Cluster Argo CD'. Select that.
 + 
-image::images/9-tiles.png[]
+image::images/gitops-images/9-tiles.png[]
 +
 2. Please ignore the certificate warning as shown below. `Proceed` to the website using the `advanced options` when you see that the connection is not private.
 Currently, we're performing a basic installation of Argo that doesn't involve setting up the certificate or kubeadmin for regular users. However, these configurations can be implemented later as needed.

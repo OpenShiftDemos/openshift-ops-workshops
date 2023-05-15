@@ -2,7 +2,7 @@
 
 As an OpenShift administrator, you can use GitOps to simplify the delivery of applications to Kubernetes. GitOps automates the deployment process to the target environment by relying on Git repositories as the primary means of determining the desired application state. You can easily track updates to branches, tags, or lock them to a specific version of manifests at a Git commit.
 
-image::images/argocd-sync-flow.png[]
+image::images/gitops-images/argocd-sync-flow.png[]
 
 GitOps also provides a method for managing infrastructure and application configurations using Git workflows. By treating infrastructure and application definitions like code, GitOps simplifies the process of propagating changes in configurations across multiple clusters.
 
@@ -29,7 +29,7 @@ before you install the Red Hat OpenShift GitOps Operator.
 
 5. Select the `Update channel` as `gitops-1.8`. Leave all defaults selected and click `Install`.
    
-image::images/gitops-tile.png[]
+image::images/gitops-images/gitops-tile.png[]
 
 
 After the Red Hat OpenShift GitOps Operator is installed, it 
@@ -42,16 +42,16 @@ Argo CD instances for your applications under your projects.
    
 1. Navigate to the nine tiles at the top of your OpenShift Console. Once you click that you should see the 'OpenShift GitOps Cluster Argo CD'. Select that.
 + 
-image::images/gitops-images/9-tiles.png[]
+image::images/gitops-images/gitops-images/9-tiles.png[]
 +
 2. Please ignore the certificate warning as shown below. `Proceed` to the website using the `advanced options` when you see that the connection is not private.
 Currently, we're performing a basic installation of Argo that doesn't involve setting up the certificate or kubeadmin for regular users. However, these configurations can be implemented later as needed.
 +
-image::images/gitops-images/connection-private-argo.png[]
+image::images/gitops-images/gitops-images/connection-private-argo.png[]
 [start=3]
 3. You can now `login` into the Argo CD UI by selecting `Log in Via OpenShift`.
 +
-image::images/login-openshift.png[]
+image::images/gitops-images/login-openshift.png[]
 
 Please use the kubeadmin login details. 
 Remember that the login is `kubeadmin` 
@@ -75,7 +75,7 @@ Once inside the ArgoCD interface we are going to run through the steps to deploy
 
 image::images/gitops-images/newappbutton.png[]
 
-image::images/argoaddapp.png[]
+image::images/gitops-images/argoaddapp.png[]
 
 [start=2]
 2. Once the new app screen pops up please fill out the information as follows:
@@ -91,7 +91,7 @@ Cluster URL: https://kubernetes.default.svc
 Namespace: openshift-operators
 ----
 
-image::images/editasyaml.png[]
+image::images/gitops-images/editasyaml.png[]
 
 If you would rather edit as YAML then please replace/paste this YAML into ArgoCD:
 
@@ -121,7 +121,7 @@ spec:
 3. Once you have made those changes click `Create`. You should see 
 your brand new app pop up on the ArgoCD dashboard.
 
-image::images/pipelines-gitops2.png[]
+image::images/gitops-images/pipelines-gitops2.png[]
 
 Let's examine each of the descriptions of the recently deployed application to gain a better understanding of ArgoCD and the application we just added. The pipelines app has several descriptions that we will review:
 
@@ -204,14 +204,14 @@ As an OpenShift admin using GitOps, you can use the Banners feature in ArgoCD an
 [start=1]
 1. To examine the `banner`, click on the `banner` on Argo CD.
 
-image::images/home-bannerbox.png[]
+image::images/gitops-images/home-bannerbox.png[]
 
 In the box to the right, look for `home-banner`.
 
 [start=2]
 2. Click on `home-banner` for more information. You should see that its `KIND` is a `ConsoleNotification`.
 
-image::images/consolenotification.png[]
+image::images/gitops-images/consolenotification.png[]
 
 [start=3]
 3. To see the `home-banner`, switch back to the `terminal` and click on the following command:

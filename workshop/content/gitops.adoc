@@ -279,6 +279,8 @@ image::images/gitops-images/sync.png[]
 [start=10]
 10. Go back to OpenShift and observe that the text in the banner has returned to it's previous state "Congratulations, you have successfully created a banner using ArgoCD!" .
 
+image::images/gitops-images/banner.png[]
+
 Note: Keep in mind that OpenShift GitOps can automatically revert these changes by enabling self-heal. If you are interested in enabling self-heal, you can find the option under 'app details'.
 
 In this module we used GitOps to configure an operator as well as a banner in our cluster. While these are relatively small changes, GitOps can be used to configure all aspects of a cluster and is an important tool for ensuring consistent and reliable configuration across a fleet of clusters in an organization.

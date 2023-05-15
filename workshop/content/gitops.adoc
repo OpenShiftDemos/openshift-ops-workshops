@@ -138,9 +138,7 @@ Let's examine each of the descriptions of the recently deployed application to g
 |*Created At*|The created at timestamp shows when the application was created in ArgoCD. In this case, the application was created 14 minutes ago.
 |===
 
-In addition to these descriptions, ArgoCD also supports pipelines, which can be used to automate the deployment process. Pipelines are a set of steps that define how an application is built, tested, and deployed. ArgoCD supports two types of pipelines: pre-sync and post-sync.
-
-Pre-sync pipelines run before an application is synced with its desired state, while post-sync pipelines run after an application has been synced. Pipelines are defined using Kubernetes manifest files, and ArgoCD uses Kubernetes native tooling to execute them.
+In addition to these descriptions, ArgoCD also supports hooks. Hooks in ArgoCD allow for the execution of custom actions or integrations with external systems at specific points during the deployment lifecycle. They provide a way to extend the deployment process and further customize application deployments within ArgoCD.
 
 By navigating to your `OpenShift Console` and accessing the `Operators` tab, you can verify the successful installation of the `Pipelines Operator` under the `Installed Operators` tab.
 

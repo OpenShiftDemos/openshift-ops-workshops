@@ -78,7 +78,7 @@ image::images/gitops-images/newappbutton.png[]
 image::images/gitops-images/argoaddapp.png[]
 
 [start=2]
-2. Once the new app screen pops up please fill out the information as follows:
+2. Once the new app screen pops up fill out the information as follows:
 
 ----
 Application Name: pipelines
@@ -93,7 +93,7 @@ Namespace: openshift-operators
 
 image::images/gitops-images/editasyaml.png[]
 
-If you would rather edit as YAML then please replace/paste this YAML into ArgoCD:
+If you would rather edit as YAML then replace/paste this YAML into ArgoCD:
 
 ----
 apiVersion: argoproj.io/v1alpha1
@@ -148,7 +148,7 @@ In this section, we will add a banner to the ArgoCD login screen using GitOps. W
 
 1. Similar to the last section `Click` the `new app` in the left hand corner.
 
-2. Once the new app screen pops up please fill out the information as follows:
+2. Once the new app screen pops up fill out the information as follows:
 
 ----
 Application Name: banner
@@ -161,7 +161,7 @@ Cluster URL: https://kubernetes.default.svc
 Namespace: argocd
 ----
 
-If you would rather edit as YAML then please replace/paste this YAML into ArgoCD:
+If you would rather edit as YAML then replace/paste this YAML into ArgoCD:
 
 ----
 apiVersion: argoproj.io/v1alpha1

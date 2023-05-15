@@ -142,6 +142,10 @@ In addition to these descriptions, ArgoCD also supports pipelines, which can be 
 
 Pre-sync pipelines run before an application is synced with its desired state, while post-sync pipelines run after an application has been synced. Pipelines are defined using Kubernetes manifest files, and ArgoCD uses Kubernetes native tooling to execute them.
 
+By navigating to your `OpenShift Console` and accessing the `Operators` tab, you can verify the successful installation of the `Pipelines Operator` under the `Installed Operators` tab.
+
+[.red.bold]#ADD IMAGE HERE#
+
 ===  Adding a Banner to ArgoCD
 
 In this section, we will add a banner to the ArgoCD login screen using GitOps. We will use a repository hosted on GitHub, which contains the necessary configuration files.

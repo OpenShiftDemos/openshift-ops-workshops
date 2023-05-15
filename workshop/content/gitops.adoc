@@ -12,8 +12,8 @@ To get started with OpenShift GitOps, this guide will walk you through the step-
 ### Installing OpenShift GitOps Operator in web console
 
 ----
-Please do not install the Community version of the Argo CD Operator, 
-if you have already do so please remove the Argo CD Community Operator 
+Do not install the Community version of the Argo CD Operator, 
+if you have already do so remove the Argo CD Community Operator 
 before you install the Red Hat OpenShift GitOps Operator.
 ----
 1.Now switch over to your *Openshift Web Console*:
@@ -44,7 +44,7 @@ Argo CD instances for your applications under your projects.
 + 
 image::images/gitops-images/9-tiles.png[]
 +
-2. Please ignore the certificate warning as shown below. `Proceed` to the website using the `advanced options` when you see that the connection is not private.
+2. Ignore the certificate warning as shown below. `Proceed` to the website using the `advanced options` when you see that the connection is not private.
 Currently, we're performing a basic installation of Argo that doesn't involve setting up the certificate or kubeadmin for regular users. However, these configurations can be implemented later as needed.
 +
 image::images/gitops-images/connection-private-argo.png[]
@@ -53,7 +53,7 @@ image::images/gitops-images/connection-private-argo.png[]
 +
 image::images/gitops-images/login-openshift.png[]
 
-Please use the kubeadmin login details. 
+Use the kubeadmin login details. 
 Remember that the login is `kubeadmin` 
 and the password is:
 

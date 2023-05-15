@@ -267,6 +267,10 @@ image::images/gitops-images/diff.png[]
 
 image::images/gitops-images/diff2.png[]
 
+In the diff output, the text from the GitHub repository is displayed in green, indicating that it is the original content. The red text represents the changes you made, highlighting the modified portions.
+
+This helps you easily identify the specific sections of the banner text that have been altered. This visual distinction helps you understand the changes you made and how they differ from the original content stored in the repository.
+
 [start=9]
 9. To `resync` the resource, click on `sync`.
 

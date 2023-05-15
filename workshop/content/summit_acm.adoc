@@ -6,6 +6,11 @@ At a high level Cluster Lifecycle management is about creating, upgrading, and d
 
 In the demo console where you have all the credentials, you will find the *OCP Console URL, Username and Password, AWS credentials*, *Access Key ID*, *Secret Access Key*, and the *Base DNS Domain*.
 
+To get started, switch over to the OpenShift Console 
+{{ MASTER_URL }}
+Remember that the login is kubeadmin and the password is:
+{{ KUBEADMIN_PASSWORD }}
+
 Once you have logged in to OpenShift Console, Navigate to the *Cluster drop down menu* and then select  *All Clusters* this will bring you to the RHACM interface.
 
 image::images/acm-allclusters.png[]
@@ -123,6 +128,122 @@ Each Red Hat Advanced Cluster Management policy can have at least one or more te
 === Creating Policies in ACM
 
 In order to assist in the creation and management of Red Hat Advanced Cluster Management for Kubernetes policies we use the policy generator tool. This tool, along with GitOps, greatly simplifies the distribution of Kubernetes resource objects to managed OpenShift or Kubernetes clusters through RHACM policies. 
+
+*Prerequisite*
+
+To deploy policies with subscriptions, complete the following steps:
+
+Bind the *open-cluster-management:subscription-admin* ClusterRole to the user creating the subscription, to do this follow this steps:
+
+* Navigate to *Governance Tab*
+* On the top tabs, click on *Policies*
+* Click *Create Policy* 
+* On the top switch the toogle to Display the YAML 
+* Copy the following YAML and paste it on the YAML screen 
+
+----
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: policy-configure-subscription-admin-hub
+  annotations:
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+spec:
+  remediationAction: inform
+  disabled: false
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-configure-subscription-admin-hub
+        spec:
+          remediationAction: inform
+          severity: low
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: rbac.authorization.k8s.io/v1
+                kind: ClusterRole
+                metadata:
+                  name: open-cluster-management:subscription-admin
+                rules:
+                - apiGroups:
+                  - app.k8s.io
+                  resources:
+                  - applications
+                  verbs:
+                  - '*'
+                - apiGroups:
+                  - apps.open-cluster-management.io
+                  resources:
+                  - '*'
+                  verbs:
+                  - '*'
+                - apiGroups:
+                  - ""
+                  resources:
+                  - configmaps
+                  - secrets
+                  - namespaces
+                  verbs:
+                  - '*'
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: rbac.authorization.k8s.io/v1
+                kind: ClusterRoleBinding
+                metadata:
+                  name: open-cluster-management:subscription-admin
+                roleRef:
+                  apiGroup: rbac.authorization.k8s.io
+                  kind: ClusterRole
+                  name: open-cluster-management:subscription-admin
+                subjects:
+                - apiGroup: rbac.authorization.k8s.io
+                  kind: User
+                  name: kube:admin
+                - apiGroup: rbac.authorization.k8s.io
+                  kind: User
+                  name: system:admin
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-policy-configure-subscription-admin-hub
+placementRef:
+  name: placement-policy-configure-subscription-admin-hub
+  kind: PlacementRule
+  apiGroup: apps.open-cluster-management.io
+subjects:
+- name: policy-configure-subscription-admin-hub
+  kind: Policy
+  apiGroup: policy.open-cluster-management.io
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: placement-policy-configure-subscription-admin-hub
+spec:
+  clusterConditions:
+  - status: "True"
+    type: ManagedClusterConditionAvailable
+  clusterSelector:
+    matchExpressions:
+      - {key: name, operator: In, values: ["local-cluster"]} 
+ ----
+
+* Enter a namespace to place the policy, default name space is OK to use
+* Click *Next* till the end and then *Submit*
+
+Allow for the policy to propagate to the Local-cluster - RHACM Hub Cluster.
+
+* Navigate back to policies and select the *policy-configure-subscription-admin-hub* policy. 
+
+* Under the actions dropdown, select *Enforced* This will enforce the policy, wait until green checkmark is displayed.
+
+=== Using Policy Generator 
 
 This Policy Generator definition will achieve 2 configuration policies:
 

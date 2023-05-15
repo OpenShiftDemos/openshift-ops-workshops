@@ -47,7 +47,7 @@ image::images/gitops-images/9-tiles.png[]
 2. Please ignore the certificate warning as shown below. `Proceed` to the website using the `advanced options` when you see that the connection is not private.
 Currently, we're performing a basic installation of Argo that doesn't involve setting up the certificate or kubeadmin for regular users. However, these configurations can be implemented later as needed.
 +
-image::images/connection-private-argo.png[]
+image::images/gitops-images/connection-private-argo.png[]
 [start=3]
 3. You can now `login` into the Argo CD UI by selecting `Log in Via OpenShift`.
 +
@@ -65,7 +65,7 @@ and the password is:
 [start=4]
 4. You will enter the Argo CD UI. (Please authorize access)
 
-image::images/authorize-access-argo.png[]
+image::images/gitops-images/authorize-access-argo.png[]
 
 ### Deploy a Sample Application
 
@@ -73,7 +73,7 @@ Once inside the ArgoCD interface we are going to run through the steps to deploy
 
 1. `Click` the `new app` in the left hand corner.
 
-image::images/newappbutton.png[]
+image::images/gitops-images/newappbutton.png[]
 
 image::images/argoaddapp.png[]
 
@@ -185,17 +185,17 @@ spec:
       selfHeal: false
 ----
 
-image::images/banner_yamlfile.png[]
+image::images/gitops-images/banner_yamlfile.png[]
 
 [start=3]
 3. Click `Create`
 
-image::images/argo_appsdeployed.png[]
+image::images/gitops-images/argo_appsdeployed.png[]
 
 [start=4]
 4. If you look back at your OpenShift Console you should now see your new banner on the top of the screen!
 
-image::images/banner.png[]
+image::images/gitops-images/banner.png[]
 
 As an OpenShift admin using GitOps, you can use the Banners feature in ArgoCD and OpenShift to show crucial information to users. Banners help you provide alerts, warnings, or other information about the cluster, applications, or other resources. For instance, you can use banners to let users know about scheduled maintenance or downtime, security alerts, or other essential announcements.
 
@@ -244,32 +244,32 @@ location: BannerTop
 text: oops, somebody changed this!
 ...
 
-image::images/changedtext.png[]
+image::images/gitops-images/changedtext.png[]
 
 Remember to `save` the changes.
 
 [start=6]
 6. Check back on the `console` and see that the `banner` has been updated.
 
-image::images/oops.png[]
+image::images/gitops-images/oops.png[]
 
 [start=7]
 7. Go back to Argo CD and notice that the resource named `home-banner` is now `Out of Sync`. Argo CD considers the application out of sync because the desired state as expressed in git no longer matches the target state in the cluster after the direct edit was performed.
 
 
-image::images/outofsync.png[]
+image::images/gitops-images/outofsync.png[]
 
 [start=8]
 8. Select the `home-banner` box and select `DIFF`. Scroll down until you see the changes made earlier. Since `self-heal` is turned off, the changes won't be reverted automatically.
 
-image::images/diff.png[]
+image::images/gitops-images/diff.png[]
 
-image::images/diff2.png[]
+image::images/gitops-images/diff2.png[]
 
 [start=9]
 9. To `resync` the resource, click on `sync`.
 
-image::images/sync.png[]
+image::images/gitops-images/sync.png[]
 
 [start=10]
 10. Go back to OpenShift and observe that the text in the banner has returned to it's previous state "Congratulations, you have successfully created a banner using ArgoCD!" .

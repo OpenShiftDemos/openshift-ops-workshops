@@ -144,9 +144,7 @@ Pre-sync pipelines run before an application is synced with its desired state, w
 
 By navigating to your `OpenShift Console` and accessing the `Operators` tab, you can verify the successful installation of the `Pipelines Operator` under the `Installed Operators` tab.
 
-[.red.bold]++++
-<span style="color:red; font-weight:bold;">ADD IMAGE HERE</span>
-++++
+[.red.bold]NOTE: Please add the image here.
 
 ===  Adding a Banner to ArgoCD
 

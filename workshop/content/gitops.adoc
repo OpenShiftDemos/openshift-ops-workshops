@@ -256,6 +256,7 @@ image::images/gitops-images/oops.png[]
 [start=7]
 7. Go back to Argo CD and notice that the resource named `home-banner` is now `Out of Sync`. Argo CD considers the application out of sync because the desired state as expressed in git no longer matches the target state in the cluster after the direct edit was performed.
 
+image::images/gitops-images/selectfordiff.png[]
 
 image::images/gitops-images/outofsync.png[]
 

@@ -5,7 +5,7 @@ modules:
   - summit_intro
   - environment
   - installation
-  - ldap-groupsync
+  - summit_ldap
   - summit_acm
   - summit_acs
   - summit_extra

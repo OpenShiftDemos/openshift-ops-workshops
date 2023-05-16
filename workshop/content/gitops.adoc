@@ -75,7 +75,7 @@ Once inside the ArgoCD interface we are going to run through the steps to deploy
 
 image::images/gitops-images/newappbutton.png[]
 
-image::images/gitops-images/argoaddapp.png[]
+image::images/gitops-images/argoaddapp2.png[]
 
 [start=2]
 2. Once the new app screen pops up fill out the information as follows:

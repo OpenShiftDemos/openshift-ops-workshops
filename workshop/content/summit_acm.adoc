@@ -1,4 +1,4 @@
-= Advanced Cluster Management for Kubernetes - RHACM
+= Red Hat Advanced Cluster Management for Kubernetes - RHACM
 
 == Working with Kubernetes Clusters and Cluster Lifecycle
 

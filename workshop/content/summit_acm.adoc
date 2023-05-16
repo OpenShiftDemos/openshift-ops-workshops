@@ -1,14 +1,37 @@
 = Red Hat Advanced Cluster Management for Kubernetes - RHACM
 
+== Goal of the Workshop
+
+In this 20-60 minute session, participants will learn how to work with Red Hat Advanced Cluster Management for Kubernetes (RHACM) 
+
+Participants will walk through these 3 major use cases:
+
+** Multi-Cluster Lifecycle
+  *** Centrally manage, create update and delete Kubernetes clusters.
+  *** Search, find and modify any kubernetes resource across the entire domain.
+  *** Quickly troubleshoot and resolve issues across your federated domain.
+
+** Advanced Application Lifecycle
+  *** Easily deploy applications at scale leveraging GitOps.
+  *** See applications work real time from multiple sources.
+  *** Quickly visualize application relationships across clusters and those that span clusters.
+
+** Policy Driven Governance
+  *** Centrally set and enforce policies for security, applications, and infrastructure.
+  *** Quickly visualize detailed auditing on configuration of apps and clusters.
+  *** Leverage Policy Generator to generate policies at scale.
+
+Let's get started! 
+
 == Working with Kubernetes Clusters and Cluster Lifecycle
 
 At a high level Cluster Lifecycle management is about creating, upgrading, and destroying and importing clusters in a multi cloud environment, whenever that might be OpenShift Hosted Control Plane Cluster - HCP - a Single Node Cluster - SNO - or a Normal OpenShift cluster.
 
 In the demo console where you have all the credentials, you will find the *OCP Console URL, Username and Password, AWS credentials*, *Access Key ID*, *Secret Access Key*, and the *Base DNS Domain*.
 
-To get started, switch over to the OpenShift Console 
+** To get started, switch over to the *OpenShift Console* 
 {{ MASTER_URL }}
-Remember that the login is kubeadmin and the password is:
+** Remember that the login is *kubeadmin* and the *password* is:
 {{ KUBEADMIN_PASSWORD }}
 
 Once you have logged in to OpenShift Console, Navigate to the *Cluster drop down menu* and then select  *All Clusters* this will bring you to the RHACM interface.
@@ -139,6 +162,9 @@ Bind the *open-cluster-management:subscription-admin* ClusterRole to the user cr
 * On the top tabs, click on *Policies*
 * Click *Create Policy* 
 * On the top switch the toogle to Display the YAML 
+
+image::images/acm_governance_yaml.png[]
+
 * Copy the following YAML and paste it on the YAML screen 
 
 ----
@@ -232,7 +258,7 @@ spec:
   clusterSelector:
     matchExpressions:
       - {key: name, operator: In, values: ["local-cluster"]} 
- ----
+----    
 
 * Enter a namespace to place the policy, default name space is OK to use
 * Click *Next* till the end and then *Submit*
@@ -242,6 +268,8 @@ Allow for the policy to propagate to the Local-cluster - RHACM Hub Cluster.
 * Navigate back to policies and select the *policy-configure-subscription-admin-hub* policy. 
 
 * Under the actions dropdown, select *Enforced* This will enforce the policy, wait until green checkmark is displayed.
+
+image::images/acm_governance_yaml2.png[]
 
 === Using Policy Generator 
 
@@ -295,4 +323,6 @@ image::images/acm-policy3.png[]
 Feel free to repeat the steps with the *kubeadmin-removed* Policy, however if you enforce this you won't be able to access that cluster through the console as the only account created on these clusters is Kubadmin.
 
 Now you have succesfully created a Policy leveraing the Policy Generator to scan your clusters, if you would like to play with other policies please visit the https://github.com/stolostron/policy-collection[Policy Repo] for more Policies you can test out.
+
+Thank you for working 
 

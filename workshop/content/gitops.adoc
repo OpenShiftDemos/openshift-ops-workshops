@@ -142,8 +142,7 @@ In addition to these descriptions, ArgoCD also supports hooks. Hooks in ArgoCD a
 
 By navigating to your `OpenShift Console` and accessing the `Operators` tab, you can verify the successful installation of the `Pipelines Operator` under the `Installed Operators` tab.
 
-=== <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<ADD IMAGE HERE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
+image::images/gitops-images/pipelines-openshift.png[]
 
 ===  Adding a Banner to ArgoCD
 

@@ -8,4 +8,3 @@ modules:
   - summit_ldap
   - summit_acm
   - summit_acs
-  - summit_extra

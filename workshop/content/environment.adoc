@@ -8,7 +8,7 @@ The OpenShift cluster is essentially set to all defaults and looks like the
 following:
 
 * 3 master nodes
-* 2 worker nodes
+* 2 or 3 worker nodes
 * 1 bastion host
 
 link:https://github.com/openshift-labs/workshop-dashboard[Homeroom] is a

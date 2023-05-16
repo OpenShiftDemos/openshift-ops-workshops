@@ -298,7 +298,7 @@ It will take a few minutes to deploy the application, *Click* on the *Topology T
 
 image::images/acm-topology2.png[]
 
-* Navigate to the *Governanc* tab 
+* Navigate to the *Governance* tab 
 * Click on the *Policies* tab
 * Verify that you see 2 policies and that there *Cluster Violations* count is 1
 ** *kubeadmin-removed*
@@ -324,5 +324,5 @@ Feel free to repeat the steps with the *kubeadmin-removed* Policy, however if yo
 
 Now you have succesfully created a Policy leveraing the Policy Generator to scan your clusters, if you would like to play with other policies please visit the https://github.com/stolostron/policy-collection[Policy Repo] for more Policies you can test out.
 
-Thank you for working 
+In Summary, we worked with a OpenShift Hosted Control Plane cluster, deploy applications and manage policies all with Red Hat Advanced Cluster Management for Kubernetes, making it much easier to build, manage and secure your Kubernetes Clusters.
 

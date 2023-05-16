@@ -213,7 +213,7 @@ In the box to the right, look for `home-banner`.
 [start=2]
 2. Click on `home-banner` for more information. You should see that its `KIND` is a `ConsoleNotification`.
 
-image::images/gitops-images/consolenotification.png[]
+image::images/gitops-images/consolenotification2.png[]
 
 [start=3]
 3. To see the `home-banner`, switch back to the `terminal` and click on the following command:

@@ -8,7 +8,7 @@ In this workshop, we aim to cover the fundamental aspects of Openshift Ops and d
 
 === Admin Ops Modules
 
-The Admin Ops section of the workshop is divided into two modules: the first module focuses on Openshift, a container application platform that uses Kubernetes for managing and automating the deployment, scaling, and operations of containerized applications. The second module provides an introduction to OpenShift Ops, covering the basics of the OpenShift 4 cluster installation and utilizing a Kubernetes feature called ServiceAccounts to interact with the OpenShift API.
+The OpenShift Admin Ops section consists of three modules. The first module, Environment, provides an introduction to the OpenShift 4 cluster and the homeroom environment. In the second module, Installation & Verification, participants explore the components and procedures involved in an OpenShift 4 installation. The third module focuses on configuring OAuth, synchronizing LDAP groups with OpenShift groups, implementing group policies, and creating collaborative projects.
 
 === Red Hat Advanced Cluster Management for Kubernetes
 

@@ -322,7 +322,7 @@ image::images/acm-policy3.png[]
 
 Feel free to repeat the steps with the *kubeadmin-removed* Policy, however if you enforce this you won't be able to access that cluster through the console as the only account created on these clusters is Kubadmin.
 
-Now you have succesfully created a Policy leveraing the Policy Generator to scan your clusters, if you would like to play with other policies please visit the https://github.com/stolostron/policy-collection[Policy Repo] for more Policies you can test out.
+Now you have succesfully created a Policy leveraing the Policy Generator to scan your clusters, if you would like to play with other policies please visit the https://github.com/stolostron/policy-collection[Policy Repo] for more Policies you can test out
 
 Thank you for working 
 

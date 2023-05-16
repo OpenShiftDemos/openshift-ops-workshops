@@ -643,4 +643,4 @@ For more information about integration with SIEM tools, see the RHACS help docum
 ---
 
 
-If you made it this far ping mfoster@redhat.com for what his summary should look like
+If you made it this far ping mfoster@redhat.com for what his summary should look like.

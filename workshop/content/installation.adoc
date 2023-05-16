@@ -210,9 +210,10 @@ oc get clusterversion
 And you will see some output like:
 
 ```
-NAME      VERSION   AVAILABLE   PROGRESSING   SINCE   STATUS
-version   4.12.9    True        False         11h     Cluster version is 4.1
-2.9
+NAME      VERSION   AVAILABLE   
+version   4.12.9    True      
+PROGRESSING   SINCE   STATUS
+False         11h     Cluster version is 4.12.9
 ```
 
 For more details, you can execute the following command:

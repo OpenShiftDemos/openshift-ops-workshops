@@ -540,6 +540,10 @@ See 'oc new-app -h' for examples.
 
 This failure is exactly what we wanted to see.
 
+#### Prometheus
+
+Users can utilize Prometheus with LDAP integration to enhance authentication and authorization capabilities. By configuring Prometheus to authenticate against an LDAP server, users can ensure secure access to Prometheus with their LDAP credentials. Additionally, LDAP integration allows administrators to define fine-grained access control policies, granting or restricting Prometheus functionalities based on LDAP user groups or attributes. This enables seamless integration of Prometheus into an LDAP-managed environment, providing centralized user management and access control for monitoring and alerting operations.
+
 After you are done, make sure to login again as the admin user:
 
 [source,bash,role="execute"]

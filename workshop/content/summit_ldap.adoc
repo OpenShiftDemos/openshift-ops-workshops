@@ -1,1 +1,550 @@
+## Configuring External Authentication Providers
 
+OpenShift supports a number of different authentication providers, and you can
+find the complete list in the
+link:https://docs.openshift.com/container-platform/4.9/authentication/understanding-identity-provider.html[understanding
+identity provider configuration]. One of the most commonly used authentication
+providers is LDAP, whether provided by Microsoft Active Directory or by other
+sources.
+
+OpenShift can perform user authentication against an LDAP server, and can also
+configure group membership and certain RBAC attributes based on LDAP group
+membership.
+
+### Background: LDAP Structure
+
+In this environment we are providing LDAP with the following user groups:
+
+* `ose-user`: Users with OpenShift access
+** Any users who should be able to log-in to OpenShift must be members of this
+group
+** All of the below mentioned users are in this group
+* `ose-normal-dev`: Normal OpenShift users
+** Regular users of OpenShift without special permissions
+** Contains: `normaluser1`, `teamuser1`, `teamuser2`
+* `ose-fancy-dev`: Fancy OpenShift users
+** Users of OpenShift that are granted some special privileges
+** Contains: `fancyuser1`, `fancyuser2`
+* `ose-teamed-app`: Teamed app users
+** A group of users that will have access to the same OpenShift *Project*
+** Contains: `teamuser1`, `teamuser2`
+
+#### Examine the OAuth configuration
+Since this is a pure, vanilla OpenShift 4 installation, it has the default OAuth resource. You can examine that OAuth configuration with the following:
+
+[source,bash,role="execute"]
+----
+oc get oauth cluster -o yaml
+----
+
+You will see something like:
+
+[source,yaml]
+----
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
+    release.openshift.io/create-only: "true"
+  creationTimestamp: "2022-02-09T23:06:59Z"
+  generation: 1
+  name: cluster
+  ownerReferences:
+  - apiVersion: config.openshift.io/v1
+    kind: ClusterVersion
+    name: version
+    uid: c9cbd13c-99bf-4e82-b2ad-690810a01f2f
+  resourceVersion: "1715"
+  uid: 1bedd82d-b235-4e39-af98-e40f411c3c8e
+spec: {}
+----
+
+There are a few things to note here. Firstly, there's basically nothing here!
+How does the `kubeadmin` user work, then? The OpenShift OAuth system knows to
+look for a `kubeadmin` *Secret* in the `kube-system` *Namespace*. You can
+examine it with the following:
+
+[source,bash,role="execute"]
+----
+oc get secret -n kube-system kubeadmin -o yaml
+----
+
+You will see something like:
+
+[source,yaml]
+----
+apiVersion: v1
+data:
+  kubeadmin: JDJhJDEwJFYwcVBXRjZGTlNOOU1RYUN6SGtJVGV4T3I5Ym9DbGRTT0VmNS44UGl2cWZOUGdsTnkvb3hT
+kind: Secret
+metadata:
+  creationTimestamp: "2022-02-09T23:06:14Z"
+  name: kubeadmin
+  namespace: kube-system
+  resourceVersion: "576"
+  uid: 834a86fd-96e6-4d6a-8c16-6eca251b10f0
+type: Opaque
+----
+
+That *Secret* contains the encoded hash of the `kubeadmin` password. This
+account will continue to work even after we configure a new `OAuth`. If you
+want to disable it, you would need to delete the secret.
+
+In a real-world environment, you will likely want to integrate with your
+existing identity management solution. For this lab we are configuring LDAP
+as our `identityProvider`. Here's an example of the OAuth configuration. Look
+for the element in `identityProviders` with `type: LDAP` like the following:
+
+[source,yaml]
+----
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+  - name: ldap <1>
+    challenge: false
+    login: true
+    mappingMethod: claim <2>
+    type: LDAP
+    ldap:
+      attributes: <3>
+        id:
+        - dn
+        email:
+        - mail
+        name:
+        - cn
+        preferredUsername:
+        - uid
+      bindDN: "uid=openshiftworkshop,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com" <4>
+      bindPassword: <5>
+        name: ldap-secret
+      ca: <6>
+        name: ca-config-map
+      insecure: false
+      url: "ldaps://ldap.jumpcloud.com/ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com?uid?sub?(memberOf=cn=ose-user,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com)" <7>
+  tokenConfig:
+    accessTokenMaxAgeSeconds: 86400
+----
+
+Some notable fields under `identityProviders:`:
+
+<1> `name`: The unique ID of the identity provider. It is possible to have
+multiple authentication providers in an OpenShift environment, and OpenShift is
+able to distinguish between them.
+
+<2> `mappingMethod: claim`: This section has to do with how usernames are
+assigned within an OpenShift cluster when multiple providers are configured. See
+the
+link:https://docs.openshift.com/container-platform/4.9/authentication/understanding-identity-provider.html#identity-provider-parameters_understanding-identity-provider[Identity provider parameters] section for more information.
+
+<3> `attributes`: This section defines the LDAP fields to iterate over and
+assign to the fields in the OpenShift user's "account". If any attributes are
+not found / not populated when searching through the list, the entire
+authentication fails. In this case we are creating an identity that is
+associated with the LDAP `dn`, an email address from the LDAP `mail`, a name from
+the LDAP `cn`, and a username from the LDAP `uid`.
+
+<4> `bindDN`: When searching LDAP, bind to the server as this user.
+
+<5> `bindPassword`: Reference to the Secret that has the password to use when binding for searching.
+
+<6> `ca`: Reference to the ConfigMap that contains the CA certificate to use for
+validating the SSL certificate of the LDAP server.
+
+<7> `url`: Identifies the LDAP server and the search to perform.
+
+For more information on the specific details of LDAP authentication in
+OpenShift you can refer to the
+link:https://docs.openshift.com/container-platform/4.9/authentication/identity_providers/configuring-ldap-identity-provider.html[Configuring
+an LDAP identity provider^] documentation.
+
+To setup the LDAP identity provider we must:
+
+1. Create a `Secret` with the bind password.
+2. Create a `ConfigMap` with the CA certificate.
+3. Update the `cluster` `OAuth` object with the LDAP identity provider.
+
+As the `kubeadmin` user apply the OAuth configuration with `oc`.
+
+[source,bash,role="execute"]
+----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+----
+
+This command will create a Kubernetes secret named "ldap-secret" in the "openshift-config" namespace with a single data item. The data item is named "bindPassword" and its value is set to "b1ndP^ssword"
+
+[source,bash,role="execute"]
+----
+oc create secret generic ldap-secret --from-literal=bindPassword=b1ndP^ssword -n openshift-config
+----
+
+Download the certificate and save it to the file 'ca.crt' with this command:
+
+[source,bash,role="execute"]
+----
+wget https://certs.godaddy.com/repository/gd-class2-root.crt -O {{ HOME_PATH }}/support/ca.crt
+----
+
+----
+If you see `Unable to establish SSL connection.` please click the above command again before proceeding.
+----
+
+Click this command to create a new ConfigMap named ca-config-map in the openshift-config namespace. The ConfigMap is populated with the contents of the file {{ HOME_PATH }}/support/ca.crt. It then applys the file.
+
+[source,bash,role="execute"]
+----
+oc create configmap ca-config-map --from-file={{ HOME_PATH }}/support/ca.crt -n openshift-config
+oc apply -f {{ HOME_PATH }}/support/oauth-cluster.yaml
+----
+
+[Note]
+====
+We use `apply` because there is an existing `OAuth` object. If you used
+`create` you would get an outright error that the object already exists. You
+still get a warning, but that's OK.
+====
+
+This will trigger a redployment of the oAuth Operator. You can monitor the rollout with the following command.
+
+
+[source,bash,role="execute"]
+----
+oc rollout status deployment/oauth-openshift -n openshift-authentication
+----
+
+#### Syncing LDAP Groups to OpenShift Groups
+In OpenShift, groups can be used to manage users and control permissions for
+multiple users at once. There is a section in the documentation on how to
+link:https://docs.openshift.com/container-platform/4.9/authentication/ldap-syncing.html[sync
+groups with LDAP^]. Syncing groups involves running a program called `groupsync`
+when logged into OpenShift as a user with `cluster-admin` privileges, and using
+a configuration file that tells OpenShift what to do with the users it finds in
+the various groups.
+
+We have provided a `groupsync` configuration file for you:
+
+View configuration file
+[source,bash,role="execute"]
+----
+cat {{ HOME_PATH }}/support/groupsync.yaml
+----
+
+Without going into too much detail (you can look at the documentation), the
+`groupsync` config file does the following:
+
+* searches LDAP using the specified bind user and password
+* queries for any LDAP groups whose name begins with `ose-`
+* creates OpenShift groups with a name from the `cn` of the LDAP group
+* finds the members of the LDAP group and then puts them into the created
+  OpenShift group
+* uses the `dn` and `uid` as the UID and name attributes, respectively, in
+  OpenShift
+
+Execute the `groupsync`:
+
+[source,bash,role="execute"]
+----
+oc adm groups sync --sync-config={{ HOME_PATH }}/support/groupsync.yaml --confirm
+----
+
+You will see output like the following:
+
+----
+group/ose-fancy-dev
+group/ose-user
+group/ose-normal-dev
+group/ose-teamed-app
+----
+
+What you are seeing is the *Group* objects that have been created by the
+`groupsync` command. If you are curious about the `--confirm` flag, check the
+output of the help with `oc adm groups sync -h`.
+
+If you want to see the *Groups* that were created, execute the following:
+
+[source,bash,role="execute"]
+----
+oc get groups
+----
+
+You will see output like the following:
+
+----
+NAME             USERS
+ose-fancy-dev    fancyuser1, fancyuser2
+ose-normal-dev   normaluser1, teamuser1, teamuser2
+ose-teamed-app   teamuser1, teamuser2
+ose-user         fancyuser1, fancyuser2, normaluser1, teamuser1, teamuser2
+----
+
+Take a look at a specific group in YAML:
+
+[source,bash,role="execute"]
+----
+oc get group ose-fancy-dev -o yaml
+----
+
+The YAML looks like:
+
+[source,yaml]
+----
+apiVersion: user.openshift.io/v1
+kind: Group
+metadata:
+  annotations:
+    openshift.io/ldap.sync-time: "2022-02-10T01:49:07Z"
+    openshift.io/ldap.uid: cn=ose-fancy-dev,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com
+    openshift.io/ldap.url: ldap.jumpcloud.com:636
+  creationTimestamp: "2022-02-10T01:49:07Z"
+  labels:
+    openshift.io/ldap.host: ldap.jumpcloud.com
+  name: ose-fancy-dev
+  resourceVersion: "68628"
+  uid: 374c463a-bdd2-4da1-ae1a-619eca0994f6
+users:
+- fancyuser1
+- fancyuser2
+----
+
+OpenShift has automatically associated some LDAP metadata with the *Group*, and
+has listed the users who are in the group.
+
+What happens if you list the *Users*?
+
+[source,bash,role="execute"]
+----
+oc get user
+----
+
+You will get:
+
+----
+No resources found.
+----
+
+Why would there be no *Users* found? They are clearly listed in the *Group*
+definition.
+
+*Users* are not actually created until the first time they try to log in. What
+you are seeing in the *Group* definition is simply a placeholder telling
+OpenShift that, if it encounters a *User* with that specific ID, that it should
+be associated with the *Group*.
+
+#### Change Group Policy
+In your environment, there is a special group of super developers called
+_ose-fancy-dev_ who should have special `cluster-reader` privileges. This is a role
+that allows a user to view administrative-level information about the cluster.
+For example, they can see the list of all *Projects* in the cluster.
+
+Change the policy for the `ose-fancy-dev` *Group*:
+
+[source,bash,role="execute"]
+----
+oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
+----
+
+[Note]
+====
+If you are interested in the different roles that come with OpenShift, you can
+learn more about them in the
+link:https://docs.openshift.com/container-platform/4.9/authentication/using-rbac.html[role-based access control (RBAC)^] documentation.
+====
+
+#### Examine `cluster-reader` policy
+Go ahead and login as a regular user: (if you get an error, wait a few minutes and try again) 
+
+[source,bash,role="execute"]
+----
+oc login -u normaluser1 -p Op#nSh1ft
+----
+
+Then, try to list *Projects*:
+
+[source,bash,role="execute"]
+----
+oc get projects
+----
+
+You will see:
+
+----
+No resources found.
+----
+
+Now, login as a member of `ose-fancy-dev`:
+
+[source,bash,role="execute"]
+----
+oc login -u fancyuser1 -p Op#nSh1ft
+----
+
+And then perform the same `oc get projects` command: 
+
+[source,bash,role="execute"]
+----
+oc get projects
+----
+
+You will now see the list of all of the projects in the cluster:
+
+----
+[~] $ oc get projects
+NAME                                               DISPLAY NAME   STATUS
+default                                                           Active
+kube-node-lease                                                   Active
+kube-public                                                       Active
+kube-system                                                       Active
+lab-ocp-cns                                                       Active
+openshift                                                         Active
+openshift-apiserver                                               Active
+...
+----
+
+You should now be starting to understand how RBAC in OpenShift Container
+Platform can work.
+
+#### Create Projects for Collaboration
+Make sure you login as the cluster administrator:
+
+[source,bash,role="execute"]
+----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+----
+
+Then, create several *Projects* for people to collaborate:
+
+[source,bash,role="execute"]
+----
+oc adm new-project app-dev --display-name="Application Development"
+oc adm new-project app-test --display-name="Application Testing"
+oc adm new-project app-prod --display-name="Application Production"
+----
+
+You have now created several *Projects* that represent a typical Software
+Development Lifecycle setup. Next, you will configure *Groups* to grant
+collaborative access to these projects.
+
+[Note]
+====
+Creating projects with `oc adm new-project` does *not* use the project request
+process or the project request template. These projects will not have quotas or
+limitranges applied by default. A cluster administrator can "impersonate" other
+users, so there are several options if you wanted these projects to get
+quotas/limit ranges:
+
+. use `--as` to specify impersonating a regular user with `oc new-project`
+. use `oc process` and provide values for the project request template, piping
+  into create (eg: `oc process ... | oc create -f -`). This will create all of
+  the objects in the project request template, which would include the quota and
+  limit range.
+. manually create/define the quota and limit ranges after creating the projects.
+
+For these exercises it is not important to have quotas or limit ranges on these
+projects.
+====
+
+#### Map Groups to Projects
+As you saw earlier, there are several roles within OpenShift that are
+preconfigured. When it comes to *Projects*, you similarly can grant view, edit,
+or administrative access. Let's give our `ose-teamed-app` users access to edit the
+development and testing projects:
+
+[source,bash,role="execute"]
+----
+oc adm policy add-role-to-group edit ose-teamed-app -n app-dev
+oc adm policy add-role-to-group edit ose-teamed-app -n app-test
+----
+
+And then give them access to view production:
+
+[source,bash,role="execute"]
+----
+oc adm policy add-role-to-group view ose-teamed-app -n app-prod
+----
+
+Now, give the `ose-fancy-dev` group edit access to the production project:
+
+[source,bash,role="execute"]
+----
+oc adm policy add-role-to-group edit ose-fancy-dev -n app-prod
+----
+
+#### Examine Group Access
+Log in as `normaluser1` and see what *Projects* you can see:
+
+[source,bash,role="execute"]
+----
+oc login -u normaluser1 -p Op#nSh1ft
+oc get projects
+----
+
+You should get:
+
+----
+No resources found.
+----
+
+Then, try `teamuser1` from the `ose-teamed-app` group:
+
+[source,bash,role="execute"]
+----
+oc login -u teamuser1 -p Op#nSh1ft
+oc get projects
+----
+
+You should get:
+
+----
+NAME       DISPLAY NAME              STATUS
+app-dev    Application Development   Active
+app-prod   Application Production    Active
+app-test   Application Testing       Active
+----
+
+You did not grant the team users edit access to the production project. Go ahead
+and try to create something in the production project as `teamuser1`:
+
+[source,bash,role="execute"]
+----
+oc project app-prod
+oc new-app docker.io/siamaksade/mapit
+----
+
+You will see that it will not work:
+
+----
+error: can't lookup images: imagestreamimports.image.openshift.io is forbidden: User "teamuser1" cannot create resource "imagestreamimports" in API group "image.openshift.io" in the namespace "app-prod"
+error:  local file access failed with: stat docker.io/siamaksade/mapit: no such file or directory
+error: unable to locate any images in image streams, templates loaded in accessible projects, template files, local docker images with name "docker.io/siamaksade/mapit"
+
+Argument 'docker.io/siamaksade/mapit' was classified as an image, image~source, or loaded template reference.
+
+The 'oc new-app' command will match arguments to the following types:
+
+  1. Images tagged into image streams in the current project or the 'openshift' project
+     - if you don't specify a tag, we'll add ':latest'
+  2. Images in the Docker Hub, on remote registries, or on the local Docker engine
+  3. Templates in the current project or the 'openshift' project
+  4. Git repository URLs or local paths that point to Git repositories
+
+--allow-missing-images can be used to point to an image that does not exist yet.
+
+See 'oc new-app -h' for examples.
+----
+
+This failure is exactly what we wanted to see.
+
+After you are done, make sure to login again as the admin user:
+
+[source,bash,role="execute"]
+----
+oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
+----
+
+That concludes the OpenShift admin modules. Thanks for working through it!

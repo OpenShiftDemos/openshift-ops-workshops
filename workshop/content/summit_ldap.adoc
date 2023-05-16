@@ -195,7 +195,7 @@ wget https://certs.godaddy.com/repository/gd-class2-root.crt -O {{ HOME_PATH }}/
 If you see `Unable to establish SSL connection.` please click the above command again before proceeding.
 ----
 
-Click this command to create a new ConfigMap named ca-config-map in the openshift-config namespace. The ConfigMap is populated with the contents of the file {{ HOME_PATH }}/support/ca.crt. It then applys the file.
+Click this command to create a new ConfigMap named ca-config-map in the openshift-config namespace. The ConfigMap is populated with the contents of the file {{ HOME_PATH }}/support/ca.crt. It then applies the file.
 
 [source,bash,role="execute"]
 ----

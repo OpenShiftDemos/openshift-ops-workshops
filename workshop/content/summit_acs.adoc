@@ -1,9 +1,8 @@
 
-= Kubernetes Security with Red Hat Advanced Cluster Security (Title to be changed)
+= Red Hat Advanced Cluster Security for Kubernetes - RHACS
 
-== Goal of the Workshop
+== Goal of the RHACS Lab Portion
 
-In this 20-60 minute session, participants will learn how to identify vulnerabilities in Kubernetes using the Red Hat Advanced Cluster Security for Kubernetes (RHACS) dashboard, focusing on the log4shell exploit. The session will cover how to effectively implement controls in a Kubernetes cluster and discuss the unique aspects of specific vulnerabilities. The optional section of this lab will discuss how to implement these controls into the build, deploy, and runtime stages. Additionally, if time permits, participants are encouraged to explore the interface for other security features that may be helpful for their use cases. 
 
 == RHACS Basics
 
@@ -17,22 +16,24 @@ These security features represent any developer or administrator's primary work 
 
 Using Red Hat Advanced Cluster Security for Kubernetes, you can gain comprehensive Kubernetes security that includes the following use cases:
 
-* Visibility: See your entire landscape of images, registries, containers, deployments, and runtime behavior.
-* Vulnerability Management: Identify and remediate vulnerabilities in container images and Kubernetes across the entire software development life cycle.
-* Compliance: Audit your systems against CIS Benchmarks, NIST, PCI, and HIPAA, with interactive dashboards and one-click audit reports.
-* Network Segmentation: Visualize existing connections and enforce tighter segmentation using Kubernetes-native controls to reduce your blast radius.
-* Risk Profiling: See all your deployments ranked by risk level, using context from Kubernetes' declarative data, to prioritize remediation.
-* Configuration Management: Apply best practices for Docker and Kubernetes to harden your environment for a more secure and stable application.
-* Threat Detection: Use rules, automated allow lists, and baselining to identify suspicious activity in your running applications accurately.
-Incident Response: Take action, from failing builds and blocking deployments to killing pods and thwarting attacks, using Kubernetes for enforcement.
+* *Visibility*: See your entire landscape of images, registries, containers, deployments, and runtime behavior.
+* *Vulnerability Management*: Identify and remediate vulnerabilities in container images and Kubernetes across the entire software development life cycle.
+* *Compliance*: Audit your systems against CIS Benchmarks, NIST, PCI, and HIPAA, with interactive dashboards and one-click audit reports.
+* *Network Segmentation*: Visualize existing connections and enforce tighter segmentation using Kubernetes-native controls to reduce your blast radius.
+* *Risk Profiling*: See all your deployments ranked by risk level, using context from Kubernetes' declarative data, to prioritize remediation.
+* *Configuration Management*: Apply best practices for Docker and Kubernetes to harden your environment for a more secure and stable application.
+* *Threat Detection*: Use rules, automated allow lists, and baselining to identify suspicious activity in your running applications accurately.
+* *Incident Response*: Take action, from failing builds and blocking deployments to killing pods and thwarting attacks, using Kubernetes for enforcement.
 
 == Workshop Setup
 
-=== Deploying the INSECURE Demo Application Sources - MANDATORY
+=== Deploy the INSECURE demo application to the cluster - MANDATORY
 
 In order to have the applications and vulnerabilities necessary for the demo, we need to introduce a few vulnerable applications into the cluster.
 
-The command below will clone the tutorial sources and set the *TUTORIAL_HOME* environment variable to point to the root directory of the tutorial and deploy the applications:
+The command below will clone the tutorial sources and set the *TUTORIAL_HOME* environment variable to point to the root directory of the tutorial and deploy the applications.
+
+1.  Please click the button to run the command in the terminal.
 
 [source,bash,role="execute"]
 ----
@@ -43,10 +44,13 @@ kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/ --recursive
 ----
 
 |===
-*NOTE* This command applies a plethora of manifests to your environment. The important part is that the deployments are up and running. The
-
-Run the following command and ensure that the applications are up and running
+NOTE: This command applies a significant number of manifests to your environment. All of these applications are insecure and pose a significant threat if used elsewhere. Please use the command with caution.
 |===
+
+Now Let's verify our deployment was successful!
+
+[start=2]
+2. Run the following command and ensure that the applications are up and running
 
 [source,bash,role="execute"]
 ----
@@ -65,48 +69,59 @@ payments       visa-processor     1/1     1            1           0d
 spring4shell   spring4shell-app   3/3     3            3           0d
 ```
 
+|===
+NOTE: If all of the applications are up and running please proceed to the next stage. If the applications are not healthy please run the deployment command again.
+|===
+
 == Navigating the RHACS console and Vulnerability Management
 
 The first half of this lab will focus on navigation and vulnerability management. This work will take place in the UI and require you to use both the dashboard and the lab environment.
 
-=== Access the RHACS Console
+=== Accessing the RHACS Console
 
-In this section, you confirm that you can connect to RHACS from the command line and that you can connect to the RHACS portal. The following information will be available in the lab URL.
+In this section, you will confirm that you can connect to that you can connect to the RHACS portal. The following information will be available in the lab URL.
 
 *Requirements* 
 
 * The RHACS `admin` credentials
 * The URL for the RHACS portal
 
-|===
-*NOTE* You will get a warning page that the webpage is not private. During setup, RHACS can utilize your certification server to avoid these errors. It is also best practice to integrate the application with your authentication server. 
-|===
-
-image::images/webpage-warning.png[]
-
 .Procedure
 [start=1]
 . Click the URL for the RHACS web console to head to the console's login page.
 ** For example, 'https://central-stackrox.apps.cluster-4klh8.4klh8.sandbox1150.opentlc.com'
 
-image::images/00-console-dashboard-3.png[RHACS console login]
+image::images/00-console-dashboard-2.png[demo console login]
+
+|===
+*NOTE* You will get a warning page that the webpage is not private. During setup, RHACS can utilize your certification server to avoid these errors. It is also best practice to integrate the application with your authentication server. 
+|===
 
 [start=2]
-. Log in with the ADMINISTRATOR credentials (admin)
+. Click through the warning page to get to the RHACS console login page
+
+image::images/acs-webpage-warning-00.png[]
+image::images/acs-webpage-warning-01.png[]
+image::images/00-console-dashboard-3.png[RHACS console login]
+
+[start=3]
+. Log in with the ADMINISTRATOR credentials from the main demo page. These crendentials are located with all of the demo credentials and will be underneath the RHACS console URL (The Username is always *admin*)
 
 image::images/00-console-dashboard-4.png[RHACS input]
 
-[start=3]
+[start=4]
 . Ensure you maintain access to the console and keep your tab open for the future lab sections. 
 
 image::images/00-console-dashboard-5.png[RHACS dashboard]
 
-= Navigating the RHACS Console
+This lab will exclusively take place in the RHACS console and Bookbag instructional terminal
+
+== Navigating the RHACS Console
 In this section, you familiarize yourself with the RHACS portal, including its tabs, search capabilities and dashboard functionality.
 
 Head to the RHACS web console from the course introduction lab. If you do not have access, please repeat the steps in the first lab titled "Access the RHACS Console."
 
-== The 4 Main Dashboard Sections
+=== The 4 Main Sections of the Dashboard
 The RHACS dashboard has four main sections:
 
 [start=1]
@@ -147,15 +162,21 @@ A search query consists of two parts:
 * An attribute that identifies the resource type you want to search for.
 * A search term that finds the matching resource.
 
-*For example,* to find all violations in the visa-processor deployment, the search query is Deployment:visa-processor. In this search query, Deployment is the attribute, and visa-processor is the search term.
+*For example,* to find all violations in the visa-processor deployment, the search query is *Deployment:visa-processor*. 
 
 image::images/01-dashboard-02.png[RHACS search visa]
+
+In this search query, *Deployment* is the attribute, and *visa-processor* is the search term.
+
+|===
+NOTE: When using the search functionality you must click the provided info from the dropdown. RHACS maintains a library of searchable assets to help you search faster. If CVE or deployment cannot be searched it is most likely because the resource is not in the cluster or incorrectly typed. 
+|===
 
 ==== Using local page filtering
 You can use local page filtering from within all views in the RHACS portal. Local page filtering works similarly to the global search, but only relevant attributes are available. You can select the search bar to show all available attributes for a specific view.
 
 ==== Common search queries
-Here are some common search queries you can run with Red Hat Advanced Cluster Security for Kubernetes.
+Here are some common search queries you can try in the RHACS search bar if you'd like to test it's functionality.
 
 [start=1]
 . Finding deployments that are affected by a specific CVE
@@ -223,9 +244,6 @@ The Red Hat Advanced Cluster Security for Kubernetes (RHACS) Dashboard provides 
 
 image::images/01-dashboard-04.png[RHACS main dashboard]
 
-[NOTE]
-When you open the RHACS portal for the first time, the Dashboard might be empty. After you deploy Sensor in at least one cluster, the Dashboard reflects the status of your environment.
-
 == Navigating the Main Dashboard
 
 The main Dashboard is your place to look at the vulnerabilities, risk, compliance, and policy violations across your clusters and namespaces. This section addresses all of the functionality in the main Dashboard to help you navigate it more effectively in the future.
@@ -257,56 +275,64 @@ The Status Bar provides at-a-glance numerical counters for critical resources. T
 |Secrets|Configuration Management → Application & Infrastructure → Secrets
 |===
 === The Dashboard Filter
-The Dashboard includes a top-level filter that applies simultaneously to all widgets. You can select clusters and one or more namespaces within selected clusters. *When no clusters or namespaces are selected, the view automatically switches to All*. Any change to the filter is immediately reflected by all widgets, limiting the data they present to the selected scope. 
+The Dashboard includes a top-level filter that applies simultaneously to all widgets. You can select clusters and one or more namespaces within selected clusters. Any change to the filter is immediately reflected by all widgets, limiting the data they present to the selected scope. 
+
+
 
 [NOTE]
-The Dashboard filter does not affect the Status Bar.
+The Dashboard filter does not affect the Status Bar and when no clusters or namespaces are selected, the view automatically switches to *All* 
 
 image::images/01-dashboard-06.png[RHACS dashboard filter]
 
 === Actionable widgets (Optional)
 
+|===
 If you have time, adjust the dashboards filtering options and the widgets themselves to hone the filtering capabilities. 
-
-RHACS never seeks to highlight misconfigurations or vulnerabilities. Everything can be seen and triaged accordingly. 
+|===
 
 == Vulnerability Management Dashboard
 
-Let us start with Vulnerability Management, a familiar topic for most security teams. Click the *Vulnerability Management* tab, and then select *Dashboard*
+Let us continue by looking at our primary use case for RHACS and that is the *Vulnerability Management* features and dashboard, a familiar topic for most security teams. 
+
+|===
+*NOTE:* The locations and size of your panels may vary depending on your screen size and zoom.
+|===
+|===
+*NOTE:* For the following section, please note that the order in which the images appear or the number of components affected may vary depending on versions and other applications running in the cluster.
+|===
+
+.Procedure
+[start=1]
+. Click the *Vulnerability Management* tab, and then select *Dashboard*
 
 image::images/vuln-1.png[]
-
-The overview provides several important reports - where the vulnerabilities are, the most widespread or the most recent, where Docker images are coming from, and important vulnerabilities in the cluster itself.
-
-|===
-*NOTE:* the locations and size of your panels may vary depending on your screen size and zoom. The pictures below will help to highlight the specific panels.
-|===
-
 image::images/vuln-2.png[]
 
-More important than fixing any vulnerability is establishing a process to keep container images updated and to prevent the promotion through the pipeline for images with serious, fixable vulnerabilities. ACS displays this through the *Top Risky Deployments by CVE and CVSS Score*. ACS takes the container's configuration and vulnerability details to show you the most *at risk* deployments in your cluster.
+The dashboard provides several important vulnerability breakdowns suchs as:
+
+* Top risky deployments/images
+* Frequently violated policies
+* Recently detected vulnerabilities
+* Most common image vulnerabilities
+
+More important than fixing any vulnerability is establishing a process to keep container images updated and to prevent the promotion through the pipeline for images with serious, fixable vulnerabilities. RHACS displays this through the *Top Risky Deployments by CVE and CVSS Score* and takes the container's configuration and vulnerability details to show you the most *at risk* deployments in your cluster.
 
 image::images/vuln-3.png[]
 
-Above the *Risky Deployment* section, there are buttons to link you to all policies, CVEs, and images, and a menu to bring you to reports by cluster, namespace, deployment, and component. The vulnerability dashboard can be filtered by clicking the *Fixable CVSS* score button.
+[start=2]
+. Above the *Risky Deployment* section, there are buttons to link you to all policies, CVEs, and images, and a menu to bring you to reports by cluster, namespace, deployment, and component. The vulnerability dashboard can be filtered by clicking the *Fixable CVSS* score button.
 
 image::images/vuln-4.png[]
 
-Locate the *Top Riskiest Images* panel. Here you can see the CVEs associated with containers currently running in the cluster. The goal is to find the log4shell exploit in your cluster and block that container from being pushed in the future.
+[start=4]
+. Locate the *Top Riskiest Images* panel. Here you can see the CVEs associated with containers currently running in the cluster. The goal is to find the log4shell exploit in your cluster and block that container from being pushed in the future.
 
 image::images/vuln-5.png[]
 
-* In the *Top Riskiest Images* panel, click on the *VIEW ALL* button. 
+[start=5]
+. In the *Top Riskiest Images* panel, click on the *VIEW ALL* button.
 
-|===
-*NOTE:* For the following sections, please note that the order in which the images appear or the number of components affected may vary depending on versions and other applications running in the cluster.
-|===
-
-=== Image Overview and Details
-
-Now you will see that the images are listed here in order of risk, based on the number and severity of the vulnerabilities present in the components in the images. 
-
-Take a look:
+The images in this dashboard are listed here in order of RISK, based on the number and severity of the vulnerabilities present in the components in the images
 
 image::images/images-1.png[]
 
@@ -319,9 +345,8 @@ Notice which images are more exposed. Not only can we see the number of CVEs aff
 - How many deployments are using the vulnerable image
 - The total components in the image
 
-You can click and get information about the CVEs and which are fixable.
-
-* In the Top Riskiest Images, *find and click on* the image *visa-processor:latest-v2*. You will review the images' components and violations. 
+[start=6]
+. Next, find and click on the image *visa-processor:latest-v2*. You will review the images' components and violations. 
 
 image::images/images-2.png[]
 
@@ -339,9 +364,9 @@ You can move on to the next section only when the dashboard displays the image b
 
 image::images/images-4.png[]
 
-==== ACS Vulnerability Scanner
+==== RHACS Vulnerability Scanner
 
-ACS' built-in vulnerability scanner breaks down images into layers and components - where components can be operating-system installed packages or dependencies installed by programming languages like Python, Javascript, or Java. The *Image Summary* provides the essential security details of the image overall, with links to the components. Below you can see why the image is ranked as a critically vulnerable application:
+RHACS' built-in vulnerability scanner breaks down images into layers and components - where components can be operating-system installed packages or dependencies installed by programming languages like Python, Javascript, or Java. The *Image Summary* provides the essential security details of the image overall, with links to the components. Below you can see why the image is ranked as a critically vulnerable application:
 
 * In the DETAILS & METADATA → Image OS panel, the information you see there tells you that this image has a severe security problem - the base image was imported several years ago (Debian 8 - 2015).
 
@@ -358,13 +383,17 @@ image::images/risk-6.png[]
 The Dockerfile tab view shows the layer-by-layer view, and, as you can see, the most recent layers are also several years old. Time is not kind to images and components - as vulnerabilities are discovered, ACS will display newly discovered CVEs.
 
 |===
-It is not practical to ask your teams to fix Linux or Javascript - but we think it is reasonable to ask them to pick up fixes published by those communities.
-|===    
+Now lets put this UI to the test with a real use case.
+|===
 
 === log4shell CVE Vulnerability Analysis
 
-It is time to find the components that have the log4shell vulnerability in your cluster.
+It is time to find the components that have the log4shell vulnerability in your cluster. Zero day and high priority vulnerabilities need to be triaged quickly. The log4shell vulnerability provides a great example of how security teams can asses a vulnerabilities impact quickly and effectively.
 
+|===
+Check out the https://access.redhat.com/security/vulnerabilities/RHSB-2021-009[Red Hat advisory] for more details)
+|===
+0
 * Head back to the *Top Riskiest Images* Dashboard
 
 * Search for the log4shell vulnerability using its CVE number (CVE-2021-44228)
@@ -382,11 +411,11 @@ The log4shell CVE is very serious - scoring 10/10 - and is fixable.
 
 Luckily there is only *ONE* image being affected by this vulnerability, so you could go directly to the source and fix all three deployments in one opportunity. 
 
+How would your DevSecOps team address this vulnerability?
+
 == Relating Image CVEs with Kubernetes Configuration Properties
 
-All of this CVE detail is well and good, but it is a bit noisy. How do we judge the genuine risk - which vulnerabilities are likely to be exploited? Which vulnerabilities do we have to fix first?
-
-ACS can use other sources of information in OpenShift to judge the risk that a given vulnerability would be exploited and set priorities for fixes.
+All of these CVE details are well and good, but they are a bit noisy. How do we judge the genuine risk - which vulnerabilities are likely to be exploited? Which vulnerabilities do we have to fix first? RHACS can use other sources of information in OpenShift to judge the risk that a given vulnerability would be exploited and set priorities for fixes.
 
 The first risk factor - is the vulnerable component in a running deployment.
 
@@ -449,13 +478,13 @@ image::images/policy-3.png[]
 
 If you click the actions button, you will see how easy it is to edit, clone, export or disable these policies. We also recommended cloning the policies and adding or removing specific filters as you need them. 
 
-= Runtime Policy Enforcement
+Now let's move on to a more day-to-day example of blocking package managers from installing new software into our OpenShift clusters.
 
-== Runtime Policy Features
+== Runtime Policy Enforcement
+
+=== Runtime Policy Features
 
 RHACS observes the processes running in containers, and collects this information to write policies. This information can also be used to create baseline policy configurations that can be updated by the user.
-
-This allows the user to quickly assess and address novel situations.
 
 === Prevent Execution of Package Manager Binary
 
@@ -477,88 +506,85 @@ Further, because a runtime policy may detect only part of an attacker's activity
 On the *Policy Management* page, type `Policy` + `Ubuntu` into the filter bar at the top.
 ====
 
-. Select the policy `Ubuntu Package Manager Execution`, and edit the policy.
-. Use the `Policy Behavior` tab and enable runtime enforcement by clicking the `inform and enforce button`
-. Click *Save*.
+. Select the policy `Ubuntu Package Manager Execution`.
+. Click the `Actions`` button then click `Edit policy`.
+. Select the `Policy Behavior` tab 
+. Enable runtime enforcement by clicking the `inform and enforce button`
+. Configure enforcement behavior by selecting `Enforce at Runtime`
+
 
 image::images/10_runtime_00.png[RHACS run time Violations]
 
+. Click *Save*.
+
+|===
+Make sure to save the policy changes!!! If you do not save the policy the process will not be blocked!!
+|===
+
 === Test Policy (Bookbag Environment)
 
-In this section, you use `tmux` to watch OpenShift _events_ while running the test, so you can see how RHACS enforces the policy at runtime.
+Next, we will use `tmux` to watch OpenShift _events_ while running the test, so you can see how RHACS enforces the policy at runtime.
 
 .Procedure
 . On your student VM, start `tmux` with two panes:
-+
+
 [source,bash,role="execute"]
 ----
 tmux new-session \; split-window -v \; attach 
 ----
-+
-. Run a watch on OpenShift events in the first shell pane:
-+
+
+[start=2]
+. Next, run a watch on OpenShift events in the first shell pane:
+
 [source,bash,role="execute"]
 ----
 oc get events -w
 ----
-+
-. Type `Ctrl-b o` to switch to the next pane.
+
+[start=3]
+. Press `Ctrl-b o` to switch to the next pane. (Ctrl+b THEN o)
 . Run a temporary Ubuntu OS image using the `tmp-shell` application:
-+
+
 [source,bash,role="execute"]
 ----
 oc run tmp-shell --labels="app=tmp-shell" --rm -i --tty --image ubuntu:18.04 -- /bin/bash
 ----
-+
-.Sample Output
+
+|===
+NOTE: After the cluster pulls the image and starts the pod, expect to see a Linux command shell as shown.
+|===
+
+Sample Output
+
 [source,texinfo]
 ----
 If you don't see a command prompt, try pressing enter.
 root@tmp-shell:/#
 ----
-+
-After the cluster pulls the image and starts the pod, expect to see a Linux command shell as shown.
 
+[start=4]
 . Run the package manager in this shell:
-+
+
 [source,bash,role="execute"]
 ----
-root@tmp-shell-65c98c7766-66fpw:/# apt update
+apt update
 ----
-+
+
+[start=5]
 . Examine the output and expect to see that the package manager performs an update operation:
-+
-.Sample Output
+
+Sample Output
 [source,texinfo]
 ----
-Get:1 http://security.ubuntu.com/ubuntu bionic-security InRelease [88.7 kB]
-Get:2 http://archive.ubuntu.com/ubuntu bionic InRelease [242 kB]
-Get:3 http://security.ubuntu.com/ubuntu bionic-security/restricted amd64 Packages [860 kB]
-Get:4 http://archive.ubuntu.com/ubuntu bionic-updates InRelease [88.7 kB]
-Get:5 http://archive.ubuntu.com/ubuntu bionic-backports InRelease [74.6 kB]
-Get:6 http://archive.ubuntu.com/ubuntu bionic/universe amd64 Packages [11.3 MB]
-Get:7 http://security.ubuntu.com/ubuntu bionic-security/universe amd64 Packages [1484 kB]
-Get:8 http://security.ubuntu.com/ubuntu bionic-security/multiverse amd64 Packages [21.1 kB]
-Get:9 http://security.ubuntu.com/ubuntu bionic-security/main amd64 Packages [2660 kB]
-Get:10 http://archive.ubuntu.com/ubuntu bionic/main amd64 Packages [1344 kB]
-Get:11 http://archive.ubuntu.com/ubuntu bionic/multiverse amd64 Packages [186 kB]
-Get:12 http://archive.ubuntu.com/ubuntu bionic/restricted amd64 Packages [13.5 kB]
-Get:13 http://archive.ubuntu.com/ubuntu bionic-updates/restricted amd64 Packages [893 kB]
-Get:14 http://archive.ubuntu.com/ubuntu bionic-updates/main amd64 Packages [3098 kB]
-Get:15 http://archive.ubuntu.com/ubuntu bionic-updates/universe amd64 Packages [2262 kB]
-Get:16 http://archive.ubuntu.com/ubuntu bionic-updates/multiverse amd64 Packages [29.8 kB]
-Get:17 http://archive.ubuntu.com/ubuntu bionic-backports/main amd64 Packages [11.6 kB]
-Get:18 http://archive.ubuntu.com/ubuntu bionic-backports/universe amd64 Packages [12.6 kB]
-97% [13 Packages store 0 B]
-Fetched 24.7 MB in 3s (7158 kB/s)
-Reading package lists... Done
-Building dependency tree
-Reading state information... Done
-All packages are up to date.
+Get:1 http://archive.ubuntu.com/ubuntu bionic InRelease [242 kB]
+0% [1 InRelease 14.2 kB/242 kB 6%] [Connecting to security.ubuntu.com (2620:2d:4000:1::16)]Sess
+ion ended, resume using 'oc attach tmp-shell -c tmp-shell -i -t' command when the pod is running
+No resources found
 ----
-+
-. Examine the `oc get events` tmux pane, and note that it shows that RHACS detected the package manager invocation and deleted the pod:
-+
+
+[start=6]
+. Examine the `oc get events` tmux pane (The pane on the bottom), and note that it shows that RHACS detected the package manager invocation and deleted the pod:
+
 .Sample Output
 [source,texinfo,options="nowrap"]
 ----
@@ -573,9 +599,10 @@ All packages are up to date.
 +
 After about 30 seconds, you can see that the pod is deleted.
 
-. In your `tmux` shell pane, note that your shell session has terminated and that you are returned to the student VM command line:
-+
-.Sample Output
+[start=7]
+. In your `tmux` shell pane, note that your shell session has terminated and that you are returned to the student VM command line
+
+*Sample Output*
 [source,texinfo,options="nowrap"]
 ----
 root@tmp-shell:/#
@@ -584,6 +611,10 @@ No resources found
 [lab-user@bastion ~]$
 ----
 
+Congrats! You have successfully stopped yourself from downloading malicious packages! However, the security investigative process continues. 
+
+You have raised a flag that needs to be triaged!
+
 == Report and Resolve Violations
 
 At this point, any attacker using a shell to install software is now disconnected from the environment.
@@ -591,21 +622,25 @@ A complete record of the event is available on the *Violations* page.
 
 .Procedure
 . Navigate to the *Violations* page.
-. Find the violation labeled `tmp-shell` and select the `Ubuntu Package Manager Execution` policy.
+. Filter by the policy violation `Ubuntu Package Manager Execution` OR by the most recent policy violations. You will see a policy violation the has been enforced 1 time.
+. Click the most recent violation and explore the list of the violation events:
 
-. Explore the list of the violation events:
-+
 image::images/rhacs_runtime_violations_tmp-shell.png[RHACS run time Violations]
-+
+
 If configured, each violation record is pushed to a Security Information and Event Management (SIEM) integration, and is available to be retrieved via the API.
 The forensic data shown in the UI is recorded, including the timestamp, process user IDs, process arguments, process ancestors, and enforcement action.
-+
-For more information about integration with SIEM tools, see the RHACS help documentation on link:https://docs.openshift.com/acs/3.74/welcome/index.html#integrating-with-other-products[external tools^].
-+
+
 After this issue is addressed--in this case by the RHACS product using the runtime enforcement action--you can remove it from the list by marking it as `Resolved`.
 
-. Hover over the violation in the list to see the resolution options:
-+
+[start=4]
+. Lastly, hover over the violation in the list to see the resolution options and resolve this issue as operator error.
+
 image::images/rhacs_runtime_violations_tmp-shell_resolved.png[RHACS Violation Resolved]
 
-Summary needed here. 
+For more information about integration with SIEM tools, see the RHACS help documentation on link:https://docs.openshift.com/acs/3.74/welcome/index.html#integrating-with-other-products[external tools^].
+
+
+---
+
+
+If you made it this far ping mfoster@redhat.com for what his summary should look like. 

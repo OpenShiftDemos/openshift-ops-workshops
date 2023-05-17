@@ -1,0 +1,6 @@
+image::images/summit_final.png[]
+
+= That concludes LB2214 - Hands on with Red Hat OpenShift Platform Plus | Red Hat Summit & AnsibleFest 2023.
+
+== We hope you enjoy the rest of Red Hat Summit & AnsibleFest 2023!
+

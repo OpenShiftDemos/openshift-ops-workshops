@@ -1,0 +1,11 @@
+name: Hands on with OCP Plus Workshop
+
+modules:
+  activate:
+  - summit_intro
+  - environment
+  - installation
+  - summit_ldap
+  - summit_acm
+  - summit_acs_intro
+  - summit_acs_runtime

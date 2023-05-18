@@ -3,8 +3,8 @@ name: Hands on with OCP Plus Workshop
 modules:
   activate:
   - summit_intro
-  - environment
-  - installation
+  - summit_environment
+  - summit_installation
   - summit_ldap
   - summit_acm
   - summit_acs_1_intro

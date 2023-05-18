@@ -44,7 +44,7 @@ modules:
   summit_intro:
     name: Introduction
   summit_acm:
-    name: ACM Module
+    name: ACM Cluster and Lifeclycle Management
   summit_acs_1_intro:
     name: ACS Introduction and Vulnerability Management Walkthrough
   summit_acs_2_runtime:

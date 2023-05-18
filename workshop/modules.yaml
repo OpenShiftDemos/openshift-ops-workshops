@@ -43,8 +43,6 @@ modules:
     name: Multicluster management with ACM
   summit_intro:
     name: Introduction
-  gitops:
-    name: gitops-test
   summit_acm:
     name: ACM Module
   summit_acs_1_intro:

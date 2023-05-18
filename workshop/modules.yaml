@@ -52,7 +52,9 @@ modules:
   summit_acs_2_runtime:
     name: ACS Runtime Enforcement
   summit_extra:
-    name: Extra Credit 
+    name: Extra Credit
+  summit_ldap:
+    name: External (LDAP) Authentication Providers, Users, and Groups
   
 config:
     template_engine: liquid.js  

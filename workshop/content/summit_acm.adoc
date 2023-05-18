@@ -2,7 +2,7 @@
 
 == Goal of the Workshop
 
-In this 20-60 minute session, participants will learn how to work with Red Hat Advanced Cluster Management for Kubernetes (RHACM) 
+In this 30 minute session, participants will learn how to work with Red Hat Advanced Cluster Management for Kubernetes (RHACM) 
 
 Participants will walk through these 3 major use cases:
 

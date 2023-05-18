@@ -8,4 +8,4 @@ modules:
   - summit_ldap
   - summit_acm
   - summit_acs_1_intro
-  - summit_acs_1_runtime
+  - summit_acs_2_runtime

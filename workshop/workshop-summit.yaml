@@ -7,5 +7,5 @@ modules:
   - installation
   - summit_ldap
   - summit_acm
-  - summit_acs_intro
-  - summit_acs_runtime
+  - summit_acs_1_intro
+  - summit_acs_1_runtime

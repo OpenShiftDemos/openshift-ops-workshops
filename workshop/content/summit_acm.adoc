@@ -167,6 +167,7 @@ image::images/acm_governance_yaml.png[]
 
 * Copy the following YAML and paste it on the YAML screen 
 
+[source,none,role="copypaste copypaste-warning"]
 ----
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy

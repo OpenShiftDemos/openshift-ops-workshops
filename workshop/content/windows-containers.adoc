@@ -499,11 +499,12 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 PS C:\Users\Administrator>
 ----
 
-Once on the Windows Node, you can see the `docker`, `kubelet`, and the `hybrid-overlay-node` process running.
+Once on the Windows Node, you can see the `containerd`, `hybrid-overlay-node`, `kubelet`, `kube-proxy`,
+`windows_exporter` and `windows-instance-config-daemon` processes are running.
 
 [source,bash,role="execute"]
 ----
-Get-Process | ?{ $_.ProcessName -match "kube|overlay|docker" } 
+Get-Process | ?{ $_.ProcessName -match "daemon|exporter|kube|overlay|containerd" }
 ----
 
 You should see the following output.
@@ -512,52 +513,19 @@ You should see the following output.
 ----
 Handles  NPM(K)    PM(K)      WS(K)     CPU(s)     Id  SI ProcessName
 -------  ------    -----      -----     ------     --  -- -----------
-    342      20    80008      46020      16.95   2640   0 dockerd
-    245      18    31740      38364      13.02   2376   0 hybrid-overlay-node
-    416      28    59812      84740     176.48   2036   0 kubelet
-    302      23    36272      46056      61.64   3968   0 kube-proxy
+    171      14    32780      30652       3.63   5484   0 containerd
+    252      17    33712      37144       1.61    292   0 hybrid-overlay-node
+    605      31    60244      81452      47.27    756   0 kubelet
+    274      21    38404      42992       5.53   5256   0 kube-proxy
+    472      23    41572      38320      16.23   1140   0 windows_exporter
+    205      16    31880      32128       1.55    592   0 windows-instance-config-daemon
 ----
-
-WARNING: Currently, the Docker-formatted container runtime is used in Windows nodes. Kubernetes is deprecating Docker as a container runtime; you can reference the Kubernetes documentation for more information about the link:https://kubernetes.io/blog/2020/12/02/dont-panic-kubernetes-and-docker/[Docker deprecation]. `Containerd` will be the new supported container runtime for Windows nodes in a future release of Kubernetes.
 
 These are the main components needed to run a Windows Node. Remember that
 this node is managed the same way as a Linux node, Via the MachineAPI;
 so you won't have to do much with this Windows Node.
 
-One caveat, however, is that Windows Containers can be quite large
-(in some cases up to 8Gigs in size!). This will timeout the deployment
-of your Windows Containers workloads. A workaround is to "pre-pull"
-any base containers.
-
-[source,bash,role="execute"]
-----
-docker pull mcr.microsoft.com/windows/servercore:ltsc2019
-----
-
-This pull process can take some time. While it's pulling,
-take note of the version of the container you are pulling is
-`mcr.microsoft.com/windows/servercore:ltsc2019`. The version you
-need to pull will differ between Windows Server versions.
-
-NOTE: Since the OS Kernel differs from version to version of Windows Server, the base container needed will differ depending on what version of Windows Server you're running. Please see link:https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/version-compatibility?tabs=windows-server-20H2%2Cwindows-10-20H2[Microsoft's documentation] about supported container image versions.
-
-After some time, the image should be on the host.
-
-[source,bash,role="execute"]
-----
-docker images
-----
-
-You should see the following output.
-
-[source,bash]
-----
-REPOSITORY                             TAG        IMAGE ID       CREATED       SIZE
-mcr.microsoft.com/windows/servercore   ltsc2019   9a0a02eca0e6   4 weeks ago   5.7GB
-----
-
-Now that you've pre-pulled the Windows Server container image, you can
-exit out of the PowerShell session.
+You can now exit out of the PowerShell session.
 
 [source,bash,role="execute"]
 ----
@@ -651,7 +619,7 @@ Apply this YAML file to deploy the sample workload.
 oc apply -f ~/support/winc-sample-workload.yaml
 ----
 
-Wait for the deployment to finish rolling out.
+Wait for the deployment to finish rolling out. This can take 5-10 minutes as Windows images are large in size.
 
 [source,bash,role="execute"]
 ----
@@ -683,23 +651,49 @@ Now log into the Windows Node using the hostname. Example:
 bash-4.4$ sshcmd.sh ip-10-0-140-10.ec2.internal
 ----
 
+To view Windows containers running on the node, you need to install the `crictl` tool
+to interact with the containerd runtime.
+
+[source,bash,role="execute"]
+----
+$ProgressPreference = "SilentlyContinue"; wget https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.27.0/crictl-v1.27.0-windows-amd64.tar.gz -o crictl-v1.27.0-windows-amd64.tar.gz; tar -xvf crictl-v1.27.0-windows-amd64.tar.gz -C C:\Windows\
+----
+
+Now lets configure `crictl`.
+[source,bash,role="execute"]
+----
+crictl config --set runtime-endpoint="npipe:\\\\.\\pipe\\containerd-containerd"
+----
+
 Here, you can see the Windows container running on the node.
 
 [source,bash,role="execute"]
 ----
-docker ps
+crictl ps
 ----
 
-Here you'll see the Container running along with the `pause` container
-as well. Here is an example output.
+Here you'll see the Container running. Here is an example output.
 
 [source,bash]
 ----
-CONTAINER ID   IMAGE                                          COMMAND                  CREATED          STATUS          PORTS     NAMES
-68e3e51ff76d   9a0a02eca0e6                                   "powershell.exe -com…"   38 seconds ago   Up 36 seconds             k8s_win
-dowswebserver_win-webserver-6bc7795585-prgrj_winc-sample_34c3f4b7-4e74-42d4-9d51-cac59e4d1b58_0
-f5cdf462e916   mcr.microsoft.com/oss/kubernetes/pause:3.4.1   "/pause.exe"             39 seconds ago   Up 38 seconds             k8s_POD
-_win-webserver-6bc7795585-prgrj_winc-sample_34c3f4b7-4e74-42d4-9d51-cac59e4d1b58_0
+CONTAINER           IMAGE               CREATED             STATE               NAME                ATTEMPT             POD ID              POD
+ac18c2aa692cf       66a1a48cbc112       2 minutes ago       Running             windowswebserver    0                   a2f1b580c659c       win-webserver-7b76494c5-s9m2q
+----
+
+You can also see the images downloaded on the host.
+
+[source,bash,role="execute"]
+----
+crictl images
+----
+
+You should see the following output.
+
+[source,bash]
+----
+IMAGE                                    TAG                 IMAGE ID            SIZE
+mcr.microsoft.com/oss/kubernetes/pause   3.6                 9adbbe02501b1       104MB
+mcr.microsoft.com/windows/servercore     ltsc2019            66a1a48cbc112       2.02GB
 ----
 
 Go ahead an logout of the Windows Node
@@ -736,13 +730,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 PS C:\>
 ----
 
-Here, you can query the TaskManager to see the HTTP process running.
+Here, you can query for the running HTTP process.
 
 NOTE: You may have to press `ENTER` to execute the following commands while in the Windows Container for them to run.
 
 [source,bash,role="execute"]
 ----
-tasklist /M /FI "IMAGENAME eq powershell.exe"  | Select-String -Pattern http
+Get-WmiObject Win32_Process -Filter "name = 'powershell.exe'" | Select-Object CommandLine | Select-String -Pattern http
 ----
 
 Go ahead an logout of the Windows Container.
@@ -795,26 +789,6 @@ order to successfully deploy the application stack, make sure you're
 
 NOTE: For more information about `helm` and how it can be used as a package manager for your containerized workloads, please see the link:https://docs.openshift.com/container-platform/4.7/cli_reference/helm_cli/getting-started-with-helm-on-openshift-container-platform.html[OpenShift documentation]
 
-[source,bash,role="execute"]
-----
-oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
-----
-
-Once you've verified you are a cluster admin, you will need to extract
-some information. You will need the hostname of the Windows node
-installed and the ssh key used to login to the Windows Node.
-
-The reason for this is part of the Helm Chart deploys a `Job` that downloads the
-image of the frontend application as a link:https://helm.sh/docs/topics/charts_hooks/#the-available-hooks[pre-deploy hook].
-
-NOTE: Please revist the <<Exploring The Windows Node>> exercise for more info on why the downloading of the image is needed.
-
-[source,bash,role="execute"]
-----
-export WSSHKEY=$(oc get secret cloud-private-key -n openshift-windows-machine-config-operator -o jsonpath='{.data.private-key\.pem}')
-export WNODE=$(oc get nodes -l kubernetes.io/os=windows -o jsonpath='{.items[0].metadata.name}')
-----
-
 Next add the Red Hat Developer Demos Helm repository.
 
 [source,bash,role="execute"]
@@ -829,9 +803,8 @@ the application stack using the `helm` cli.
 [source,bash,role="execute"]
 ----
 helm install ncs --namespace netcandystore \
---create-namespace --timeout=1200s \
-redhat-demos/netcandystore \
---set ssh.hostkey=${WSSHKEY} --set ssh.hostname=${WNODE}
+--timeout=1200s \
+redhat-demos/netcandystore
 ----
 
 NOTE: Note that the `--timeout=1200s` is needed because the default timeout for `helm` is 5 minutes and, in most cases, the Windows container image will take longer than that to download.

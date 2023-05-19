@@ -1,18 +1,14 @@
-== Runtime Policy Enforcement
-
 === Runtime Policy Features
 
-RHACS observes the processes running in containers, and collects this information to write policies. This information can also be used to create baseline policy configurations that can be updated by the user.
+RHACS observes container processes and collects this information to enable you to craft policies to prevent behavior that you don't like. This information can also create baseline policy configurations that the user can update.
+
+The example below demonstrates how security may want to block a package manager from downloading any packages to the container. This runtime enforcement option is the first in the process of *shifting left*. After runtime enforcement, you will want to stop the package manager from being used in the container altogether.
 
 === Prevent Execution of Package Manager Binary
 
 Package managers like `apt` (Ubuntu), `apk` (Alpine), or `yum` (RedHat) are binary software components used to manage and update installed software on a Linux^(R)^ host system. They are used extensively to manage running virtual machines. But using a package manager to install or remove software on a running container violates the immutable principle of container operation.
 
-This policy demonstrates how RHACS detects and avoids a runtime violation, using Linux kernel instrumentation to detect the running process and OpenShift^(R)^ to terminate the pod for enforcement.
-
-Using OpenShift to enforce runtime policy is preferable to enforcing rules directly within containers or in the container engine, as it avoids a disconnect between the state that OpenShift is maintaining and the state in which the container is actually operating.
-
-Further, because a runtime policy may detect only part of an attacker's activity inside a container, removing the container avoids the attack.
+This policy demonstrates how RHACS detects and avoids a runtime violation, using Linux kernel instrumentation to detect the running process and OpenShift^(R)^ to terminate the pod for enforcement. Using OpenShift to enforce runtime policy is preferable to enforcing rules directly within containers or in the container engine, as it avoids a disconnect between the state that OpenShift is maintaining and the state where the container is operating. Furthermore, because a runtime policy may detect only part of an attacker's activity inside a container, removing the container avoids the attack.
 
 === Enable Enforcement of Policy
 
@@ -120,6 +116,11 @@ After about 30 seconds, you can see that the pod is deleted.
 [start=7]
 . In your `tmux` shell pane, note that your shell session has terminated and that you are returned to the student VM command line
 
+|===
+NOTE: You can always type *exit* into the terminal or *reload the terminal* using the button on the top right of the workshop environment.
+|===
+
+
 *Sample Output*
 [source,texinfo,options="nowrap"]
 ----
@@ -160,5 +161,6 @@ For more information about integration with SIEM tools, see the RHACS help docum
 
 ---
 
+Congrats! You successfully stopped pacakages from being downloaded to the host! Thanks for testing out RHACS! 
 
-If you made it this far ping mfoster@redhat.com for what his summary should look like. 
+Let us know if you have any questions otherwise you are free to explore on your own.

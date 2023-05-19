@@ -1,0 +1,241 @@
+:labname: Deploy-Time Policy Enforcement
+
+== {labname} Lab
+
+:numbered:
+
+== Introduction to {labname}
+
+In this lab, you explore how Red Hat^(R)^ Advanced Cluster Security for Kubernetes (RHACS) can prevent the deployment of applications that violate workflow, configuration, or security best practices before they become actively running containers.
+
+There are two approaches to enforcing deploy-time policies in RHACS:
+
+* In clusters with _listen_ and _enforce_ AdmissionController options enabled, RHACS uses the admission controller to reject deployments that violate policy.
+* In clusters where the enforcement option is disabled, RHACS scales pod replicas to zero for deployments that violate policy.
+
+In this lab, the enforcement action output that is documented assumes that the AdmissionController deployment is created with the listen and enforce options enabled.
+
+.Goals
+
+* Prevent unscanned images from deployment
+* Prevent misuse of environment variables at deploy time
+
+[[labexercises]]
+
+
+== Prevent Unscanned Images from Deployment
+
+RHACS can block the deployment of container images that were not scanned for vulnerabilities either by the RHACS Scanner or other, third-party vulnerability scanners.
+Enforcing the use of vulnerability scanning is an important part of general security practices and in industry and regulatory standards like NIST 800-190, PCI-DSS, and HIPAA.
+
+=== Configure Admission Controller
+
+Using admission controller enforcement for image-based scanning requires enabling the AdmissionController deployment and configuring it to contact image scanners.
+
+.Procedure
+. Verify that admission controller and image scanning are set up properly by navigating to *Platform Configuration -> Clusters -> Production* and verifying that the following settings are enabled:
++
+image::images/rhacs_deploytime_admission_controler.png[RHACS Admission Controller Listen and Enforce Enabled]
+image::images/rhacs_deploytime_image_scanner.png[RHACS Image Scanning Enabled]
++
+CAUTION: Before configuring this lab, be aware that enforcing this policy blocks all deployments that use images for which RHACS Central cannot retrieve results.
+For more information, review the RHACS help for Scanner and Image Registries.
+
+. Navigate to *Platform Configuration -> System Policies*, find the `Images with no scans` policy, and select it to open the side panel.
+. On the first page, click *Edit* (pencil) and enable the policy. This policy rejects attempts to deploy an image that has no scanning status.
++
+. On your student VM, use Kubernetes to deploy a deliberately nonsensical image with no scans:
++
+[source,sh]
+----
+oc new-project test
+oc run nonsense --image=test-nonsense:latest
+----
++
+RHACS evaluates the policy and the Kubernetes admission controller rejects the new deployment:
++
+.Sample Output
+[source,texinfo]
+----
+Error from server (Failed currently enforced policies from StackRox): admission webhook "policyeval.stackrox.io" denied the request:
+The attempted operation violated 1 enforced policy, described below:
+
+Policy: Images with no scans
+- Description:
+    ↳ Alert on deployments with images that have not been scanned
+- Rationale:
+    ↳ Without a scan, there be no vulnerability information for this image
+- Remediation:
+    ↳ Configure the appropriate registry and scanner integrations so that StackRox can
+      obtain scans for your images.
+- Violations:
+    - Image in container 'nonsense' has not been scanned
+
+In case of emergency, add the annotation {"admission.stackrox.io/break-glass": "ticket-1234"} to your deployment with an updated ticket number
+----
++
+If RHACS is deployed without the admission controller webhook, RHACS still enforces the policy and scales down the deployment to `0` replicas:
++
+[source,sh]
+----
+oc get events
+----
++
+.Sample Output
+[source,texinfo,options='nowrap']
+----
+26s    Normal    ScalingReplicaSet      Deployment   Scaled up replica set ubuntu-5bdbf595b8 to 1
+25s    Warning   RHACS enforcement   Deployment   Deployment violated RHACS policy "Images with no scans" and was scaled down
+25s    Normal    ScalingReplicaSet      Deployment   Scaled down replica set ubuntu-5bdbf595b8 to 0
+----
+
+== Enforce Deploy-Time Policy on Misuse of Environment Variables
+
+In this section, you explore using RHACS to prevent the deployment of applications that mishandle sensitive data (such as account keys, certificates, or passwords).
+
+Container-based microservices applications face challenges when providing sensitive information like passwords to running containers. For example, an e-commerce application may have an order status microservice that needs to read records from a database that requires a username and password to execute queries. It is a critical security practice to keep passwords private.
+
+Unfortunately, several methods for distributing secrets that have come into common use fail to protect sensitive content or restrict access to secrets. One of these insecure methods is to store sensitive data in the clear in Kubernetes deployment YAML files. This section demonstrates how RHACS can bring this misuse to light and encourage a developer to use a proper secrets management method.
+
+RHACS also has a separate feature for visibility into the Kubernetes Secrets feature, a method for distributing secrets to deployments natively in Kubernetes. For more information, see the RHACS documentation.
+
+This section demonstrates two separate enforcement points for policies: at build time (perhaps as part of a CI/CD job) and at deployment time in a Kubernetes cluster.
+
+.Procedure
+. Create the following Deployment manifest on your student VM:
++
+[source,sh]
+----
+cat << EOF >$HOME/secrets.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu
+  labels:
+    app: ubuntu
+spec:
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+      - name: ubuntu
+        image: ubuntu:18.04
+        env:
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "abcdefg"
+EOF
+----
++
+. In the *Platform Configuration -> Policy Management* page of the RHACS web console, locate the `Environment Variable Contains Secret` policy.
+. Click the `Actions` drop down and enable the policy.
++
+At build time, the `roxctl` binary can be used to _preview_ the Deployment before actually attempting to create it in a Kubernetes cluster.
++
+. Supply the file containing this YAML to `roxctl` on your student VM to run the Deployment check:
++
+[source,sh]
+----
+roxctl -e $ROX_CENTRAL_ADDRESS:443 deployment check --file ./secrets.yaml --insecure-skip-tls-verify
+----
++
+. Among the policy violations, review the output and expect to see the following:
++
+.Sample Output
+[source,texinfo,options="nowrap"]
+----
+Policy check results for deployments: [ubuntu]
+(TOTAL: 5, LOW: 2, MEDIUM: 2, HIGH: 1, CRITICAL: 0)
+
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|             POLICY             | SEVERITY | BREAKS DEPLOY | DEPLOYMENT |          DESCRIPTION           |           VIOLATION            |          REMEDIATION           |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+| Environment Variable Contains  |   HIGH   |       X       |   ubuntu   |   Alert on deployments with    |     - Environment variable     |   Migrate your secrets from    |
+|             Secret             |          |               |            |   environment variables that   |   'AWS_SECRET_ACCESS_KEY' is   |    environment variables to    |
+|                                |          |               |            |        contain 'SECRET'        | present in container 'ubuntu'  |    orchestrator secrets or     |
+|                                |          |               |            |                                |                                |  your security team's secret   |
+|                                |          |               |            |                                |                                |      management solution.      |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+| No resource requests or limits |  MEDIUM  |       -       |   ubuntu   | Alert on deployments that have | - CPU limit set to 0 cores for |    Specify the requests and    |
+|           specified            |          |               |            |  containers without resource   |       container 'ubuntu'       |  limits of CPU and Memory for  |
+|                                |          |               |            |      requests and limits       |                                |        your deployment.        |
+|                                |          |               |            |                                |  - CPU request set to 0 cores  |                                |
+|                                |          |               |            |                                |     for container 'ubuntu'     |                                |
+|                                |          |               |            |                                |                                |                                |
+|                                |          |               |            |                                | - Memory limit set to 0 MB for |                                |
+|                                |          |               |            |                                |       container 'ubuntu'       |                                |
+|                                |          |               |            |                                |                                |                                |
+|                                |          |               |            |                                |  - Memory request set to 0 MB  |                                |
+|                                |          |               |            |                                |     for container 'ubuntu'     |                                |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|   Pod Service Account Token    |  MEDIUM  |       -       |   ubuntu   |  Protect pod default service   |    - Deployment mounts the     |              Add               |
+|     Automatically Mounted      |          |               |            | account tokens from compromise |    service account tokens.     | `automountServiceAccountToken: |
+|                                |          |               |            |   by minimizing the mounting   |                                |   false` or a value distinct   |
+|                                |          |               |            |     of the default service     | - Namespace has name 'default' |     from 'default' for the     |
+|                                |          |               |            |  account token to only those   |                                |    `serviceAccountName` key    |
+|                                |          |               |            |     pods whose application     |  - Service Account is set to   |    to the deployment's Pod     |
+|                                |          |               |            | requires interaction with the  |           'default'            |         configuration.         |
+|                                |          |               |            |        Kubernetes API.         |                                |                                |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|  Docker CIS 4.1: Ensure That   |   LOW    |       -       |   ubuntu   |   Containers should run as a   | - Container 'ubuntu' has image | Ensure that the Dockerfile for |
+|  a User for the Container Has  |          |               |            |         non-root user          |        with user 'root'        |  each container switches from  |
+|          Been Created          |          |               |            |                                |                                |         the root user          |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|   Ubuntu Package Manager in    |   LOW    |       -       |   ubuntu   |      Alert on deployments      | - Container 'ubuntu' includes  |    Run `dpkg -r --force-all    |
+|             Image              |          |               |            |     with components of the     |    component 'apt' (version    |     apt apt-get && dpkg -r     |
+|                                |          |               |            |     Debian/Ubuntu package      |            1.6.14)             |  --force-all debconf dpkg` in  |
+|                                |          |               |            |    management system in the    |                                | the image build for production |
+|                                |          |               |            |             image.             | - Container 'ubuntu' includes  |          containers.           |
+|                                |          |               |            |                                |   component 'dpkg' (version    |                                |
+|                                |          |               |            |                                |       1.19.0.5ubuntu2.3)       |                                |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+WARN:   A total of 5 policies have been violated
+ERROR:  failed policies found: 1 policies violated that are failing the check
+ERROR:  Policy "Environment Variable Contains Secret" within Deployment "ubuntu" - Possible remediation: "Migrate your secrets from environment variables to orchestrator secrets or your security team's secret management solution."
+ERROR:  checking deployment failed after 3 retries: failed policies found: 1 policies violated that are failing the check
+----
++
+In a CI/CD pipeline service, this output is available to the developer via the job's console output, and the job fails because of this failed `roxctl` check.
++
+If a developer were to bypass the CI/CD checks, or deploy manually without any build-time controls, RHACS can still enforce policies at deployment time.
+RHACS does this by using policy evaluation and admission controller enforcement.
++
+. To see this in action, deploy the secrets file:
++
+[source,sh]
+----
+oc create -f secrets.yaml
+----
++
+.Sample Output
+[source,texinfo,options="nowrap"]
+----
+Error from server (Failed currently enforced policies from StackRox): error when creating "secrets.yaml": admission webhook "policyeval.stackrox.io" denied the request:
+The attempted operation violated 1 enforced policy, described below:
+
+Policy: Environment Variable Contains Secret
+- Description:
+    ↳ Alert on deployments with environment variables that contain 'SECRET'
+- Rationale:
+    ↳ Using secrets in environment variables may allow inspection into your secrets
+      from the host or even through the orchestrator UI.
+- Remediation:
+    ↳ Migrate your secrets from environment variables to orchestrator secrets or your
+      security team's secret management solution.
+- Violations:
+    - Environment variable 'AWS_SECRET_ACCESS_KEY' is present in container 'ubuntu'
+
+In case of emergency, add the annotation {"admission.stackrox.io/break-glass": "ticket-1234"} to your deployment with an updated ticket number
+----
+
+== Summary
+
+In this lab, you explored how RHACS can prevent the deployment of applications that violate workflow, configuration, or security best practices before they become actively running containers.
+
+You saw how to use the AdmissionController with the listen and enforce options enabled to reject deployments that violate policy.
+
+In clusters where the enforcement option is disabled, you saw how RHACS scales pod replicas to zero for deployments that violate policy.

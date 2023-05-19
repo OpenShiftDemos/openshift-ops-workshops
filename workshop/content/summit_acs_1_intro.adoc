@@ -1,8 +1,8 @@
-
-= Red Hat Advanced Cluster Security for Kubernetes - ACS
-
 == Goal of the ACS Lab Portion
 
+The goal of the two lab modules is to take you through the RHACS console/user interface and get you used to finding vulnerabilities in your clusters. After you are comfortable, we will apply a runtime policy to block packages from being downloaded to the host. 
+
+If you have questions at any time, please don't hesitate to ask!
 
 == ACS Basics
 
@@ -10,7 +10,7 @@ ACS provides the tools and capabilities to address the security needs of a cloud
 
 The ACS solution offers visibility into the security of your cluster, vulnerability management, and security compliance through auditing, network segmentation awareness and configuration, security risk profiling, security-related configuration management, threat detection, and incident response. In addition, ACS grants an ability to pull the actions from that tooling deep into the application code development process through APIs.
 
-These security features represent any developer or administrator's primary work as they work across various environments, including multiple datacenters, private clouds, or public clouds that run Kubernetes clusters.
+These security features represent any developer or administrator's primary work across various environments, including multiple datacenters, private clouds, or public clouds that run Kubernetes clusters.
 
 === ACS Features
 
@@ -22,14 +22,14 @@ Using Red Hat Advanced Cluster Security for Kubernetes, you can gain comprehensi
 * *Network Segmentation*: Visualize existing connections and enforce tighter segmentation using Kubernetes-native controls to reduce your blast radius.
 * *Risk Profiling*: See all your deployments ranked by risk level, using context from Kubernetes' declarative data, to prioritize remediation.
 * *Configuration Management*: Apply best practices for Docker and Kubernetes to harden your environment for a more secure and stable application.
-* *Threat Detection*: Use rules, automated allow lists, and baselining to identify suspicious activity in your running applications accurately.
+* *Threat Detection*: Use rules, automated allow lists, and baselining to accurately identify suspicious activity in your running applications.
 * *Incident Response*: Take action, from failing builds and blocking deployments to killing pods and thwarting attacks, using Kubernetes for enforcement.
 
 == Workshop Setup (BookBag Environment)
 
 === MANDATORY - Deploy the INSECURE demo application to the cluster
 
-In order to have the applications and vulnerabilities necessary for the demo, we need to introduce a few vulnerable applications into the cluster.
+To have the applications and vulnerabilities necessary for the demo, we need to introduce a few vulnerable applications into the cluster.
 
 The command below will clone the tutorial sources and set the *TUTORIAL_HOME* environment variable to point to the root directory of the tutorial and deploy the applications.
 
@@ -285,7 +285,7 @@ image::images/01-dashboard-7.png[ACS dashboard filter]
 === Actionable widgets (Optional)
 
 |===
-If you have time, adjust the dashboards filtering options and the widgets themselves to hone the filtering capabilities. 
+If you have time, adjust the dashboard filtering options and widgets to hone the filtering capabilities. 
 |===
 
 == Vulnerability Management Dashboard
@@ -305,7 +305,7 @@ Let us continue by looking at our primary use case for ACS and that is the *Vuln
 
 image::images/vuln-01.png[]
 
-The dashboard provides several important vulnerability breakdowns suchs as:
+The dashboard provides several important vulnerability breakdowns such as:
 
 * Top risky deployments/images
 * Frequently violated policies

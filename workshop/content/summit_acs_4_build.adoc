@@ -1,0 +1,316 @@
+:labname: Build-Time Policy Enforcement
+
+== {labname} Lab
+
+:numbered:
+
+== Introduction to {labname}
+
+In this lab, you explore Red Hat^(R)^ Advanced Cluster Security for Kubernetes (RHACS) vulnerability management at build time.
+This allows the build process to fail as soon as a serious, fixable vulnerability is identified in an image.
+
+For this lab, you run a publicly available image prebuilt with known fixable vulnerabilities.
+You also experiment with OpenShift^(R)^ resource manifests and the RHACS ability to warn and enforce violations.
+
+You do both of these activities from the command line and also via a Tekton pipeline.
+
+.Goals
+
+* Trigger build-time violations for images and deployments on the command line and CI/CD pipelines
+* Enforce a container image vulnerability violation at build time
+* Codify an image vulnerability violation enforcement in a pipeline
+* Explore warnings about deployment attributes from the command line
+
+[[labexercises]]
+
+
+== Enforce Container Image Vulnerability Violation at Build Time
+
+In this section, you configure the proper policies for enforcement, test them on the command line, and then execute them via Pipelines.
+
+=== Configure RHACS Policy
+
+.Procedure
+. From the left navigation menu, select *Platform Configuration -> Policy Management*.
+. Scroll down to `Fixable CVSS >= 7` (`rhacs_fix_image_vuln_policy`):
++
+image::images/08_build_00.png[RHACS Policy - Configure]
++
+TIP: You can find this policy quickly by entering `fixable` in the filter bar at the top of the page.
++
+You can see that the `Fixable CVSS >= 7` policy has both the `Build` and `Deploy` lifecycles set as `Enabled: No`.
+RHACS can detect the presence of this vulnerability in images at both stages.
+But it is not yet enabled, and is not yet enforcing.
+The next steps are to edit the policy to enable and enforce it.
+
+. Review the other attributes, and note the `Rationale` and `Guidance` fields, which you can expect to see in the policy output later.
+. Click the `Actions` drop down and enable the policy.
+. You can also edit the policy and preview oputcomes before accept any changes to the policy.
+
+=== Test Image Vulnerability Enforcement
+
+After the enforcement is enabled, you can use `roxctl` to check any image for violations of this policy.
+To run the image check, you need to know the exposed network endpoint for the Central component.
+
+.Procedure
+. Determine the OpenShift route to Central:
++
+[source,sh]
+----
+CENTRAL=$( oc get route central -n stackrox -o json | jq -r '.spec.host' )
+----
++
+. Run the image check:
++
+[source,sh]
+----
+roxctl -e $ROX_CENTRAL_ADDRESS:443 image check --image docker.io/vulnerables/cve-2017-7494 --insecure-skip-tls-verify
+----
++
+.Example Output
+[source,texinfo,options="nowrap"]
+----
+(TOTAL: 5, LOW: 4, MEDIUM: 0, HIGH: 1, CRITICAL: 0)
+
++--------------------------------+----------+--------------+--------------------------------+--------------------------------+--------------------------------+
+|             POLICY             | SEVERITY | BREAKS BUILD |          DESCRIPTION           |           VIOLATION            |          REMEDIATION           |
++--------------------------------+----------+--------------+--------------------------------+--------------------------------+--------------------------------+
+|   Fixable Severity at least    |   HIGH   |      X       |   Alert on deployments with    | - Fixable CVE-2016-2090 (CVSS  |  Use your package manager to   |
+|           Important            |          |              |  fixable vulnerabilities with  | 9.8) (severity Critical) found |  update to a fixed version in  |
+|                                |          |              |   a Severity Rating at least   | in component 'libbsd' (version |  future builds or speak with   |
+|                                |          |              |           Important            | 0.7.0-2), resolved by version  | your security team to mitigate |
+|                                |          |              |                                |         0.7.0-2+deb8u1         |      the vulnerabilities.      |
+|                                |          |              |                                |                                |                                |
+
+[ ... MANY SPECIFIC CVE VIOLATIONS OMITTED ... ]
+[ ... MANY SPECIFIC CVE VIOLATIONS OMITTED ... ]
+[ ... MANY SPECIFIC CVE VIOLATIONS OMITTED ... ]
+
+|                                |          |              |                                |                                |       image to the code.       |
++--------------------------------+----------+--------------+--------------------------------+--------------------------------+--------------------------------+
+|   Ubuntu Package Manager in    |   LOW    |      -       |      Alert on deployments      |   - Image includes component   |    Run `dpkg -r --force-all    |
+|             Image              |          |              |     with components of the     |   'apt' (version 1.0.9.8.4)    |     apt apt-get && dpkg -r     |
+|                                |          |              |     Debian/Ubuntu package      |                                |  --force-all debconf dpkg` in  |
+|                                |          |              |    management system in the    |   - Image includes component   | the image build for production |
+|                                |          |              |             image.             |    'dpkg' (version 1.17.27)    |          containers.           |
++--------------------------------+----------+--------------+--------------------------------+--------------------------------+--------------------------------+
+WARN:	A total of 5 policies have been violated
+ERROR:	failed policies found: 1 policies violated that are failing the check
+ERROR:	Policy "Fixable Severity at least Important" - Possible remediation: "Use your package manager to update to a fixed version in future builds or speak with your security team to mitigate the vulnerabilities."
+ERROR:	checking image failed after 3 retries: failed policies found: 1 policies violated that are failing the check
+----
+When `roxctl` runs an image check, it requests Central to perform the check, evaluate policies, and return the result. Any policy violations are displayed, informing the user of the policy's _rationale_ and any _remediation_ steps. Policy failure is indicated by the process return code of `roxctl`. A zero value indicates success (no policy violation), while a non-zero value indicates failure (policy violations).
++
+NOTE: Because vulnerabilities change often, your output results for the particular CVEs in this image may vary.
+This output is truncated to improve readability.
+
+=== Codify Image Vulnerability Violation Enforcement in Pipeline
+
+When incorporated into a CI/CD build pipeline, this failure code stops the pipeline and leaves the policy violation output in the build job console.
+
+.Procedure
+. Navigate to your OpenShift web console, and on the left navigation menu select *Pipelines -> Pipelines*:
++
+image::images/rhacs_pipeline_pipelines.png[RHACS - OpenShift Console Pipelines]
++
+NOTE: You can find your OpenShift Console URL and credentials in your Red Hat provisioning email message.
+
+. Click `rox-pipeline` to rerun the failed `rox-pipeline` pipeline with the container image you tested earlier from the command line.
++
+. From this *Pipeline details* page, use the *Actions* menu to select *Start*:
++
+image::images/rhacs_pipeline_start.png[RHACS Pipeline Start]
++
+. In the window that appears, paste the container image URL (`docker.io/vulnerables/cve-2017-7494`) and click *Start*:
++
+image::images/rhacs_pipeline_failed_docker.png[RHACS PipelineRun TaskRun failure]
++
+This PipelineRun kicked off a TaskRun to run the `image-check` task.
+It failed the same way it failed on the `stackrox` command line earlier.
+Only this time, it is part of a pipeline and causes a build failure.
+
+. Click the *Logs* tab to see the full output of the `image-check` failure.
++
+NOTE: Because vulnerability changes often, your output results for the particular CVEs in this image may vary.
+The output is truncated for increased readability.
+
+////
+rhacs_pipeline_taskRun_no_bash_enforce_OFF.png
+rhacs_pipeline_taskRun_no_bash.png
+rhacs_pipeline_pipelineRun_failed_CVE7.png
+image::rhacs_pipeline_rerun.png[RHACS PipelineRun Rerun]
+////
+
+== Warn About Deployment Attributes at Build Time
+
+In this section, you explore RHACS's visibility and control over Kubernetes deployment attributes at build time--before an application is deployed--shortening the time to discover and correct workflow and configuration errors.
+
+Kubernetes deployments are defined in YAML and declare the desired state of the application and all of its components.
+Among the many supported attributes are privilege levels, secrets access, storage requirements, and, as illustrated in this next section, network service exposure.
+
+=== Test Warnings About Deployment Attributes from Command Line
+
+This simple YAML file declares an example deployment from a public image, and attempts to expose the service on that deployment on TCP port 22, typically reserved for SSH.
+
+.Procedure
+. On your student VM, create the `$HOME/deployment.yaml` file:
++
+[source,sh]
+----
+cat << EOF >$HOME/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubuntu-lb
+  labels:
+    app: ubuntu
+spec:
+  ports:
+    - port: 22
+  selector:
+    app: ubuntu
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu
+  labels:
+    app: ubuntu
+spec:
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+      - name: ubuntu
+        image: ubuntu:18.04
+        ports:
+        - containerPort: 22
+EOF
+----
+
+. Use `roxctl` to run a check on the YAML code using the `--file` argument:
++
+[source,sh]
+----
+roxctl -e $CENTRAL:443 deployment check --file deployment.yaml --insecure-skip-tls-verify
+----
++
+.Sample Output
+[source,texinfo,options="nowrap"]
+----
+Policy check results for deployments: [ubuntu]
+(TOTAL: 5, LOW: 2, MEDIUM: 2, HIGH: 1, CRITICAL: 0)
+
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|             POLICY             | SEVERITY | BREAKS DEPLOY | DEPLOYMENT |          DESCRIPTION           |           VIOLATION            |          REMEDIATION           |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|    Secure Shell (ssh) Port     |   HIGH   |       -       |   ubuntu   | Alert on deployments exposing  |    - Exposed port 22/TCP is    |  Ensure that non-SSH services  |
+|            Exposed             |          |               |            | port 22, commonly reserved for |            present             | are not using port 22. Ensure  |
+|                                |          |               |            |          SSH access.           |                                |  that any actual SSH servers   |
+|                                |          |               |            |                                |                                |       have been vetted.        |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+| No resource requests or limits |  MEDIUM  |       -       |   ubuntu   | Alert on deployments that have | - CPU limit set to 0 cores for |    Specify the requests and    |
+|           specified            |          |               |            |  containers without resource   |       container 'ubuntu'       |  limits of CPU and Memory for  |
+|                                |          |               |            |      requests and limits       |                                |        your deployment.        |
+|                                |          |               |            |                                |  - CPU request set to 0 cores  |                                |
+|                                |          |               |            |                                |     for container 'ubuntu'     |                                |
+|                                |          |               |            |                                |                                |                                |
+|                                |          |               |            |                                | - Memory limit set to 0 MB for |                                |
+|                                |          |               |            |                                |       container 'ubuntu'       |                                |
+|                                |          |               |            |                                |                                |                                |
+|                                |          |               |            |                                |  - Memory request set to 0 MB  |                                |
+|                                |          |               |            |                                |     for container 'ubuntu'     |                                |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|   Pod Service Account Token    |  MEDIUM  |       -       |   ubuntu   |  Protect pod default service   |    - Deployment mounts the     |              Add               |
+|     Automatically Mounted      |          |               |            | account tokens from compromise |    service account tokens.     | `automountServiceAccountToken: |
+|                                |          |               |            |   by minimizing the mounting   |                                |   false` or a value distinct   |
+|                                |          |               |            |     of the default service     | - Namespace has name 'default' |     from 'default' for the     |
+|                                |          |               |            |  account token to only those   |                                |    `serviceAccountName` key    |
+|                                |          |               |            |     pods whose application     |  - Service Account is set to   |    to the deployment's Pod     |
+|                                |          |               |            | requires interaction with the  |           'default'            |         configuration.         |
+|                                |          |               |            |        Kubernetes API.         |                                |                                |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|  Docker CIS 4.1: Ensure That   |   LOW    |       -       |   ubuntu   |   Containers should run as a   | - Container 'ubuntu' has image | Ensure that the Dockerfile for |
+|  a User for the Container Has  |          |               |            |         non-root user          |        with user 'root'        |  each container switches from  |
+|          Been Created          |          |               |            |                                |                                |         the root user          |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|   Ubuntu Package Manager in    |   LOW    |       -       |   ubuntu   |      Alert on deployments      | - Container 'ubuntu' includes  |    Run `dpkg -r --force-all    |
+|             Image              |          |               |            |     with components of the     |    component 'apt' (version    |     apt apt-get && dpkg -r     |
+|                                |          |               |            |     Debian/Ubuntu package      |            1.6.14)             |  --force-all debconf dpkg` in  |
+|                                |          |               |            |    management system in the    |                                | the image build for production |
+|                                |          |               |            |             image.             | - Container 'ubuntu' includes  |          containers.           |
+|                                |          |               |            |                                |   component 'dpkg' (version    |                                |
+|                                |          |               |            |                                |       1.19.0.5ubuntu2.3)       |                                |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+WARN:	A total of 5 policies have been violated
+----
++
+The warning is clear, and the policy was enforced.
+In the next section, you try it as part of a build pipeline.
+
+=== Warn About Deployment Attributes at Build Time from Pipeline
+
+RHACS does not check only images from pipelines--it can also check the deployment and service manifests.
+In the pipeline provided in this lab, you can paste the base64-encoded manifests into the UI and verify them.
+This is just a simple, focused example.
+In a complete pipeline integration, these manifests are not delivered by hand as base64, but checked out of a source code control system such as Git by means of dedicated Tekton Pipeline tasks.
+
+.Procedure
+. Navigate to your OpenShift web console, and select *Pipelines -> Pipelines* from the left navigation menu:
++
+image::images/rhacs_pipeline_pipelines.png[RHACS - OpenShift Console Pipelines]
++
+NOTE: You can find your OpenShift Console URL and credentials in your Red Hat provisioning email message.
+
+. Select `rox-deploy-pipeline` to run this pipeline with the container image you tested earlier from the command line.
++
+IMPORTANT: This pipeline is named `rox-deploy-pipeline`.
+Do not confuse it with the prior pipeline `rox-pipeline`, which only verifies images.
+
+. From this *Pipeline details* page, use the *Actions* menu to select *Start*:
++
+image::images/rhacs_pipeline_start_check_deploy.png[RHACS Pipeline Start Check Deploy]
+
+. In the window that appears, provide three required parameters:
+.. In the *Parameters yaml* field, paste the following data, which is the base64-encoded representation of the manifests that you created earlier:
++
+[source,texinfo]
+----
+YXBpVmVyc2lvbjogdjEKa2luZDogU2VydmljZQptZXRhZGF0YToKICBuYW1lOiB1YnVudHUtbGIKICBsYWJlbHM6CiAgICBhcHA6IHVidW50dQpzcGVjOgogIHBvcnRzOgogICAgLSBwb3J0OiAyMgogIHNlbGVjdG9yOgogICAgYXBwOiB1YnVudHUKICB0eXBlOiBMb2FkQmFsYW5jZXIKLS0tCmFwaVZlcnNpb246IGFwcHMvdjEKa2luZDogRGVwbG95bWVudAptZXRhZGF0YToKICBuYW1lOiB1YnVudHUKICBsYWJlbHM6CiAgICBhcHA6IHVidW50dQpzcGVjOgogIHNlbGVjdG9yOgogICAgbWF0Y2hMYWJlbHM6CiAgICAgIGFwcDogdWJ1bnR1CiAgdGVtcGxhdGU6CiAgICBtZXRhZGF0YToKICAgICAgbGFiZWxzOgogICAgICAgIGFwcDogdWJ1bnR1CiAgICBzcGVjOgogICAgICBjb250YWluZXJzOgogICAgICAtIG5hbWU6IHVidW50dQogICAgICAgIGltYWdlOiB1YnVudHU6MTguMDQKICAgICAgICBwb3J0czoKICAgICAgICAtIGNvbnRhaW5lclBvcnQ6IDIyCgo=
+----
++
+.. For *Workspaces* -> *files*, select `PersistentVolumeClaim`.
+.. For *Select a PVC*, select the first PVC.
+(PVCs can be reused, because the data is overwritten to the same file inside the PV each time.)
++
+This PipelineRun kicked off two TaskRuns:
++
+* The first, `write-yaml`, decoded the base64 and wrote it to the PV as `/deployfile/deploy.yaml`.
+* The second, `deploy-check`, actually ran `stackrox` against the file.
++
+NOTE: This PipelineRun only generated a warning. This is the same way you received a warning on the `stackrox` command line earlier, but this time it is part of a pipeline.
+
+. Examine the *PipelineRun details* page and note that because there were no enforced policies, you do not see any failures or log snippets.
+
+. Click the *Logs* tab to see the full output of the `deploy-check` failure:
++
+image::images/rhacs_pipeline_deployment_warning_log.png[RHACS Deployment Check Warning]
+
+////
+If you'd like to investigate the `write-yaml` Task, it's implemented like this:
+----
+     script: |
+        #!/usr/bin/env bash
+        echo "$(params.yaml)" | base64 -d > /deployfile/deploy.yml
+----
+////
+
+== Summary
+
+In this lab, you became familiar with how to prevent vulnerabilities from reaching production by triggering build-time violations for images and deployments on the command line and CI/CD pipelines.

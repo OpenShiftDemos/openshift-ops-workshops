@@ -63,7 +63,7 @@ The decoupling of the Control Plane and DP introduced multiple potential benefit
 * *Infra Component Isolation*: Registries, HAProxy, Cluster Monitoring, Storage Nodes, and other infra type components are allowed to be pushed out to the tenant’s cloud provider account isolating their usage of those to just themselves
 * *Increased Life Cycle Options*: You can upgrade the consolidated control planes out of cycle from the segmented worker nodes, including embargoed CVEs.
 * *Future Mixed Management & Workers IaaS*: Although it is not in the solution today, we feel we could  get to running the control plane on a different IaaS provider than the workers faster under this architecture
-* *Heterogeneous Arch Clusters: We can more easily run control planes on one CPU chip type (ie x86) and the workers on a different one (ie ARM or even Power/Z).
+* *Heterogeneous Arch Clusters*: We can more easily run control planes on one CPU chip type (ie x86) and the workers on a different one (ie ARM or even Power/Z).
 * *Easier Multi-Cluster Management*: More centralized multi-cluster management which results in fewer external factors influencing the cluster status and consistency
 * *Cross Cluster Delivery Benefits*: As we look to have more and more layered offerings such as service mesh, server-less, pipelines, and other span multiple clusters, having a concept of externalized control planes may make delivering such solutions easier.
 * *Easy Operability*: Think about SREs. Instead of chasing down cluster control-planes, they would now have a central-pane of glass where they could debug and navigate their way even to cluster data-plane. Centralized operations, less Time To Resolution (TTR), and higher productivity become low-hanging fruits.

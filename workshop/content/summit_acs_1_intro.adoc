@@ -1,18 +1,20 @@
+= Red Hat Advanced Cluster Security for Kubernetes - RHACS
 
-= Red Hat Advanced Cluster Security for Kubernetes - ACS
+== Goal of the RHACS Lab Portion
 
-== Goal of the ACS Lab Portion
+The goal of the two lab modules is to take you through the RHACS console/user interface and get you used to finding vulnerabilities in your clusters. After you are comfortable, we will apply a runtime policy to block packages from being downloaded to the host. 
 
+If you have questions at any time, please don't hesitate to ask!
 
-== ACS Basics
+== RHACS Basics
 
-ACS provides the tools and capabilities to address the security needs of a cloud-native development approach on Kubernetes.
+RHACS provides the tools and capabilities to address the security needs of a cloud-native development approach on Kubernetes.
 
-The ACS solution offers visibility into the security of your cluster, vulnerability management, and security compliance through auditing, network segmentation awareness and configuration, security risk profiling, security-related configuration management, threat detection, and incident response. In addition, ACS grants an ability to pull the actions from that tooling deep into the application code development process through APIs.
+The RHACS solution offers visibility into the security of your cluster, vulnerability management, and security compliance through auditing, network segmentation awareness and configuration, security risk profiling, security-related configuration management, threat detection, and incident response. In addition, RHACS grants an ability to pull the actions from that tooling deep into the application code development process through APIs.
 
-These security features represent any developer or administrator's primary work as they work across various environments, including multiple datacenters, private clouds, or public clouds that run Kubernetes clusters.
+These security features represent any developer or administrator's primary work across various environments, including multiple datacenters, private clouds, or public clouds that run Kubernetes clusters.
 
-=== ACS Features
+== RHACS Features
 
 Using Red Hat Advanced Cluster Security for Kubernetes, you can gain comprehensive Kubernetes security that includes the following use cases:
 
@@ -22,14 +24,14 @@ Using Red Hat Advanced Cluster Security for Kubernetes, you can gain comprehensi
 * *Network Segmentation*: Visualize existing connections and enforce tighter segmentation using Kubernetes-native controls to reduce your blast radius.
 * *Risk Profiling*: See all your deployments ranked by risk level, using context from Kubernetes' declarative data, to prioritize remediation.
 * *Configuration Management*: Apply best practices for Docker and Kubernetes to harden your environment for a more secure and stable application.
-* *Threat Detection*: Use rules, automated allow lists, and baselining to identify suspicious activity in your running applications accurately.
+* *Threat Detection*: Use rules, automated allow lists, and baselining to accurately identify suspicious activity in your running applications.
 * *Incident Response*: Take action, from failing builds and blocking deployments to killing pods and thwarting attacks, using Kubernetes for enforcement.
 
 == Workshop Setup (BookBag Environment)
 
 === MANDATORY - Deploy the INSECURE demo application to the cluster
 
-In order to have the applications and vulnerabilities necessary for the demo, we need to introduce a few vulnerable applications into the cluster.
+To have the applications and vulnerabilities necessary for the demo, we need to introduce a few vulnerable applications into the cluster.
 
 The command below will clone the tutorial sources and set the *TUTORIAL_HOME* environment variable to point to the root directory of the tutorial and deploy the applications.
 
@@ -73,54 +75,54 @@ spring4shell   spring4shell-app   3/3     3            3           0d
 NOTE: If all of the applications are up and running please proceed to the next stage. If the applications are not healthy please run the deployment command again.
 |===
 
-== Navigating the ACS console and Vulnerability Management
+== Navigating the RHACS console and Vulnerability Management
 
 The first half of this lab will focus on navigation and vulnerability management. This work will take place in the UI and require you to use both the dashboard and the lab environment.
 
-=== Accessing the ACS Console
+=== Accessing the RHACS Console
 
-In this section, you will confirm that you can connect to that you can connect to the ACS portal. The following information will be available in the lab URL.
+In this section, you will confirm that you can connect to that you can connect to the RHACS portal. The following information will be available in the lab URL.
 
 *Requirements* 
 
-* The ACS `admin` credentials
-* The URL for the ACS portal
+* The RHACS `admin` credentials
+* The URL for the RHACS portal
 
 .Procedure
 [start=1]
-. From the main lab page, click the URL for the ACS web console to head to the console's login page.
+. From the main lab page, click the URL for the RHACS web console to head to the console's login page.
 ** For example, 'https://central-stackrox.apps.cluster-4klh8.4klh8.sandbox1150.opentlc.com'
 
 image::images/00-console-dashboard-1.png[demo console login]
 
 |===
-*NOTE* You will get a warning page that the webpage is not private. During setup, ACS can utilize your certification server to avoid these errors. It is also best practice to integrate the application with your authentication server. 
+*NOTE* You will get a warning page that the webpage is not private. During setup, RHACS can utilize your certification server to avoid these errors. It is also best practice to integrate the application with your authentication server. 
 |===
 
 [start=2]
-. Click through the warning page to get to the ACS console login page
+. Click through the warning page to get to the RHACS console login page
 
 image::images/acs-webpage-warning-00.png[]
 image::images/acs-webpage-warning-01.png[]
-image::images/00-console-dashboard-3.png[ACS console login]
+image::images/00-console-dashboard-3.png[RHACS console login]
 
 [start=3]
-. Log in with the ADMINISTRATOR credentials from the main demo page. These credentials are located with all of the demo credentials and will be underneath the ACS console URL (HINT: The Username is always *admin*)
+. Log in with the ADMINISTRATOR credentials from the main demo page. These credentials are located with all of the demo credentials and will be underneath the RHACS console URL (HINT: The Username is always *admin*)
 
-image::images/00-console-dashboard-4.png[ACS input]
+image::images/00-console-dashboard-4.png[RHACS input]
 
 [start=4]
 . Ensure you maintain access to the console and keep your tab open for the future lab sections. 
 
-image::images/00-console-dashboard-5.png[ACS dashboard]
+image::images/00-console-dashboard-5.png[RHACS dashboard]
 
-== Navigating the ACS Console
-In this section, you familiarize yourself with the ACS portal, including its tabs, search capabilities and dashboard functionality.
+== Navigating the RHACS Console
+In this section, you familiarize yourself with the RHACS portal, including its tabs, search capabilities and dashboard functionality.
 
-Head to the ACS web console from the course introduction lab. If you do not have access, please repeat the steps in the first lab titled "Access the ACS Console."
+Head to the RHACS web console from the course introduction lab. If you do not have access, please repeat the steps in the first lab titled "Access the RHACS Console."
 
 === The 4 Main Sections of the Dashboard
-The ACS dashboard has four main sections:
+The RHACS dashboard has four main sections:
 
 [start=1]
 . Top Bar
@@ -128,7 +130,7 @@ The ACS dashboard has four main sections:
 . Navigation menu
 . Dashboard
 
-image::images/01-dashboard-0.png[ACS dashboard labelled]
+image::images/01-dashboard-0.png[RHACS dashboard labelled]
 
 === Top Bar
 
@@ -142,15 +144,15 @@ The top bar contains the following functionality
 * Logged-in user account
 
 [NOTE]
-The top bar is available in EVERY tab and displayed when accessing the ACS console.
+The top bar is available in EVERY tab and displayed when accessing the RHACS console.
 
 === Global Search
 
-image::images/01-dashboard-1.png[ACS global search]
+image::images/01-dashboard-1.png[RHACS global search]
 
 ==== Searching and filtering
 
-The ability to instantly find resources is essential to safeguard your cluster. Utilize the ACS search feature to find relevant resources faster. 
+The ability to instantly find resources is essential to safeguard your cluster. Utilize the RHACS search feature to find relevant resources faster. 
 
 For example, you can use it to find deployments exposed to a newly published CVE or all deployments with external network exposure.
 
@@ -162,19 +164,19 @@ A search query consists of two parts:
 
 *For example,* to find all violations in the visa-processor deployment, the search query is *Deployment:visa-processor*. 
 
-image::images/01-dashboard-02.png[ACS search visa]
+image::images/01-dashboard-02.png[RHACS search visa]
 
 In this search query, *Deployment* is the attribute, and *visa-processor* is the search term.
 
 |===
-NOTE: When using the search functionality you must click the provided info from the dropdown. ACS maintains a library of searchable assets to help you search faster. If CVE or deployment cannot be searched it is most likely because the resource is not in the cluster or incorrectly typed. 
+NOTE: When using the search functionality you must click the provided info from the dropdown. RHACS maintains a library of searchable assets to help you search faster. If CVE or deployment cannot be searched it is most likely because the resource is not in the cluster or incorrectly typed. 
 |===
 
 ==== Using local page filtering
-You can use local page filtering from within all views in the ACS portal. Local page filtering works similarly to the global search, but only relevant attributes are available. You can select the search bar to show all available attributes for a specific view.
+You can use local page filtering from within all views in the RHACS portal. Local page filtering works similarly to the global search, but only relevant attributes are available. You can select the search bar to show all available attributes for a specific view.
 
 ==== Common search queries
-Here are some common search queries you can try in the ACS search bar if you'd like to test it's functionality.
+Here are some common search queries you can try in the RHACS search bar if you'd like to test it's functionality.
 
 [start=1]
 . Finding deployments that are affected by a specific CVE
@@ -210,13 +212,13 @@ Here are some common search queries you can try in the ACS search bar if you'd l
 |===
 
 [NOTE]
-There are plenty more local and global search examples in the link:https://docs.openshift.com/acs/operating/search-filter.html[ACS documentation] 
+There are plenty more local and global search examples in the link:https://docs.openshift.com/acs/operating/search-filter.html[RHACS documentation] 
 
 === Navigation Menu
 
-image::images/01-dashboard-3.png[ACS navigation]
+image::images/01-dashboard-3.png[RHACS navigation]
 
-The left-hand navigation menu provides access to each of the security use cases, as well as product configuration to integrate ACS with your existing tooling.
+The left-hand navigation menu provides access to each of the security use cases, as well as product configuration to integrate RHACS with your existing tooling.
 The navigation menu has the following items:
 
 * *Dashboard*: Summary view of your environment
@@ -226,7 +228,7 @@ The navigation menu has the following items:
 * *Vulnerability Management*: Information about known vulnerabilities affecting your environment, including deployed workloads and infrastructure, risk acceptance and reporting.
 * *Configuration Management*: Identification of potential misconfigurations that can lead to security issues
 * *Risk*: Risks affecting your environment, such as suspicious executions
-* *Platform Configuration*: ACS configuration, policy management and integration details, including;
+* *Platform Configuration*: RHACS configuration, policy management and integration details, including;
 ** *Clusters*
 ** *Policy Management*
 ** *Integrations*
@@ -238,9 +240,9 @@ This course follows the pattern of the major use cases, but in the order of most
 
 === Dashboard
 
-The Red Hat Advanced Cluster Security for Kubernetes (ACS) Dashboard provides quick access to the data you need. It contains additional navigation shortcuts and actionable widgets that are easy to filter and customize so that you can focus on the data that matters most to you. You can view information about levels of risk in your environment, compliance status, policy violations, and common vulnerabilities and exposures (CVEs) in images.
+The Red Hat Advanced Cluster Security for Kubernetes (RHACS) Dashboard provides quick access to the data you need. It contains additional navigation shortcuts and actionable widgets that are easy to filter and customize so that you can focus on the data that matters most to you. You can view information about levels of risk in your environment, compliance status, policy violations, and common vulnerabilities and exposures (CVEs) in images.
 
-image::images/01-dashboard-4.png[ACS main dashboard]
+image::images/01-dashboard-4.png[RHACS main dashboard]
 
 == Navigating the Main Dashboard
 
@@ -256,7 +258,7 @@ The three core dashboard components are as follows
 . The Dashboard Filter
 . The Actionable Widgets
 
-image::images/01-dashboard-5.png[ACS dashboard numbered]
+image::images/01-dashboard-5.png[RHACS dashboard numbered]
 
 === The Status Bar
 
@@ -279,18 +281,18 @@ The Dashboard includes a top-level filter that applies simultaneously to all wid
 [NOTE]
 The Dashboard filter does not affect the Status Bar and when no clusters or namespaces are selected, the view automatically switches to *All* 
 
-image::images/01-dashboard-6.png[ACS dashboard filter]
-image::images/01-dashboard-7.png[ACS dashboard filter]
+image::images/01-dashboard-6.png[RHACS dashboard filter]
+image::images/01-dashboard-7.png[RHACS dashboard filter]
 
 === Actionable widgets (Optional)
 
 |===
-If you have time, adjust the dashboards filtering options and the widgets themselves to hone the filtering capabilities. 
+If you have time, adjust the dashboard filtering options and widgets to hone the filtering capabilities. 
 |===
 
 == Vulnerability Management Dashboard
 
-Let us continue by looking at our primary use case for ACS and that is the *Vulnerability Management* features and dashboard, a familiar topic for most security teams. 
+Let us continue by looking at our primary use case for RHACS and that is the *Vulnerability Management* features and dashboard, a familiar topic for most security teams. 
 
 |===
 *NOTE:* The locations and size of your panels may vary depending on your screen size and zoom.
@@ -305,14 +307,14 @@ Let us continue by looking at our primary use case for ACS and that is the *Vuln
 
 image::images/vuln-01.png[]
 
-The dashboard provides several important vulnerability breakdowns suchs as:
+The dashboard provides several important vulnerability breakdowns such as:
 
 * Top risky deployments/images
 * Frequently violated policies
 * Recently detected vulnerabilities
 * Most common image vulnerabilities
 
-More important than fixing any vulnerability is establishing a process to keep container images updated and to prevent the promotion through the pipeline for images with serious, fixable vulnerabilities. ACS displays this through the *Top Risky Deployments by CVE and CVSS Score* and takes the container's configuration and vulnerability details to show you the most *at risk* deployments in your cluster.
+More important than fixing any vulnerability is establishing a process to keep container images updated and to prevent the promotion through the pipeline for images with serious, fixable vulnerabilities. RHACS displays this through the *Top Risky Deployments by CVE and CVSS Score* and takes the container's configuration and vulnerability details to show you the most *at risk* deployments in your cluster.
 
 image::images/vuln-03.png[]
 
@@ -350,7 +352,7 @@ Note: If you cannot find the *visa-processor:latest-v2* image, use the search ba
 
 If you click the search bar, you will be shown the different labels you can search by. Click *Image* and type visa until the correct image comes up. 
 
-You can use this method of searching in all search bars within the ACS dashboard.
+You can use this method of searching in all search bars within the RHACS dashboard.
 |===
 
 image::images/vuln-08.png[]
@@ -359,9 +361,9 @@ You can move on to the next section only when the dashboard displays the image b
 
 image::images/vuln-09.png[]
 
-==== ACS Vulnerability Scanner
+==== RHACS Vulnerability Scanner
 
-ACS' built-in vulnerability scanner breaks down images into layers and components - where components can be operating-system installed packages or dependencies installed by programming languages like Python, Javascript, or Java. The *Image Summary* provides the essential security details of the image overall, with links to the components. Below you can see why the image is ranked as a critically vulnerable application:
+RHACS' built-in vulnerability scanner breaks down images into layers and components - where components can be operating-system installed packages or dependencies installed by programming languages like Python, Javascript, or Java. The *Image Summary* provides the essential security details of the image overall, with links to the components. Below you can see why the image is ranked as a critically vulnerable application:
 
 * In the DETAILS & METADATA → Image OS panel, the information you see there tells you that this image has a severe security problem - the base image was imported several years ago (Debian 8 - 2015).
 
@@ -375,7 +377,7 @@ image::images/risk-5.png[]
 
 image::images/risk-6.png[]
 
-The Dockerfile tab view shows the layer-by-layer view, and, as you can see, the most recent layers are also several years old. Time is not kind to images and components - as vulnerabilities are discovered, ACS will display newly discovered CVEs.
+The Dockerfile tab view shows the layer-by-layer view, and, as you can see, the most recent layers are also several years old. Time is not kind to images and components - as vulnerabilities are discovered, RHACS will display newly discovered CVEs.
 
 |===
 Now lets put this UI to the test with a real use case.
@@ -415,7 +417,7 @@ Luckily there is only *ONE* image being affected by this vulnerability (2 deploy
 
 == Relating Image CVEs with Kubernetes Configuration Properties
 
-All of these CVE details are well and good, but they are a bit noisy. How do we judge the genuine risk - which vulnerabilities are likely to be exploited? Which vulnerabilities do we have to fix first? ACS can use other sources of information in OpenShift to judge the risk that a given vulnerability would be exploited and set priorities for fixes.
+All of these CVE details are well and good, but they are a bit noisy. How do we judge the genuine risk - which vulnerabilities are likely to be exploited? Which vulnerabilities do we have to fix first? RHACS can use other sources of information in OpenShift to judge the risk that a given vulnerability would be exploited and set priorities for fixes.
 
 The first risk factor - is the vulnerable component in a running deployment.
 
@@ -457,7 +459,7 @@ We will leave it to you to make risk assessments in the future. Let us get to en
 
 == Policy Management
 
-ACS has many built-in policies to detect activity related to attacker goals: gain a foothold, maintain a presence, move laterally, and exfiltrate data. The continuous runtime monitoring observes all container activity and will automatically respond to events with appropriate enforcement and notification. However, that would be missing out on an opportunity - ACS wants to go one step further, to take advantage of containers' ephemeral, immutable nature to improve security in a measurable way from now on.
+RHACS has many built-in policies to detect activity related to attacker goals: gain a foothold, maintain a presence, move laterally, and exfiltrate data. The continuous runtime monitoring observes all container activity and will automatically respond to events with appropriate enforcement and notification. However, that would be missing out on an opportunity - RHACS wants to go one step further, to take advantage of containers' ephemeral, immutable nature to improve security in a measurable way from now on.
 
 We want to use runtime incidents and vulnerabilities as a learning opportunity to improve security going forward by constraining how our containers can act. We achieve this by creating policies and implementing them early in the CI/CD process.
 
@@ -485,5 +487,5 @@ image::images/policy-3.png[]
 
 ---
 
-==== Move on to the next ACS module to see this policy in action at runtime
+==== Move on to the next RHACS module to see this policy in action at runtime
 

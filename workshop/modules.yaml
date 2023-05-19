@@ -42,13 +42,13 @@ modules:
   acm-multicluster:
     name: Multicluster management with ACM
   summit_intro:
-    name: Introduction
+    name: Workshop Introduction
   summit_acm:
-    name: ACM Cluster and Lifeclycle Management
+    name: ACM - Cluster and Lifecycle Management
   summit_acs_1_intro:
-    name: ACS Introduction and Vulnerability Management Walkthrough
+    name: ACS - Introduction and Vulnerability Management Walkthrough
   summit_acs_2_runtime:
-    name: ACS Runtime Enforcement
+    name: ACS - Runtime Enforcement
   summit_extra:
     name: Extra Credit
   summit_ldap:

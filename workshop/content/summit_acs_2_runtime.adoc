@@ -1,4 +1,4 @@
-=== Runtime Policy Features
+== Runtime Policy Features
 
 RHACS observes container processes and collects this information to enable you to craft policies to prevent behavior that you don't like. This information can also create baseline policy configurations that the user can update.
 

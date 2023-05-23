@@ -29,6 +29,13 @@ group
 ** A group of users that will have access to the same OpenShift *Project*
 ** Contains: `teamuser1`, `teamuser2`
 
+Before we get started please clone this repo:
+
+[source,bash,role="execute"]
+----
+git clone https://github.com/OpenShiftDemos/openshift-ops-workshops.git
+----
+
 #### Examine the OAuth configuration
 Since this is a pure, vanilla OpenShift 4 installation, it has the default OAuth resource. You can examine that OAuth configuration with the following:
 
@@ -188,19 +195,19 @@ Download the certificate and save it to the file 'ca.crt' with this command:
 
 [source,bash,role="execute"]
 ----
-wget https://certs.godaddy.com/repository/gd-class2-root.crt -O {{ HOME_PATH }}/support/ca.crt
+wget https://certs.godaddy.com/repository/gd-class2-root.crt -O openshift-ops-workshops/support/ca.crt
 ----
 
 ----
 If you see `Unable to establish SSL connection.` please click the above command again before proceeding.
 ----
 
-Click this command to create a new ConfigMap named ca-config-map in the openshift-config namespace. The ConfigMap is populated with the contents of the file {{ HOME_PATH }}/support/ca.crt. It then applies the file.
+Click this command to create a new ConfigMap named ca-config-map in the openshift-config namespace. The ConfigMap is populated with the contents of the file openshift-ops-workshops/support/ca.crt. It then applies the file.
 
 [source,bash,role="execute"]
 ----
-oc create configmap ca-config-map --from-file={{ HOME_PATH }}/support/ca.crt -n openshift-config
-oc apply -f {{ HOME_PATH }}/support/oauth-cluster.yaml
+oc create configmap ca-config-map --from-file=openshift-ops-workshops/support/ca.crt -n openshift-config
+oc apply -f openshift-ops-workshops/support/oauth-cluster.yaml
 ----
 
 [Note]
@@ -232,7 +239,7 @@ We have provided a `groupsync` configuration file for you:
 View configuration file
 [source,bash,role="execute"]
 ----
-cat {{ HOME_PATH }}/support/groupsync.yaml
+cat openshift-ops-workshops/support/groupsync.yaml
 ----
 
 Without going into too much detail (you can look at the documentation), the
@@ -250,7 +257,7 @@ Execute the `groupsync`:
 
 [source,bash,role="execute"]
 ----
-oc adm groups sync --sync-config={{ HOME_PATH }}/support/groupsync.yaml --confirm
+oc adm groups sync --sync-config=openshift-ops-workshops/support/groupsync.yaml --confirm
 ----
 
 You will see output like the following:

@@ -109,7 +109,7 @@ image::images/acm_labels-1.png[]
 ** *Name*: `rocket-chat`
 ** *Namespace*: `rocket-chat`
 ** Under repository types, select the *GIT* repository
-** *URL:*  https://github.com/levenhagen/rocketchat-acmt[https://github.com/levenhagen/rocketchat-acm]
+** *URL:*  https://github.com/levenhagen/rocketchat-acm[https://github.com/levenhagen/rocketchat-acm]
 ** *Branch*:  `main`
 ** *Path:*  `rocketchat`
 

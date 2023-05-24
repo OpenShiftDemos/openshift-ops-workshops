@@ -13,7 +13,7 @@ To get started with OpenShift GitOps, this guide will walk you through the step-
 
 ----
 Do not install the Community version of the Argo CD Operator, 
-if you have already do so remove the Argo CD Community Operator 
+if you have already done so remove the Argo CD Community Operator 
 before you install the Red Hat OpenShift GitOps Operator.
 ----
 1.Now switch over to your *Openshift Web Console*:
@@ -146,7 +146,7 @@ image::images/gitops-images/pipelines-openshift.png[]
 
 ===  Adding a Banner to ArgoCD
 
-In this section, we will add a banner to the ArgoCD login screen using GitOps. We will use a repository hosted on GitHub, which contains the necessary configuration files.
+In this section, we will add a banner to the top of the OpenShift console using GitOps. We will use a repository hosted on GitHub, which contains the necessary configuration files.
 
 1. Similar to the last section `Click` the `new app` in the left hand corner.
 

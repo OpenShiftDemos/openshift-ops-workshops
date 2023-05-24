@@ -249,11 +249,9 @@ location: BannerTop
 text: oops, somebody changed this!
 ...
 
-This is what the file looks like once the patch has been completed.
+This is what the file looks after the patch:
 
 image::images/gitops-images/changedtext.png[]
-
-Remember to `save` the changes.
 
 [start=6]
 6. Check back on the `console` and see that the `banner` has been updated.

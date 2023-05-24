@@ -287,7 +287,7 @@ image::images/gitops-images/sync.png[]
 
 image::images/gitops-images/banner.png[]
 
-The banner has been restored to its original synchronized state within Argo CD.
+The banner has been restored to its desired state specified in git by Argo CD.
 
 image::images/gitops-images/argo_appsdeployed.png[]
 

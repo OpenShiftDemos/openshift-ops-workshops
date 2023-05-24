@@ -233,9 +233,12 @@ home-banner Congratulations, you have successfully created a banner using ArgoCD
 4. To change the text that is being deployed on the banner, click on the following command:
 
 [source,bash,role="execute"]
-oc edit consolenotification
+----
+oc patch consolenotification home-banner -p '{"spec":{"text":"Oops, somebody changed this!"}}' -
+-type=merge
+----
 
-and `change` the line where the text is being deployed to the following:
+This patch will `change` the line where the text is being deployed to the following:
 
 [source,yaml]
 ...
@@ -245,6 +248,8 @@ color: '#fff'
 location: BannerTop
 text: oops, somebody changed this!
 ...
+
+This is what the file looks like once the patch has been completed.
 
 image::images/gitops-images/changedtext.png[]
 

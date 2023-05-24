@@ -234,8 +234,7 @@ home-banner Congratulations, you have successfully created a banner using ArgoCD
 
 [source,bash,role="execute"]
 ----
-oc patch consolenotification home-banner -p '{"spec":{"text":"Oops, somebody changed this!"}}' -
--type=merge
+oc patch consolenotification home-banner -p '{"spec":{"text":"oops somebody changed this!"}}' --type=merge
 ----
 
 This patch will `change` the line where the text is being deployed to the following:

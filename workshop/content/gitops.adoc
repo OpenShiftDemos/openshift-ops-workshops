@@ -237,6 +237,8 @@ home-banner Congratulations, you have successfully created a banner using ArgoCD
 oc patch consolenotification home-banner -p '{"spec":{"text":"oops somebody changed this!"}}' --type=merge
 ----
 
+image::images/gitops-images/patch.png[]
+
 This patch will `change` the line where the text is being deployed to the following:
 
 [source,yaml]

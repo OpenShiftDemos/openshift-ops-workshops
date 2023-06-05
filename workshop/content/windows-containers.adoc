@@ -797,6 +797,13 @@ helm repo add redhat-demos https://redhat-developer-demos.github.io/helm-repo
 helm repo update
 ----
 
+Create the namespace for `netcandystore`.
+
+[source,bash,role="execute"]
+----
+oc create namespace netcandystore
+----
+
 With the two variables exported, and the helm repo added, you can install
 the application stack using the `helm` cli.
 

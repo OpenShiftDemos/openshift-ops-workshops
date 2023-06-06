@@ -402,7 +402,7 @@ The default behavior of `new-app` is to create just one instance of the item
 requested. We will see how to modify/adjust this in a moment, but there are a
 few more concepts to learn first.
 
-### Background: Deployment Configurations and Replica Sets
+### Background: Deployments and ReplicaSets in OpenShift
 
 While *Services* provide routing and load balancing for *Pods*, which may go in
 and out of existence, *ReplicaSets* (RS) are used to specify and then

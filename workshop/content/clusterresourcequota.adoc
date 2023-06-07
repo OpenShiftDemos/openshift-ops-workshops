@@ -283,8 +283,8 @@ To identify these two projects to belonging to the `pricelist` application stack
 
 [source,bash,role="execute"]
 ----
-oc label ns pricelist-frontend appstack=pricelist
-oc label ns pricelist-backend appstack=pricelist
+oc label namespace pricelist-frontend appstack=pricelist
+oc label namespace pricelist-backend appstack=pricelist
 ----
 
 Run the `oc describe` command for the `for-pricelist` cluster resource quota:

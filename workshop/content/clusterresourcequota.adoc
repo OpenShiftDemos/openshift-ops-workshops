@@ -159,7 +159,7 @@ You see that not only that 2 out of 10 pods are being used, but that the namespa
 
 [source,bash,role="execute"]
 ----
-oc get ns welcome1 -o yaml
+oc get namespace welcome1 -o yaml
 ----
 
 The output should look something like this. Take special note of the annotations:

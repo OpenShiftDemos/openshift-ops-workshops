@@ -445,7 +445,7 @@ OpenShift to stand up the `mapit` image:
 
 [source,bash,role="execute"]
 ----
-oc get deploy
+oc get deployment
 ----
 
 You will see something like the following:
@@ -455,6 +455,8 @@ NAME    READY   UP-TO-DATE   AVAILABLE   AGE
 mapit   1/1     1            1           76m
 ----
 
+you can also shorten the command to `oc get deploy`.
+
 To get more details, we can look into the *ReplicaSet* (*RS*).
 
 Take a look at the *ReplicaSet* (RS) that was created for you when
@@ -462,7 +464,7 @@ you told OpenShift to stand up the `mapit` image:
 
 [source,bash,role="execute"]
 ----
-oc get rs
+oc get replicaset
 ----
 
 You will see something like the following:
@@ -472,6 +474,8 @@ NAME               DESIRED   CURRENT   READY   AGE
 mapit-7bf4f447ff   0         0         0       18m
 mapit-85fdb44576   1         1         1       18m
 ----
+
+you can also shorten the command to `oc get rs`.
 
 This lets us know that, right now, we expect one *Pod* to be deployed
 (`Desired`), and we have one *Pod* actually deployed (`Current`). By changing
@@ -491,7 +495,7 @@ To verify that we changed the number of replicas, issue the following command:
 
 [source,bash,role="execute"]
 ----
-oc get rs
+oc get replicaset
 ----
 
 You will see something like the following:
@@ -526,8 +530,10 @@ previous lab accurately reflects two endpoints:
 
 [source,bash,role="execute"]
 ----
-oc describe svc mapit
+oc describe service mapit
 ----
+
+you can also shorten the command to `oc describe svc mapit`.
 
 You will see something like the following:
 
@@ -793,7 +799,7 @@ You can then see that this probe is defined in the `oc describe` output:
 
 [source,bash,role="execute"]
 ----
-oc describe deploy mapit
+oc describe deployment mapit
 ----
 
 You will see a section like:

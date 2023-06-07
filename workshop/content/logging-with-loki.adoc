@@ -75,7 +75,7 @@ Next, verify that the namespace has been created with this command:
 
 [source,bash,role="execute"]
 ----
-oc get ns openshift-logging
+oc get namespace openshift-logging
 ----
 
 You should see the following output:

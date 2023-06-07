@@ -265,7 +265,7 @@ in the deployment YAML
 
 [source,bash,role="execute"]
 ----
-oc get deploy welcome-php -o yaml
+oc get deployment welcome-php -o yaml
 ----
 
 Now, since we have the toleration in place, we should be running on the node

@@ -62,7 +62,7 @@ You can see the new `Deployment` like this:
 
 [source,bash,role="execute"]
 ----
-oc get deploy mapit
+oc get deployment mapit
 ----
 
 The output will show that a new deployment was created by inspecting the `AGE` column.
@@ -90,7 +90,7 @@ Take a look at the `Deployment` now:
 
 [source,bash,role="execute"]
 ----
-oc describe deploy mapit
+oc describe deployment mapit
 ----
 
 You will see there is now both `Mounts` and `Volumes` details about the new storage:

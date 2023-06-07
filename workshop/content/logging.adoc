@@ -89,7 +89,7 @@ Verify that it has been created:
 
 [source,bash,role="execute"]
 ----
-oc get ns openshift-logging
+oc get namespace openshift-logging
 ----
 
 You should see the following output:
@@ -328,8 +328,10 @@ provisioned. If you query the *PersistentVolumeClaim* objects in this project yo
 
 [source,bash,role="execute"]
 ----
-oc get pvc -n openshift-logging
+oc get persistentvolumeclaim -n openshift-logging
 ----
+
+You can also use `oc get pvc -n openshift-logging` for short.
 
 You will see something like:
 

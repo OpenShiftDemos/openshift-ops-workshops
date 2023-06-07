@@ -542,8 +542,9 @@ This failure is exactly what we wanted to see.
 
 #### Prometheus
 Now that you have a user with `cluster-reader` privileges (one that can see
-many administrative aspects of the cluster), we can revisit Prometheus and
-attempt to log-in to it.
+many administrative aspects of the cluster), we can now delve into Prometheus 
+again. We briefly touched upon Prometheus in the infrastructure nodes module, 
+but now we can proceed to log in and explore it further.
 
 Login as a the user with `cluster-reader` privileges:
 

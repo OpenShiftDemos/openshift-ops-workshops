@@ -75,8 +75,6 @@ Once inside the ArgoCD interface we are going to run through the steps to deploy
 
 image::images/gitops-images/newappbutton.png[]
 
-image::images/gitops-images/argoaddapp2.png[]
-
 [start=2]
 2. Once the new app screen pops up fill out the information as follows:
 
@@ -90,6 +88,8 @@ Path: support/gitops-catalog/openshift-pipelines-operator/overlays/latest
 Cluster URL: https://kubernetes.default.svc
 Namespace: openshift-operators
 ----
+
+image::images/gitops-images/argoaddapp2.png[]
 
 image::images/gitops-images/editasyaml.png[]
 

@@ -1,6 +1,6 @@
 ## GitOps On OpenShift
 
-As an OpenShift administrator, you can use GitOps to simplify the provisioning and configuration of your cluster and its underlying infrastructure, as well as the delivery of applications to Kubernetes. GitOps automates the deployment of Kubernetes Resources, regardless their packaging (i.e. Helm, Kustomize, kpt, etc.), to the target environment by relying on Git repositories as the source of thruth (desired state). You can easily track updates to branches, tags, or lock them to a specific version of manifests at a Git commit.
+GitOps is a modern approach for managing cloud-based infrastructure and applications through Git. With GitOps, you define the desired system state in Git and utilize tools like ArgoCD to automatically sync it with your cluster or application. As an OpenShift administrator, you can simplify provisioning, configuration, and application delivery to Kubernetes using GitOps. Treating infrastructure and application definitions as code streamlines configuration changes across multiple clusters, allowing easy tracking and management of updates in Git.
 By treating infrastructure and application definitions like code, GitOps simplifies the process of propagating changes in configurations across multiple clusters.
 
 image::images/gitops-images/argocd-sync-flow.png[]

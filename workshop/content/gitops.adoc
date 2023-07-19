@@ -40,7 +40,7 @@ Argo CD instances for your applications under your projects.
 
 ### Logging in to the Argo CD instance by using the Argo CD admin account
    
-1. Navigate to the nine tiles at the top of your OpenShift Console. Once you click that you should see the 'OpenShift GitOps Cluster Argo CD'. Select that.
+1. Navigate to the nine tiles at the top of your OpenShift Console. Once you click that you should see the `OpenShift GitOps Cluster Argo CD`. Select that.
 + 
 image::images/gitops-images/9-tiles.png[]
 +

@@ -71,7 +71,7 @@ image::images/gitops-images/authorize-access-argo.png[]
 
 Once inside the ArgoCD interface we are going to run through the steps to deploy a platform component: the Pipelines Operator.
 
-1. `Click` the `new app` in the left hand corner.
+1. Click the `new app` button in the left hand corner.
 
 image::images/gitops-images/newappbutton.png[]
 
@@ -132,17 +132,20 @@ Let's examine each of the descriptions of the recently deployed application to g
 |*Status*|The status of an application in ArgoCD shows whether it is healthy and synced with its desired state. A healthy application is one that has all its resources up and running, while a synced application is one where the actual state matches the desired state. In this case, the application is healthy and synced.
 |*Repository*|The repository is the location where the application's source code is stored. In this case, the source code is stored in the Git repository located at `https://github.com/OpenShiftDemos/openshift-ops-workshops/`.
 |*Target Revision*|The target revision is the Git commit hash or branch name that ArgoCD uses to deploy the application. In this case, the target revision is set to `ocp4-dev`.
-|*Path*|The path is the location within the Git repository where the application manifests are stored. In this case, the application manifests are located in the `support/gitops-catalog/openshift-pipelines-operator/overlays/latest` directory.
-|*Destination*|The destination is the location where the application will be deployed. It is composed of the targetted cluster API server URL and a namespace. In this case, the `server` points to the local cluster API server.
+|*Path*|The path is the location within the Git repository where the application manifests are stored. In this case, the application manifests are located in the  
+link:https://github.com/OpenShiftDemos/openshift-ops-workshops/tree/ocp4-dev/support/gitops-catalog/openshift-pipelines-operator/overlays/latest[`support/gitops-catalog/openshift-pipelines-operator/overlays/latest`] directory.
+|*Destination*|The destination is the cluster in which the objects will be synced. It is composed of the targetted cluster API server URL and a namespace. In this case, the `server` points to the local cluster API server. "in-cluster" is the "the cluster in which your ArgoCD instance is installed" but other clusters can be configured to allow you to sync to additional clusters.
 |*Namespace*|The namespace is the Kubernetes namespace where the application will be deployed. In this case, the application will be deployed in the openshift-operators namespace.
 |*Created At*|The created at timestamp shows when the application was created in ArgoCD. In this case, the application was created 14 minutes ago.
 |===
 
-Argo CD has two additional features: resource hooks and prune. Let's briefly explore them:
+Resource hooks, prune, auto sync and the Reconciliation Cycle are some of the additional features that ArgoCD offers. Let's briefly explore them:
 
-ArgoCD also supports [resource hooks](https://argo-cd.readthedocs.io/en/stable/user-guide/resource_hooks/), which allows for the execution of custom actions or integrations with external systems at specific points during the deployment lifecycle. They provide a way to extend the deployment process and further customize application deployments within ArgoCD.
+link:https://argo-cd.readthedocs.io/en/stable/user-guide/resource_hooks/[Resource hooks] allow you to execute custom actions or integrate with external systems at specific stages of the deployment lifecycle. They are a powerful way to extend and customize your application deployments in ArgoCD.
 
-ArgoCD also supports Prune - a feature that removes outdated resources from your cluster based on your Git repository, keeping your cluster clean and up-to-date.
+Prune is a link:https://argo-cd.readthedocs.io/en/stable/user-guide/sync-options/[sync option] that cleans up your cluster by removing outdated resources that are no longer present in your Git repository. It helps you keep your cluster up-to-date and consistent with your Git source of truth. 
+
+link:https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/[Auto sync] is a feature that automatically refreshes your application and applies any changes from your Git repository to your cluster every three minutes (by default). This feature enables the Reconciliation Cycle, which is the process of syncing your application state with your Git state.
 
 By navigating to your `OpenShift Console` and accessing the `Operators` tab, you can verify the successful installation of the `Pipelines Operator` under the `Installed Operators` tab.
 
@@ -152,7 +155,9 @@ image::images/gitops-images/pipelines-openshift.png[]
 
 In this section, we will add a banner to the top of the OpenShift console using GitOps. We will use a repository hosted on GitHub, which contains the necessary configuration files.
 
-1. Similar to the last section `Click` the `new app` in the left hand corner.
+
+
+1. To create a new app in Argo, go back to the Argo console and look for the `new app` button in the top left corner.
 
 2. Once the new app screen pops up fill out the information as follows:
 
@@ -210,9 +215,11 @@ As an OpenShift admin using GitOps, you can use the Banners feature in ArgoCD an
 [start=1]
 1. To examine the `banner`, click on the `banner` on Argo CD.
 
-image::images/gitops-images/home-bannerbox.png[]
+image::images/gitops-images/argo_appsdeployed.png[]
 
 In the box to the right, look for `home-banner`.
+
+image::images/gitops-images/home-bannerbox.png[]
 
 [start=2]
 2. Click on `home-banner` for more information. You should see that its `kind` is a `ConsoleNotification`.
@@ -264,7 +271,7 @@ image::images/gitops-images/changedtext.png[]
 image::images/gitops-images/oops.png[]
 
 [start=7]
-7. Go back to Argo CD and notice that the resource named `home-banner` is now `Out of Sync`. Argo CD considers the application out of sync because the desired state as expressed in git no longer matches the target state in the cluster after the direct edit was performed.
+7. Go back to Argo CD and notice that the resource named `home-banner` is now `Out of Sync`. Argo CD considers the application out of sync because the desired state as expressed in Git no longer matches the target state in the cluster after the direct edit was performed.
 
 image::images/gitops-images/selectfordiff.png[]
 
@@ -291,7 +298,7 @@ image::images/gitops-images/sync.png[]
 
 image::images/gitops-images/banner.png[]
 
-The banner has been restored to its desired state specified in git by Argo CD.
+The banner has been restored to its desired state specified in Git by Argo CD.
 
 image::images/gitops-images/argo_appsdeployed.png[]
 

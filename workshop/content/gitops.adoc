@@ -292,6 +292,6 @@ The banner has been restored to its desired state specified in git by Argo CD.
 
 image::images/gitops-images/argo_appsdeployed.png[]
 
-Note: Keep in mind that OpenShift GitOps can automatically revert these changes by enabling self-heal. If you are interested in enabling self-heal, you can find the option under 'app details'.
+Note: Keep in mind that OpenShift GitOps can automatically revert these changes by enabling self-heal. If you are interested in enabling self-heal, you can find the option under 'app details'. Self-heal is a feature of OpenShift GitOps that allows you to automatically restore your cluster or application to a desired state if it deviates from the configuration stored in a Git repository. This way, you can ensure consistency and reliability across different environments and avoid manual intervention or errors.
 
 In this module we used GitOps to configure an operator as well as a banner in our cluster. While these are relatively small changes, GitOps can be used to configure all aspects of a cluster and is an important tool for ensuring consistent and reliable configuration across a fleet of clusters in an organization.

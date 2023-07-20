@@ -133,7 +133,7 @@ requested size (in our example, 1Gi).
 
 [Note]
 ====
-You'll note that there is also a `gp2-csi`. This implements the
+You'll note that there is also a `gp3-csi`. This implements the
 https://github.com/container-storage-interface/spec[CSI interface],
 which stands for "Container Storage Interface". This specification enables
 storage vendors to develop their plugins once, and have it work across

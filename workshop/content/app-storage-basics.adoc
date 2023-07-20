@@ -121,9 +121,9 @@ oc get storageclass
 And you will see something like:
 
 ----
-NAME            PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
-gp2 (default)   kubernetes.io/aws-ebs   Delete          WaitForFirstConsumer   true                   47m
-gp2-csi         ebs.csi.aws.com         Delete          WaitForFirstConsumer   true                   47m
+NAME                PROVISIONER       RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+gp2-csi             ebs.csi.aws.com   Delete          WaitForFirstConsumer   true                   88m
+gp3-csi (default)   ebs.csi.aws.com   Delete          WaitForFirstConsumer   true                   88m
 ----
 
 Any time a request for a volume is made (`PersistentVolumeClaim`) that

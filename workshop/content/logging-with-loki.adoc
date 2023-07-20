@@ -439,9 +439,10 @@ You should see a box pop up in the top right corner after about
 and will prompt you to refresh your browser. Go ahead and do that; 
 this change will now allow you to access logs.
 
-image::images/Loki_refresh.png[]
+If you come across any references to Fluentd status, 
+kindly disregard them, as they are not relevant to our current task.
 
-If you come across any references to Fluentd status, kindly disregard them, as they are not relevant to our current task.
+image::images/Loki_refresh.png[]
 
 #### Observing The Logs
 

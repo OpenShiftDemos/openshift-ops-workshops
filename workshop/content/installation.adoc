@@ -36,7 +36,6 @@ yes
 
 Here is your ssh password (please copy/paste):
 
-[source,none,role="copypaste copypaste-warning"]
 ----
 {{ SSH_PASSWORD }}
 ----

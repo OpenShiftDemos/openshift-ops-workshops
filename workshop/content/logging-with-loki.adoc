@@ -441,6 +441,8 @@ this change will now allow you to access logs.
 
 image::images/Loki_refresh.png[]
 
+If you come across any references to Fluentd status, kindly disregard them, as they are not relevant to our current task.
+
 #### Observing The Logs
 
 1. At this Point you can go to `Observe` -> `Logs` on the left hand menu. 

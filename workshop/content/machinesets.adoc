@@ -62,7 +62,8 @@ Each `Machine` has a corresponding `INSTANCE`. Do those IDs look familiar?
 They are AWS EC2 instance IDs. You also see `Machines` for the OpenShift
 masters. They are not part of a `MachineSet` because they are somewhat
 stateful and their management is handled by different operators and through a
-different process.
+different process. If you have a different number of worker machines, 
+it doesn't matter as we will be adding more later.
 
 [Warning]
 ====

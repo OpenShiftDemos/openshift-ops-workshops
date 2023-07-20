@@ -288,9 +288,11 @@ stringData:
   endpoint: https://s3.us-east-1.amazonaws.com/
   region: us-east-1
 ----
-  d. Once you are happy, click `Create`.
+
+[start=4]
+  4. Once you are happy, click `Create`.
   
-  e. Check that the `lokistack-dev-s3 secret` has been created by running the following command:
+  5. Check that the `lokistack-dev-s3 secret` has been created by running the following command:
 [source,bash,role="execute"]
 kubectl get secrets -n openshift-logging
  

@@ -541,78 +541,8 @@ See 'oc new-app -h' for examples.
 This failure is exactly what we wanted to see.
 
 #### Prometheus
-Now that you have a user with `cluster-reader` privileges (one that can see
-many administrative aspects of the cluster), we can now delve into Prometheus 
-again. We briefly touched upon Prometheus in the infrastructure nodes module, 
-but now we can proceed to log in and explore it further.
 
-Login as a the user with `cluster-reader` privileges:
-
-[source,bash,role="execute"]
-----
-oc login -u fancyuser1 -p Op#nSh1ft
-----
-
-Find the `prometheus` `Route` with the following command:
-
-[source,bash,role="execute"]
-----
-oc get route prometheus-k8s -n openshift-monitoring -o jsonpath='{.spec.host}{"\n"}'
-----
-
-You will see something like the following:
-
-----
-prometheus-k8s-openshift-monitoring.{{ ROUTE_SUBDOMAIN }}
-----
-
-[Warning]
-====
-Before continuing, make sure to go to the {{ MASTER_URL }}[OpenShift Web Console] (Do not 
-use the console that is built-in to the workshop). Instead, please use the 
-one that you will find on your credentials page and log out by 
-using the dropdown menu at the upper right where it says `kube:admin`.
-Otherwise Prometheus will try to use your `kubeadmin` user to pass through
-authentication. While it will work, it doesn't demonstrate the
-`cluster-reader` role.
-====
-
-The installer configured a `Route` for Prometheus by default. Go ahead and
-control+click the link:https://prometheus-k8s-openshift-monitoring.{{
-ROUTE_SUBDOMAIN }}[Prometheus link] to open it in your browser. You'll be
-greeted with a login screen. Click the *Log in with OpenShift* button, then
-select the `ldap` auth mechanism, and use the `fancyuser1` user that you gave
-`cluster-reader` privileges to earlier.
-
-More specifically, the `ose-fancy-dev` group has `cluster-reader`
-permissions, and `fancyuser1` is a member. Remember that the password
-for all of these users is:
-
-----
-Op#nSh1ft
-----
-
-[Warning]
-====
-You might get a certificate error because of a self-signed certificate
-(depending on how the cluster was installed).  Make sure to accept it.
-====
-
-After logging in, the first time you will be presented with an auth proxy
-permissions acknowledgement:
-
-.Auth Proxy Acceptance.
-image::images/prometheus-auth-proxy.png[]
-
-There is actually an OAuth proxy that sits in the flow between you and the
-Prometheus container. This proxy is used to validate your AuthenticatioN
-(AuthN) as well as authorize (AuthZ) what is allowed to happen. Here you are
-explicitly authorizing the permissions from your `fancyuser1` account to be
-used as part of accessing Prometheus. Hit _Allow selected permissions_.
-
-At this point you are viewing Prometheus. There are no alerts configured. If
-you look at `Status` and then `Targets` you can see some interesting
-information about the current state of the cluster.
+Users can utilize Prometheus with LDAP integration to enhance authentication and authorization capabilities. By configuring Prometheus to authenticate against an LDAP server, users can ensure secure access to Prometheus with their LDAP credentials. Additionally, LDAP integration allows administrators to define fine-grained access control policies, granting or restricting Prometheus functionalities based on LDAP user groups or attributes. This enables seamless integration of Prometheus into an LDAP-managed environment, providing centralized user management and access control for monitoring and alerting operations.
 
 After you are done, make sure to login again as the admin user:
 
@@ -620,3 +550,5 @@ After you are done, make sure to login again as the admin user:
 ----
 oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
+
+That concludes the OpenShift admin modules. Thanks for working through it!

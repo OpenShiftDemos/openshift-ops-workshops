@@ -137,8 +137,8 @@ While we wait for the main cluster to provision, lets go ahead and provision a S
 3. Select *Amazon Web services*
 4. Select *Standalone*
 
-[start=6]
-6. Please set it up as follows:
+[start=5]
+5. Please set it up as follows:
 * Select the *Infrastructure provider credential*  *AWS*
 * Click NEXT
 * Add the desired cluster name. Leave the Cluster set empty for now
@@ -156,20 +156,21 @@ While we wait for the main cluster to provision, lets go ahead and provision a S
 |*ASIA PACIFIC*|Select *ap-southeast-2* or *ap-northeast-2* or *ap-east-1*
 |===
 
-[start=7]
-7. Expand the *Worker Pools*, and change the worker node count to 0
+[start=6]
+6. Expand the *Worker Pools*, and change the worker node count to 0
 
 image::images/acm-images/node_0.png[]
 
-[start=8]
-8. Click on step 7 to Review *before* proceeding, turn *YAML: ON at the top of the screen.*
+[start=7]
+7. Click on step 7 to Review *before* proceeding, turn *YAML: ON at the top of the screen.*
 
-9. Click on the *install-config* tab in the YAML window pane and *change the master replica number to 1* (will likely be 3).  Double check that the worker replica is 0.
+[start=8]
+8. Click on the *install-config* tab in the YAML window pane and *change the master replica number to 1* (will likely be 3).  Double check that the worker replica is 0.
 
 image::images/acm-images/install-config.png[]
 
-[start=10]
-10. Click back on the *cluster* tab in the YAML window pane and locate the section that defines an object of type: *kind: MachinePool*. Add the following line at the end of the *MachinePool* section.
+[start=9]
+9. Click back on the *cluster* tab in the YAML window pane and locate the section that defines an object of type: *kind: MachinePool*. Add the following line at the end of the *MachinePool* section.
 ----
   skipMachinePools: true
 ----
@@ -198,8 +199,8 @@ spec:
 
 Be sure the new line is at the same indentation as the previous line.
 
-[start=11]
-11. Click on “*Create*” and the single node cluster creation will go through.
+[start=10]
+10. Click on “*Create*” and the single node cluster creation will go through.
 
 _This process takes about 10 to 20 minutes depending on AWS traffic at the time this course is taken. Make sure you monitor for any failures and address as needed_
 

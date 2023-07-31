@@ -57,6 +57,8 @@ modules:
     name: Admin Ops - Installation and Verification
   summit_environment:
     name: Admin Ops - Environment Overview
+  acm-multicluster-412:
+    name: Multicluster management with ACM
   
 config:
     template_engine: liquid.js  

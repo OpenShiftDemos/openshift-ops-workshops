@@ -19,4 +19,4 @@ modules:
   - acs-vulnerability
   - acs-devsecops
   - acm-multicluster
-  - gitops
+  - acm-multicluster-412

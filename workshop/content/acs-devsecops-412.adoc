@@ -124,7 +124,7 @@ First, we will need to create a token to access ACS central.
 
 Access the RHACS web user interface, select "Platform Configuration" from the left-hand side menu, and then select integrations. Scroll down to the section for authentication tokens and select "StackRox API Token." 
 
-image::images/acs-images/acs-images/ci-1.png[]
+image::images/acs-images/ci-1.png[]
 
 Press the *Generate Token* button in the top right corner and select the token role of "Continuous Integration." Give the token a name and press the button titled "Generate".
 

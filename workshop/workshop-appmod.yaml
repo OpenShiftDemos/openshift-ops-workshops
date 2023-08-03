@@ -20,3 +20,5 @@ modules:
   - acs-devsecops
   - acm-multicluster
   - acm-multicluster-412
+  - acs-vulnerability-412
+  - acs-devsecops-412

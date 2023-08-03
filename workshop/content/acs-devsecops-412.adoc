@@ -1,4 +1,3 @@
-
 = DevSecOps and Policy Enforcement with Red Hat Advanced Cluster Security (4.12 Draft)
 
 == Using OpenShift Pipelines to Automate Red Hat Advanced Cluster Security for Kubernetes
@@ -22,7 +21,7 @@ The roxctl command line interface has several options for resource and image ana
 
 The CI process in the example below takes advantage of the tasks, skeleton pipeline, and pipeline run resources that users can build into their own wider OpenShift Pipelines process. The resources and their interaction are shown in figure 1:
 
-image::images/tekton-1.png[]
+image::images/acs-images/tekton-1.png[]
 
 _Figure 1: OpenShift Pipeline process_ +
 
@@ -125,11 +124,11 @@ First, we will need to create a token to access ACS central.
 
 Access the RHACS web user interface, select "Platform Configuration" from the left-hand side menu, and then select integrations. Scroll down to the section for authentication tokens and select "StackRox API Token." 
 
-image::images/acs-images/ci-1.png[]
+image::images/acs-images/acs-images/ci-1.png[]
 
 Press the *Generate Token* button in the top right corner and select the token role of "Continuous Integration." Give the token a name and press the button titled "Generate".
 
-image::images/ci-2.png[]
+image::images/acs-images/ci-2.png[]
 
 * Create a token name and click the 'Continuous Integration' role.
 
@@ -162,31 +161,31 @@ You are now ready to run your pipeline!
 
 First, head to the OpenShift console to execute the pipeline. Then click on the *Pipelines* tab to select the *Pipelines* dropdown.
 
-image::images/pipeline-1.png[]
+image::images/acs-images/pipeline-1.png[]
 
 You should see a pipeline labeled *rox-pipeline*. Let's run one.
 
 To run a pipeline, you can click the three dots to the left of the pipeline and click *start*, OR you can click on the *rox-pipeline* to be brought to a details page where you can select *actions -> start* 
 
-image::images/pipeline-2.png[]
+image::images/acs-images/pipeline-2.png[]
 
-image::images/pipeline-3.png[]
+image::images/acs-images/pipeline-3.png[]
 
 * You will need to add the image you wish to scan (quay.io/mfoster/log4shell-demo:0.1.0). In this case, we want to look at the image we know has the log4shell vulnerability.
 
-image::images/pipeline-4.png[]
+image::images/acs-images/pipeline-4.png[]
 
 * Click start and ensure that the pipeline is in its running phase. It should look like the pictures below. 
 
-image::images/pipeline-5.png[]
+image::images/acs-images/pipeline-5.png[]
 
-image::images/pipeline-6.png[]
+image::images/acs-images/pipeline-6.png[]
 
 Since this image is designed to fail, we should only have 1 of the tasks pass. Therefore the outcome will look like the following. 
 
-image::images/pipeline-7.png[]
+image::images/acs-images/pipeline-7.png[]
 
-image::images/pipeline-8.png[]
+image::images/acs-images/pipeline-8.png[]
 
 From the image above, the log snippet shows that 5 policies have been violated. 
 
@@ -194,7 +193,7 @@ From the image above, the log snippet shows that 5 policies have been violated.
 
 If you expand the log snippet, you will get an output like the following.
 
-image::images/pipeline-9.png[]
+image::images/acs-images/pipeline-9.png[]
 
 Congratulations! The log shows that the policy log4shell policy has been violated, breaking the pipeline.
 

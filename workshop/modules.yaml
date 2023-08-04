@@ -47,7 +47,7 @@ modules:
     name: GitOps on OpenShift
 
 
-    
+
 config:
     template_engine: liquid.js  
     vars:

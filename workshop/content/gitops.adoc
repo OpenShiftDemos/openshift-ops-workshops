@@ -265,6 +265,13 @@ This is what the file looks after the patch:
 
 image::images/gitops-images/changedtext.png[]
 
+you can also see the change by using this command again:
+
+[source,bash,role="execute"]
+----
+oc get consolenotification
+----
+
 [start=6]
 6. Check back on the `console` and see that the `banner` has been updated.
 

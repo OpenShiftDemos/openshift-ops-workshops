@@ -16,7 +16,7 @@ Do not install the Community version of the Argo CD Operator,
 if you have already done so remove the Argo CD Community Operator 
 before you install the Red Hat OpenShift GitOps Operator.
 ----
-1.Now switch over to your *Openshift Web Console*:
+1. Now switch over to your *Openshift Web Console*:
 
 {{ MASTER_URL }}
 

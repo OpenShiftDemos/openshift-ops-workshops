@@ -42,7 +42,12 @@ modules:
   summit_intro:
     name: Introduction
   ldap-groupsync4-12:
-    name: External (LDAP) Authentication Providers, Users, and Groups    
+    name: External (LDAP) Authentication Providers, Users, and Groups
+  gitops:
+    name: GitOps on OpenShift
+
+
+    
 config:
     template_engine: liquid.js  
     vars:

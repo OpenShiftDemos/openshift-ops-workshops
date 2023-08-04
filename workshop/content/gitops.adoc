@@ -296,7 +296,7 @@ In the diff output, the text from the GitHub repository is displayed in green, i
 This helps you easily identify the specific sections of the banner text that have been altered. This visual distinction helps you understand the changes you made and how they differ from the original content stored in the repository.
 
 [start=9]
-9. To resync the resource, click on `sync`.
+9. To resync the resource, click on `sync`. You may have to press the `synchronize` button one more time after.
 
 image::images/gitops-images/sync.png[]
 

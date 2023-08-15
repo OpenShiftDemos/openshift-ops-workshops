@@ -435,7 +435,7 @@ Once complete notice the violations you have, since we created this policy as a 
 [start=12]
 12. Navigate to the Results screen, allow the remediation to complete, _it shouldn't take more than 3 minutes_
 
-image::images/acm-images/no-violations.png[]
+image::images/acm-images/policy7.png[]
 
 It may take longer to enforce the policy.
 

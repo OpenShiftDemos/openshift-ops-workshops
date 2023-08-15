@@ -437,4 +437,6 @@ Once complete notice the violations you have, since we created this policy as a 
 
 image::images/acm-images/no-violations.png[]
 
+It may take longer to enforce the policy.
+
 Now you have succesfully created a Policy to scan your clusters, if you would like to play with other policies please visit the https://github.com/stolostron/policy-collection[Policy Repo] for more Policies you can test out.

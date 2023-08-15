@@ -804,6 +804,20 @@ Create the namespace for `netcandystore`.
 oc create namespace netcandystore
 ----
 
+Next we will use this command below to create a Kubernetes resource with specific security restrictions and context constraints within the OpenShift cluster.
+
+[source,bash,role="execute"]
+----
+oc create -f ./restrictedfsgroupscc.yaml
+----
+
+Next, we'll allow a specific group of service accounts (in this case, those related to Microsoft SQL Server) to follow the strict security rules defined by the "restrictedfsgroup" Security Context Constraints in the OpenShift system.
+
+[source,bash,role="execute"]
+----
+oc adm policy add-scc-to-group restrictedfsgroup system:serviceaccounts:mssql
+----
+
 With the two variables exported, and the helm repo added, you can install
 the application stack using the `helm` cli.
 

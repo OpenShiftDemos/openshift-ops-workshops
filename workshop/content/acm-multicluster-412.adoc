@@ -433,10 +433,10 @@ Once complete notice the violations you have, since we created this policy as a 
 11. Click *Submit*
 
 [start=12]
-12. Navigate to the Results screen, allow the remediation to complete, _it shouldn't take more than 3 minutes_
+12. Navigate to the Results screen, allow the remediation to complete, _it may take longer to enforce the policy._
 
 image::images/acm-images/policy7.png[]
 
-It may take longer to enforce the policy.
+
 
 Now you have succesfully created a Policy to scan your clusters, if you would like to play with other policies please visit the https://github.com/stolostron/policy-collection[Policy Repo] for more Policies you can test out.

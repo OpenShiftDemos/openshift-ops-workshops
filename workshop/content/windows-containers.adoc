@@ -864,6 +864,9 @@ Major  Minor  Build  Revision
 10     0      17763  0
 ----
 
+
+If the helm installation finishes quickly, please examine the pods. It might be necessary to wait for approximately 10-20 minutes for this specific pod to become operational. When you run the command `"oc describe pod <netcandystore-78d78677c8-jmhtg> -n netcandystore` , you will be able to observe that it is currently retrieving the NCS image from quay.io.
+
 Verify that the helm chart was installed successfully.
 
 [source,bash,role="execute"]

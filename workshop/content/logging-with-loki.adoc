@@ -367,12 +367,10 @@ and configure logging.
 
 1. Head over to the `console` and go to `Operators` and `Installed Operators`. 
 
-[start=a]
-a. Select the `Red Hat OpenShift Logging`.
-  
-b. On the first page under `Provided APIs` and `Cluster Logging`, select `Create instance`.
-  
-c. Next, remove the current YAML and replace it with this YAML:
+[start=1]
+1. Select the `Red Hat OpenShift Logging`. 
+2. On the first page under `Provided APIs` and `Cluster Logging`, select `Create instance`.
+3. Next, remove the current YAML and replace it with this YAML:
   
 [source,yaml]
 ----

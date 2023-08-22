@@ -8,7 +8,7 @@ modules:
   - app-storage-basics
   - machinesets
   - infra-nodes
-  - logging
+  - logging-with-loki
   - ldap-groupsync
   - monitoring-basics
   - template-quota-limits
@@ -16,6 +16,6 @@ modules:
   - disabling-project-self-provisioning
   - clusterresourcequota
   - taints-and-tolerations
-  - acs-vulnerability
-  - acs-devsecops
-  - acm-multicluster
+  - acs-vulnerability-4-1
+  - acs-devsecops-4-1
+  - acm-multicluster-2-7

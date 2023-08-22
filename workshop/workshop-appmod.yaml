@@ -2,7 +2,6 @@ name: Modern App Dev Roadshow - Ops Track
 
 modules:
   activate:
-  - welcome  
   - environment
   - installation
   - app-mgmt-basics

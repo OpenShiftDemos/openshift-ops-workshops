@@ -551,4 +551,4 @@ After you are done, make sure to login again as the admin user:
 oc login -u kubeadmin -p {{ KUBEADMIN_PASSWORD }}
 ----
 
-That concludes the OpenShift admin modules. Thanks for working through it!
+That concludes the LDAP module. Thanks for working through it!

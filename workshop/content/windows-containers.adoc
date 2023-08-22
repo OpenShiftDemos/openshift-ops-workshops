@@ -810,7 +810,7 @@ Next we will use this command below to create a Kubernetes resource with specifi
 
 [source,bash,role="execute"]
 ----
-oc create -f ./restrictedfsgroupscc.yaml
+oc create -f ${HOME}/support/restrictedfsgroupscc.yaml
 ----
 
 Next, we'll allow a specific group of service accounts (in this case, those related to Microsoft SQL Server) to follow the strict security rules defined by the "restrictedfsgroup" Security Context Constraints in the OpenShift system.

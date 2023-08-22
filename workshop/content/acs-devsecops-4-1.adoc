@@ -137,7 +137,7 @@ image::images/acs-images/ci-2.png[]
 * Next, edit the *rox-secrets.yml* file in the demo directory. Use *vi/vim/nano/your favorite command line editor* to add the API token to the following file.
 
 ----
-$TUTORIAL_HOME/workshop/demo-apps/pipelines/pipeline/rox-secrets.yml 
+$TUTORIAL_HOME/acs-workshop/workshop/demo-apps/pipelines/pipeline/rox-secrets.yml
 ----
 
 |===

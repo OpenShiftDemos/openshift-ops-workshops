@@ -52,7 +52,7 @@ modules:
   acs-devsecops-4-1:
     name: DevSecOps with ACS
   welcome:
-    name: Welcome 
+    name: Welcome to the Modern App Dev Roadshow: Ops Track 
 
 
 

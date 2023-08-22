@@ -51,6 +51,8 @@ modules:
     name: Vulnerability Scanning with ACS
   acs-devsecops-4-1:
     name: DevSecOps with ACS
+  welcome:
+    name: Welcome 
 
 
 

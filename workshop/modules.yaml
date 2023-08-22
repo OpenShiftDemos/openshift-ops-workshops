@@ -45,6 +45,13 @@ modules:
     name: External (LDAP) Authentication Providers, Users, and Groups
   gitops:
     name: GitOps on OpenShift
+  acm-multicluster-2-7:
+    name: Multicluster management with ACM
+  acs-vulnerability-4-1:
+    name: Vulnerability Scanning with ACS
+  acs-devsecops-4-1:
+    name: DevSecOps with ACS
+
 
 
 

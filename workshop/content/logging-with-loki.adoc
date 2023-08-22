@@ -186,7 +186,7 @@ from the credentials on the page mentioned above. Use
 This is an example below:
 +
  AWS Access Key ID [None]: w3EDfSERUiLSAEXAMPLE (PLEASE REPLACE)
- AWS Secret Access Key [None]: mshdyShDTYKWEywajsqpshdNSUWJDA+1+REXAMPLE (PLEASE REPLACE)
+ AWS Secret Access Key [None]: mshdyShDTYKWEywajsqpshdREXAMPLE (PLEASE REPLACE)
  Default region name [None]: us-east-1
  Default output format [None]: json
  

@@ -1,4 +1,4 @@
-= DevSecOps and Policy Enforcement with Red Hat Advanced Cluster Security (RHACS 4.1)
+= DevSecOps and Policy Enforcement with Red Hat Advanced Cluster Security
 
 == Using OpenShift Pipelines to Automate Red Hat Advanced Cluster Security for Kubernetes
 

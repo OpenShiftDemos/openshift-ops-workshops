@@ -3,6 +3,7 @@ FROM quay.io/openshifthomeroom/workshop-dashboard:5.0.1
 USER root
 
 RUN wget https://github.com/noobaa/noobaa-operator/releases/download/v5.12.4/noobaa-operator-v5.12.4-linux-amd64.tar.gz -O /opt/workshop/bin/noobaa && \
+    tar -xzvf /opt/workshop/bin/noobaa -C /opt/workshop/bin/ && \
     wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.12.9/openshift-client-linux-4.12.9.tar.gz -P /opt/app-root/src/ && \
     wget https://github.com/mikefarah/yq/releases/download/v4.35.1/yq_linux_amd64 -O /opt/workshop/bin/yq && \
     wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -O /usr/local/src/awscliv2.zip && \

@@ -34,3 +34,4 @@ RUN rm -rf /tmp/src/.git* && \
 USER 1001
 
 RUN /usr/libexec/s2i/assemble
+

@@ -2,12 +2,11 @@ FROM quay.io/openshifthomeroom/workshop-dashboard:5.0.1
 
 USER root
 
-RUN wget https://github.com/noobaa/noobaa-operator/releases/download/v5.12.4/noobaa-operator-v5.12.4-linux-amd64.tar.gz -O /opt/workshop/bin/noobaa && \
-    tar -xzvf /opt/workshop/bin/noobaa -C /opt/workshop/bin/ && \
+RUN wget https://github.com/noobaa/noobaa-operator/releases/download/v5.9.0/noobaa-linux-v5.9.0 -O /opt/workshop/bin/noobaa && \
     wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.12.9/openshift-client-linux-4.12.9.tar.gz -P /opt/app-root/src/ && \
-    wget https://github.com/mikefarah/yq/releases/download/v4.35.1/yq_linux_amd64 -O /opt/workshop/bin/yq && \
+    wget https://github.com/mikefarah/yq/releases/download/v4.17.2/yq_linux_amd64 -O /opt/workshop/bin/yq && \
     wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -O /usr/local/src/awscliv2.zip && \
-    wget https://get.helm.sh/helm-v3.12.3-linux-amd64.tar.gz -O /usr/local/src/helm.tar.gz && \
+    wget https://get.helm.sh/helm-v3.8.0-linux-amd64.tar.gz -O /usr/local/src/helm.tar.gz && \
     tar -xzf /usr/local/src/helm.tar.gz -C /usr/local/src && \
     mv /usr/local/src/linux-amd64/helm /usr/local/bin && \
     unzip /usr/local/src/awscliv2.zip -d /usr/local/src && \

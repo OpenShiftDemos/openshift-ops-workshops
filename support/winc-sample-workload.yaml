@@ -5,6 +5,10 @@ items:
     kind: Namespace
     metadata:
       name: winc-sample
+      labels:
+        security.openshift.io/scc.podSecurityLabelSync: "false"
+        pod-security.kubernetes.io/enforce: "privileged"
+        pod-security.kubernetes.io/warn: "privileged"
     spec: {}
   - apiVersion: v1
     kind: Service
@@ -38,6 +42,8 @@ items:
             app: win-webserver
           name: win-webserver
         spec:
+          os:
+            name: "windows"
           tolerations:
           - key: "os"
             value: "Windows"

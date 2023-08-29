@@ -865,7 +865,7 @@ Major  Minor  Build  Revision
 ----
 
 
-If the helm installation finishes quickly, please examine the pods. It might be necessary to wait for approximately 10-20 minutes for this specific pod to become operational. When you run the command `"oc describe pod <netcandystore-78d78677c8-jmhtg> -n netcandystore` , you will be able to observe that it is currently retrieving the NCS image from quay.io.
+If the helm installation finishes quickly, please examine the pods. It might be necessary to wait for approximately 10-20 minutes for this specific pod to become operational.
 
 Verify that the helm chart was installed successfully.
 
@@ -889,6 +889,34 @@ and a DB called mysql.
 [source,bash,role="execute"]
 ----
 oc get pods -n netcandystore
+----
+
+If the NetCandyStore Pod looks kinda like this, please wait for a little longer:
+
+----
+netcandystore-78d78677c8-j7k62        0/1     ContainerCreating   0          104s
+----
+
+You can easily look into more details about what's happening with your pod by using the oc describe command. Just replace the pod name with your own.
+
+[source,bash,role="execute"]
+----
+oc describe pod <netcandystore-78d78677c8-j7k62> -n netcandystore
+----
+
+You'll be able to tell it's done when the events start looking like this:
+
+----
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  13m    default-scheduler  Successfully assigned netcandystore/netcandystore-78d78677c8-j7k62
+to ip-10-0-130-99.us-east-2.compute.internal
+  Normal  Pulling    13m    kubelet            Pulling image "quay.io/donschenck/netcandystore:2021mar8.1"
+  Normal  Pulled     4m48s  kubelet            Successfully pulled image "quay.io/donschenck/netcandystore:2021mar
+8.1" in 8m41.7951457s (8m41.7951457s including waiting)
+  Normal  Created    4m48s  kubelet            Created container netcandystore
+  Normal  Started    4m46s  kubelet            Started container netcandystore
 ----
 
 Looking at the frontend application, you can list where the pod is

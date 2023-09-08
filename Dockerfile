@@ -3,10 +3,10 @@ FROM quay.io/openshifthomeroom/workshop-dashboard:5.0.1
 USER root
 
 RUN wget https://github.com/noobaa/noobaa-operator/releases/download/v5.9.0/noobaa-linux-v5.9.0 -O /opt/workshop/bin/noobaa && \
-    wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.9.18/openshift-client-linux-4.9.18.tar.gz -P /opt/app-root/src/ && \
-    wget https://github.com/mikefarah/yq/releases/download/v4.17.2/yq_linux_amd64 -O /opt/workshop/bin/yq && \
+    wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.12.9/openshift-client-linux-4.12.9.tar.gz -P /opt/app-root/src/ && \
+    wget https://github.com/mikefarah/yq/releases/download/v4.35.1/yq_linux_amd64 -O /opt/workshop/bin/yq && \
     wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -O /usr/local/src/awscliv2.zip && \
-    wget https://get.helm.sh/helm-v3.8.0-linux-amd64.tar.gz -O /usr/local/src/helm.tar.gz && \
+    wget https://get.helm.sh/helm-v3.12.3-linux-amd64.tar.gz -O /usr/local/src/helm.tar.gz && \
     tar -xzf /usr/local/src/helm.tar.gz -C /usr/local/src && \
     mv /usr/local/src/linux-amd64/helm /usr/local/bin && \
     unzip /usr/local/src/awscliv2.zip -d /usr/local/src && \
@@ -14,8 +14,8 @@ RUN wget https://github.com/noobaa/noobaa-operator/releases/download/v5.9.0/noob
     rm -rf /usr/local/src/aws* && \
     rm -f /usr/local/src/helm*gz && \
     rm -rf /usr/local/src/linux-amd64 && \
-    tar -xzvf /opt/app-root/src/openshift-client-linux-4.9.18.tar.gz -C /opt/workshop/bin/ && \
-    rm -f /opt/app-root/src/openshift-client-linux-4.9.18.tar.gz && \
+    tar -xzvf /opt/app-root/src/openshift-client-linux-4.12.9.tar.gz -C /opt/workshop/bin/ && \
+    rm -f /opt/app-root/src/openshift-client-linux-4.12.9.tar.gz && \
     rm -f /opt/workshop/bin/README.md && \
     ln -s /opt/workshop/bin/noobaa /opt/app-root/bin/noobaa && \
     ln -s /opt/workshop/bin/yq /opt/app-root/bin/yq && \

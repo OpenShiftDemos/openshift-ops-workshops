@@ -38,8 +38,12 @@ echo -n "."
 export AWS_ACCESS_KEY_ID=$(oc get secret aws-creds -n kube-system -o jsonpath='{.data.aws_access_key_id}' | base64 -d)
 export AWS_SECRET_ACCESS_KEY=$(oc get secret aws-creds -n kube-system -o jsonpath='{.data.aws_secret_access_key}' | base64 -d)
 export AWS_DEFAULT_REGION=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.placement.region}')
-export WAMI=$(${awscli} ec2 describe-images --region=${AWS_DEFAULT_REGION} --filters "Name=name,Values=Windows_Server-2019*English*Full*ECS_Optimized-2023.05.18*" "Name=is-public,Values=true" --query "reverse(sort_by(Images, &CreationDate))[*].{name: Name, id: ImageId}" | ${jqcli} -r '.[0].id';)
-
+export WAMI=$(aws ec2 describe-images \
+  --region $AWS_DEFAULT_REGION \
+  --owners amazon \
+  --filters "Name=name,Values=Windows_Server-2019*English*Full*ECS_Optimized-*" \
+  --query 'sort_by(Images, &CreationDate)[-1].ImageId' \
+  --output text)
 #
 ## Give status information to user
 echo -n "."

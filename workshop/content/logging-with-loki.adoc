@@ -44,6 +44,11 @@ Configuring sections for more information on working with each component,
 including modifications you can make outside of the Cluster Logging Custom
 Resource.
 
+[Warning]
+====
+IMPORTANT: Do not utilize the internal OpenShift Console provided within the workshop. Instead, it is crucial to access the external OpenShift Console available on the workshop's credentials page for proper functionality
+====
+
 To enable metrics service discovery, add the following namespace label
 openshift.io/cluster-monitoring: "true".
  

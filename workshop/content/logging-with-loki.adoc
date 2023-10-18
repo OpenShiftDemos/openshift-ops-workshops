@@ -46,7 +46,7 @@ Resource.
 
 [Warning]
 ====
-IMPORTANT: Do not utilize the internal OpenShift Console provided within the workshop. Instead, it is crucial to access the external OpenShift Console available on the workshop's credentials page for proper functionality
+IMPORTANT: We have set up an external OpenShift Console with kubeadmin credentials exclusively for this workshop. To access it, please refer to the workshop credentials page. Kindly refrain from using the internal OpenShift Console while logged in with the service account within this dashboard.
 ====
 
 To enable metrics service discovery, add the following namespace label

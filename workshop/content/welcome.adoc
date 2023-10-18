@@ -1,3 +1,0 @@
-= Welcome to the Modern App Dev Roadshow: Ops Track
-
-image::images/madroadshow.png[]

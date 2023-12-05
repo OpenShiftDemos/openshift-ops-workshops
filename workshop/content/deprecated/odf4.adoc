@@ -31,7 +31,7 @@ a persistent storage solution for OCP workloads.
 * Use must-gather to collect support information
 
 .OpenShift Data Foundation components
-image::images/ocs/OCS-Pods-Diagram.png[OpenShift Data Foundation components]
+image::../images/ocs/OCS-Pods-Diagram.png[OpenShift Data Foundation components]
 
 NOTE: If you want more information about how Ceph works please review
 <<Introduction to Ceph>> section before starting the exercises in this
@@ -209,22 +209,22 @@ Remember that the login is `kubeadmin` and the password is:
 Once you are logged in, navigate to the *Operators* -> *OperatorHub* menu.
 
 .OCP OperatorHub
-image::images/ocs/OCS-OCP-OperatorHub.png[OCP OperatorHub]
+image::../images/ocs/OCS-OCP-OperatorHub.png[OCP OperatorHub]
 
 Now type `openshift data foundation` in the *Filter by _keyword..._* box.
 
 .OCP OperatorHub filter on OpenShift Data Foundation Operator
-image::images/ocs/OCS4-OCP-OperatorHub-Filter.png[OCP OperatorHub Filter]
+image::../images/ocs/OCS4-OCP-OperatorHub-Filter.png[OCP OperatorHub Filter]
 
 Select `OpenShift Data Foundation Operator` and then select *Install*.
 
 .OCP OperatorHub Install OpenShift Data Foundation
-image::images/ocs/OCS4-OCP4-OperatorHub-Install.png[OCP OperatorHub Install]
+image::../images/ocs/OCS4-OCP4-OperatorHub-Install.png[OCP OperatorHub Install]
 
 On the next screen make sure the settings are as shown in this figure.
 
 .OCP Subscribe to OpenShift Data Foundation
-image::images/ocs/OCS4-OCP4-OperatorHub-Subscribe.png[OCP OperatorHub Subscribe]
+image::../images/ocs/OCS4-OCP4-OperatorHub-Subscribe.png[OCP OperatorHub Subscribe]
 
 Click *Install*.
 
@@ -276,17 +276,17 @@ installation for ODF 4.
 Select *Create StorageSystem* in figure below to get to the ODF configuration screen.
 
 .Create storage system in openshift-storage namespace
-image::images/ocs/OCS4-OCP4-View-Operator.png[Create storage system in openshift-storage namespace]
+image::../images/ocs/OCS4-OCP4-View-Operator.png[Create storage system in openshift-storage namespace]
 
 The `Create StorageSystem` screen will display.
 
 .Configure storage system settings
-image::images/ocs/OCS4-config-screen-partial1.png[Configure storage system settings]
+image::../images/ocs/OCS4-config-screen-partial1.png[Configure storage system settings]
 
 Leave the default selection of `gp2`, `Full deployment`, and select *Next*.
 
 .Select capacity and nodes for new storage system
-image::images/ocs/OCS4-config-screen-partial2.png[Select capacity and nodes for new storage system]
+image::../images/ocs/OCS4-config-screen-partial2.png[Select capacity and nodes for new storage system]
 
 Leave the default of `2 TiB` as the requested capacity for the storage system.
 
@@ -303,7 +303,7 @@ Then click on the button *Next* below the dialog box with the 3 workers
 selected with a `checkmark`. Click *Next*  one more time until you see the figure below.
 
 .Review and create new storage system
-image::images/ocs/OCS4-config-screen-partial3.png[Review and create new storage system]
+image::../images/ocs/OCS4-config-screen-partial3.png[Review and create new storage system]
 
 Click *Create StorageSystem*.
 
@@ -389,7 +389,7 @@ NOTE: If you just finished your ODF 4 deployment it could take 5-10 minutes
 for your *Dashboards* to fully populate. 
 
 .Storage Dashboard after successful storage installation
-image::images/ocs/OCS-dashboard-healthy.png[Storage Dashboard after successful storage installation]
+image::../images/ocs/OCS-dashboard-healthy.png[Storage Dashboard after successful storage installation]
 
 Reference the https://access.redhat.com/documentation/en-us/red_hat_openshift_data_foundation/4.9/html/monitoring_openshift_data_foundation/cluster_health#verifying-openshift-data-foundation-is-healthy_rhodf[ODF Monitoring Guide] for more information on how to use the *Dashboards*.
 
@@ -771,7 +771,7 @@ exit
 Let's verify an alert has appeared in the OCP event log.
 
 .OpenShift Container Platform Events
-image::images/ocs/OCS-PVCResize-pvcnearfull-alert.png[PVC nearfull alert]
+image::../images/ocs/OCS-PVCResize-pvcnearfull-alert.png[PVC nearfull alert]
 
 ==== Expand applying a modified PVC YAML file
 
@@ -919,25 +919,25 @@ Web Console*. Proceed as follow:
 First step is to select the project to which the *PVC* belongs to.
 
 .Select the appropriate project
-image::images/ocs/OCS-PVCResize-select-project.png[Select project]
+image::../images/ocs/OCS-PVCResize-select-project.png[Select project]
 
 Choose `Expand PVC` from the contextual menu.
 
 .Choose Expand from menu
-image::images/ocs/OCS-PVCResize-choose-expand-menu.png[Choose expand from the contextual menu]
+image::../images/ocs/OCS-PVCResize-choose-expand-menu.png[Choose expand from the contextual menu]
 
 In the dialog box that appears enter the new capacity for the *PVC*.
 
 CAUTION: You can NOT reduce the size of a *PVC*.
 
 .Enter the new size for the *PVC*
-image::images/ocs/OCS-PVCResize-enter-new-size.png[Enter new size]
+image::../images/ocs/OCS-PVCResize-enter-new-size.png[Enter new size]
 
 You now simply have to wait for the expansion to complete and for the new size
 to be reflected in the console (15 GiB).
 
 .Wait for the expansion to complete
-image::images/ocs/OCS-PVCResize-verify-resize-worked2.png[Wait for expansion]
+image::../images/ocs/OCS-PVCResize-verify-resize-worked2.png[Wait for expansion]
 
 == Create a new OCP application deployment using CephFS volume
 
@@ -1139,7 +1139,7 @@ nothing.
 Select an arbitrary file from your local machine and upload it to the app.
 
 .A simple PHP-based file upload tool
-image::images/ocs/uploader_screen_upload.png[]
+image::../images/ocs/uploader_screen_upload.png[]
 
 Once done click *_List uploaded files_* to see the list of all currently
 uploaded files.
@@ -1266,12 +1266,12 @@ spec:
 Doing the same operation in the *OpenShift Web Console* would require navigating to `Storage` -> `Persistent Volume Claim` and choosing `Clone PVC`.
 
 .Persistent Volume Claim clone PVC using UI
-image::images/ocs/OCP4-OCS4-Clone-PVC.png[Persistent Volume Claim clone PVC using UI]
+image::../images/ocs/OCP4-OCS4-Clone-PVC.png[Persistent Volume Claim clone PVC using UI]
 
 Size of new clone *PVC* is greyed out. The new *PVC* will be the same size as the original.
 
 .Persistent Volume Claim clone configuration
-image::images/ocs/OCP4-OCS4-Clone-PVC-config.png[Persistent Volume Claim clone configuration]
+image::../images/ocs/OCP4-OCS4-Clone-PVC-config.png[Persistent Volume Claim clone configuration]
     
 Now create a *PVC* clone for `postgresql`.
 
@@ -1298,7 +1298,7 @@ postgresql-clone   Bound    pvc-f5e09c63-e8aa-48a0-99df-741280d35e42   15Gi     
 You can also check the new clone *PVC* in the *OpenShift Web Console*.
 
 .Persistent Volume Claim clone view in UI
-image::images/ocs/OCP4-OCS4-Clone-PVC-view.png[Persistent Volume Claim clone view in UI]
+image::../images/ocs/OCP4-OCS4-Clone-PVC-view.png[Persistent Volume Claim clone view in UI]
 
 ==== Using a CSI Volume clone for application recovery
 
@@ -1346,7 +1346,7 @@ oc get route rails-pgsql-persistent -n my-database-app -o jsonpath --template="h
 If you refresh the browser you will see the application has failed.
 
 .Application failed because database table removed
-image::images/ocs/rails-postgresql-failed.png[Application failed because database table removed]
+image::../images/ocs/rails-postgresql-failed.png[Application failed because database table removed]
 
 Remember a *PVC* clone is an exact duplicate of the original *PVC* at the time the clone was created. Therefore you can use you `postgresql` clone to recover the application.
 
@@ -1464,12 +1464,12 @@ spec:
 Doing the same operation in the *OpenShift Web Console* would require navigating to `Storage` -> `Persistent Volume Claim` and choosing `Create Snapshot`. Make sure to be in the `my-shared-storage` project.
 
 .Persistent Volume Claim snapshot using UI
-image::images/ocs/OCP4-OCS4-Snapshot.png[Persistent Volume Claim snapshot using UI]
+image::../images/ocs/OCP4-OCS4-Snapshot.png[Persistent Volume Claim snapshot using UI]
 
 The *VolumeSnapshot* will be the same size as the original.
 
 .Persistent Volume Claim snapshot configuration
-image::images/ocs/OCP4-OCS4-Snapshot-config.png[Persistent Volume Claim snapshot configuration]
+image::../images/ocs/OCP4-OCS4-Snapshot-config.png[Persistent Volume Claim snapshot configuration]
     
 Now create a snapshot for CephFS volume `my-shared-storage`.
 
@@ -1499,12 +1499,12 @@ my-shared-storage-snapshot   true         my-shared-storage                     
 You can now restore the new *VolumeSnapshot* in the *OpenShift Web Console*. Navigate to `Storage` -> `Volume Snapshots`. Select `Restore as new PVC`. Make sure to have the `my-shared-storage` project selected at the top left.
 
 .Persistent Volume Claim snapshot restore in UI
-image::images/ocs/OCP4-OCS4-Snapshot-restore.png[Persistent Volume Claim snapshot restore in UI]
+image::../images/ocs/OCP4-OCS4-Snapshot-restore.png[Persistent Volume Claim snapshot restore in UI]
 
 Chose the correct *StorageClass* to create the new clone from snapshot *PVC* and select `Restore`. The size of the new *PVC* is greyed out and is same as the `parent` or original *PVC* `my-shared-storage`. 
 
 .Persistent Volume Claim snapshot restore configuration
-image::images/ocs/OCP4-OCS4-Snapshot-restore-config.png[Persistent Volume Claim snapshot restore configuration]
+image::../images/ocs/OCP4-OCS4-Snapshot-restore-config.png[Persistent Volume Claim snapshot restore configuration]
 
 Click *Restore*.
 
@@ -2075,12 +2075,12 @@ http://photo-album.apps.cluster-7c31.7c31.sandbox905.opentlc.com
 Copy and paste this route into a web browser tab. 
 
 .Select Photo and Upload
-image::images/ocs/photo-album-select-upload.png[Select Photo and Upload]
+image::../images/ocs/photo-album-select-upload.png[Select Photo and Upload]
 
 Select one or more photos of your choosing on your local machine. Then make sure to click the `Upload` button for each photo.
 
 .View photos after uploading
-image::images/ocs/photo-album-images.png[View photos after uploading]
+image::../images/ocs/photo-album-images.png[View photos after uploading]
 
 To view the photos in your object bucket navigate back to the `OpenShift
 Data Foundation` *Dashboard* under `Storage` and select
@@ -2088,7 +2088,7 @@ Data Foundation` *Dashboard* under `Storage` and select
 the `Mulitcloud Object Gateway` link under `System Name`.
 
 .Launch MCG console from Object dashboard
-image::images/ocs/System-Name-MCG-Console.png[Launch MCG console from Object dashboard]
+image::../images/ocs/System-Name-MCG-Console.png[Launch MCG console from Object dashboard]
 
 Login to the `MCG Console` using `username` kubeadmin and your `password`. 
 
@@ -2100,12 +2100,12 @@ Login to the `MCG Console` using `username` kubeadmin and your `password`.
 You can navigate to the bucket details by selecting the `Buckets` on the far right side. Now select `Object Buckets`.
 
 .Login to MCG Console and select Buckets
-image::images/ocs/MCG-Console-photo-album-buckets.png[Login to MCG Console and select Buckets]
+image::../images/ocs/MCG-Console-photo-album-buckets.png[Login to MCG Console and select Buckets]
 
 Select your bucket name under `Object Buckets` and then select the `Objects` tab to view the individual objects create when you uploaded your photos.
 
 .Validate uploaded photos are in your Object Bucket
-image::images/ocs/MCG-Console-photo-album-objects.png[Validate uploaded photos are in your object bucket]
+image::../images/ocs/MCG-Console-photo-album-objects.png[Validate uploaded photos are in your object bucket]
 
 == Adding storage to the Ceph Cluster
 
@@ -2205,13 +2205,13 @@ reach the ODF storage cluster overview:
  - Click on `OpenShift Data Foundation Operator`
  - In the top navigation bar, scroll right to find the item `Storage System` and click on it
 
-image::images/ocs/OCS4-OCP4-Storage-Cluster-overview-reachit.png[]
+image::../images/ocs/OCS4-OCP4-Storage-Cluster-overview-reachit.png[]
 
  - The visible list should list only one item - click on the three dots on the far right to extend the options menu
  - Select `Add Capacity` from the options menu
 
 .Add Capacity dialog
-image::images/ocs/OCS4-add-capacity.png[Add Capacity dialog]
+image::../images/ocs/OCS4-add-capacity.png[Add Capacity dialog]
 
 The storage class should be set to `gp2`. The added provisioned capacity will
 be three times as much as you see in the `Raw Capacity` field, because ODF uses
@@ -2358,12 +2358,12 @@ Click on the *Alerting* item to open the Alert window as illustrated in the
 screen capture below.
 
 .OCP Observe Menu choose Alerting
-image::images/ocs/metrics-alertingleftpanemenu.png[OCP Observe Menu choose Alerting]
+image::../images/ocs/metrics-alertingleftpanemenu.png[OCP Observe Menu choose Alerting]
 
 This will take you to the *Alerting* homepage as illustrated below.
 
 .OCP Alerting Homepage
-image::images/ocs/metrics-alertinghomepage.png[OCP Alerting Homepage]
+image::../images/ocs/metrics-alertinghomepage.png[OCP Alerting Homepage]
 
 You can display the alerts in the main window using the filters at your
 disposal.
@@ -2398,7 +2398,7 @@ The alert `Source` can be.
 As illustrated below, alerts can be filtered precisely using multiple criteria.
 
 .OCP Alerting Status Filtering
-image::images/ocs/metrics-alertingstatusfilter.png[OCP Alert Status Filtering]
+image::../images/ocs/metrics-alertingstatusfilter.png[OCP Alert Status Filtering]
 
 NOTE: You can clear all filters to view all the existing alerts.
 
@@ -2407,10 +2407,10 @@ rule that triggered the alert. The details include the Prometheus query used
 by the alert to perform the detection of the condition.
 
 .OCP Alert Contextual Menu
-image::images/ocs/metrics-alertingcontextualmenu.png[OCP Alert Contextual Menu]
+image::../images/ocs/metrics-alertingcontextualmenu.png[OCP Alert Contextual Menu]
 
 .OCP Alert Detail Display
-image::images/ocs/metrics-alertingviewrule.png[OCP Alert Detailed Display]
+image::../images/ocs/metrics-alertingviewrule.png[OCP Alert Detailed Display]
 
 NOTE: If desired, you can click the Prometheus query embedded in the alert.
 Doing so will take you to the *Metrics* page where you will be able to
@@ -2421,12 +2421,12 @@ execute the query for the alert and if desired make changes to the rule.
 Click on the *Metrics* item as illustrated below in the `Observe` menu.
 
 .OCP Observe Menu choose Metrics
-image::images/ocs/metrics-metricsleftpanemenu.png[OCP Observe Menu choose Metrics]
+image::../images/ocs/metrics-metricsleftpanemenu.png[OCP Observe Menu choose Metrics]
 
 This will take you to the *Metrics* homepage as illustrated below.
 
 .OCP Monitoring Metrics Homepage
-image::images/ocs/metrics-queryfield.png[OCP Monitoring Metrics Homepage]
+image::../images/ocs/metrics-queryfield.png[OCP Monitoring Metrics Homepage]
 
 Use the query field to either enter the formula of your choice or to search for
 metrics by name. The metrics available will let you query both OCP related
@@ -2438,31 +2438,31 @@ Let's start testing a simple query example and enter the following text
 `[Enter]` or select `Run Queries`.
 
 .Simple Ceph Query
-image::images/ocs/metrics-simplecephquery.png[Ceph Simple Query]
+image::../images/ocs/metrics-simplecephquery.png[Ceph Simple Query]
 
 The window should refresh with a graph similar to the one below.
 
 .Simple Ceph Graph
-image::images/ocs/metrics-simplecephgraph.png[Ceph Simple Graph]
+image::../images/ocs/metrics-simplecephgraph.png[Ceph Simple Graph]
 
 Then let's try a more relevant query example and enter the following text
 `rate(ceph_osd_op[5m])` or `irate(ceph_osd_op[5m])` in the query field. When
 you are done typing, simply hit `[Enter]`or select `Run Queries`.
 
 .Complex Ceph Query
-image::images/ocs/metrics-complexcephquery.png[Ceph Complex Query]
+image::../images/ocs/metrics-complexcephquery.png[Ceph Complex Query]
 
 The window should refresh with a graph similar to the one below.
 
 .Complex Ceph Graph
-image::images/ocs/metrics-complexcephgraph.png[Ceph Complex Graph]
+image::../images/ocs/metrics-complexcephgraph.png[Ceph Complex Graph]
 
 All OCP metrics are also available through the integrated *Metrics* window.
 Feel free to try with any of the OCP related metrics such as
 `irate(process_cpu_seconds_total[5m])` for example.
 
 .Complex OCP Graph
-image::images/ocs/metrics-complexocpgraph.png[OCP Complex Graph]
+image::../images/ocs/metrics-complexocpgraph.png[OCP Complex Graph]
 
 Have a look at the difference between `sum(irate(process_cpu_seconds_total[5m]))` and the last query `irate(process_cpu_seconds_total[5m])`.
 
@@ -2565,7 +2565,7 @@ outside of OCP 4.
 The Ceph project has a long history as you can see in the timeline below.
 
 .Ceph Project History
-image::images/ocs/ceph101-timeline.png[Ceph Project Timeline]
+image::../images/ocs/ceph101-timeline.png[Ceph Project Timeline]
 
 [.lead]
 It is a battle-tested software defined storage (SDS) solution that has been
@@ -2580,7 +2580,7 @@ multiple access methods to enable the different types of
 clients present within the IT infrastructure to get access to the data.
 
 .Ceph Architecture
-image::images/ocs/ceph101-overview.png[Ceph From Above]
+image::../images/ocs/ceph101-overview.png[Ceph From Above]
 
 [.lead]
 The entire Ceph architecture is resilient and does not present any single point
@@ -2642,7 +2642,7 @@ If we look at the Ceph cluster foundation layer, the full picture with the
 different types of daemons or containers looks like this.
 
 .RADOS as it stands
-image::images/ocs/ceph101-rados.png[RADOS Overview]
+image::../images/ocs/ceph101-rados.png[RADOS Overview]
 
 The circles represent the MONs, the Ms represent the MGRs and the squares
 with the bars represent the OSDs. In the diagram above, the cluster operates
@@ -2656,7 +2656,7 @@ access methods so that any application can use what is the best solution for
 its use-case.
 
 .Different Storage Types Supported
-image::images/ocs/ceph101-differentstoragetypes.png[Ceph Access Modes]
+image::../images/ocs/ceph101-differentstoragetypes.png[Ceph Access Modes]
 
 Ceph supports block storage through the RADOS Block Device (aka RBD) access
 method, file storage through the Ceph Filesystem (aka CephFS) access method
@@ -2671,7 +2671,7 @@ Librados allows developers to code natively against the native Ceph cluster
 API for maximum efficiency combined with a small footprint.
 
 .Application Native Object API
-image::images/ocs/ceph101-librados.png[librados]
+image::../images/ocs/ceph101-librados.png[librados]
 
 The Ceph native API offers different wrappers such as C, C++, Python, Java,
 Ruby, Erlang, Go and Rust.
@@ -2692,7 +2692,7 @@ The kernel RBD driver offers superior performance compared to the userspace
 same level of functionality. e.g., no RBD Mirroring support.
 
 .kRBD Diagram
-image::images/ocs/ceph101-krbd.png[Kernel based RADOS Block Device]
+image::../images/ocs/ceph101-krbd.png[Kernel based RADOS Block Device]
 
 [.lead]
 *_Userspace RBD (librbd)_*
@@ -2703,7 +2703,7 @@ This mode allows us to leverage all existing RBD features such as RBD
 Mirroring.
 
 .librbd Diagram
-image::images/ocs/ceph101-librbd.png[Userspace RADOS Block Device]
+image::../images/ocs/ceph101-librbd.png[Userspace RADOS Block Device]
 
 [.lead]
 *_Shared Filesystem (CephFS)_*
@@ -2714,7 +2714,7 @@ location of the object(s) for a given inode and then communicates directly
 with an OSD to perform the final IO request.
 
 .File Access (Ceph Filesystem or CephFS)
-image::images/ocs/ceph101-cephfs.png[Kernel Based CephFS Client]
+image::../images/ocs/ceph101-cephfs.png[Kernel Based CephFS Client]
 
 CephFS is typically used for RWX claims but can also be used to support RWO claims.
 
@@ -2728,7 +2728,7 @@ the Multi Cloud Gateway perspective the RADOS Gateway will be tagged as a
 compatible S3 endpoint.
 
 .Amazone S3 or OpenStack Swift (Ceph RADOS Gateway)
-image::images/ocs/ceph101-rgw.png[S3 and Swift Support]
+image::../images/ocs/ceph101-rgw.png[S3 and Swift Support]
 
 [.lead]
 *CRUSH*
@@ -2739,7 +2739,7 @@ multiple OSDs in the cluster. The technique used is called CRUSH or
 Controlled Replication Under Scalable Hashing. With CRUSH, every object is
 assigned to one and only one hash bucket known as a Placement Group (PG).
 
-image::images/ocs/ceph101-crushfromobjecttoosd.png[From Object to OSD]
+image::../images/ocs/ceph101-crushfromobjecttoosd.png[From Object to OSD]
 
 CRUSH is the central point of configuration for the topology of the cluster.
 It offers a pseudo-random placement algorithm to distribute the objects
@@ -2772,7 +2772,7 @@ pool has the following properties that can be adjusted:
 *Pools and PGs*
 
 .Pools and PGs
-image::images/ocs/ceph101-thefullpicture.png[From Object to OSD]
+image::../images/ocs/ceph101-thefullpicture.png[From Object to OSD]
 
 The diagram above shows the relationship end to end between the object at the
 access method level down to the OSDs at the physical layer.
@@ -2787,7 +2787,7 @@ pool.
 Ceph supports two types of data protection presented in the diagram below.
 
 .Ceph Data Protection
-image::images/ocs/ceph101-dataprotection.png[Replicated Pools vs Erasure Coded Pools]
+image::../images/ocs/ceph101-dataprotection.png[Replicated Pools vs Erasure Coded Pools]
 
 Replicated pools provide better performance in almost all cases at the cost
 of a lower usable to raw storage ratio (1 usable byte is stored using 3 bytes
@@ -2816,7 +2816,7 @@ stored through the RADOS Gateway via the Multi Cloud Gateway will be divided
 in multiple objects.
 
 .Data Distribution
-image::images/ocs/ceph101-rbdlayout.png[RADOS Block Device Layout]
+image::../images/ocs/ceph101-rbdlayout.png[RADOS Block Device Layout]
 
 NOTE: By default, each access method uses an object size of 4MB. The above
 diagram details how a 32MB RBD (Block Device) supporting a RWO PVC will be

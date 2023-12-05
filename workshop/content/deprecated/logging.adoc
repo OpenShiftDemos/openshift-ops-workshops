@@ -411,7 +411,7 @@ Once you open Kibana, before being able to view logs, we need to define an `inde
 
 1. On the following screen, input `app*` as the index pattern, as shown below and click `Next Step`.
 +
-image::images/logging-kibana-indexpattern.png[Kibana Index Pattern]
+image::../images/logging-kibana-indexpattern.png[Kibana Index Pattern]
 +
 
 2. On the next screen, select `@timestamp` in the drop-down box, as shown below:

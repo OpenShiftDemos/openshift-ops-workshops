@@ -13,8 +13,6 @@ modules:
     name: MachineSets, Machines, and Nodes
   infra-nodes:
     name: Infrastructure Nodes and Operators
-  odf4:
-    name: Deploying and Managing OpenShift Data Foundation
   logging-with-loki:
     name: OpenShift Logging with Loki
   ldap-groupsync:

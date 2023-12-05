@@ -4,9 +4,9 @@ of administrative-focused workshops centered around OpenShift.
 
 The workshops included in this repo are:
 
-- **Red Hat OpenShift Container Platform 4 for Admins**
-- **Modern App Dev Roadshow - Ops Track**
-- **Summit 2023 Hands on with OCP Plus Workshop**
+- **Red Hat OpenShift Container Platform 4 for Admins** [RHDP]([https://demo.redhat.com/catalog?search=admin&item=babylon-catalog-prod%2Fsandboxes-gpte.ocp4-admin-storage.prod))
+- **Modern App Dev Roadshow - Ops Track** [RHDP]([https://demo.redhat.com/catalog?search=ops+track&item=babylon-catalog-prod%2Fsandboxes-gpte.ocp4-acm-acs-ops-wksp.prod))
+- **Summit 2023 Hands on with OCP Plus Workshop** [RHDP]([https://demo.redhat.com/catalog?search=2023&item=babylon-catalog-prod%2Fsandboxes-gpte.hands-on-ocp-plus-wksp.prod))
 
 ## Requirements / Prerequisites
 Doing these labs on your own requires a few things.

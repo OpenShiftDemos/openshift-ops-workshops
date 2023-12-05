@@ -1,3 +1,8 @@
+[Note]
+====
+Attention: The current module has been deprecated. Kindly utilise the new logging-with-loki module instead.
+====
+
 ## OpenShift Log Aggregation
 In this lab you will explore the logging aggregation capabilities of
 OpenShift.

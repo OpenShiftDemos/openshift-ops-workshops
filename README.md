@@ -1,7 +1,12 @@
-# OpenShift and Container Storage for Administrators
-This repository contains lab instructions and related supporting content for
-an administrative-focused workshop that deals with OpenShift and OpenShift
-Container Storage.
+# OpenShift Operations Workshops
+This repository contains lab instructions and supporting content for a series 
+of administrative-focused workshops centered around OpenShift.
+
+The workshops included in this repo are:
+
+- **Red Hat OpenShift Container Platform 4 for Admins**
+- **Modern App Dev Roadshow - Ops Track**
+- **Summit 2023 Hands on with OCP Plus Workshop**
 
 ## Requirements / Prerequisites
 Doing these labs on your own requires a few things.

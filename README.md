@@ -8,6 +8,8 @@ The workshops included in this repo are:
 - **Modern App Dev Roadshow - Ops Track** [RHDP](https://demo.redhat.com/catalog?search=ops+track&item=babylon-catalog-prod%2Fsandboxes-gpte.ocp4-acm-acs-ops-wksp.prod)
 - **Summit 2023 Hands on with OCP Plus Workshop** [RHDP](https://demo.redhat.com/catalog?search=2023&item=babylon-catalog-prod%2Fsandboxes-gpte.hands-on-ocp-plus-wksp.prod)
 
+If you are a Red Hat employee with access to RHDP, we recommend deploying using the provided RHDP links above.
+
 ## Requirements / Prerequisites
 Doing these labs on your own requires a few things.
 

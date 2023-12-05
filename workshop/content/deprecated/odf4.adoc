@@ -1,6 +1,6 @@
 [Note]
 ====
-Attention: The current module has been deprecated. Kindly utilise the new logging-with-loki module instead.
+Attention: The current module has been deprecated.
 ====
 
 

@@ -416,14 +416,14 @@ image::../images/logging-kibana-indexpattern.png[Kibana Index Pattern]
 
 2. On the next screen, select `@timestamp` in the drop-down box, as shown below:
 +
-image::images/logging-kibana-indexpattern-timestamp.png[Kibana Index Pattern]
+image::../images/logging-kibana-indexpattern-timestamp.png[Kibana Index Pattern]
 +
 
 3. Click `Create Index Pattern`
 
 4. You should see the following summary screen.
 +
-image::images/kibana-summary-ip.png[Kibana Index Pattern Summary]
+image::../images/kibana-summary-ip.png[Kibana Index Pattern Summary]
 +
 
 5. Click on "Discover" on the upper left side of the screen.
@@ -678,17 +678,17 @@ We will be using the OpenShift Console Terminal to access the pod and check the 
 
 1. Open the Administrator View and go to `workloads->Pods`. Make sure you're on the `external-logs` Project.
 +
-image::images/logging-syslog-pods.png[Syslog Pods]
+image::../images/logging-syslog-pods.png[Syslog Pods]
 +
 
 2. Click on the syslog infrastructure pod, which name looks like `syslog-ng-infra-xyz`, and go the the `Terminal` tab (you may have to hit enter a few times to see the `#` prompt)
 +
-image::images/logging-syslog-terminal-infra.png[Syslog Terminal]
+image::../images/logging-syslog-terminal-infra.png[Syslog Terminal]
 +
 
 3. In the Terminal box, enter this command: `tail -f /var/log/messages`. The forwarded logs should then appear in the terminal.
 +
-image::images/logging-syslog-logs.png[Syslog logs]
+image::../images/logging-syslog-logs.png[Syslog logs]
 +
 
 And voilà! You can repeat this procedure with the other pod to check that the application logs are correctly forwarded too. 

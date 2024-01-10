@@ -208,3 +208,4 @@ Create a policy that will target a specific CVE deployed in the cluster (i.e., t
 |===
 *Hint:* Find a container with a critical vulnerability first, create the policy, and alter the pipeline.
 |===
+

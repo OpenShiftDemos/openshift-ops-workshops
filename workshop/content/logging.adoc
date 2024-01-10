@@ -3,7 +3,7 @@
 Attention: The current module has been deprecated. Kindly utilise the new logging-with-loki module instead.
 ====
 
-## OpenShift Log Aggregation
+## (DEPRECATED) OpenShift Log Aggregation (DEPRECATED)
 In this lab you will explore the logging aggregation capabilities of
 OpenShift.
 

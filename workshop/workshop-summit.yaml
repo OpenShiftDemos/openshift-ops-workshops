@@ -9,7 +9,7 @@ modules:
   - app-storage-basics
   - machinesets
   - infra-nodes
-  - logging-with-loki
+  - logging
   - ldap-groupsync
   - monitoring-basics
   - template-quota-limits

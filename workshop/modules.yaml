@@ -37,8 +37,6 @@ modules:
     name: DevSecOps with ACS
   acm-multicluster:
     name: Multicluster management with ACM
-  summit_intro:
-    name: Introduction
   ldap-groupsync4-12:
     name: External (LDAP) Authentication Providers, Users, and Groups
   gitops:

@@ -1,0 +1,6 @@
+name: Red Hat OpenShift Security Workshop
+
+modules:
+  activate:
+  - summit_acs_1_intro
+  - summit_acs_2_runtime

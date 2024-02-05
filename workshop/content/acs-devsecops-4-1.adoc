@@ -132,9 +132,9 @@ image::images/acs-images/ci-2.png[]
 
 * Create a token name and click the 'Continuous Integration' role.
 
-* Make sure to copy the token as we need to add it to the *rox-secrets.yml* file.
+* Make sure to copy the token as we need to add it to the *rox-secrets-mad.yml* file.
 
-* Next, edit the *rox-secrets.yml* file in the demo directory. Use *vi/vim/nano/your favorite command line editor* to add the API token to the following file.
+* Next, edit the *rox-secrets-mad.yml* file in the demo directory. Use *vi/vim/nano/your favorite command line editor* to add the API token to the following file.
 
 ----
 $TUTORIAL_HOME/acs-workshop/workshop/demo-apps/pipelines/pipeline/rox-secrets-mad.yml

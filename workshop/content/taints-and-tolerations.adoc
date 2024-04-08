@@ -22,7 +22,7 @@ workloads land.
 ### Background
 
 Taints and tolerations work in tandem to ensure that workloads are not
-scheduled onto certian nodes. Once a node is tainted, that node should not
+scheduled onto certain nodes. Once a node is tainted, that node should not
 accept any workload that does not tolerate the taint(s). Tolerations that are
 applied to these workloads will allow (but do not require) the corresponding
 pods to schedule onto nodes with matching taints.

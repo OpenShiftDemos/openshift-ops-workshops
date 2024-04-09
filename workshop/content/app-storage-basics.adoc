@@ -65,14 +65,16 @@ You can see the new `Deployment` like this:
 oc get deploy mapit
 ----
 
-The output will show that a new deployment was created by inspecting the `AGE` column.
+The output will show when the deployment was created by inspecting the `AGE` column.
+Since we did not create a new deployment, it shows the original deployment age:
 
 ----
 NAME    READY   UP-TO-DATE   AVAILABLE   AGE
 mapit   1/1     1            1           14m
 ----
 
-Likely, depending when you ran the command, you may or may not see that the new pod is still being spawned:
+Likely, depending when you ran the command, you may or may not see that the new pod is still being spawned.
+You will see pod age here, the smallest `AGE` is the new pod attached to the storage:
 
 [source,bash,role="execute"]
 ----

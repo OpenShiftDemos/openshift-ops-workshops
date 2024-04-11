@@ -19,7 +19,8 @@ To inspect the cluster installation, you can simply SSH to the bastion host wher
 ssh -l {{ SSH_USERNAME }} {{ BASTION_FQDN }} -o ServerAliveInterval=120
 ----
 
-you can also find this command on the cred page you used to login with. It should look like this:
+You'll also find this command on the workshop credential page you used to log in with. It'll look something like this:
+
 
 ----
 [~] $ ssh -l lab-user bastion.kdcfh.sandbox2962.opentlc.com -o ServerAliveInterval=120

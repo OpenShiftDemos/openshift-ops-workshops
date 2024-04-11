@@ -129,7 +129,7 @@ namespace was created from the previous steps
 ====
 
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators (choose the newest version you can see, which should be '5.6.1'), and click `Install`.
+  b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators (choose the newest version you can see, which should be '5.8'), and click `Install`.
   c. On the `Install Operator` page, *select Update Channel `stable`*. Under `Installation Mode` ensure that `A specific namespace on the cluster` is selected, and choose
      `Operator recommended Namespace: openshift-logging` under `Installed Namespace`. Leave all other defaults
       unchanged and then click `Install`.
@@ -186,7 +186,7 @@ If either operator does not appear as installed, follow these steps to troublesh
 aws configure
 ----
 Fill out the `AWS Access Key ID` and the `AWS Secret Access Key` 
-from the credentials on the page mentioned above. Use
+from the credentials on the original access screen page mentioned above. Use
 `us-east-1` as region and `json` as default output.
 This is an example below:
 +

@@ -19,6 +19,13 @@ To inspect the cluster installation, you can simply SSH to the bastion host wher
 ssh -l {{ SSH_USERNAME }} {{ BASTION_FQDN }} -o ServerAliveInterval=120
 ----
 
+you can also find this command on the cred page you used to login with. It should look like this:
+
+----
+[~] $ ssh -l lab-user bastion.kdcfh.sandbox2962.opentlc.com -o ServerAliveInterval=120
+----
+
+
 You might see the following message:
 ----
 The authenticity of host 'bastion.xxxxx.sandbox000.opentlc.com (x.x.x.x.' can't be established.

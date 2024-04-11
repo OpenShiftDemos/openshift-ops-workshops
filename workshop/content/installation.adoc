@@ -160,7 +160,8 @@ drwxr-x---.  2 ec2-user ec2-user      62 Nov 18 01:15 tls
 The OpenShift 4 IPI installation embeds Terraform in order to create some of
 the cloud provider resources. You can see some of its outputs here. The
 important file right now is the `.openshift_install.log`. Its last few lines
-contain the relevant output to figure out how to access your environment:
+contain the relevant output to figure out how to access your environment
+(sometimes you need to increase the -n10 to e.g. -n15):
 
 [source,bash,role="execute"]
 ----

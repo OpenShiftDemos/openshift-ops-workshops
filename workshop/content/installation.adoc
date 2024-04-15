@@ -16,7 +16,7 @@ To inspect the cluster installation, you can simply SSH to the bastion host wher
 
 [source,bash,role="execute"]
 ----
-ssh -l {{ bastion_ssh_user_name }} {{ bastion_public_hostname }} -o ServerAliveInterval=120
+ssh -l {{ SSH_USERNAME }} {{ BASTION_FQDN }} -o ServerAliveInterval=120
 ----
 
 

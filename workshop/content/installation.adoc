@@ -16,7 +16,7 @@ To inspect the cluster installation, you can simply SSH to the bastion host wher
 
 [source,bash,role="execute"]
 ----
-{ssh_command} -o "StrictHostKeyChecking no"
+{{ssh_command}} -o "StrictHostKeyChecking no"
 ----
 
 
@@ -47,7 +47,7 @@ Send the password:
 
 [{format_cmd_exec}]
 ----
-{SSH_PASSWORD}
+{{SSH_PASSWORD}}
 ----
 
 

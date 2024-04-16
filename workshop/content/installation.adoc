@@ -16,17 +16,17 @@ To inspect the cluster installation, you can simply SSH to the bastion host wher
 
 [source,bash,role="execute"]
 ----
-{{ssh_command}} -o "StrictHostKeyChecking no"
+{{ ssh_command }} -o "StrictHostKeyChecking no"
 ----
 
 [source,bash,role="execute"]
 ----
-{{SSH_COMMAND}} -o "StrictHostKeyChecking no"
+{{ SSH_COMMAND }} -o "StrictHostKeyChecking no"
 ----
 
 [source,bash,role="execute"]
 ----
-{{BASTION_FQDN}} -o "StrictHostKeyChecking no"
+{{ BASTION_FQDN }} -o "StrictHostKeyChecking no"
 ----
 
 

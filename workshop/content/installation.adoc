@@ -24,6 +24,11 @@ To inspect the cluster installation, you can simply SSH to the bastion host wher
 {{SSH_COMMAND}} -o "StrictHostKeyChecking no"
 ----
 
+[source,bash,role="execute"]
+----
+{{BASTION_FQDN}} -o "StrictHostKeyChecking no"
+----
+
 
 You'll also find this command on the workshop credential page you used to log in with. It'll look something like this:
 

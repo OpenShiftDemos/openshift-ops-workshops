@@ -16,17 +16,7 @@ To inspect the cluster installation, you can simply SSH to the bastion host wher
 
 [source,bash,role="execute"]
 ----
-{{ ssh_command }} -o "StrictHostKeyChecking no"
-----
-
-[source,bash,role="execute"]
-----
-{{ SSH_COMMAND }} -o "StrictHostKeyChecking no"
-----
-
-[source,bash,role="execute"]
-----
-{{ BASTION_FQDN }} -o "StrictHostKeyChecking no"
+ssh -l {{ SSH_USERNAME }} {{ BASTION_FQDN }} -o ServerAliveInterval=120
 ----
 
 
@@ -53,19 +43,11 @@ If so, type `yes`:
 yes
 ----
 
-Send the password:
+Here is your ssh password (please copy/paste):
 
-[{format_cmd_exec}]
 ----
-{{SSH_PASSWORD}}
+{{ SSH_PASSWORD }}
 ----
-
-
-#Here is your ssh password (please copy/paste):
-
-#----
-#{{ SSH_PASSWORD }}
-#----
 
 Once you've SSH-ed into the bastion host, become the `ec2-user`:
 

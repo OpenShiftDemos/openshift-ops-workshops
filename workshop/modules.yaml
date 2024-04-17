@@ -74,5 +74,3 @@ config:
       - name: GUID
       - name: ROUTE_SUBDOMAIN
       - name: HOME_PATH
-      - name: ssh_command
-      - name: SSH_COMMAND

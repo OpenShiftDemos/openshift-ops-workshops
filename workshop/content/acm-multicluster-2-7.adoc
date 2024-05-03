@@ -263,7 +263,7 @@ image::images/acm-images/create_sub_app.png[]
 
 [start=4]
 4. Verify that *Deploy application resources only on clusters matching specified labels* is selected and enter the following information
-** *environment*: `dev`
+** *environment*: `dev`. It may ask you to select a 'Cluster set' if it does please choose `default`.
 
 image::images/acm-images/label_sub.png[]
 

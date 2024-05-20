@@ -150,19 +150,22 @@ ls -al ~/cluster-$GUID
 You'll see something like the following:
 
 ----
-total 3008
-drwxrwxr-x.  4 ec2-user ec2-user     273 Nov 18 01:48 .
-drwx------. 13 ec2-user ec2-user    4096 Nov 18 02:55 ..
-drwxr-x---.  2 ec2-user ec2-user      50 Nov 18 01:15 auth
--rw-rw----.  1 ec2-user ec2-user    4197 Nov 18 01:15 install-config.yaml.bak
--rw-r-----.  1 ec2-user ec2-user     283 Nov 18 01:15 metadata.json
--rw-rw-r--.  1 ec2-user ec2-user  149886 Nov 18 01:48 .openshift_install.log
--rw-rw-r--.  1 ec2-user ec2-user   11746 Nov 18 01:48 .openshift_install.log.gz
--rw-r-----.  1 ec2-user ec2-user 2403044 Nov 18 01:21 .openshift_install_state.json
--rw-r-----.  1 ec2-user ec2-user    1576 Nov 18 01:15 terraform.aws.auto.tfvars.json
--rw-r--r--.  1 ec2-user ec2-user  168006 Nov 18 01:30 terraform.tfstate
--rw-r-----.  1 ec2-user ec2-user  318587 Nov 18 01:15 terraform.tfvars.json
-drwxr-x---.  2 ec2-user ec2-user      62 Nov 18 01:15 tls
+total 3172
+drwxrwxr-x.  4 ec2-user ec2-user    4096 May 20 11:22 .
+drwx------. 13 ec2-user ec2-user    4096 May 20 11:24 ..
+drwxr-x---.  2 ec2-user ec2-user      50 May 20 10:51 auth
+-rw-r-----.  1 ec2-user ec2-user      32 May 20 10:58 bootstrap.tfvars.json
+-rw-r-----.  1 ec2-user ec2-user     814 May 20 10:58 cluster.tfvars.json
+-rw-rw----.  1 ec2-user ec2-user    4127 May 20 10:51 install-config.yaml.bak
+-rw-r-----.  1 ec2-user ec2-user     336 May 20 10:51 metadata.json
+-rw-rw-r--.  1 ec2-user ec2-user  575540 May 20 11:22 .openshift_install.log
+-rw-rw-r--.  1 ec2-user ec2-user   30013 May 20 11:22 .openshift_install.log.gz
+-rw-r-----.  1 ec2-user ec2-user 2047767 May 20 10:58 .openshift_install_state.json
+-rw-r-----.  1 ec2-user ec2-user     181 May 20 11:13 terraform.bootstrap.tfstate
+-rw-r-----.  1 ec2-user ec2-user  231267 May 20 10:58 terraform.cluster.tfstate
+-rw-r-----.  1 ec2-user ec2-user    1455 May 20 10:51 terraform.platform.auto.tfvars.json
+-rw-r-----.  1 ec2-user ec2-user  316946 May 20 10:51 terraform.tfvars.json
+drwxr-x---.  2 ec2-user ec2-user      62 May 20 10:51 tls
 ----
 
 The OpenShift 4 IPI installation embeds Terraform in order to create some of
@@ -179,16 +182,14 @@ tail -n10 ~/cluster-$GUID/.openshift_install.log
 You will see something like the following::
 
 ----
-time="2021-07-06T19:36:30Z" level=info msg="Install complete!"
-time="2021-07-06T19:36:30Z" level=info msg="To access the cluster as the system:admin user when using 'oc', run 'export KUBECONFIG=/home/ec2-user/cluster-pdr-5434/auth/kubeconfig'"
-time="2021-07-06T19:36:30Z" level=info msg="Access the OpenShift web-console here: https://console-openshift-console.apps.cluster-pdr-5434.pdr-5434.sandbox259.opentlc.com"
-time="2021-07-06T19:36:30Z" level=info msg="Login to the console with user: \"kubeadmin\", and password: \"SfaIH-4dBE5-A95AT-ahjjd\""
-time="2021-07-06T19:36:30Z" level=debug msg="Time elapsed per stage:"
-time="2021-07-06T19:36:30Z" level=debug msg="    Infrastructure: 8m50s"
-time="2021-07-06T19:36:30Z" level=debug msg="Bootstrap Complete: 9m10s"
-time="2021-07-06T19:36:30Z" level=debug msg=" Bootstrap Destroy: 38s"
-time="2021-07-06T19:36:30Z" level=debug msg=" Cluster Operators: 14m45s"
-time="2021-07-06T19:36:30Z" level=info msg="Time elapsed: 33m33s"
+time="2024-05-20T11:22:04Z" level=debug msg="Time elapsed per stage:"
+time="2024-05-20T11:22:04Z" level=debug msg="           cluster: 5m18s"
+time="2024-05-20T11:22:04Z" level=debug msg="         bootstrap: 1m11s"
+time="2024-05-20T11:22:04Z" level=debug msg="Bootstrap Complete: 13m31s"
+time="2024-05-20T11:22:04Z" level=debug msg="               API: 2m22s"
+time="2024-05-20T11:22:04Z" level=debug msg=" Bootstrap Destroy: 1m49s"
+time="2024-05-20T11:22:04Z" level=debug msg=" Cluster Operators: 8m33s"
+time="2024-05-20T11:22:04Z" level=info msg="Time elapsed: 30m35s"
 ----
 
 The installation was run as a different system user, and the artifacts folder
@@ -220,8 +221,7 @@ And you will see some output like:
 
 ```
 NAME      VERSION   AVAILABLE   PROGRESSING   SINCE   STATUS
-version   4.12.9    True        False         11h     Cluster version is 4.1
-2.9
+version   4.14.20    True        False         11h     Cluster version is 4.14.20
 ```
 
 For more details, you can execute the following command:
@@ -232,7 +232,6 @@ oc describe clusterversion
 ----
 
 Which will give you additional details, such as available updates:
-```
 Name:         version
 Namespace:
 Labels:       <none>
@@ -240,132 +239,139 @@ Annotations:  <none>
 API Version:  config.openshift.io/v1
 Kind:         ClusterVersion
 Metadata:
-  Creation Timestamp:  2023-04-11T23:33:04Z
+  Creation Timestamp:  2024-05-20T11:01:20Z
   Generation:          2
-  Managed Fields:
-    API Version:  config.openshift.io/v1
-    Fields Type:  FieldsV1
-    fieldsV1:
-      f:spec:
-        .:
-        f:channel:
-        f:clusterID:
-    Manager:      cluster-bootstrap
-    Operation:    Update
-    Time:         2023-04-11T23:33:04Z
-    API Version:  config.openshift.io/v1
-    Fields Type:  FieldsV1
-    fieldsV1:
-      f:status:
-        .:
-        f:availableUpdates:
-        f:capabilities:
-          .:
-          f:enabledCapabilities:
-          f:knownCapabilities:
-        f:conditions:
-        f:desired:
-          .:
-          f:channels:
-          f:image:
-          f:url:
-          f:version:
-        f:history:
-        f:observedGeneration:
-        f:versionHash:
-    Manager:         cluster-version-operator
-    Operation:       Update
-    Subresource:     status
-    Time:            2023-04-11T23:56:50Z
-  Resource Version:  30491
-  UID:               11a6c70c-e897-484d-9895-11d37dced524
+  Resource Version:    32443
+  UID:                 845f6b90-6304-4852-a1d0-7f219fc1c4f2
 Spec:
-  Channel:     stable-4.12
-  Cluster ID:  ca86953a-866e-4a19-bb7c-06260d5376ff
+  Channel:     stable-4.14
+  Cluster ID:  025b1f93-99ea-45d9-9f49-668469fe8799
 Status:
   Available Updates:
     Channels:
-      candidate-4.12
-      candidate-4.13
-      eus-4.12
-      fast-4.12
-      stable-4.12
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:db976910d909373b
-1136261a5479ed18ec08c93971285ff760ce75c6217d3943
-    URL:      https://access.redhat.com/errata/RHBA-2023:1508
-    Version:  4.12.10
+      candidate-4.14
+      candidate-4.15
+      eus-4.14
+      fast-4.14
+      fast-4.15
+      stable-4.14
+      stable-4.15
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:0a34eac4b834e67f1bca94493c237e307be2c0eae7b8956d4d8
+ef1c0c462c7b0
+    URL:      https://access.redhat.com/errata/RHSA-2024:2668
+    Version:  4.14.24
+    Channels:
+      candidate-4.14
+      candidate-4.15
+      eus-4.14
+      fast-4.14
+      fast-4.15
+      stable-4.14
+      stable-4.15
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:f8465817382128ec7c0bc676174bad0fb43204c353e49c146dd
+d83a5b3d58d92
+    URL:      https://access.redhat.com/errata/RHBA-2024:2051
+    Version:  4.14.23
+    Channels:
+      candidate-4.14
+      candidate-4.15
+      eus-4.14
+      fast-4.14
+      fast-4.15
+      stable-4.14
+      stable-4.15
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:7093fa606debe63820671cc92a1384e14d0b70058d4b4719d66
+6571e1fc62190
+    URL:      https://access.redhat.com/errata/RHSA-2024:1891
+    Version:  4.14.22
+    Channels:
+      candidate-4.14
+      candidate-4.15
+      eus-4.14
+      fast-4.14
+      fast-4.15
+      stable-4.14
+      stable-4.15
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:6e3fba19a1453e61f8846c6b0ad3abf41436a3550092cbfd364
+ad4ce194582b7
+    URL:      https://access.redhat.com/errata/RHSA-2024:1765
+    Version:  4.14.21
   Capabilities:
     Enabled Capabilities:
+      Build
       CSISnapshot
       Console
+      DeploymentConfig
+      ImageRegistry
       Insights
+      MachineAPI
+      NodeTuning
       Storage
       baremetal
       marketplace
       openshift-samples
     Known Capabilities:
+      Build
       CSISnapshot
       Console
+      DeploymentConfig
+      ImageRegistry
       Insights
+      MachineAPI
+      NodeTuning
       Storage
       baremetal
       marketplace
       openshift-samples
   Conditions:
-    Last Transition Time:  2023-04-11T23:33:07Z
+    Last Transition Time:  2024-05-20T11:01:24Z
     Status:                True
     Type:                  RetrievedUpdates
-    Last Transition Time:  2023-04-11T23:33:07Z
-    Message:               Kubernetes 1.26 and therefore OpenShift 4.13 remove
-several APIs which require admin consideration. Please see the knowledge articl
-e https://access.redhat.com/articles/6958394 for details and instructions.
-    Reason:                AdminAckRequired
-    Status:                False
-    Type:                  Upgradeable
-    Last Transition Time:  2023-04-11T23:33:07Z
+    Last Transition Time:  2024-05-20T11:01:24Z
     Message:               Capabilities match configured spec
     Reason:                AsExpected
     Status:                False
     Type:                  ImplicitlyEnabledCapabilities
-    Last Transition Time:  2023-04-11T23:33:07Z
-    Message:               Payload loaded version="4.12.9" image="quay.io/opens
-hift-release-dev/ocp-release@sha256:96bf74ce789ccb22391deea98e0c5050c41b67cc17d
-efbb38089d32226dba0b8" architecture="amd64"
+    Last Transition Time:  2024-05-20T11:01:24Z
+    Message:               Payload loaded version="4.14.20" image="quay.io/openshift-release-dev/ocp-release@sha25
+6:e64464879cd1acdfa7112c1ac1d90039e1689189e0af197f34881c79decda933" architecture="amd64"
     Reason:                PayloadLoaded
     Status:                True
     Type:                  ReleaseAccepted
-    Last Transition Time:  2023-04-11T23:56:50Z
-    Message:               Done applying 4.12.9
+    Last Transition Time:  2024-05-20T11:22:03Z
+    Message:               Done applying 4.14.20
     Status:                True
     Type:                  Available
-    Last Transition Time:  2023-04-11T23:56:50Z
+    Last Transition Time:  2024-05-20T11:28:33Z
     Status:                False
     Type:                  Failing
-    Last Transition Time:  2023-04-11T23:56:50Z
-    Message:               Cluster version is 4.12.9
+    Last Transition Time:  2024-05-20T11:22:03Z
+    Message:               Cluster version is 4.14.20
     Status:                False
     Type:                  Progressing
   Desired:
     Channels:
-      candidate-4.12
-      candidate-4.13
-      eus-4.12
-      fast-4.12
-      stable-4.12
-    Image:    quay.io/openshift-release-dev/ocp-release@sha256:96bf74ce789ccb22
-391deea98e0c5050c41b67cc17defbb38089d32226dba0b8
-    URL:      https://access.redhat.com/errata/RHSA-2023:1409
-    Version:  4.12.9
+      candidate-4.14
+      candidate-4.15
+      eus-4.14
+      fast-4.14
+      fast-4.15
+      stable-4.14
+      stable-4.15
+    Image:    quay.io/openshift-release-dev/ocp-release@sha256:e64464879cd1acdfa7112c1ac1d90039e1689189e0af197f348
+81c79decda933
+    URL:      https://access.redhat.com/errata/RHSA-2024:1681
+    Version:  4.14.20
   History:
-    Completion Time:    2023-04-11T23:56:50Z
-    Image:              quay.io/openshift-release-dev/ocp-release@sha256:96bf74
-ce789ccb22391deea98e0c5050c41b67cc17defbb38089d32226dba0b8
-    Started Time:       2023-04-11T23:33:07Z
+    Completion Time:    2024-05-20T11:22:03Z
+    Image:              quay.io/openshift-release-dev/ocp-release@sha256:e64464879cd1acdfa7112c1ac1d90039e1689189e
+0af197f34881c79decda933
+    Started Time:       2024-05-20T11:01:24Z
     State:              Completed
     Verified:           false
-    Version:            4.12.9
+    Version:            4.14.20
   Observed Generation:  2
-  Version Hash:         pZYKzz8RmAo=
+  Version Hash:         8tAqQ0_IORc=
 Events:                 <none>
 ```
 
@@ -381,12 +387,12 @@ oc get nodes
 The output should look something like the following:
 
 ----
-NAME                                         STATUS   ROLES    AGE    VERSION
-ip-10-0-142-214.us-east-2.compute.internal   Ready    master   126m   v1.22.8+9e95cb9
-ip-10-0-156-248.us-east-2.compute.internal   Ready    worker   118m   v1.22.8+9e95cb9
-ip-10-0-161-130.us-east-2.compute.internal   Ready    worker   118m   v1.22.8+9e95cb9
-ip-10-0-171-45.us-east-2.compute.internal    Ready    master   126m   v1.22.8+9e95cb9
-ip-10-0-208-3.us-east-2.compute.internal     Ready    master   126m   v1.22.8+9e95cb9
+NAME                                        STATUS   ROLES                  AGE   VERSION
+ip-10-0-29-201.us-east-2.compute.internal   Ready    worker                 59m   v1.27.11+749fe1d
+ip-10-0-33-207.us-east-2.compute.internal   Ready    worker                 62m   v1.27.11+749fe1d
+ip-10-0-51-82.us-east-2.compute.internal    Ready    control-plane,master   69m   v1.27.11+749fe1d
+ip-10-0-7-192.us-east-2.compute.internal    Ready    control-plane,master   69m   v1.27.11+749fe1d
+ip-10-0-88-149.us-east-2.compute.internal   Ready    control-plane,master   69m   v1.27.11+749fe1d
 ----
 
 You have 3 masters and 2 workers. The OpenShift *Master* is also a *Node*

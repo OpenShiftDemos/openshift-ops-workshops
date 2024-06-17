@@ -14,8 +14,8 @@ RUN wget https://github.com/noobaa/noobaa-operator/releases/download/v5.11.0/noo
     rm -rf /usr/local/src/aws* && \
     rm -f /usr/local/src/helm*gz && \
     rm -rf /usr/local/src/linux-amd64 && \
-    tar -xzvf /opt/app-root/src/openshift-client-linux-4.14.20.tar.gz -C /opt/workshop/bin/ && \
-    rm -f /opt/app-root/src/openshift-client-linux-4.14.20.tar.gz && \
+    tar -xzvf /opt/app-root/src/openshift-client-linux-4.15.6.tar.gz -C /opt/workshop/bin/ && \
+    rm -f /opt/app-root/src/openshift-client-linux-4.15.6.tar.gz && \
     rm -f /opt/workshop/bin/README.md && \
     ln -s /opt/workshop/bin/noobaa /opt/app-root/bin/noobaa && \
     ln -s /opt/workshop/bin/yq /opt/app-root/bin/yq && \

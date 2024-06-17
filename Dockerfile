@@ -20,6 +20,7 @@ RUN wget https://github.com/noobaa/noobaa-operator/releases/download/v5.11.0/noo
     ln -s /opt/workshop/bin/noobaa /opt/app-root/bin/noobaa && \
     ln -s /opt/workshop/bin/yq /opt/app-root/bin/yq && \
     chmod +x /opt/workshop/bin/{oc,kubectl,noobaa,yq}
+    
 
 COPY . /tmp/src
 

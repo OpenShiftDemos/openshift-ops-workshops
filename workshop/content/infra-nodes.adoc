@@ -41,8 +41,8 @@ This will allow you to follow along with some of the following discussion.
 
 [source,bash,role="execute"]
 ----
-CLUSTERNAME=$(oc get  infrastructures.config.openshift.io cluster  -o jsonpath='{.status.infrastructureName}')
-ZONENAME=$(oc get nodes -L topology.kubernetes.io/zone  --no-headers  | awk '{print $NF}' | tail -1)
+CLUSTERNAME=$(oc get infrastructure cluster -o=jsonpath='{.status.infrastructureName}')
+ZONENAME=$(oc get nodes --sort-by='.metadata.creationTimestamp' -o=jsonpath='{.items[-1:].metadata.labels.topology\.kubernetes\.io/zone}')
 oc get machineset -n openshift-machine-api -o yaml ${CLUSTERNAME}-worker-${ZONENAME}
 ----
 

@@ -558,6 +558,17 @@ You should see:
 Error from server (NotFound): configmaps "cluster-monitoring-config" not found
 ```
 
+----
+NOTE: If you have a cluster-monitoring-config, it is recommended that 
+you delete the configuration using the following command
+----
+
+[source,bash,role="execute"]
+----
+oc delete configmap cluster-monitoring-config -n openshift-monitoring
+----
+
+
 The operator will, in turn, create several `ConfigMap` objects for the
 various monitoring stack components, and you can see them, too:
 

@@ -310,7 +310,7 @@ subdomain for the cluster:
 
 [source,bash,role="execute"]
 ----
-oc get ingresses.config.openshift.io cluster -o yaml
+oc get ingresses.config/cluster -o yaml
 ----
 
 The `cluster` object is observed by the router operator as well as the

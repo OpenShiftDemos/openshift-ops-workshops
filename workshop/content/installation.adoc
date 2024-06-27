@@ -232,6 +232,8 @@ oc describe clusterversion
 ----
 
 Which will give you additional details, such as available updates:
+
+----
 Name:         version
 Namespace:
 Labels:       <none>
@@ -373,7 +375,7 @@ ad4ce194582b7
   Observed Generation:  2
   Version Hash:         8tAqQ0_IORc=
 Events:                 <none>
-```
+----
 
 #### Look at the Nodes
 Execute the following command to see a list of the *Nodes* that OpenShift knows

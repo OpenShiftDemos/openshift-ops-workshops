@@ -558,10 +558,8 @@ You should see:
 Error from server (NotFound): configmaps "cluster-monitoring-config" not found
 ```
 
-----
 NOTE: If you have a cluster-monitoring-config, it is recommended that 
 you delete the configuration using the following command
-----
 
 [source,bash,role="execute"]
 ----

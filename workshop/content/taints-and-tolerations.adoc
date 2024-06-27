@@ -49,7 +49,7 @@ List the current worker nodes, ignoring infra nodes and storage nodes.
 oc get nodes -l 'node-role.kubernetes.io/worker,!node-role.kubernetes.io/infra,!cluster.ocs.openshift.io/openshift-storage'
 ----
 
-Depending on which labs you've done, you may have 3 more more nodes with the
+Depending on which labs you've done, you may have 3 more nodes with the
 worker label set.
 
 Now, let's look to see if there are any taints added to these workers.

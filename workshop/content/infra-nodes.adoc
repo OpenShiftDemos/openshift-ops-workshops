@@ -337,7 +337,7 @@ created in the `openshift-ingress-operator` namespace:
 
 [source,bash,role="execute"]
 ----
-oc get ingresscontrollers.operator.openshift.io default -n openshift-ingress-operator -o yaml
+oc --namespace openshift-ingress-operator get ingresscontrollers/default -o yaml
 ----
 
 Yours looks something like:

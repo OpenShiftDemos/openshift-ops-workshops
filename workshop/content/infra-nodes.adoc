@@ -305,7 +305,7 @@ infrastructure nodes, we want to tell the operator to put the router
 instances on nodes with the role of `infra`.
 
 The OpenShift router operator uses a custom resource definition (`CRD`)
-called `ingresses.config.openshift.io` to define the default routing
+called `ingresses.config/cluster` to define the default routing
 subdomain for the cluster:
 
 [source,bash,role="execute"]
@@ -331,8 +331,8 @@ spec:
 status: {}
 ```
 
-Individual router deployments are managed via the
-`ingresscontrollers.operator.openshift.io` CRD. There is a default one
+Individual router deployments are managed via 
+`ingresscontrollers/default` (the default IngressController). There is a default one
 created in the `openshift-ingress-operator` namespace:
 
 [source,bash,role="execute"]

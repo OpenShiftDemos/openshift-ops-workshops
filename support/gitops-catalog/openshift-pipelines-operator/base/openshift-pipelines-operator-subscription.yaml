@@ -4,7 +4,7 @@ metadata:
   name: openshift-pipelines-operator
   namespace: openshift-operators
 spec:
-  channel: v1.15.0
+  channel: patch-me-see-overlays-dir
   installPlanApproval: Automatic
   name: openshift-pipelines-operator-rh
   source: redhat-operators

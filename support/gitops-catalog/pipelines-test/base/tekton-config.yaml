@@ -1,10 +1,6 @@
 apiVersion: operator.tekton.dev/v1alpha1
 kind: TektonConfig
 metadata:
-  annotations:
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-    ## Do last to overwrite default rather then other way arround
-    argocd.argoproj.io/sync-wave: "99"
   name: config
 spec:
   addon:
@@ -15,14 +11,7 @@ spec:
       value: "true"
     - name: communityClusterTasks
       value: "true"
-  chain:
-    artifacts.taskrun.format: in-toto
-    artifacts.taskrun.storage: tekton
-    artifacts.taskrun.signer: x509
-    artifacts.oci.storage: oci
-    artifacts.oci.format: simplesigning
-    artifacts.oci.signer: x509
-    transparency.enabled: "true"
+  chain: 
   dashboard:
     readonly: false
   params:
@@ -39,12 +28,12 @@ spec:
     enable-custom-tasks: true
     enable-git-resolver: true
     enable-hub-resolver: true
-    enable-provenance-in-status: false
+    enable-provenance-in-status: true
     enable-tekton-oci-bundles: false
-    metrics.pipelinerun.duration-type: lastvalue
-    metrics.pipelinerun.level: pipelinerun
-    metrics.taskrun.duration-type: lastvalue
-    metrics.taskrun.level: taskrun
+    metrics.pipelinerun.duration-type: histogram	
+    metrics.pipelinerun.level: pipeline	
+    metrics.taskrun.duration-type: histogram	
+    metrics.taskrun.level: task
     params:
     - name: enableMetrics
       value: "true"
@@ -54,10 +43,6 @@ spec:
     running-in-environment-with-injected-sidecars: true
     send-cloudevents-for-runs: false
     trusted-resources-verification-no-match-policy: ignore
-    git-resolver-config:
-      default-revision: main
-      fetch-timeout: 1m
-      default-url: https://github.com/gnunn-gitops/tekton-catalog
   platforms:
     openshift:
       pipelinesAsCode:
@@ -75,8 +60,6 @@ spec:
           error-detection-simple-regexp: ^(?P<filename>[^:]*):(?P<line>[0-9]+):(?P<column>[0-9]+):([
             ]*)?(?P<error>.*)
           error-log-snippet: "true"
-          hub-catalog-name: tekton
-          hub-url: https://api.hub.tekton.dev/v1
           remote-tasks: "true"
           secret-auto-create: "true"
           secret-github-app-token-scoped: "true"

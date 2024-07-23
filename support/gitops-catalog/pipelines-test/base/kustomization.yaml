@@ -1,0 +1,5 @@
+resources:
+- subscription.yaml
+- tekton-config.yaml
+# Partial needs more work, even with sync wave it fails. Suspect TektonInstaller needs health check so this doesn't get applied until it's ready
+# - tekton-config-metrics-partial.yaml

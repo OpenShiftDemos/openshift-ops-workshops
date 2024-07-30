@@ -55,9 +55,9 @@ modules:
     name: Admin Ops - Environment Overview
   acm-multicluster-412:
     name: Multicluster management with ACM (4.12 test)
-  acs-vulnerability-412:
+  acs-vulnerability-4.5:
     name: Vulnerability Scanning with ACS (4.12 test)
-  acs-devsecops-412:
+  acs-devsecops-4.5:
     name: DevSecOps with ACS (4.12 test)
   
 config:

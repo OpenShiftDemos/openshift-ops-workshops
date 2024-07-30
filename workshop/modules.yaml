@@ -60,7 +60,6 @@ modules:
   acs-devsecops-4-5:
     name: DevSecOps with ACS (4.12 test)
 
-  
 config:
     template_engine: liquid.js  
     vars:

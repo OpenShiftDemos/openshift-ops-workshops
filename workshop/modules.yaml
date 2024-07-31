@@ -55,11 +55,11 @@ modules:
     name: Admin Ops - Environment Overview
   acm-multicluster-412:
     name: Multicluster management with ACM (4.12 test)
-  acs-vulnerability-4-5:
+  acs-vulnerability-412:
     name: Vulnerability Scanning with ACS (4.12 test)
-  acs-devsecops-4-5:
+  acs-devsecops-412:
     name: DevSecOps with ACS (4.12 test)
-
+  
 config:
     template_engine: liquid.js  
     vars:

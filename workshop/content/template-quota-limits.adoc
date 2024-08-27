@@ -63,7 +63,7 @@ sets of OpenShift objects with powerful parameterization. They can be used to
 quickly deploy more complicated and related components into OpenShift, and can be a
 useful part of your organization's software development lifecycle (SDLC). More
 information can be found in the
-link:https://docs.openshift.com/container-platform/4.9/openshift_images/using-templates.html[template documentation^].
+link:https://docs.openshift.com/container-platform/4.16/openshift_images/using-templates.html[template documentation^].
 We will not go into detail on *Templates* in this lab.
 ====
 
@@ -82,7 +82,7 @@ Please take note that there are two new sections added: *ResourceQuota* and
 
 ### Background: ResourceQuota
 The
-link:https://docs.openshift.com/container-platform/4.9/applications/quotas/quotas-setting-per-project.html[quota documentation^]
+link:https://docs.openshift.com/container-platform/4.16/applications/quotas/quotas-setting-per-project.html[quota documentation^]
 provides a great description of *ResourceQuota*:
 
 ----
@@ -125,12 +125,12 @@ when we get to the *LimitRange* object.
 <6> The total number of persistent volume claims in a project.
 
 For more details on the available quota options, refer back to the
-link:https://docs.openshift.com/container-platform/4.9/applications/quotas/quotas-setting-per-project.html[quota
+link:https://docs.openshift.com/container-platform/4.16/applications/quotas/quotas-setting-per-project.html[quota
 documentation^]
 
 ### Background: LimitRange
 The
-link:https://docs.openshift.com/container-platform/4.9/nodes/clusters/nodes-cluster-limit-ranges.html[limit
+link:https://docs.openshift.com/container-platform/4.16/nodes/clusters/nodes-cluster-limit-ranges.html[limit
 range documentation^] provides some good background:
 
 ----
@@ -174,7 +174,7 @@ Take a look at the sample `LimitRange` definition that we have provided in the
 
 The difference between requests and
 default limits is important, and is covered in the
-link:https://docs.openshift.com/container-platform/4.9/nodes/clusters/nodes-cluster-limit-ranges.html[limit
+link:https://docs.openshift.com/container-platform/4.16/nodes/clusters/nodes-cluster-limit-ranges.html[limit
 range documentation^]. But, generally speaking:
 
 <1> `max` is the highest value that may be specified for limits and requests
@@ -186,7 +186,7 @@ nothing is specified
 
 In addition to these topics, there are things like *Quality of Service Tiers*
 as well as a *Limit* to *Request* ratio. There is additionally more information in the
-link:https://docs.openshift.com/container-platform/4.9/nodes/clusters/nodes-cluster-limit-ranges.html[limit
+link:https://docs.openshift.com/container-platform/4.16/nodes/clusters/nodes-cluster-limit-ranges.html[limit
 range documentation^] section of the documentation.
 
 For the sake of brevity, suffice it to say that there is a complex and powerful
@@ -222,7 +222,7 @@ Remember that quotas and limits are applied at the *Project* level. *Users*
 may have access to multiple *Projects*, but quotas and limits do not apply
 directly to *Users*. If you want to apply one quota across multiple *Projects*,
 then you should look at the
-link:https://docs.openshift.com/container-platform/4.9/applications/quotas/quotas-setting-across-multiple-projects.html[multi-project
+link:https://docs.openshift.com/container-platform/4.16/applications/quotas/quotas-setting-across-multiple-projects.html[multi-project
 quota^] documentation. We will not cover multi-project quota in these exercises.
 ====
 
@@ -355,14 +355,18 @@ The output will look something like:
 
 ----
 Name:           template-test
-Created:        22 seconds ago
-Labels:         <none>
+Created:        1 second ago
+Labels:         kubernetes.io/metadata.name=template-test
+                pod-security.kubernetes.io/audit=restricted
+                pod-security.kubernetes.io/audit-version=v1.24
+                pod-security.kubernetes.io/warn=restricted
+                pod-security.kubernetes.io/warn-version=v1.24
 Annotations:    openshift.io/description=
                 openshift.io/display-name=
-                openshift.io/requester=system:serviceaccount:lab-ocp-cns:dashboard-user
-                openshift.io/sa.scc.mcs=s0:c24,c19
-                openshift.io/sa.scc.supplemental-groups=1000590000/10000
-                openshift.io/sa.scc.uid-range=1000590000/10000
+                openshift.io/requester=kube:admin
+                openshift.io/sa.scc.mcs=s0:c30,c25
+                openshift.io/sa.scc.supplemental-groups=1000920000/10000
+                openshift.io/sa.scc.uid-range=1000920000/10000
 Display Name:   <none>
 Description:    <none>
 Status:         Active
@@ -381,8 +385,8 @@ Resource limits:
         Name:           template-test-limits
         Type            Resource        Min     Max     Default Request Default Limit   Max Limit/Request Ratio
         ----            --------        ---     ---     --------------- -------------   -----------------------
-        Container       cpu             10m     4       100m        4       -
-        Container       memory          5Mi     1Gi     512Mi       1Gi     -
+        Container       cpu             10m     4       100m            4               -
+        Container       memory          5Mi     1Gi     512Mi           1Gi             -
 ----
 
 [Note]
@@ -427,7 +431,7 @@ You will see:
 
 ----
 NAME                   CREATED AT
-template-test-limits   2020-12-16T00:16:39Z
+template-test-limits   2024-07-11T15:30:30Z
 ----
 
 [Note]

@@ -67,7 +67,7 @@ export GUID=`hostname | cut -d. -f2`
 ### Master Components
 
 .OpenShift Master's 4 main responsibilities.
-image::images/openshift_master_4_responsibilities_new.png[width=30%]
+image::images/openshift_master_4_responsibilities_new.png[]
 
 
 #### API/Authentication
@@ -370,7 +370,7 @@ You can do this by simply control+click the following link:
 
 When accessing the console for the first time you should switch from `All Clusters` to `local-clsuter`. We will be using the local-cluster for the majority of the excerises (apart from ACM).
 
-image::images/cluster-switch.png[width=50%]
+image::images/cluster-switch.png[]
 
 #### You will now exit the ssh session
 [source,role="execute"]

@@ -160,8 +160,8 @@ oc get persistentvolume
 You will see something like the following:
 
 ----
-NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                          STORAGECLASS   REASON   AGE
-pvc-4397c6be-9f53-490e-960d-c1b77de6000c   1Gi        RWO            Delete           Bound    app-management/mapit-storage   gp3-csi                     12m
+NAME                                    CAPACITY    ACCESS MODES  RECLAIM POLICY  STATUS   CLAIM  STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+pvc-8bdb3642-ce3b-41a9-95e1-7febacb8b15e   1Gi        RWO           Delete         Bound  app-management/mapit-storage   gp3-csi        <unset>   105s
 ----
 This is the volume that was created as a result of your earlier claim. Note
 that the volume is *bound* to the claim that exists in the `app-management`
@@ -177,8 +177,8 @@ oc get persistentvolumeclaim -n app-management
 You will see something like:
 
 ----
-NAME            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-mapit-storage   Bound    pvc-4397c6be-9f53-490e-960d-c1b77de6000c   1Gi        RWO            gp3-csi        14m
+NAME            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+mapit-storage   Bound    pvc-8bdb3642-ce3b-41a9-95e1-7febacb8b15e   1Gi        RWO            gp3-csi        <unset>                 9m41s
 ----
 
 A rollout is taking place, since the `pod` needs to mount the created
@@ -210,13 +210,13 @@ You will see a directory there called `/app-storage`:
 
 ----
 total 20K
-dr-xr-xr-x.   1 root  root         36 May 20 13:23 .
-dr-xr-xr-x.   1 root  root         36 May 20 13:23 ..
+dr-xr-xr-x.   1 root  root         36 Jul  5 13:40 .
+dr-xr-xr-x.   1 root  root         36 Jul  5 13:40 ..
 -rw-r--r--.   1 root  root        16K Dec 14  2016 anaconda-post.log
-drwxrwsr-x.   3 root  1000690000 4.0K May 20 12:38 app-storage
+drwxrwsr-x.   3 root  1000830000 4.0K Jul  5 13:40 app-storage
 lrwxrwxrwx.   1 root  root          7 Dec 14  2016 bin -> usr/bin
 drwxrwxrwx.   1 jboss root         59 Oct 23  2023 deployments
-drwxr-xr-x.   5 root  root        360 May 20 13:23 dev
+drwxr-xr-x.   5 root  root        360 Jul  5 13:40 dev
 drwxr-xr-x.   1 root  root         93 Jan 18  2017 etc
 drwxr-xr-x.   2 root  root          6 Nov  5  2016 home
 lrwxrwxrwx.   1 root  root          7 Dec 14  2016 lib -> usr/lib
@@ -225,13 +225,13 @@ drwx------.   2 root  root          6 Dec 14  2016 lost+found
 drwxr-xr-x.   2 root  root          6 Nov  5  2016 media
 drwxr-xr-x.   2 root  root          6 Nov  5  2016 mnt
 drwxr-xr-x.   1 root  root         19 Jan 18  2017 opt
-dr-xr-xr-x. 381 root  root          0 May 20 13:23 proc
+dr-xr-xr-x. 794 root  root          0 Jul  5 13:40 proc
 dr-xr-x---.   2 root  root        114 Dec 14  2016 root
 drwxr-xr-x.   1 root  root         42 Oct 13  2023 run
 lrwxrwxrwx.   1 root  root          8 Dec 14  2016 sbin -> usr/sbin
 drwxr-xr-x.   2 root  root          6 Nov  5  2016 srv
-dr-xr-xr-x.  13 root  root          0 May 20 11:09 sys
-drwxrwxrwt.   1 root  root        121 May 20 13:23 tmp
+dr-xr-xr-x.  13 root  root          0 Jul  5 11:52 sys
+drwxrwxrwt.   1 root  root        121 Jul  5 13:40 tmp
 drwxr-xr-x.   1 root  root         69 Dec 16  2016 usr
 drwxr-xr-x.   1 root  root         41 Dec 14  2016 var
 ----

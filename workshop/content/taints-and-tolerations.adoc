@@ -1,6 +1,6 @@
 ## Taints and Tolerations
 
-In a previous lab, you created "infra" nodes leveraging https://docs.openshift.com/container-platform/latest/nodes/scheduling/nodes-scheduler-node-selectors.html[nodeSelector]
+In a previous lab, you created "infra" nodes leveraging https://docs.openshift.com/container-platform/4.16/nodes/scheduling/nodes-scheduler-node-selectors.html[nodeSelector]
 to control where the workload lands. You saw how you can set nodes to perform
 certain tasks. The `nodeSelector` in  the `nodePlacement` attracts pods to a
 set of nodes. But what if you want the opposite? What if you want to repel
@@ -49,7 +49,7 @@ List the current worker nodes, ignoring infra nodes and storage nodes.
 oc get nodes -l 'node-role.kubernetes.io/worker,!node-role.kubernetes.io/infra,!cluster.ocs.openshift.io/openshift-storage'
 ----
 
-Depending on which labs you've done, you may have 3 more nodes with the
+Depending on which labs you've done, you may have 2 or 3 more nodes with the
 worker label set.
 
 Now, let's look to see if there are any taints added to these workers.
@@ -285,7 +285,7 @@ oc get pods -o=custom-columns=NAME:.metadata.name,NODE:.spec.nodeName
 oc get nodes -l appnode=welcome-php
 ----
 
-To read more about taints and tolerations, you can take a look at the https://docs.openshift.com/container-platform/4.9/nodes/scheduling/nodes-scheduler-taints-tolerations.html[Official Documentation].
+To read more about taints and tolerations, you can take a look at the https://docs.openshift.com/container-platform/4.16/nodes/scheduling/nodes-scheduler-taints-tolerations.html[Official Documentation].
 
 #### Clean Up
 

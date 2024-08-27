@@ -66,7 +66,7 @@ message by running `oc new-app -h`.
 ### Pods
 
 .OpenShift Pods
-image::images/openshift_pod_new.png[width=30%]
+image::images/openshift_pod_new.png[]
 
 Pods are one or more containers deployed together on a host. A pod is the
 smallest compute unit you can define, deploy and manage in OpenShift. Each pod is allocated
@@ -195,7 +195,7 @@ and other information about what is going on.
 
 ### Services
 .OpenShift Service
-image::images/openshift_service_new.png[width=50%]
+image::images/openshift_service_new.png[]
 
 *Services* provide a convenient abstraction layer inside OpenShift to find a
 group of like *Pods*. They also act as an internal proxy/load balancer between
@@ -612,7 +612,7 @@ fixed it by scheduling the *Pods*.
 
 ### Background: Routes
 .OpenShift Route
-image::images/openshift_route_new.png[width=50%]
+image::images/openshift_route_new.png[]
 
 While *Services* provide internal abstraction and load balancing within an
 OpenShift environment, sometimes clients (users, systems, devices, etc.)
@@ -859,4 +859,4 @@ oc get route mapit -o jsonpath='{.spec.host}' | sed 's/^/http:\/\//'
 
 It should look something like this:
 
-image::images/mapit-app-route.png[width=50%]
+image::images/mapit-app-route.png[]

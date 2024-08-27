@@ -41,7 +41,7 @@ oc new-app quay.io/openshiftroadshow/mapit
 The output will look like:
 
 ----
---> Found container image 7ce7ade (3 years old) from quay.io for "quay.io/openshiftroadshow/mapit"
+--> Found container image a464a13 (8 months old) from quay.io for "quay.io/openshiftroadshow/mapit"
 
     * An image stream tag will be created as "mapit:latest" that will track this image
 
@@ -50,8 +50,8 @@ The output will look like:
     deployment.apps "mapit" created
     service "mapit" created
 --> Success
-    Application is not exposed. You can expose services to the outside world by executin
-g one or more of the commands below:
+    Application is not exposed. You can expose services to the outside world by executing one or more of the comma
+nds below:
      'oc expose service/mapit'
     Run 'oc status' to view your app.
 ----
@@ -66,7 +66,7 @@ message by running `oc new-app -h`.
 ### Pods
 
 .OpenShift Pods
-image::images/openshift_pod.png[]
+image::images/openshift_pod_new.png[width=30%]
 
 Pods are one or more containers deployed together on a host. A pod is the
 smallest compute unit you can define, deploy and manage in OpenShift. Each pod is allocated
@@ -108,25 +108,25 @@ NOTE: The `-l deployment=mapit` selects the pod that is related to the
 And you will see output similar to the following:
 
 ----
-Name:             mapit-595987c59c-vr7l7
+Name:             mapit-85ddc7b8f-6kf4b
 Namespace:        app-management
 Priority:         0
 Service Account:  default
-Node:             ip-10-0-33-207.us-east-2.compute.internal/10.0.33.207
-Start Time:       Mon, 20 May 2024 12:38:14 +0000
+Node:             ip-10-0-20-193.us-east-2.compute.internal/10.0.20.193
+Start Time:       Fri, 05 Jul 2024 13:36:23 +0000
 Labels:           deployment=mapit
-                  pod-template-hash=595987c59c
+                  pod-template-hash=85ddc7b8f
 Annotations:      k8s.ovn.org/pod-networks:
-                    {"default":{"ip_addresses":["10.128.2.26/23"],"mac_address":"0a:58:0a:80:02:1a","gateway_ips":
+                    {"default":{"ip_addresses":["10.128.2.75/23"],"mac_address":"0a:58:0a:80:02:4b","gateway_ips":
 ["10.128.2.1"],"routes":[{"dest":"10.128.0.0...
                   k8s.v1.cni.cncf.io/network-status:
                     [{
                         "name": "ovn-kubernetes",
                         "interface": "eth0",
                         "ips": [
-                            "10.128.2.26"
+                            "10.128.2.75"
                         ],
-                        "mac": "0a:58:0a:80:02:1a",
+                        "mac": "0a:58:0a:80:02:4b",
                         "default": true,
                         "dns": {}
                     }]
@@ -135,13 +135,13 @@ Annotations:      k8s.ovn.org/pod-networks:
                   seccomp.security.alpha.kubernetes.io/pod: runtime/default
 Status:           Running
 SeccompProfile:   RuntimeDefault
-IP:               10.128.2.26
+IP:               10.128.2.75
 IPs:
-  IP:           10.128.2.26
-Controlled By:  ReplicaSet/mapit-595987c59c
+  IP:           10.128.2.75
+Controlled By:  ReplicaSet/mapit-85ddc7b8f
 Containers:
   mapit:
-    Container ID:   cri-o://374e17fedd19514d3daf85140601195bee2a63556c22842ab918b9fe10fac8ca
+    Container ID:   cri-o://6ac58477bc41b7428da44b8a4504384faa2cd772740ca21c963a1fa5c4578f65
     Image:          quay.io/openshiftroadshow/mapit@sha256:1366b430c7d4bddf35c7b2d067bc24e8d67ba297dbaacd10e0d8093
 9efd1de9d
     Image ID:       quay.io/openshiftroadshow/mapit@sha256:1366b430c7d4bddf35c7b2d067bc24e8d67ba297dbaacd10e0d8093
@@ -149,27 +149,21 @@ Containers:
     Ports:          8080/TCP, 8778/TCP, 9779/TCP
     Host Ports:     0/TCP, 0/TCP, 0/TCP
     State:          Running
-      Started:      Mon, 20 May 2024 12:38:23 +0000
+      Started:      Fri, 05 Jul 2024 13:36:30 +0000
     Ready:          True
     Restart Count:  0
-    Liveness:       http-get http://:8080/health delay=30s timeout=1s period=10s #success=1 #failure=3
-    Readiness:      http-get http://:8080/health delay=30s timeout=1s period=10s #success=1 #failure=3
     Environment:    <none>
     Mounts:
-      /app-storage from mapit-storage (rw)
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-l4vhn (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-79472 (ro)
 Conditions:
-  Type              Status
-  Initialized       True
-  Ready             True
-  ContainersReady   True
-  PodScheduled      True
+  Type                        Status
+  PodReadyToStartContainers   True
+  Initialized                 True
+  Ready                       True
+  ContainersReady             True
+  PodScheduled                True
 Volumes:
-  mapit-storage:
-    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
-    ClaimName:  mapit-storage
-    ReadOnly:   false
-  kube-api-access-l4vhn:
+  kube-api-access-79472:
     Type:                    Projected (a volume that contains injected data from multiple sources)
     TokenExpirationSeconds:  3607
     ConfigMapName:           kube-root-ca.crt
@@ -182,17 +176,17 @@ Node-Selectors:              <none>
 Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
                              node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
 Events:
-  Type    Reason                  Age   From                     Message
-  ----    ------                  ----  ----                     -------
-  Normal  Scheduled               37m   default-scheduler        Successfully assigned app-management/mapit-595987
-c59c-vr7l7 to ip-10-0-33-207.us-east-2.compute.internal
-  Normal  SuccessfulAttachVolume  37m   attachdetach-controller  AttachVolume.Attach succeeded for volume "pvc-07f
-ed757-188c-4adc-9c92-37d9964fcfbb"
-  Normal  AddedInterface          37m   multus                   Add eth0 [10.128.2.26/23] from ovn-kubernetes
-  Normal  Pulled                  37m   kubelet                  Container image "quay.io/openshiftroadshow/mapit@
-sha256:1366b430c7d4bddf35c7b2d067bc24e8d67ba297dbaacd10e0d80939efd1de9d" already present on machine
-  Normal  Created                 37m   kubelet                  Created container mapit
-  Normal  Started                 37m   kubelet                  Started container mapit
+  Type    Reason          Age   From               Message
+  ----    ------          ----  ----               -------
+  Normal  Scheduled       38s   default-scheduler  Successfully assigned app-management/mapit-85ddc7b8f-6kf4b to i
+p-10-0-20-193.us-east-2.compute.internal
+  Normal  AddedInterface  38s   multus             Add eth0 [10.128.2.75/23] from ovn-kubernetes
+  Normal  Pulling         38s   kubelet            Pulling image "quay.io/openshiftroadshow/mapit@sha256:1366b430c
+7d4bddf35c7b2d067bc24e8d67ba297dbaacd10e0d80939efd1de9d"
+  Normal  Pulled          32s   kubelet            Successfully pulled image "quay.io/openshiftroadshow/mapit@sha2
+56:1366b430c7d4bddf35c7b2d067bc24e8d67ba297dbaacd10e0d80939efd1de9d" in 5.976s (5.976s including waiting)
+  Normal  Created         32s   kubelet            Created container mapit
+  Normal  Started         32s   kubelet            Started container mapit
 ----
 
 This is a more detailed description of the pod that is running. You can see what
@@ -201,7 +195,7 @@ and other information about what is going on.
 
 ### Services
 .OpenShift Service
-image::images/openshift_service.png[]
+image::images/openshift_service_new.png[width=50%]
 
 *Services* provide a convenient abstraction layer inside OpenShift to find a
 group of like *Pods*. They also act as an internal proxy/load balancer between
@@ -223,7 +217,7 @@ The way that a *Service* maps to a set of *Pods* is via a system of *Labels* and
 protocols can be mapped.
 
 There is a lot more information about
-https://docs.openshift.com/container-platform/4.9/architecture/understanding-development.html#understanding-kubernetes-pods[Services],
+https://docs.openshift.com/container-platform/4.16/architecture/understanding-development.html#understanding-kubernetes-pods[Services],
 including the YAML format to make one by hand, in the official documentation.
 
 You can see the current list of services in a project with:
@@ -236,8 +230,8 @@ oc get services
 You will see something like the following:
 
 ----
-NAME    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
-mapit   ClusterIP   172.30.167.160   <none>        8080/TCP,8778/TCP,9779/TCP   26
+NAME    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
+mapit   ClusterIP   172.30.239.63   <none>        8080/TCP,8778/TCP,9779/TCP   2m35s
 ----
 
 NOTE: Service IP addresses are dynamically assigned on creation and are
@@ -265,17 +259,17 @@ Selector:          deployment=mapit
 Type:              ClusterIP
 IP Family Policy:  SingleStack
 IP Families:       IPv4
-IP:                172.30.226.25
-IPs:               172.30.226.25
+IP:                172.30.203.181
+IPs:               172.30.203.181
 Port:              8080-tcp  8080/TCP
 TargetPort:        8080/TCP
-Endpoints:         10.128.2.22:8080
+Endpoints:         10.128.2.75:8080
 Port:              8778-tcp  8778/TCP
 TargetPort:        8778/TCP
-Endpoints:         10.128.2.22:8778
+Endpoints:         10.128.2.75:8778
 Port:              9779-tcp  9779/TCP
 TargetPort:        9779/TCP
-Endpoints:         10.128.2.22:9779
+Endpoints:         10.128.2.75:9779
 Session Affinity:  None
 Events:            <none>
 ----
@@ -299,19 +293,19 @@ kind: Service
 metadata:
   annotations:
     openshift.io/generated-by: OpenShiftNewApp
-  creationTimestamp: "2024-05-20T12:15:16Z"
+  creationTimestamp: "2024-07-05T13:36:23Z"
   labels:
     app: mapit
     app.kubernetes.io/component: mapit
     app.kubernetes.io/instance: mapit
   name: mapit
   namespace: app-management
-  resourceVersion: "47584"
-  uid: 7d4a9d5b-68c4-46b6-b7cd-1d3d928b6557
+  resourceVersion: "122841"
+  uid: 9f4b742b-cb10-472f-8e44-547c1fbdd490
 spec:
-  clusterIP: 172.30.226.25
+  clusterIP: 172.30.203.181
   clusterIPs:
-  - 172.30.226.25
+  - 172.30.203.181
   internalTrafficPolicy: Cluster
   ipFamilies:
   - IPv4
@@ -385,7 +379,7 @@ somehow die/exit are not automatically restarted. *ReplicaSets* are
 how OpenShift "self heals".
 
 A *Deployment* (deploy) defines how something in OpenShift should be
-deployed. From the https://docs.openshift.com/container-platform/4.9/applications/deployments/what-deployments-are.html#deployments-kube-deployments_what-deployments-are[deployments documentation]:
+deployed. From the https://docs.openshift.com/container-platform/4.16/applications/deployments/what-deployments-are.html#deployments-kube-deployments_what-deployments-are[deployments documentation]:
 
 ----
 Deployments describe the desired state of a particular component of an
@@ -404,7 +398,7 @@ exercises.
 NOTE: Earlier versions of OpenShift used something called a *DeploymentConfig*.
 While still a valid deployment mechanism, moving forward the *Deployment* will
 be what will be created with `oc new-app`. See the
-https://docs.openshift.com/container-platform/4.9/applications/deployments/what-deployments-are.html#deployments-comparing-deploymentconfigs_what-deployments-are[official
+https://docs.openshift.com/container-platform/4.16/applications/deployments/what-deployments-are.html#deployments-comparing-deploymentconfigs_what-deployments-are[official
 documentation] for more details.
 
 
@@ -520,17 +514,17 @@ Selector:          deployment=mapit
 Type:              ClusterIP
 IP Family Policy:  SingleStack
 IP Families:       IPv4
-IP:                172.30.226.25
-IPs:               172.30.226.25
+IP:                172.30.203.181
+IPs:               172.30.203.181
 Port:              8080-tcp  8080/TCP
 TargetPort:        8080/TCP
-Endpoints:         10.128.2.22:8080
+Endpoints:         10.128.2.75:8080,10.131.0.124:8080
 Port:              8778-tcp  8778/TCP
 TargetPort:        8778/TCP
-Endpoints:         10.128.2.22:8778
+Endpoints:         10.128.2.75:8778,10.131.0.124:8778
 Port:              9779-tcp  9779/TCP
 TargetPort:        9779/TCP
-Endpoints:         10.128.2.22:9779
+Endpoints:         10.128.2.75:9779,10.131.0.124:9779
 Session Affinity:  None
 Events:            <none>
 ----
@@ -546,7 +540,7 @@ And you will see something like the following:
 
 ----
 NAME    ENDPOINTS                                                        AGE
-mapit   10.128.2.19:8080,10.129.2.99:8080,10.128.2.19:9779 + 3 more...   81m
+mapit   10.128.2.94:8080,10.131.0.99:8080,10.128.2.94:9779 + 3 more...   4m32s
 ----
 
 Your IP addresses will likely be different, as each pod receives a unique IP
@@ -618,7 +612,7 @@ fixed it by scheduling the *Pods*.
 
 ### Background: Routes
 .OpenShift Route
-image::images/openshift_route.png[]
+image::images/openshift_route_new.png[width=50%]
 
 While *Services* provide internal abstraction and load balancing within an
 OpenShift environment, sometimes clients (users, systems, devices, etc.)
@@ -658,7 +652,7 @@ oc expose service mapit
 You will see:
 
 ----
-route.route.openshift.io/mapit exposed
+route/mapit exposed
 ----
 
 Verify the *Route* was created with the following command:
@@ -724,7 +718,7 @@ OpenShift also allows you to run a command inside the *Pod*/container in order
 to perform the check. That command could be a complicated script that uses any
 language already installed inside the container image.
 
-There are two types of application probes that can be defined:
+There are three types of application probes that can be defined:
 
 *Liveness Probe*
 
@@ -740,8 +734,15 @@ address removed from the endpoints of all services that should match it. A
 readiness probe can be used to signal to the endpoint's controller that even
 though a container is running, it should not receive any traffic.
 
+*Startup Probe*
+
+A startup probe indicates whether the application within a container is started. 
+All other probes are disabled until the startup succeeds. If the startup probe 
+does not succeed within a specified time period, the kubelet kills the container, 
+and the container is subject to the pod restartPolicy.
+
 More information on probing applications is available in the
-https://docs.openshift.com/container-platform/4.9/applications/application-health.html[Application
+https://docs.openshift.com/container-platform/4.16/applications/application-health.html[Application
 Health] section of the documentation.
 
 ### Add Probes to the Application
@@ -848,3 +849,14 @@ recent RS has a desired scale of 1.
 
 If you `oc describe` each of these RSs you will see how earlier versions have
 no probes, and the latest running RS has the new probes.
+
+Feel free to try out the mapit application:
+
+[source,bash,role="execute"]
+----
+oc get route mapit -o jsonpath='{.spec.host}' | sed 's/^/http:\/\//'
+----
+
+It should look something like this:
+
+image::images/mapit-app-route.png[width=50%]

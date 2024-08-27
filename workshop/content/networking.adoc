@@ -5,7 +5,7 @@ on Open Virtual Network (OVN), and is called OVN-Kubernetes.
 Older versions of OpenShift may be running a different SDN, based on Open vSwitch 
 called OpenShift SDN. As of OpenShift 4.12 OVN-Kubernetes has succeeded Openshift as the 
 default SDN. To read more about OVN-Kubernetes, please read
-link:https://access.redhat.com/documentation/en-us/openshift_container_platform/4.12/html/networking/ovn-kubernetes-network-plugin#about-ovn-kubernetes[the official documentation].
+link:https://access.redhat.com/documentation/en-us/openshift_container_platform/4.16/html/networking/ovn-kubernetes-network-plugin#about-ovn-kubernetes[the official documentation].
 
 The SDN is used to provide connectivity between application
 components inside of the OpenShift environment. It comes with default network

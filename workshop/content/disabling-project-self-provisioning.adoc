@@ -90,7 +90,7 @@ OpenShift that allows the users to create projects.
 ====
 If you are interested in the different roles that come with OpenShift, you
 can learn more about them in the
-link:https://docs.openshift.com/container-platform/4.9/authentication/using-rbac.html[role-based
+link:https://docs.openshift.com/container-platform/4.16/authentication/using-rbac.html[role-based
 access control (RBAC)^] documentation.
 ====
 
@@ -111,7 +111,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     rbac.authorization.kubernetes.io/autoupdate: "true"
-  creationTimestamp: "2022-02-14T22:25:08Z"
+  creationTimestamp: "2024-07-11T11:07:30Z"
   name: self-provisioners
   resourceVersion: "10620"
   uid: a0098c02-b9cb-4815-aebd-7dc44ef4d163
@@ -160,7 +160,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     rbac.authorization.kubernetes.io/autoupdate: "false"
-  creationTimestamp: "2022-02-14T22:25:08Z"
+  creationTimestamp: "2024-07-11T11:07:30Z"
   name: self-provisioners
   resourceVersion: "55489"
   uid: a0098c02-b9cb-4815-aebd-7dc44ef4d163

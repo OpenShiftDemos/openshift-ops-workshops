@@ -54,11 +54,11 @@ The configuration should look something like this:
 apiVersion: quota.openshift.io/v1
 kind: ClusterResourceQuota
 metadata:
-  creationTimestamp: "2022-09-12T15:47:24Z"
+  creationTimestamp: "2024-07-11T15:08:28Z"
   generation: 1
   name: for-user-normaluser1
-  resourceVersion: "786378"
-  uid: 575364ba-124d-4307-9bd2-f32dfe474389
+  resourceVersion: "308434"
+  uid: 3a93d78a-bea9-4836-8f9a-655e17897b62
 spec:
   quota:
     hard:
@@ -173,15 +173,20 @@ metadata:
     openshift.io/description: ""
     openshift.io/display-name: ""
     openshift.io/requester: normaluser1
-    openshift.io/sa.scc.mcs: s0:c27,c9
-    openshift.io/sa.scc.supplemental-groups: 1000720000/10000
-    openshift.io/sa.scc.uid-range: 1000720000/10000
-  creationTimestamp: "2022-02-15T00:18:30Z"
+    openshift.io/sa.scc.mcs: s0:c31,c10
+    openshift.io/sa.scc.supplemental-groups: 1000950000/10000
+    openshift.io/sa.scc.uid-range: 1000950000/10000
+  creationTimestamp: "2024-07-11T15:10:13Z"
   labels:
     kubernetes.io/metadata.name: welcome1
+    openshift-pipelines.tekton.dev/namespace-reconcile-version: 1.14.3
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/audit-version: v1.24
+    pod-security.kubernetes.io/warn: baseline
+    pod-security.kubernetes.io/warn-version: v1.24
   name: welcome1
-  resourceVersion: "59245"
-  uid: 75612ea5-aa5d-4c99-a28c-0604efe0f457
+  resourceVersion: "311083"
+  uid: 5613ab5a-6552-4d16-9a6c-5b2034fc3627
 spec:
   finalizers:
   - kubernetes

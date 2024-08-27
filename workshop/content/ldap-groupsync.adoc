@@ -2,7 +2,7 @@
 
 OpenShift supports a number of different authentication providers, and you can
 find the complete list in the
-link:https://docs.openshift.com/container-platform/4.9/authentication/understanding-identity-provider.html[understanding
+link:https://docs.openshift.com/container-platform/4.16/authentication/understanding-identity-provider.html[understanding
 identity provider configuration]. One of the most commonly used authentication
 providers is LDAP, whether provided by Microsoft Active Directory or by other
 sources.
@@ -47,18 +47,17 @@ metadata:
   annotations:
     include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
-    include.release.openshift.io/single-node-developer: "true"
     release.openshift.io/create-only: "true"
-  creationTimestamp: "2022-02-09T23:06:59Z"
+  creationTimestamp: "2024-07-10T08:45:46Z"
   generation: 1
   name: cluster
   ownerReferences:
   - apiVersion: config.openshift.io/v1
     kind: ClusterVersion
     name: version
-    uid: c9cbd13c-99bf-4e82-b2ad-690810a01f2f
-  resourceVersion: "1715"
-  uid: 1bedd82d-b235-4e39-af98-e40f411c3c8e
+    uid: 24d972c3-7257-46b2-bf52-4ac7ac483ee8
+  resourceVersion: "1554"
+  uid: 3f899ae5-ab90-4bc2-a463-febd148a6eaa
 spec: {}
 ----
 
@@ -78,14 +77,14 @@ You will see something like:
 ----
 apiVersion: v1
 data:
-  kubeadmin: JDJhJDEwJFYwcVBXRjZGTlNOOU1RYUN6SGtJVGV4T3I5Ym9DbGRTT0VmNS44UGl2cWZOUGdsTnkvb3hT
+  kubeadmin: JDJhJDEwJFo3TmJtQXB2ZUprbVB1dHBRelRkR2VBeWJtTHh3NEFMY0VnREp0Sy9WeThXalYvVEU2anhh
 kind: Secret
 metadata:
-  creationTimestamp: "2022-02-09T23:06:14Z"
+  creationTimestamp: "2024-07-10T08:44:46Z"
   name: kubeadmin
   namespace: kube-system
-  resourceVersion: "576"
-  uid: 834a86fd-96e6-4d6a-8c16-6eca251b10f0
+  resourceVersion: "444"
+  uid: 2fd22d00-3118-4597-a31c-57a12a053f86
 type: Opaque
 ----
 
@@ -141,7 +140,7 @@ able to distinguish between them.
 <2> `mappingMethod: claim`: This section has to do with how usernames are
 assigned within an OpenShift cluster when multiple providers are configured. See
 the
-link:https://docs.openshift.com/container-platform/4.9/authentication/understanding-identity-provider.html#identity-provider-parameters_understanding-identity-provider[Identity provider parameters] section for more information.
+link:https://docs.openshift.com/container-platform/4.16/authentication/understanding-identity-provider.html#identity-provider-parameters_understanding-identity-provider[Identity provider parameters] section for more information.
 
 <3> `attributes`: This section defines the LDAP fields to iterate over and
 assign to the fields in the OpenShift user's "account". If any attributes are
@@ -161,7 +160,7 @@ validating the SSL certificate of the LDAP server.
 
 For more information on the specific details of LDAP authentication in
 OpenShift you can refer to the
-link:https://docs.openshift.com/container-platform/4.9/authentication/identity_providers/configuring-ldap-identity-provider.html[Configuring
+link:https://docs.openshift.com/container-platform/4.16/authentication/identity_providers/configuring-ldap-identity-provider.html[Configuring
 an LDAP identity provider^] documentation.
 
 To setup the LDAP identity provider we must:
@@ -221,7 +220,7 @@ oc rollout status deployment/oauth-openshift -n openshift-authentication
 #### Syncing LDAP Groups to OpenShift Groups
 In OpenShift, groups can be used to manage users and control permissions for
 multiple users at once. There is a section in the documentation on how to
-link:https://docs.openshift.com/container-platform/4.9/authentication/ldap-syncing.html[sync
+link:https://docs.openshift.com/container-platform/4.16/authentication/ldap-syncing.html[sync
 groups with LDAP^]. Syncing groups involves running a program called `groupsync`
 when logged into OpenShift as a user with `cluster-admin` privileges, and using
 a configuration file that tells OpenShift what to do with the users it finds in
@@ -298,15 +297,15 @@ apiVersion: user.openshift.io/v1
 kind: Group
 metadata:
   annotations:
-    openshift.io/ldap.sync-time: "2022-02-10T01:49:07Z"
+    openshift.io/ldap.sync-time: "2024-07-10T14:42:23Z"
     openshift.io/ldap.uid: cn=ose-fancy-dev,ou=Users,o=5e615ba46b812e7da02e93b5,dc=jumpcloud,dc=com
     openshift.io/ldap.url: ldap.jumpcloud.com:636
-  creationTimestamp: "2022-02-10T01:49:07Z"
+  creationTimestamp: "2024-07-10T14:42:23Z"
   labels:
     openshift.io/ldap.host: ldap.jumpcloud.com
   name: ose-fancy-dev
-  resourceVersion: "68628"
-  uid: 374c463a-bdd2-4da1-ae1a-619eca0994f6
+  resourceVersion: "432118"
+  uid: 5130d4e2-1429-4471-8621-c5d9123f8885
 users:
 - fancyuser1
 - fancyuser2
@@ -353,7 +352,7 @@ oc adm policy add-cluster-role-to-group cluster-reader ose-fancy-dev
 ====
 If you are interested in the different roles that come with OpenShift, you can
 learn more about them in the
-link:https://docs.openshift.com/container-platform/4.9/authentication/using-rbac.html[role-based access control (RBAC)^] documentation.
+link:https://docs.openshift.com/container-platform/4.16/authentication/using-rbac.html[role-based access control (RBAC)^] documentation.
 ====
 
 #### Examine `cluster-reader` policy
@@ -394,15 +393,18 @@ oc get projects
 You will now see the list of all of the projects in the cluster:
 
 ----
-[~] $ oc get projects
-NAME                                               DISPLAY NAME   STATUS
-default                                                           Active
-kube-node-lease                                                   Active
-kube-public                                                       Active
-kube-system                                                       Active
-lab-ocp-cns                                                       Active
-openshift                                                         Active
-openshift-apiserver                                               Active
+NAME                                     DISPLAY NAME   
+app-management                           Active
+default                                  Active
+default-broker                           Active
+hive                                     Active
+hypershift                               Active
+kube-node-lease                          Active
+kube-public                              Active
+kube-system                              Active
+lab-ocp-cns                              Active
+local-cluster                            Active
+multicluster-engine                      Active
 ...
 ----
 

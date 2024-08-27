@@ -1,7 +1,7 @@
 ## Summary - OpenShift Logging
 In this lab you will explore the logging capabilities of
-OpenShift 4.12. This module will break down all the new logging
-features within 4.12.
+OpenShift 4.16. This module will break down all the new logging
+features within 4.16.
 
 An extremely important function of OpenShift is collecting and aggregating
 logs from the environments and the application pods it is running. 
@@ -11,7 +11,7 @@ The cluster logging components are based upon Vector and Loki. Vector is a high-
 [Note]
 ====
 More information may be found on the official
-link:https://docs.openshift.com/container-platform/4.12/logging/cluster-logging.html[OpenShift
+link:https://docs.openshift.com/container-platform/4.16/logging/cluster-logging.html[OpenShift
 documentation site]
 ====
 
@@ -73,7 +73,7 @@ Use that file to create the namespace by running the following command:
 
 [source,bash,role="execute"]
 ----
-oc create -f openshift_logging_namespace.yaml
+oc create -f {{ HOME_PATH }}/support/openshift_logging_namespace.yaml
 ----
 
 Next, verify that the namespace has been created with this command:
@@ -117,6 +117,13 @@ To begin, use the following link to log-in
 to the `OpenShift Cluster's GUI`. (note: do not use the built-in 
 console for these steps)
 `{{ MASTER_URL }}`
+
+You may need to switch from `All-Clusters` to `local-clusters`.
+
+
+image::images/local-cluster.png[]
+
+
 then follow these steps:
 
 1. Install the `Cluster Logging Operator`:
@@ -129,15 +136,15 @@ namespace was created from the previous steps
 ====
 
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators (choose the newest version you can see, which should be '5.8'), and click `Install`.
-  c. On the `Install Operator` page, *select Update Channel `stable`*. Under `Installation Mode` ensure that `A specific namespace on the cluster` is selected, and choose
-     `Operator recommended Namespace: openshift-logging` under `Installed Namespace`. Leave all other defaults
+  b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators (choose the newest version you can see, which should be 'stable-5.9'), and click `Install`.
+  c. On the `Install Operator` page, *select Update Channel `stable 5.9` and  and `Version 5.9.13` *. Under `Installation Mode` ensure that `A specific namespace on the cluster` is selected, and it should say that the
+     `Operator recommended Namespace is: openshift-logging`. Leave all other defaults
       unchanged and then click `Install`.
 
 2. Install the `Loki Operator`:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Type `Loki Operator` in the search field and click the `Loki Operator` card from the list of available Operators (choose the newest version you can see, which should be '5.6.1'), and then click `Install`.
-  c. On the `Create Operator Subscription` page, select *Update Channel `stable`*. You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults
+  b. Type `Loki Operator` in the search field and click the `Loki Operator` card from the list of available Operators (choose the newest version you can see, which should be `stable-5.9 and Version '5.9.3'), and then click `Install`.
+  c. On the `Create Operator Subscription` page, select *Update Channel `stable-5.9`*. You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults
      and click `Install`.
 +
 This now makes the Operator available to all users and projects that use this
@@ -303,17 +310,16 @@ stringData:
 kubectl get secrets -n openshift-logging
  
  You should see something like this:
- [lab-user@bastion ~]$ kubectl get secrets -n openshift-logging
-NAME                                       TYPE                                  DATA   AGE
-builder-dockercfg-wcksv                    kubernetes.io/dockercfg               1      7m51s
-builder-token-vszlq                        kubernetes.io/service-account-token   4      7m51s
-cluster-logging-operator-dockercfg-xc8hq   kubernetes.io/dockercfg               1      6m41s
-cluster-logging-operator-token-tcb2h       kubernetes.io/service-account-token   4      6m41s
-default-dockercfg-7vhqw                    kubernetes.io/dockercfg               1      7m51s
-default-token-khmnw                        kubernetes.io/service-account-token   4      7m51s
-deployer-dockercfg-5kqr7                   kubernetes.io/dockercfg               1      7m51s
-deployer-token-65zmx                       kubernetes.io/service-account-token   4      7m51s
-lokistack-dev-s3                           Opaque                                5      57s
+
+```
+NAME                                       TYPE                      DATA   AGE
+builder-dockercfg-vppmj                    kubernetes.io/dockercfg   1      10m
+cluster-logging-operator-dockercfg-bc7nd   kubernetes.io/dockercfg   1      4m58s
+cluster-logging-operator-dockercfg-rr9kb   kubernetes.io/dockercfg   1      5m2s
+default-dockercfg-rtkcq                    kubernetes.io/dockercfg   1      10m
+deployer-dockercfg-t6pjc                   kubernetes.io/dockercfg   1      10m
+lokistack-dev-s3                           Opaque                    5      5s
+```
 
 #### Creating the LokiStack
   
@@ -338,7 +344,7 @@ spec:
   size: 1x.extra-small
   storage:
     schemas:
-    - version: v12
+    - version: v13
       effectiveDate: "2022-06-01"
     secret:
       name: lokistack-dev-s3
@@ -472,7 +478,7 @@ drop down menu for `Severity`. This menu breaks the logs down into `critical`,
 
 image::images/severity.png[]
 
-The final piece of this is the `histogram`. This gives the user a more visual look into the logs.
+The final piece of this is the `histogram`. This gives the user a more visual look into the logs. (This may take a little bit of time to populate)
 
 image::images/histogram.png[]
 
@@ -516,7 +522,6 @@ spec:
 5. You should now be able to go back to `Observe` -> `Logs` and select `Audit` from the menu.
 
 #### Congratulations, you have now completed the logging section!
-
 
 
 

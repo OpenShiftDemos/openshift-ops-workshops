@@ -49,13 +49,12 @@ oc get machine -n openshift-machine-api
 You will see something like:
 
 ----
-NAME                                         INSTANCE              STATE     TYPE         REGION      ZONE         AGE
-cluster-f4a3-lpxbs-master-0                  i-04280885cafad3130   running   m4.xlarge    us-east-2   us-east-2a   47h
-cluster-f4a3-lpxbs-master-1                  i-0def910edcae51d11   running   m4.xlarge    us-east-2   us-east-2b   47h
-cluster-f4a3-lpxbs-master-2                  i-0beb5e40214d706fc   running   m4.xlarge    us-east-2   us-east-2c   47h
-cluster-f4a3-lpxbs-worker-us-east-2a-b94pr   i-0a922c0fe765caa3c   running   m5.2xlarge   us-east-2   us-east-2a   47h
-cluster-f4a3-lpxbs-worker-us-east-2b-m8gbx   i-0fb8d960b8a3a3343   running   m5.2xlarge   us-east-2   us-east-2b   47h
-cluster-f4a3-lpxbs-worker-us-east-2c-5tmg7   i-0151c72cd85f85038   running   m5.2xlarge   us-east-2   us-east-2c   47h
+NAME                                          PHASE     TYPE          REGION      ZONE         AGE
+cluster-pn5pp-g5lb8-master-0                  Running   m5a.2xlarge   us-east-2   us-east-2a   6h34m
+cluster-pn5pp-g5lb8-master-1                  Running   m5a.2xlarge   us-east-2   us-east-2b   6h34m
+cluster-pn5pp-g5lb8-master-2                  Running   m5a.2xlarge   us-east-2   us-east-2c   6h34m
+cluster-pn5pp-g5lb8-worker-us-east-2a-ljf99   Running   m6a.8xlarge   us-east-2   us-east-2a   6h29m
+cluster-pn5pp-g5lb8-worker-us-east-2b-j2w27   Running   m6a.8xlarge   us-east-2   us-east-2b   6h29m
 ----
 
 Each `Machine` has a corresponding `INSTANCE`. Do those IDs look familiar?
@@ -82,13 +81,12 @@ oc get nodes
 You will see something like:
 
 ----
-NAME                                         STATUS   ROLES    AGE     VERSION
-ip-10-0-186-197.us-east-2.compute.internal   Ready    master   4h5m    v1.22.3+e790d7f
-ip-10-0-190-214.us-east-2.compute.internal   Ready    master   4h6m    v1.22.3+e790d7f
-ip-10-0-199-60.us-east-2.compute.internal    Ready    worker   3h53m   v1.22.3+e790d7f
-ip-10-0-216-121.us-east-2.compute.internal   Ready    worker   3h53m   v1.22.3+e790d7f
-ip-10-0-231-224.us-east-2.compute.internal   Ready    worker   3h53m   v1.22.3+e790d7f
-ip-10-0-244-159.us-east-2.compute.internal   Ready    master   4h6m    v1.22.3+e790d7f
+NAME                                        STATUS   ROLES                  AGE     VERSION
+ip-10-0-22-105.us-east-2.compute.internal   Ready    control-plane,master   6h33m   v1.28.10+a2c84a5
+ip-10-0-44-60.us-east-2.compute.internal    Ready    worker                 6h27m   v1.28.10+a2c84a5
+ip-10-0-49-34.us-east-2.compute.internal    Ready    control-plane,master   6h34m   v1.28.10+a2c84a5
+ip-10-0-5-241.us-east-2.compute.internal    Ready    worker                 6h27m   v1.28.10+a2c84a5
+ip-10-0-75-11.us-east-2.compute.internal    Ready    control-plane,master   6h34m   v1.28.10+a2c84a5
 ----
 
 Each `Machine` ends up corresponding to a `Node`. With IPI, there is a
@@ -136,7 +134,7 @@ You probably already have new entries for 2 new `Machine` with a `STATE` of
 and will look something like:
 
 ----
-cluster-f4a3-lpxbs-worker-us-east-2c-h7gdt   i-0b9208ec47f0e206b   running   m5.2xlarge     us-east-2   us-east-2c   47s
+cluster-f4a3-lpxbs-worker-us-east-2c-h7gdt   i-0b9208ec47f0e206b   running   m6a.8xlarge     us-east-2   us-east-2c   47s
 ----
 
 At this point, in the background, the bootstrap process is happening
@@ -151,7 +149,7 @@ oc get nodes
 You should see your fresh and happy new nodes. They are the ones with a very young age:
 
 ----
-ip-10-0-166-103.us-east-2.compute.internal   Ready    worker   1m   v1.16.2
+ip-10-0-34-107.us-east-2.compute.internal   Ready   worker   44s    v1.28.10+a2c84a5
 ----
 
 [Note]

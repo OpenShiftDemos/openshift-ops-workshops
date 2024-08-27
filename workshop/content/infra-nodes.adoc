@@ -43,7 +43,7 @@ This will allow you to follow along with some of the following discussion.
 ----
 CLUSTERNAME=$(oc get infrastructure cluster -o=jsonpath='{.status.infrastructureName}')
 ZONENAME=$(oc get nodes --sort-by='.metadata.creationTimestamp' -o=jsonpath='{.items[-1:].metadata.labels.topology\.kubernetes\.io/zone}')
-oc get machineset -n openshift-machine-api -o yaml ${CLUSTERNAME}-worker-${ZONENAME}
+oc get machineset.machine.openshift.io -n openshift-machine-api -o yaml ${CLUSTERNAME}-worker-${ZONENAME}
 ----
 
 #### Metadata
@@ -52,17 +52,19 @@ of the `MachineSet` and various labels.
 
 ```YAML
 metadata:
-  creationTimestamp: 2019-01-25T16:00:34Z
-  generation: 1
+  annotations:
+    capacity.cluster-autoscaler.kubernetes.io/labels: kubernetes.io/arch=amd64
+    machine.openshift.io/GPU: "0"
+    machine.openshift.io/memoryMb: "131072"
+    machine.openshift.io/vCPU: "32"
+  creationTimestamp: "2024-07-01T08:08:06Z"
+  generation: 3
   labels:
-    machine.openshift.io/cluster-api-cluster: 190125-3
-    machine.openshift.io/cluster-api-machine-role: worker
-    machine.openshift.io/cluster-api-machine-type: worker
-  name: 190125-3-worker-us-east-1b
+    machine.openshift.io/cluster-api-cluster: cluster-pn5pp-g5lb8
+  name: cluster-pn5pp-g5lb8-worker-us-east-2b
   namespace: openshift-machine-api
-  resourceVersion: "9027"
-  selfLink: /apis/cluster.k8s.io/v1alpha1/namespaces/openshift-machine-api/machinesets/190125-3-worker-us-east-1b
-  uid: 591b4d06-20ba-11e9-a880-068acb199400
+  resourceVersion: "419102"
+  uid: c07aa6d4-8621-4753-97ad-e13e010b7c34
 ```
 
 [Note]
@@ -77,14 +79,14 @@ the operator which machines are associated with the set:
 
 ```YAML
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      machine.openshift.io/cluster-api-cluster: 190125-3
-      machine.openshift.io/cluster-api-machineset: 190125-3-worker-us-east-1b
+      machine.openshift.io/cluster-api-cluster: cluster-pn5pp-g5lb8
+      machine.openshift.io/cluster-api-machineset: cluster-pn5pp-g5lb8-worker-us-east-2b
 ```
 
-In this case, the cluster name is `190125-3` and there is an additional
+In this case, the cluster name is `cluster-pn5pp-g5lb8` and there is an additional
 label for the whole set.
 
 ### Template Metadata
@@ -93,13 +95,13 @@ The `template` is the part of the `MachineSet` that templates out the
 make sure that things match here when we make changes:
 
 ```YAML
-  template:
-    metadata: {}
+ template:
+    metadata:
       labels:
-        machine.openshift.io/cluster-api-cluster: 190125-3
+        machine.openshift.io/cluster-api-cluster: cluster-pn5pp-g5lb8
         machine.openshift.io/cluster-api-machine-role: worker
         machine.openshift.io/cluster-api-machine-type: worker
-        machine.openshift.io/cluster-api-machineset: 190125-3-worker-us-east-1b
+        machine.openshift.io/cluster-api-machineset: cluster-pn5pp-g5lb8-worker-us-east-2b
 ```
 
 #### Template Spec
@@ -113,13 +115,13 @@ specific labels. As you've seen in the examples above, labels go in
 `metadata` sections:
 
 ```YAML
-  spec:
-      metadata:
-        creationTimestamp: null
+spec:
+      lifecycleHooks: {}
+      metadata: {}
       providerSpec:
         value:
           ami:
-            id: ami-08871aee06d13e584
+            id: ami-049d8fda91038a0fd
 ...
 ```
 
@@ -303,7 +305,7 @@ You will see that it has the role of `worker`.
 
 ```
 NAME                                        STATUS   ROLES    AGE   VERSION
-ip-10-0-144-70.us-east-2.compute.internal   Ready    worker   9h    v1.12.4+509916ce1
+ip-10-0-144-70.us-east-2.compute.internal   Ready    worker   9h    v1.29.5+29c95f3
 ```
 
 The default configuration of the router operator is to
@@ -327,15 +329,20 @@ master. Yours likely looks something like:
 apiVersion: config.openshift.io/v1
 kind: Ingress
 metadata:
-  creationTimestamp: 2019-04-08T14:37:49Z
+  creationTimestamp: "2024-07-10T08:44:56Z"
   generation: 1
   name: cluster
-  resourceVersion: "396"
-  selfLink: /apis/config.openshift.io/v1/ingresses/cluster
-  uid: e1ec463c-5a0b-11e9-93e8-028b0fb1636c
+  resourceVersion: "54069"
+  uid: 042a2270-c48a-47eb-bde4-78286131574b
 spec:
-  domain: {{ ROUTE_SUBDOMAIN }}
-status: {}
+  domain: apps.cluster-hdwjj.hdwjj.sandbox2959.opentlc.com
+  loadBalancer:
+    platform:
+      aws:
+        type: Classic
+      type: AWS
+status:
+...
 ```
 
 Individual router deployments are managed via 
@@ -353,26 +360,42 @@ Yours looks something like:
 apiVersion: operator.openshift.io/v1
 kind: IngressController
 metadata:
-  creationTimestamp: 2019-04-08T14:46:15Z
+  creationTimestamp: "2024-07-10T08:48:34Z"
   finalizers:
-  - ingress.openshift.io/ingress-controller
-  generation: 2
+  - ingresscontroller.operator.openshift.io/finalizer-ingresscontroller
+  generation: 3
   name: default
   namespace: openshift-ingress-operator
-  resourceVersion: "2056085"
-  selfLink: /apis/operator.openshift.io/v1/namespaces/openshift-ingress-operator/ingresscontrollers/default
-  uid: 0fac160d-5a0d-11e9-a3bb-02d64e703494
-spec: {}
+  resourceVersion: "54016"
+  uid: e15b0cb7-9a53-4b2a-b234-a54bd6c8dd3c
+spec:
+  clientTLS:
+    clientCA:
+      name: ""
+    clientCertificatePolicy: ""
+  defaultCertificate:
+    name: ingress-certs-2024-07-10
+  httpCompression: {}
+  httpEmptyRequestsPolicy: Respond
+  httpErrorCodePages:
+    name: ""
+  replicas: 2
+  routeSelector:
+    matchExpressions:
+    - key: hypershift.openshift.io/hosted-control-plane
+      operator: DoesNotExist
+  tuningOptions:
+    reloadInterval: 0s
+  unsupportedConfigOverrides: null
 status:
   availableReplicas: 2
   conditions:
-  - lastTransitionTime: 2019-04-08T14:47:14Z
+  - lastTransitionTime: "2024-07-10T08:48:35Z"
+    reason: Valid
     status: "True"
-    type: Available
-  domain: apps.cluster-f4a3.f4a3.openshiftworkshop.com
-  endpointPublishingStrategy:
-    type: LoadBalancerService
-  selector: ingress.operator.openshift.io/ingress-controller-deployment=default
+    type: Admitted
+  - lastTransitionTime: "2024-07-10T08:56:09Z"
+...
 ```
 
 To specify a `nodeSelector` that tells the router pods to hit the
@@ -430,41 +453,38 @@ You will see something like:
 apiVersion: imageregistry.operator.openshift.io/v1
 kind: Config
 metadata:
-  creationTimestamp: "2019-08-06T13:57:22Z"
+  creationTimestamp: "2024-07-10T08:56:00Z"
   finalizers:
   - imageregistry.operator.openshift.io/finalizer
   generation: 2
   name: cluster
-  resourceVersion: "13218"
-  selfLink: /apis/imageregistry.operator.openshift.io/v1/configs/cluster
-  uid: 1cb6272a-b852-11e9-9a54-02fdf1f6ca7a
+  resourceVersion: "232230"
+  uid: 68f0d612-891a-40c6-b05a-3f668fc831b1
 spec:
-  defaultRoute: false
-  httpSecret: fff8bb0952d32e0aa56adf0ac6f6cf5267e0627f7b42e35c508050b5be426f8fd5e5108bea314f4291eeacc0b95a2ea9f842b54d7eb61522238f2a2dc471f131
-  logging: 2
+  httpSecret: 41c06f1684df3c03f7b810ef79db35f38741580d34c23e6f9897016251b4d01a55a72d24681080f37a266e7ccbb7f4850b1c
+c2b3bc1937e16ae439f7d2b213f2
+  logLevel: Normal
   managementState: Managed
-  proxy:
-    http: ""
-    https: ""
-    noProxy: ""
-  readOnly: false
-  replicas: 1
+  observedConfig: null
+  operatorLogLevel: Normal
+  proxy: {}
+  replicas: 2
   requests:
     read:
-      maxInQueue: 0
-      maxRunning: 0
       maxWaitInQueue: 0s
     write:
-      maxInQueue: 0
-      maxRunning: 0
       maxWaitInQueue: 0s
+  rolloutStrategy: RollingUpdate
   storage:
+    managementState: Managed
     s3:
-      bucket: image-registry-us-east-2-0a598598fc1649d8b96ed91a902b982c-1cbd
+      bucket: cluster-hdwjj-szxgx-image-registry-us-east-2-ulxmappwomctwobgt
       encrypt: true
-      keyID: ""
       region: us-east-2
-      regionEndpoint: ""
+      trustedCA:
+        name: ""
+      virtualHostedStyle: false
+  unsupportedConfigOverrides: null
 status:
 ...
 ```
@@ -604,4 +624,3 @@ oc get pod -w -n openshift-monitoring
 ----
 
 You can exit by pressing kbd:[Ctrl+C].
-

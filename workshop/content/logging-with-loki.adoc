@@ -67,7 +67,7 @@ metadata:
     openshift.io/cluster-logging: "true"
     openshift.io/cluster-monitoring: "true"
 ----
-So `create` a file with the above YAML called 'openshift_logging_namespace.yaml'
+So we have `created` a file with the above YAML called 'openshift_logging_namespace.yaml'
 
 Use that file to create the namespace by running the following command:
 

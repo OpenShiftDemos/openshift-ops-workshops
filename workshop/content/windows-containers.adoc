@@ -12,9 +12,9 @@ following providers:
 * Amazon Web Services (AWS)
 * Microsoft Azure
 * VMware vSphere
-* Bare Metal (via link:https://docs.openshift.com/container-platform/4.9/windows_containers/byoh-windows-instance.html[BYOH])
+* Bare Metal (via link:https://docs.openshift.com/container-platform/4.14/windows_containers/byoh-windows-instance.html[BYOH])
 
-NOTE: For more information  about what versions of Windows Server are supported, please see the link:https://docs.openshift.com/container-platform/4.9/windows_containers/understanding-windows-container-workloads.html[official documentation].
+NOTE: For more information  about what versions of Windows Server are supported, please see the link:https://docs.openshift.com/container-platform/4.14/windows_containers/understanding-windows-container-workloads.html[official documentation].
 
 In this lab, you'll get hands on experence on how to deploy a Windows
 worker node and how to deploy workloads onto an OpenShift platform with
@@ -47,7 +47,7 @@ During setup, the WMCO will:
 * Confiugre the CNI on the Kubelet.
 * Set up kube-proxy.
 
-For more information please see the link:https://docs.openshift.com/container-platform/4.9/windows_containers/understanding-windows-container-workloads.html[official documentation].
+For more information please see the link:https://docs.openshift.com/container-platform/4.14/windows_containers/understanding-windows-container-workloads.html[official documentation].
 
 #### Prerequisites
 
@@ -101,21 +101,29 @@ the Windows Node.
 [source,yaml]
 ----
 ovnKubernetesConfig:
+  egressIPConfig: {}
+  gatewayConfig:
+    ipv4: {}
+    ipv6: {}
+    routingViaHost: false
   genevePort: 6081
   hybridOverlayConfig:
     hybridClusterNetwork:
       - cidr: 10.132.0.0/14
         hostPrefix: 23
+  ipsecConfig:
+    mode: Disabled
   mtu: 8901
   policyAuditConfig:
     destination: "null"
     maxFileSize: 50
+    maxLogFiles: 5
     rateLimit: 20
     syslogFacility: local0
 type: OVNKubernetes
 ----
 
-NOTE: To read more about how to setup HybridNetworking, please see the link:https://docs.openshift.com/container-platform/4.9/networking/ovn_kubernetes_network_provider/configuring-hybrid-networking.html#configuring-hybrid-ovnkubernetes_configuring-hybrid-networking[official doc].
+NOTE: To read more about how to setup HybridNetworking, please see the link:https://docs.openshift.com/container-platform/4.14/networking/ovn_kubernetes_network_provider/configuring-hybrid-networking.html#configuring-hybrid-ovnkubernetes_configuring-hybrid-networking[official doc].
 
 To summarize, in order to use Windows Containers on OpenShift. You will need the following:
 
@@ -158,7 +166,7 @@ image::images/wmco-card.png[WMCO Install Card]
 On the overview page, select *Install*.
 
 .WMCO Operator Overview
-image::images/install-overview.png[WMCO Overview]
+image::images/windows-containers/install-overview.png[WMCO Overview]
 
 On the *Install Operator* overview page, make sure you have *stable*
 selected in the "Update channel" section. Also, in the "Installation mode"
@@ -168,17 +176,17 @@ on *Enable Cluster Monitoring*. Finally, leave the "Approval strategy"
 as *Automatic*. Then click *Install*. Use the below graphic to guide you.
 
 .WMCO Install Operator Overview
-image::images/wmco-install-operator-overivew-page.png[WMCO Install Overview]
+image::images/windows-containers/wmco-install-operator-overivew-page.png[WMCO Install Overview]
 
 The "Installing Operator" status page will come up.
 
 .WMCO Install Operator status page
-image::images/installing-the-wmco-status-operator.png[WMCO Installing]
+image::images/windows-containers/installing-the-wmco-status-operator.png[WMCO Installing]
 
 When the screen says "ready for use", the WMCO Operator is successfully installed.
 
 .WMCO Install Operator status page
-image::images/wmco-ready-for-use.png[WMCO Installing]
+image::images/windows-containers/wmco-ready-for-use.png[WMCO Installing]
 
 Back on the cli, you should now see the WMCO pod running.
 
@@ -242,7 +250,7 @@ explore important sections of the YAML.
 ${HOME}/support/generate-windows-ms.sh
 ----
 
-NOTE: For more information on how to create a Windows MachineSet YAML see the link:https://docs.openshift.com/container-platform/4.9/windows_containers/creating_windows_machinesets/creating-windows-machineset-aws.html[official docs].
+NOTE: For more information on how to create a Windows MachineSet YAML see the link:https://docs.openshift.com/container-platform/4.14/windows_containers/creating_windows_machinesets/creating-windows-machineset-aws.html[official docs].
 
 This should create the `windows-ms.yaml` file in your home directory.
 
@@ -275,7 +283,7 @@ The AMI ID is of a Windows Server 2019 AMI.
 yq e '.spec.template.spec.providerSpec.value.ami.id' ~/windows-ms.yaml
 ----
 
-NOTE: You will need to use an AMI of a supported version of Windows Server. For more information, consult the link:https://docs.openshift.com/container-platform/4.9/windows_containers/windows-containers-release-notes-4-x.html#supported-windows-server-versions[official documentation].
+NOTE: You will need to use an AMI of a supported version of Windows Server. For more information, consult the link:https://docs.openshift.com/container-platform/4.15/windows_containers/wmco_rn/windows-containers-release-notes-10-15-x.html#supported-windows-server-versions[official documentation].
 
 One last thing to note, is the user data secret.
 
@@ -309,8 +317,8 @@ This should show the following output.
 
 [source,bash]
 ----
-NAME                                       DESIRED   CURRENT   READY   AVAILABLE   AGE
-cluster1-wrkjp-windows-worker-us-east-1a   1         1                             9s
+NAME                                            DESIRED   CURRENT   READY   AVAILABLE   AGE
+cluster-w2tlt-7rwdh-windows-worker-us-east-2a     1         1                             9s
 ----
 
 The MachineSet has the replica set to 1. The MachineAPI will see that desired state and, in turn, create a Windows Machine. This machine will eventually turn into a node. See the status of the machine with the following command.
@@ -345,8 +353,8 @@ The output should look something like this.
 
 [source,bash]
 ----
-NAME                          STATUS   ROLES    AGE   VERSION
-ip-10-0-140-10.ec2.internal   Ready    worker   22m   v1.20.0-1081+d0b1ad449a08b3
+NAME                                        STATUS   ROLES    AGE   VERSION
+ip-10-0-12-4.us-east-2.compute.internal     Ready    worker   25m    v1.29.6+aba1e8d
 ----
 
 #### Managing a Windows Node
@@ -403,15 +411,15 @@ Here's an example output.
 
 [source,bash]
 ----
-NAME                           STATUS   ROLES    AGE     VERSION
-ip-10-0-139-232.ec2.internal   Ready    worker   15m     v1.20.0-1081+d0b1ad449a08b3
-ip-10-0-143-146.ec2.internal   Ready    worker   3h18m   v1.20.0-1081+d0b1ad449a08b3
+NAME                                         STATUS   ROLES    AGE     VERSION
+ip-10-0-12-4.us-east-2.compute.internal     Ready    worker   23m    v1.29.6+aba1e8d
+ip-10-0-20-199.us-east-2.compute.internal   Ready    worker   2m5s   v1.29.6+aba1e8d
 ----
 
 You can see how easy it is to manage a Windows Machine
 with the MachineAPI on OpenShift. It is managed by the
 same system as your Linux Nodes. You can even attach the Windows
-link:https://docs.openshift.com/container-platform/4.9/machine_management/applying-autoscaling.html[MachineSet Autoscaler] as well
+link:https://docs.openshift.com/container-platform/4.14/machine_management/applying-autoscaling.html[MachineSet Autoscaler] as well
 
 Remove this node by scaling the Windows MachineSet back down to 1.
 
@@ -488,7 +496,7 @@ Windows Node. Here is an example:
 
 [source,bash]
 ----
-bash-4.4$ sshcmd.sh ip-10-0-140-10.ec2.internal
+bash-4.4$ sshcmd.sh ip-10-0-20-199.us-east-2.compute.internal
 ----
 
 This should drop you into a PowerShell session. It should look something like this.
@@ -515,12 +523,14 @@ You should see the following output.
 ----
 Handles  NPM(K)    PM(K)      WS(K)     CPU(s)     Id  SI ProcessName
 -------  ------    -----      -----     ------     --  -- -----------
-    171      14    32780      30652       3.63   5484   0 containerd
-    252      17    33712      37144       1.61    292   0 hybrid-overlay-node
-    605      31    60244      81452      47.27    756   0 kubelet
-    274      21    38404      42992       5.53   5256   0 kube-proxy
-    472      23    41572      38320      16.23   1140   0 windows_exporter
-    205      16    31880      32128       1.55    592   0 windows-instance-config-daemon
+    173      14    31488      36740       5.97   4688   0 containerd
+    254      17    31080      40376       2.48   5320   0 hybrid-overlay-node
+    482      31    56224      80748      46.11   1924   0 kubelet
+    101       8    12704       6096       0.09   5100   0 kube-log-runner
+    104       8    12424       5332       0.11   5440   0 kube-log-runner
+    268      21    33176      44792       3.80   6080   0 kube-proxy
+    436      23    30824      32440      20.22   2676   0 windows_exporter
+    209      15    26252      85528       4.23   3056   0 windows-instance-config-daemon
 ----
 
 These are the main components needed to run a Windows Node. Remember that
@@ -650,7 +660,7 @@ Now log into the Windows Node using the hostname. Example:
 
 [source,bash]
 ----
-bash-4.4$ sshcmd.sh ip-10-0-140-10.ec2.internal
+bash-4.4$ sshcmd.sh ip-10-0-20-199.us-east-2.compute.internal
 ----
 
 To view Windows containers running on the node, you need to install the `crictl` tool
@@ -679,7 +689,7 @@ Here you'll see the Container running. Here is an example output.
 [source,bash]
 ----
 CONTAINER           IMAGE               CREATED             STATE               NAME                ATTEMPT             POD ID              POD
-ac18c2aa692cf       66a1a48cbc112       2 minutes ago       Running             windowswebserver    0                   a2f1b580c659c       win-webserver-7b76494c5-s9m2q
+c06eb847b6313       b51a50ce03f12       2 minutes ago       Running             windowswebserver    0                   6a295ed1a5a8d       win-webserver-776bb9fb97-zxf78
 ----
 
 You can also see the images downloaded on the host.
@@ -694,8 +704,8 @@ You should see the following output.
 [source,bash]
 ----
 IMAGE                                    TAG                 IMAGE ID            SIZE
-mcr.microsoft.com/oss/kubernetes/pause   3.6                 9adbbe02501b1       104MB
-mcr.microsoft.com/windows/servercore     ltsc2019            66a1a48cbc112       2.02GB
+mcr.microsoft.com/oss/kubernetes/pause   3.9                 6778bc79db242       270MB
+mcr.microsoft.com/windows/servercore     ltsc2019            b51a50ce03f12       2.18GB
 ----
 
 Go ahead an logout of the Windows Node
@@ -789,7 +799,7 @@ We will be using a helm chart to deploy the sample application. In
 order to successfully deploy the application stack, make sure you're
 `kubeadmin`.
 
-NOTE: For more information about `helm` and how it can be used as a package manager for your containerized workloads, please see the link:https://docs.openshift.com/container-platform/4.7/cli_reference/helm_cli/getting-started-with-helm-on-openshift-container-platform.html[OpenShift documentation]
+NOTE: For more information about `helm` and how it can be used as a package manager for your containerized workloads, please see the link:https://docs.openshift.com/container-platform/4.14/applications/working_with_helm_charts/installing-helm.html[OpenShift documentation]
 
 Next add the Red Hat Developer Demos Helm repository.
 

@@ -118,7 +118,7 @@ to the `OpenShift Cluster's GUI`. (note: do not use the built-in
 console for these steps)
 `{{ MASTER_URL }}`
 
-You may need to switch from `All-Clusters` to `local-clusters`.
+You may need to switch from `All-Clusters` to `local-cluster`.
 
 
 image::images/local-cluster.png[]

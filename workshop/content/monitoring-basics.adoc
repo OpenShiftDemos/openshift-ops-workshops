@@ -106,7 +106,7 @@ multiple metrics in easy to consume form graphed over time.
 Click the "Dashboards" link under the "Observe" section on the left hand side.
 
 .Dashboards OpenShift
-image::images/ocp-grafana-replacement.png[]
+image::images/ocp-grafana-replacement-new.png[]
 
 Here you can click on the "Dashboard" arrow and select different metrics
 to visualize. Go ahead and play around with this view. Note that this

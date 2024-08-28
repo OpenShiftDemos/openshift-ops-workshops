@@ -160,7 +160,7 @@ oc scale machineset $MACHINESET -n openshift-machine-api --replicas=3
 Then go ahead and run:
 [source,bash,role="execute"]
 ----
-oc get machineset -n openshift-machine-api
+oc get machineset.machine.openshift.io -n openshift-machine-api
 ----
 
 You should see the new infra set listed with a name similar to the following:

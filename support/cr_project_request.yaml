@@ -3,6 +3,9 @@ kind: "Project"
 metadata: 
   name: "cluster"
   namespace: ""
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"config.openshift.io/v1","kind":"Project","metadata":{"name":"cluster","namespace":""},"spec":{"projectRequestMessage":"","projectRequestTemplate":{"name":"project-request"}}}
 spec: 
   projectRequestMessage: ""
   projectRequestTemplate: 

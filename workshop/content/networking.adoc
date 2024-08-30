@@ -56,8 +56,7 @@ After a while you will see something like the following:
 
 ```
 NAME           READY   STATUS              RESTARTS   AGE
-ose-1-66dz2    0/1     ContainerCreating   0          7s
-ose-1-deploy   1/1     Running             0          16s
+ose-5895b8687d-sp4dz    0/1     ContainerCreating   0          7s
 ```
 
 Similarly:
@@ -71,8 +70,7 @@ After a while you will see something like the following:
 
 ```
 NAME           READY   STATUS      RESTARTS   AGE
-ose-1-deploy   0/1     Completed   0          38s
-ose-1-vj2gn    1/1     Running     0          30s
+ose-5895b8687d-slwzq    1/1     Running     0          30s
 ```
 
 We will run commands inside the pod in the `netproj-a` *Project* that will
@@ -93,8 +91,8 @@ You will see something like the following:
 
 [source]
 ----
-Getting Pod B's IP... 10.129.0.180
-Getting Pod A's Name... ose-1-66dz2
+Getting Pod B's IP... 10.131.0.101
+Getting Pod A's Name... ose-5895b8687d-sp4dz
 Checking connectivity between Pod A and Pod B... worked
 ----
 
@@ -153,8 +151,8 @@ You will see something like the following:
 
 [source]
 ----
-Getting Pod B's IP... 10.129.0.180
-Getting Pod A's Name... ose-1-66dz2
+Getting Pod B's IP... 10.131.0.101
+Getting Pod A's Name... ose-5895b8687d-sp4dz
 Checking connectivity between Pod A and Pod B............ FAILED!
 ----
 
@@ -257,8 +255,8 @@ You will see something like the following:
 
 [source]
 ----
-Getting Pod B's IP... 10.129.0.180
-Getting Pod A's Name... ose-1-66dz2
+Getting Pod B's IP... 10.131.0.101
+Getting Pod A's Name... ose-5895b8687d-sp4dz
 Checking connectivity between Pod A and Pod B... worked
 ----
 

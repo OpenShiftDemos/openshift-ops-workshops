@@ -7,7 +7,3 @@ export NAME=${2:-workerocs}
 export SCALE=${3:-1}
 
 $( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/machineset-cli -scale $SCALE -name $NAME -count $COUNT -ami $AMI -clusterID $CLUSTERID -region $REGION
-
-chmod +x /opt/app-root/src/support/machineset-patch.sh
-
-/opt/app-root/src/support/machineset-patch.sh

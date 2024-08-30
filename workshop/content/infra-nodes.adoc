@@ -165,10 +165,10 @@ cluster-city-56f8-mc4pf-infra-us-east-2a    1         1                         
 ```
 
 We don't yet have any ready or available machines in the set because the
-instances are still coming up and bootstrapping. You can check `oc get
-machine -n openshift-machine-api` to see when the instance finally starts
-running. Then, you can use `oc get node` to see when the actual node is
-joined and ready.
+instances are still coming up and bootstrapping. You can check `oc get 
+machine.machine.openshift.io -n openshift-machine-api` to see when the 
+instance finally starts running. Then, you can use `oc get node` to 
+see when the actual node is joined and ready.
 
 [Note]
 ====

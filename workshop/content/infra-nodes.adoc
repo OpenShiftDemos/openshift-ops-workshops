@@ -145,6 +145,7 @@ will do the hard work for you:
 [source,bash,role="execute"]
 ----
 bash {{ HOME_PATH }}/support/machineset-generator.sh 1 infra 0 | oc create -f -
+bash {{ HOME_PATH }}/support/machineset-patch.sh
 export MACHINESET=$(oc get machineset.machine.openshift.io -n openshift-machine-api -l machine.openshift.io/cluster-api-machine-role=infra -o jsonpath='{.items[0].metadata.name}')
 oc scale machineset.machine.openshift.io/$MACHINESET -n openshift-machine-api --replicas=3
 ----

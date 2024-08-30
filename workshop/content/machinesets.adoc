@@ -22,7 +22,7 @@ Execute the following:
 
 [source,bash,role="execute"]
 ----
-oc get machineset -n openshift-machine-api
+oc get machineset.machine.openshift.io -n openshift-machine-api
 ----
 
 You will see something like:
@@ -43,7 +43,7 @@ zero.
 
 [source,bash,role="execute"]
 ----
-oc get machine -n openshift-machine-api
+oc get machine.machine.openshift.io -n openshift-machine-api
 ----
 
 You will see something like:
@@ -107,7 +107,7 @@ Look at the list of `MachineSets` again:
 
 [source,bash,role="execute"]
 ----
-oc get machineset -n openshift-machine-api
+oc get machineset.machine.openshift.io -n openshift-machine-api
 ----
 
 Within that list, we will scale one of the `MachineSet` objects with the
@@ -117,7 +117,7 @@ Within that list, we will scale one of the `MachineSet` objects with the
 ----
 CLUSTERNAME=$(oc get infrastructure cluster -o=jsonpath='{.status.infrastructureName}')
 ZONENAME=$(oc get nodes --sort-by='.metadata.creationTimestamp' -o=jsonpath='{.items[-1:].metadata.labels.topology\.kubernetes\.io/zone}')
-oc scale machineset ${CLUSTERNAME}-worker-${ZONENAME} -n openshift-machine-api --replicas=3
+oc scale machineset.machine.openshift.io ${CLUSTERNAME}-worker-${ZONENAME} -n openshift-machine-api --replicas=3
 ----
 
 Take special note the `MachineSet` scaled is likely different from
@@ -126,7 +126,7 @@ the one that is shown in the lab guide. You should see a note that the
 
 [source,bash,role="execute"]
 ----
-oc get machines -n openshift-machine-api
+oc get machine.machine.openshift.io -n openshift-machine-api
 ----
 
 You probably already have new entries for 2 new `Machine` with a `STATE` of
@@ -169,5 +169,5 @@ when you scaled up, a few steps ago.
 
 [source,bash,role="execute"]
 ----
-oc scale machineset ${CLUSTERNAME}-worker-${ZONENAME} -n openshift-machine-api --replicas=1
+oc scale machineset.machine.openshift.io ${CLUSTERNAME}-worker-${ZONENAME} -n openshift-machine-api --replicas=1
 ----

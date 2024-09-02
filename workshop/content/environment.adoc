@@ -139,3 +139,24 @@ with a role referenced being the _cluster-admin_ `ClusterRole`
 
 As a cluster-admin throughout the exercises, you will be able to do anything
 with the cluster as you have noted earlier, so follow instructions carefully.
+
+Please also check that you can see the support directory
+
+[source,bash,role="execute"]
+----
+ls
+----
+
+If you see the support directory please skip the next commands and move to the next module:
+
+----
+git clone -b ocp4-prod https://github.com/OpenShiftDemos/openshift-ops-workshops.git
+
+bash openshift-ops-workshops/support/clone_support_folder.sh
+
+ls /opt/app-root/src/support/
+----
+
+
+
+

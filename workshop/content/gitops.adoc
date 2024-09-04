@@ -84,7 +84,7 @@ Project Name: default
 SYNC POLICY: Automatic
 Repository URL: https://github.com/OpenShiftDemos/openshift-ops-workshops/
 Revision: ocp4-dev
-Path: support/gitops-catalog/openshift-pipelines-operator/overlays/latest
+Path: support/gitops-catalog/pipelines-new/base/
 Cluster URL: https://kubernetes.default.svc
 Namespace: openshift-operators
 ----
@@ -106,7 +106,7 @@ spec:
     namespace: openshift-operators
     server: 'https://kubernetes.default.svc'
   source:
-    path: support/gitops-catalog/openshift-pipelines-operator/overlays/latest
+    path: support/gitops-catalog/pipelines-new/base/
     repoURL: 'https://github.com/OpenShiftDemos/openshift-ops-workshops/'
     targetRevision: ocp4-dev
   sources: []
@@ -133,7 +133,7 @@ Let's examine each of the descriptions of the recently deployed application to g
 |*Repository*|The repository is the location where the application's source code is stored. In this case, the source code is stored in the Git repository located at `https://github.com/OpenShiftDemos/openshift-ops-workshops/`.
 |*Target Revision*|The target revision is the Git commit hash or branch name that ArgoCD uses to deploy the application. In this case, the target revision is set to `ocp4-dev`.
 |*Path*|The path is the location within the Git repository where the application manifests are stored. In this case, the application manifests are located in the  
-link:https://github.com/OpenShiftDemos/openshift-ops-workshops/tree/ocp4-dev/support/gitops-catalog/openshift-pipelines-operator/overlays/latest[`support/gitops-catalog/openshift-pipelines-operator/overlays/latest`] directory.
+link:https://github.com/OpenShiftDemos/openshift-ops-workshops/tree/ocp4-dev/support/gitops-catalog/pipelines-new/base[`support/gitops-catalog/pipelines-new/base/`] directory.
 |*Destination*|The destination is the cluster in which the objects will be synced. It is composed of the targetted cluster API server URL and a namespace. In this case, the `server` points to the local cluster API server. "in-cluster" is the "the cluster in which your ArgoCD instance is installed" but other clusters can be configured to allow you to sync to additional clusters.
 |*Namespace*|The namespace is the Kubernetes namespace where the application will be deployed. In this case, the application will be deployed in the openshift-operators namespace.
 |*Created At*|The created at timestamp shows when the application was created in ArgoCD. In this case, the application was created 14 minutes ago.

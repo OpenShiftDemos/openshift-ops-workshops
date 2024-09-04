@@ -82,7 +82,7 @@ oc extract cm/cluster-config-v1 -n kube-system --to=- | yq e '.networking.networ
 
 This should output `OVNKubernetes` as the network type.
 
-NOTE: Learn more about the `install-config.yaml` file at the link:https://docs.openshift.com/container-platform/4.9/installing/installing_aws/installing-aws-customizations.html#installation-aws-config-yaml_installing-aws-customizations[official documentation page].
+NOTE: Learn more about the `install-config.yaml` file at the link:https://docs.openshift.com/container-platform/4.16/installing/installing_aws/installing-aws-customizations.html#installation-aws-config-yaml_installing-aws-customizations[official documentation page].
 
 The next requisite is the cluster must be set up with overlay hybrid
 networking. This is another step that can only be done at install

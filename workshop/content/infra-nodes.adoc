@@ -217,12 +217,14 @@ oc get nodes ${YOUNG_INFRA_NODE} --show-labels | grep --color node-role
 
 And, in the `LABELS` column we something that looks like:
 
+----
 kubernetes.io/arch=amd64,beta.kubernetes.io/instance-type=m5.4xlarge,beta.kubernetes.io/os=linux,
 failure-domain.beta.kubernetes.io/region=us-east-2,failure-domain.beta.kubernetes.io/zone=us-east
 -2a,kubernetes.io/arch=amd64,kubernetes.io/hostname=ip-10-0-23-94.us-east-2.compute.internal,kube
 rnetes.io/os=linux,node-role.kubernetes.io/infra=,node-role.kubernetes.io/worker=,node.kubernetes
 .io/instance-type=m5.4xlarge,node.openshift.io/os_id=rhcos,topology.ebs.csi.aws.com/zone=us-east-
 2a,topology.kubernetes.io/region=us-east-2,topology.kubernetes.io/zone=us-east-2a
+----
 
 It's hard to see, but our `node-role.kubernetes.io/infra` label is there.
 

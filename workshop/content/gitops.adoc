@@ -121,7 +121,7 @@ spec:
 3. Once you have made those changes click `Create`. You should see 
 your brand new app pop up on the ArgoCD dashboard.
 
-image::images/gitops-images/pipelines-gitops2.png[]
+image::images/gitops-images/pipelines-gitops2new.png[]
 
 Let's examine each of the descriptions of the recently deployed application to gain a better understanding of ArgoCD and the application we just added. The `pipelines` app has several descriptions that we will review:
 
@@ -149,7 +149,7 @@ link:https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/[Auto sync] i
 
 By navigating to your `OpenShift Console` and accessing the `Operators` tab, you can verify the successful installation of the `Pipelines Operator` under the `Installed Operators` tab.
 
-image::images/gitops-images/pipelines-openshift.png[]
+image::images/gitops-images/pipelines-openshift-new.png[]
 
 ===  Adding a Banner to ArgoCD
 
@@ -280,7 +280,7 @@ image::images/gitops-images/oops.png[]
 [start=7]
 7. Go back to Argo CD and notice that the resource named `home-banner` is now `Out of Sync`. Argo CD considers the application out of sync because the desired state as expressed in Git no longer matches the target state in the cluster after the direct edit was performed.
 
-image::images/gitops-images/selectfordiff.png[]
+image::images/gitops-images/selectfordiffnew.png[]
 
 image::images/gitops-images/outofsync.png[]
 
@@ -307,7 +307,7 @@ image::images/gitops-images/banner.png[]
 
 The banner has been restored to its desired state specified in Git by Argo CD.
 
-image::images/gitops-images/argo_appsdeployed.png[]
+image::images/gitops-images/argo_appsdeployednew.png[]
 
 Note: Keep in mind that OpenShift GitOps can automatically revert these changes by enabling self-heal. If you are interested in enabling self-heal, you can find the option under 'app details'. Self-heal is a feature of OpenShift GitOps that allows you to automatically restore your cluster or application to a desired state if it deviates from the configuration stored in a Git repository. This way, you can ensure consistency and reliability across different environments and avoid manual intervention or errors. 
 

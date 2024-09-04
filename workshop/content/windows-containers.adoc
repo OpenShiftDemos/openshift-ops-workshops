@@ -12,9 +12,9 @@ following providers:
 * Amazon Web Services (AWS)
 * Microsoft Azure
 * VMware vSphere
-* Bare Metal (via link:https://docs.openshift.com/container-platform/4.14/windows_containers/byoh-windows-instance.html[BYOH])
+* Bare Metal (via link:https://docs.openshift.com/container-platform/4.16/windows_containers/byoh-windows-instance.html[BYOH])
 
-NOTE: For more information  about what versions of Windows Server are supported, please see the link:https://docs.openshift.com/container-platform/4.14/windows_containers/understanding-windows-container-workloads.html[official documentation].
+NOTE: For more information  about what versions of Windows Server are supported, please see the link:https://docs.openshift.com/container-platform/4.16/windows_containers/understanding-windows-container-workloads.html[official documentation].
 
 In this lab, you'll get hands on experence on how to deploy a Windows
 worker node and how to deploy workloads onto an OpenShift platform with
@@ -47,7 +47,7 @@ During setup, the WMCO will:
 * Confiugre the CNI on the Kubelet.
 * Set up kube-proxy.
 
-For more information please see the link:https://docs.openshift.com/container-platform/4.14/windows_containers/understanding-windows-container-workloads.html[official documentation].
+For more information please see the link:https://docs.openshift.com/container-platform/4.16/windows_containers/understanding-windows-container-workloads.html[official documentation].
 
 #### Prerequisites
 
@@ -123,7 +123,7 @@ ovnKubernetesConfig:
 type: OVNKubernetes
 ----
 
-NOTE: To read more about how to setup HybridNetworking, please see the link:https://docs.openshift.com/container-platform/4.14/networking/ovn_kubernetes_network_provider/configuring-hybrid-networking.html#configuring-hybrid-ovnkubernetes_configuring-hybrid-networking[official doc].
+NOTE: To read more about how to setup HybridNetworking, please see the link:https://docs.openshift.com/container-platform/4.16/networking/ovn_kubernetes_network_provider/configuring-hybrid-networking.html#configuring-hybrid-ovnkubernetes_configuring-hybrid-networking[official doc].
 
 To summarize, in order to use Windows Containers on OpenShift. You will need the following:
 
@@ -250,7 +250,7 @@ explore important sections of the YAML.
 ${HOME}/support/generate-windows-ms.sh
 ----
 
-NOTE: For more information on how to create a Windows MachineSet YAML see the link:https://docs.openshift.com/container-platform/4.14/windows_containers/creating_windows_machinesets/creating-windows-machineset-aws.html[official docs].
+NOTE: For more information on how to create a Windows MachineSet YAML see the link:https://docs.openshift.com/container-platform/4.16/windows_containers/creating_windows_machinesets/creating-windows-machineset-aws.html[official docs].
 
 This should create the `windows-ms.yaml` file in your home directory.
 
@@ -419,7 +419,7 @@ ip-10-0-20-199.us-east-2.compute.internal   Ready    worker   2m5s   v1.29.6+aba
 You can see how easy it is to manage a Windows Machine
 with the MachineAPI on OpenShift. It is managed by the
 same system as your Linux Nodes. You can even attach the Windows
-link:https://docs.openshift.com/container-platform/4.14/machine_management/applying-autoscaling.html[MachineSet Autoscaler] as well
+link:https://docs.openshift.com/container-platform/4.16/machine_management/applying-autoscaling.html[MachineSet Autoscaler] as well
 
 Remove this node by scaling the Windows MachineSet back down to 1.
 
@@ -799,7 +799,7 @@ We will be using a helm chart to deploy the sample application. In
 order to successfully deploy the application stack, make sure you're
 `kubeadmin`.
 
-NOTE: For more information about `helm` and how it can be used as a package manager for your containerized workloads, please see the link:https://docs.openshift.com/container-platform/4.14/applications/working_with_helm_charts/installing-helm.html[OpenShift documentation]
+NOTE: For more information about `helm` and how it can be used as a package manager for your containerized workloads, please see the link:https://docs.openshift.com/container-platform/4.16/applications/working_with_helm_charts/installing-helm.html[OpenShift documentation]
 
 Next add the Red Hat Developer Demos Helm repository.
 

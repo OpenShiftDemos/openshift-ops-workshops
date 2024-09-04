@@ -1,0 +1,13 @@
+apiVersion: operator.tekton.dev/v1alpha1
+kind: TektonConfig
+metadata:
+  name: config
+  annotations:
+    argocd.argoproj.io/sync-options: Validate=false,ServerSideApply=true, SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "99"
+spec:
+  pipeline:
+    metrics.taskrun.level: taskrun
+    metrics.pipelinerun.level: pipelinerun
+    metrics.taskrun.duration-type: lastvalue
+    metrics.pipelinerun.duration-type: lastvalue

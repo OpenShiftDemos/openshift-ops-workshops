@@ -201,7 +201,7 @@ image::images/gitops-images/banner_yamlfile.png[]
 [start=3]
 3. Click `Create`
 
-image::images/gitops-images/argo_appsdeployed.png[]
+image::images/gitops-images/argo_appsdeployednew.png[]
 
 [start=4]
 4. If you look back at your OpenShift Console you should now see your new banner on the top of the screen!

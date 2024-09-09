@@ -119,7 +119,9 @@ spec:
 
 [start=3]
 3. Once you have made those changes click `Create`. You should see 
-your brand new app pop up on the ArgoCD dashboard.
+your brand new app pop up on the ArgoCD dashboard. If it says “Out of Sync,” 
+please go ahead and click on the tile, then click the `Sync` button, and finally 
+click `Synchronize`. This should make both turn green.
 
 image::images/gitops-images/pipelines-gitops2new.png[]
 

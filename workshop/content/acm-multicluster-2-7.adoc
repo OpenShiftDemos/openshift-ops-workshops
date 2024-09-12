@@ -35,6 +35,8 @@ image::images/acm-images-new/add_cred.png[]
 
 image::images/acm-images-new/aws_cred.png[]
 
+image::images/acm-images-new/aws_cred2.png[]
+
 ### Screen 1: Basic Info
 
 * Credential Name:  `aws`

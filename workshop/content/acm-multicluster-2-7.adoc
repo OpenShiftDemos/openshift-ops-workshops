@@ -327,7 +327,7 @@ You need to create three different resources in order to implement the policy co
 This is a complex topic, and this course is only providing an overview. Please consult the https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.5/html-single/governance/index#governance[GRC product documentation] for more details on any of these policy controllers.
 
 1. Navigate to the *Governance* screen and click *create policy.*
-2. Under the *Create Policy* screen, enable the *YAML*. Copy and Paste the * ETCD Encryption Policy YAML * we have provided below:
+2. Under the *Create Policy* screen, enable the *YAML*. Copy and Paste the *ETCD Encryption Policy YAML* we have provided below:
 
 It should look something like this (make sure to include the namespace field like below):
 

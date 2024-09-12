@@ -109,7 +109,7 @@ image::images/acm-images-new/standalone.png[]
 
 * Add the desired *cluster name*.
 * Leave the *Cluster set empty for now*
-* Select a *Release Image*, select the `4.16.2` version
+* Select a *Release Image*, select the `4.15.31` version
 * Add an Additional labels of *environment=prod*
 * Click NEXT
 
@@ -144,7 +144,7 @@ While we wait for the main cluster to provision, lets go ahead and provision a S
 * Select the *Infrastructure provider credential*  *AWS*
 * Click NEXT
 * Add the desired cluster name. Leave the Cluster set empty for now
-* Select a *Release Image*, select a *OCP 4.16.2 version*
+* Select a *Release Image*, select a *OCP 4.15.31 version*
 * Add an Additional label of *environment=qa*
 * Click NEXT
 * Change the region to *see table below*

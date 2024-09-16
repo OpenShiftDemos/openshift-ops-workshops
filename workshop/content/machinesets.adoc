@@ -171,7 +171,7 @@ First we will patch the deletePolicy of the machineset to delete only the newest
 
 [source,bash,role="execute"]
 ----
-oc patch machineset ${CLUSTERNAME}-worker-${ZONENAME} -n openshift-machine-api --type='merge' -p '{"spec":{"deletePolicy":"Newest"}}'
+oc patch machineset.machine.openshift.io ${CLUSTERNAME}-worker-${ZONENAME} -n openshift-machine-api --type='merge' -p '{"spec":{"deletePolicy":"Newest"}}'
 ----
 
 Then we will scale down the machineset

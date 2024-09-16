@@ -140,6 +140,12 @@ with a role referenced being the _cluster-admin_ `ClusterRole`
 As a cluster-admin throughout the exercises, you will be able to do anything
 with the cluster as you have noted earlier, so follow instructions carefully.
 
+----
+Please note that if you experience any issues with the workshop dashboard 
+throughout this workshop (application is not avaliable), you should try reopening it 
+in an incognito window after a few minutes.
+----
+
 Please also check that you can see the support directory
 
 [source,bash,role="execute"]

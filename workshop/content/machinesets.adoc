@@ -117,7 +117,7 @@ Within that list, we will scale one of the `MachineSet` objects with the
 ----
 CLUSTERNAME=$(oc get infrastructure cluster -o=jsonpath='{.status.infrastructureName}')
 ZONENAME=$(oc get nodes --sort-by='.metadata.creationTimestamp' -o=jsonpath='{.items[-1:].metadata.labels.topology\.kubernetes\.io/zone}')
-oc scale machineset.machine.openshift.io ${CLUSTERNAME}-worker-${ZONENAME} -n openshift-machine-api --replicas=3
+oc scale machineset.machine.openshift.io ${CLUSTERNAME}-worker-${ZONENAME} -n openshift-machine-api --replicas=2
 ----
 
 Take special note the `MachineSet` scaled is likely different from
@@ -129,7 +129,7 @@ the one that is shown in the lab guide. You should see a note that the
 oc get machine.machine.openshift.io -n openshift-machine-api
 ----
 
-You probably already have new entries for 2 new `Machine` with a `STATE` of
+You probably already have new entries for 1 new `Machine` with a `STATE` of
 `Pending`. After a few moments, both will have a corresponding EC2 instance ID
 and will look something like:
 

@@ -136,14 +136,14 @@ namespace was created from the previous steps
 ====
 
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators (choose 'stable-5.9'), and click `Install`.
+  b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators (choose 'stable-5.9') (please do not select `stable-6.0`), and click `Install`.
   c. On the `Install Operator` page, *select Update Channel `stable 5.9` and  and `Version 5.9.5` *. Under `Installation Mode` ensure that `A specific namespace on the cluster` is selected, and it should say that the
      `Operator recommended Namespace is: openshift-logging`. Leave all other defaults
       unchanged and then click `Install`.
 
 2. Install the `Loki Operator`:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Type `Loki Operator` in the search field and click the `Loki Operator` card from the list of available Operators (choose `stable-5.9 and Version '5.9.5'), and then click `Install`.
+  b. Type `Loki Operator` in the search field and click the `Loki Operator` card from the list of available Operators (choose `stable-5.9 and Version '5.9.5') (please do not select `stable-6.0`), and then click `Install`.
   c. On the `Create Operator Subscription` page, select *Update Channel `stable-5.9`*. You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults
      and click `Install`.
 +

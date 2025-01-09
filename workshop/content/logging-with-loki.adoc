@@ -265,9 +265,9 @@ lokistack-dev-s3                           Opaque                    5      5s
 1. Now, head on over to the `console` and go to `Administration` and `CustomResourceDefinitions`. 
   
   a. Select the `Create CustomResourceDefinition`
-  
+  +
   b. Next you should remove the current YAML and replace it with this YAML:
-  
+  +
 [source,yaml]
 ----
 apiVersion: loki.grafana.com/v1
@@ -289,7 +289,7 @@ spec:
   tenants:
     mode: openshift-logging
 ----
-
++
 d. Create a service account for the collector:
 
 [source,bash,role="execute"]

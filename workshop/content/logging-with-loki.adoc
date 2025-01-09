@@ -25,72 +25,7 @@ or other tools, but these methods are not covered in the exercise or documentati
 at this time.
 ====
 
-### Deploying OpenShift Logging
-
-OpenShift Container Platform cluster logging is designed to be used with the
-default configuration, which is tuned for small to medium sized OpenShift
-Container Platform clusters. The installation instructions that follow
-include a sample Cluster Logging Custom Resource (CR), which you can use to
-create a cluster logging instance and configure your cluster logging
-deployment.
-
-If you want to use the default cluster logging install, you can use 
-the sample CR directly. If you prefer to customize your deployment, 
-however, make changes to the sample CR as needed. 
-
-The following describes the configurations you can make when
-installing your cluster logging instance or modify after installation. See the
-Configuring sections for more information on working with each component,
-including modifications you can make outside of the Cluster Logging Custom
-Resource.
-
-[Warning]
-====
-IMPORTANT: We have set up an external OpenShift Console with kubeadmin credentials exclusively for this workshop. To access it, please refer to the workshop credentials page. Kindly refrain from using the internal OpenShift Console while logged in with the service account within this dashboard.
-====
-
-To enable metrics service discovery, add the following namespace label
-openshift.io/cluster-monitoring: "true".
- 
-The namespace is represented in yaml format as:
-
-[source,yaml]
-.openshift_logging_namespace.yaml
-----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-logging
-  annotations:
-    openshift.io/node-selector: ""
-  labels:
-    openshift.io/cluster-logging: "true"
-    openshift.io/cluster-monitoring: "true"
-----
-So we have `created` a file with the above YAML called 'openshift_logging_namespace.yaml'
-
-Use that file to create the namespace by running the following command:
-
-[source,bash,role="execute"]
-----
-oc create -f {{ HOME_PATH }}/support/openshift_logging_namespace.yaml
-----
-
-Next, verify that the namespace has been created with this command:
-
-[source,bash,role="execute"]
-----
-oc get namespace openshift-logging
-----
-
-You should see the following output:
-
-```
-NAME                STATUS   AGE
-openshift-logging   Active   11s
-```
-
-#### Install the `Loki` and  `Cluster Logging` Operators in the cluster
+#### Install the `Loki`,  `Cluster Logging`, and `Cluster Observability` Operators in the cluster
 
 In order to install and configure the logging stack into the cluster,
 additional operators need to be installed. we'll cover below how these can be 
@@ -136,16 +71,20 @@ namespace was created from the previous steps
 ====
 
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators (choose 'stable-5.9') (please do not select `stable-6.0`), and click `Install`.
-  c. On the `Install Operator` page, *select Update Channel `stable 5.9` and  and `Version 5.9.7` *. Under `Installation Mode` ensure that `A specific namespace on the cluster` is selected, and it should say that the
-     `Operator recommended Namespace is: openshift-logging`. Leave all other defaults
-      unchanged and then click `Install`. Please manually approve if asked.
+  b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators (choose 'stable-6.1'), and click `Install`.
+  c. On the `Install Operator` page, *select Update Channel `stable 6.1` and  and `Version 6.1.0` *.  Leave all other defaults unchanged and then click `Install`.
 
 2. Install the `Loki Operator`:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Type `Loki Operator` in the search field and click the `Loki Operator` card from the list of available Operators (choose `stable-5.9 and Version '5.9.7') (please do not select `stable-6.0`), and then click `Install`.
-  c. On the `Create Operator Subscription` page, select *Update Channel `stable-5.9`*. You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults
+  b. Type `Loki Operator` in the search field and click the `Loki Operator` card from the list of available Operators (choose `stable-6.1 and Version '6.1.0') , and then click `Install`.
+  c. On the `Create Operator Subscription` page, select *Update Channel `stable-6.1`*. You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults
      and click `Install`. Please manually approve if asked.
+
+3. Install the `Cluster Observability Operator`:
+  a. In the OpenShift console, click `Operators` → `OperatorHub`.
+  b. Type `Cluster Observability Operator` in the search field and click the `Cluster Observability Operator` card from the list of available Operators (In this example we are using '0.4.1'), and then click `Install`.
+  c. On the `Create Operator Subscription` page, select *Update Channel `development`*. Leave all other defaults
+     and click `Install`.
 +
 This now makes the Operator available to all users and projects that use this
 OpenShift Container Platform cluster.
@@ -154,7 +93,7 @@ OpenShift Container Platform cluster.
 
   a. Switch to the `Operators` → `Installed Operators` page.
 
-  b. Make sure the `openshift-logging` project is selected.
+  b. Make sure the `All Projects` project is selected.
 
   c. In the _Status_ column you should see green checks with either
      `InstallSucceeded` or `Copied` and the text _Up to date_.
@@ -321,43 +260,215 @@ deployer-dockercfg-t6pjc                   kubernetes.io/dockercfg   1      10m
 lokistack-dev-s3                           Opaque                    5      5s
 ```
 
-#### Creating the LokiStack
+#### Creating the LokiStack custom resource (CR)
+
+1. Now, head on over to the `console` and go to `Administration` and `CustomResourceDefinitions`. 
   
-1. Now, head on over to the `console` and go to `Operators` and `Installed Operators`. 
+  a. Select the `Create CustomResourceDefinition`
   
-  a. Select the `Loki Operator`
-  
-  b. On the first page under `Provided APIs` and `LokiStack` select `Create instance`.
-  
-  c. Switch to `YAML view` option
-  
-  d. Next you should remove the current YAML and replace it with this YAML:
+  b. Next you should remove the current YAML and replace it with this YAML:
   
 [source,yaml]
 ----
 apiVersion: loki.grafana.com/v1
 kind: LokiStack
 metadata:
-  name: lokistack-dev
+  name: logging-loki
   namespace: openshift-logging
 spec:
+  managementState: Managed
   size: 1x.extra-small
   storage:
     schemas:
-    - version: v13
-      effectiveDate: "2022-06-01"
+    - effectiveDate: '2024-10-01'
+      version: v13
     secret:
       name: lokistack-dev-s3
       type: s3
-  storageClassName: gp2-csi
+  storageClassName: gp3-csi
   tenants:
     mode: openshift-logging
 ----
 
-This YAML will create a useable `LokiStack`. As you can see within this `YAML` 
-it uses the secret file we created earlier.
+d. Create a service account for the collector:
 
-d. Then click `Create`.
+[source,bash,role="execute"]
+----
+oc create sa collector -n openshift-logging
+----
+
+e. Allow the collector’s service account to write data to the LokiStack CR:
+
+[source,bash,role="execute"]
+----
+oc adm policy add-cluster-role-to-user logging-collector-logs-writer -z collector -n openshift-logging
+----
+
+Allow the collector’s service account to collect logs:
+
+[source,bash,role="execute"]
+----
+oc project openshift-logging
+----
+
+[source,bash,role="execute"]
+----
+oc adm policy add-cluster-role-to-user collect-application-logs -z collector
+----
+
+[source,bash,role="execute"]
+----
+oc adm policy add-cluster-role-to-user collect-audit-logs -z collector
+----
+
+[source,bash,role="execute"]
+----
+oc adm policy add-cluster-role-to-user collect-infrastructure-logs -z collector
+----
+
+Now, head on over to the `console` and go to `Administration` and `CustomResourceDefinitions`. 
+  
+  a. Select the `Create CustomResourceDefinition`
+  
+  b. Create a UIPlugin CR to enable the Log section in the Observe tab. Remove the current YAML and replace it with this YAML:
+  
+[source,yaml]
+----
+apiVersion: observability.openshift.io/v1alpha1
+kind: UIPlugin
+metadata:
+  name: logging
+spec:
+  type: Logging
+  logging:
+    lokiStack:
+      name: logging-loki
+----
+
+  c. Click Create.
+
+Now, head on over to the `console` and go to `Administration` and `CustomResourceDefinitions`. 
+  
+  a. Select the `Create CustomResourceDefinition`
+  
+  b. Create a ClusterLogForwarder CR to configure log forwarding. Remove the current YAML and replace it with this YAML:
+  
+[source,yaml]
+----
+apiVersion: observability.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: collector
+  namespace: openshift-logging
+spec:
+  serviceAccount:
+    name: collector
+  outputs:
+  - name: default-lokistack
+    type: lokiStack
+    lokiStack:
+      authentication:
+        token:
+          from: serviceAccount
+      target:
+        name: logging-loki
+        namespace: openshift-logging
+    tls:
+      ca:
+        key: service-ca.crt
+        configMapName: openshift-service-ca.crt
+  pipelines:
+  - name: default-logstore
+    inputRefs:
+    - application
+    - infrastructure
+    - audit
+    outputRefs:
+    - default-lokistack
+----
+
+  c. Click Create.
+
+#### Observing The Logs
+
+1. At this Point you can go to `Observe` -> `Logs` on the left hand menu. 
+
+2. Once you are inside you will notice a menu which is currently 
+set to `Applications`. change this instead to `infrastructure`
+
+You should now see all the `logs` for `Infrastructure`. The logs are split 
+into 3 sections: `application`, `infrastructure` and `audits`. We will set 
+up audits and the `log forwarder` in the next part, but lets have a 
+look through the different parts of this.
+
+image::images/appinfraaudit.png[]
+
+As we can see in the graphic below, you can filter by `Content`, `Namespaces`, `Pods`, and `Containers`. 
+This can be useful to narrow down searches when looking for something more specific.
+
+image::images/filterlogs.png[]
+
+You can further specify the logs you are looking for by using the other 
+drop down menu for `Severity`. This menu breaks the logs down into `critical`, 
+`error`, `warning`, `debug`, `info`, `trace`, and `unknown` logging categories.
+
+image::images/severity.png[]
+
+The final piece of this is the `histogram`. This gives the user a more visual look into the logs. (This may take a little bit of time to populate)
+
+image::images/histogram.png[]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 e. Navigate to the `LokiStack` tab and click on `lokistack-dev`. 
 
@@ -453,34 +564,7 @@ kindly disregard them, as they are not relevant to our current task.
 
 image::images/Loki_refresh.png[]
 
-#### Observing The Logs
 
-1. At this Point you can go to `Observe` -> `Logs` on the left hand menu. 
-
-2. Once you are inside you will notice a menu which is currently 
-set to `Applications`. change this instead to `infrastructure`
-
-You should now see all the `logs` for `Infrastructure`. The logs are split 
-into 3 sections: `application`, `infrastructure` and `audits`. We will set 
-up audits and the `log forwarder` in the next part, but lets have a 
-look through the different parts of this.
-
-image::images/appinfraaudit.png[]
-
-As we can see in the graphic below, you can filter by `Content`, `Namespaces`, `Pods`, and `Containers`. 
-This can be useful to narrow down searches when looking for something more specific.
-
-image::images/filterlogs.png[]
-
-You can further specify the logs you are looking for by using the other 
-drop down menu for `Severity`. This menu breaks the logs down into `critical`, 
-`error`, `warning`, `debug`, `info`, `trace`, and `unknown` logging categories.
-
-image::images/severity.png[]
-
-The final piece of this is the `histogram`. This gives the user a more visual look into the logs. (This may take a little bit of time to populate)
-
-image::images/histogram.png[]
 
 #### Setting up Log forwarding
 

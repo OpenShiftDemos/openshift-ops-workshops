@@ -290,6 +290,24 @@ spec:
     mode: openshift-logging
 ----
 
+c. Switch to the `Operators` → `Installed Operators` page.
+
+d. Make sure the `All Projects` project is selected.
+
+e. Select the `Loki Operator`.
+
+d. Navigate to the `LokiStack` tab and click on `lokistack-dev`. 
+
+It may take up to a minute to be up and running but it should eventually look like this:
+
+image::images/LokiStack.png[]
+
+_Figure 1: LokiStack +
+
+We haven't set a ruler so you should see `No members`
+
+#### Setting up collector’s
+
 d. Create a service account for the collector:
 
 [source,bash,role="execute"]
@@ -470,15 +488,7 @@ image::images/histogram.png[]
 
 
 
-e. Navigate to the `LokiStack` tab and click on `lokistack-dev`. 
 
-It may take up to a minute to be up and running but it should eventually look like this:
-
-image::images/LokiStack.png[]
-
-_Figure 1: LokiStack +
-
-We haven't set a ruler so you should see `The field components.ruler is invalid.`
 
 #### Create the Logging `CustomResource (CR)` instance
 

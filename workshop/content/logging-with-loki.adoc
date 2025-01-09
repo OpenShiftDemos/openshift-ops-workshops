@@ -373,8 +373,7 @@ Now that Logging has been created, let's verify that things are working.
 
 2. Select the `openshift-logging` project.
 
-You should see pods for `cluster logging` (the operator itself), 
-the `collectors`, `logging-view-plugin`, and a variety of `lokistack` pods
+You should see a variety of `logging-loki` pods
 
 Alternatively, you can verify from the command line by using the following command:
 
@@ -386,22 +385,20 @@ oc get pods -n openshift-logging
 Which will eventually show you something like this:
 
 ----
-cluster-logging-operator-6d94c695db-lpjgd       1/1     Running   0          89m
-collector-5z8ll                                 2/2     Running   0          80m
-collector-bdjnv                                 2/2     Running   0          79m
-collector-bwxdr                                 2/2     Running   0          79m
-collector-m75c7                                 2/2     Running   0          80m
-collector-snqp5                                 2/2     Running   0          80m
-collector-spdr2                                 2/2     Running   0          79m
-logging-view-plugin-69c86cb9c9-4qlcj            1/1     Running   0          80m
-lokistack-dev-compactor-0                       1/1     Running   0          81m
-lokistack-dev-distributor-56cf98db97-vvpbw      1/1     Running   0          81m
-lokistack-dev-gateway-757dd67c8c-gv9s5          2/2     Running   0          81m
-lokistack-dev-gateway-757dd67c8c-rcfb2          2/2     Running   0          81m
-lokistack-dev-index-gateway-0                   1/1     Running   0          81m
-lokistack-dev-ingester-0                        1/1     Running   0          81m
-lokistack-dev-querier-5854c87fcb-hqltx          1/1     Running   0          81m
-lokistack-dev-query-frontend-855b5684f7-846vb   1/1     Running   0          81m
+cluster-logging-operator-7c8fdf7c6-8r4th        1/1     Running   0          24m
+logging-loki-compactor-0                        1/1     Running   0          11m
+logging-loki-distributor-56b5698d5b-pkvt7       1/1     Running   0          11m
+logging-loki-distributor-56b5698d5b-qrz76       1/1     Running   0          11m
+logging-loki-gateway-7d84bc5884-tfpf4           2/2     Running   0          11m
+logging-loki-gateway-7d84bc5884-wdn2j           2/2     Running   0          11m
+logging-loki-index-gateway-0                    1/1     Running   0          11m
+logging-loki-index-gateway-1                    1/1     Running   0          10m
+logging-loki-ingester-0                         1/1     Running   0          11m
+logging-loki-ingester-1                         1/1     Running   0          9m58s
+logging-loki-querier-7b9795965d-2vqzn           1/1     Running   0          11m
+logging-loki-querier-7b9795965d-9qqwx           1/1     Running   0          11m
+logging-loki-query-frontend-8587b5c8f9-fsgjx    1/1     Running   0          11m
+logging-loki-query-frontend-8587b5c8f9-wmfzr    1/1     Running   0          11m
 ----
 
 You should see a box pop up in the top right corner after about 

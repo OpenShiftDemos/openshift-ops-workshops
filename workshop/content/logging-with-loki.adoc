@@ -365,7 +365,7 @@ spec:
 
   c. Click Create.
 
-#### Verify the Logging install
+#### Verify that the UIPlugin CR is enabled
 
 Now that Logging has been created, let's verify that things are working.
 

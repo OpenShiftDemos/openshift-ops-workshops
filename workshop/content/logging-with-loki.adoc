@@ -320,7 +320,7 @@ oc adm policy add-cluster-role-to-user collect-audit-logs -z collector
 oc adm policy add-cluster-role-to-user collect-infrastructure-logs -z collector
 ----
 
-1. This is what each command does:
+This is what each command does:
   1. Create a service account for the collector
   2. Allow the collector’s service account to write data to the LokiStack CR
   3. Allow the collector’s service account to collect logs

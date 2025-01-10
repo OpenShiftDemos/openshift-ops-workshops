@@ -92,7 +92,7 @@ image::images/lokioperator.png[]
 
 image::images/clusterobservabilityoperator.png[]
 
-+
+
 This now makes the Operator available to all users and projects that use this
 OpenShift Container Platform cluster.
 

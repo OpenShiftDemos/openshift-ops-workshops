@@ -321,6 +321,7 @@ oc adm policy add-cluster-role-to-user collect-infrastructure-logs -z collector
 ----
 
 This is what each command does:
+
 * Create a service account for the collector
 * Allow the collector’s service account to write data to the LokiStack CR
 * Allow the collector’s service account to collect logs

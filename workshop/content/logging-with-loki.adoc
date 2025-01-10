@@ -89,6 +89,7 @@ image::images/lokioperator.png[]
   b. Type `Cluster Observability Operator` in the search field and click the `Cluster Observability Operator` card from the list of available Operators (In this example we are using '0.4.1'), and then click `Install`.
   c. On the `Create Operator Subscription` page, select *Update Channel `development`*. Leave all other defaults
      and click `Install`.
+
 image::images/clusterobservabilityoperator.png[]
 
 +

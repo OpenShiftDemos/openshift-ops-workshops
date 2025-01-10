@@ -326,7 +326,7 @@ This is what each command does:
 * Allow the collector’s service account to write data to the LokiStack CR
 * Allow the collector’s service account to collect logs
 * Switch to the openshift-logging project
-* The last 3 commands assign the `collector` service account permissions to gather application, audit, and infrastructure logs in an OpenShift cluster.
+* The last 3 commands assign the `collector` service account permissions to gather application, audit, and infrastructure logs in the OpenShift cluster.
 
 Now, head on over to the `console` and go to `Administration` and `CustomResourceDefinitions`. 
   

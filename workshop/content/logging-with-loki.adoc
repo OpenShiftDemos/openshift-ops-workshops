@@ -70,21 +70,21 @@ then follow these steps:
    b. Type `OpenShift Logging` in the search box and click the `Red Hat OpenShift Logging` card from the list of available Operators (choose 'stable-6.1'), and click `Install`.  
    c. On the `Install Operator` page, *select Update Channel `stable 6.1` and `Version 6.1.0`*. Leave all other defaults unchanged and then click `Install`.  
 
-   image::images/openshiftloggingoperator.png[]
+image::images/openshiftloggingoperator.png[]
 
 2. **Install the `Loki Operator`:**  
    a. In the OpenShift console, click `Operators` → `OperatorHub`.  
    b. Type `Loki Operator` in the search field and click the `Loki Operator` card from the list of available Operators (choose `stable-6.1` and Version '6.1.0'), and then click `Install`.  
    c. On the `Create Operator Subscription` page, select *Update Channel `stable-6.1`*. You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults and click `Install`. Please manually approve if asked.
 
-   image::images/lokioperator.png[]
+image::images/lokioperator.png[]
 
 3. **Install the `Cluster Observability Operator`:**  
    a. In the OpenShift console, click `Operators` → `OperatorHub`.  
    b. Type `Cluster Observability Operator` in the search field and click the `Cluster Observability Operator` card from the list of available Operators (in this example, we are using '0.4.1'), and then click `Install`.  
    c. On the `Create Operator Subscription` page, select *Update Channel `development`*. Leave all other defaults and click `Install`.  
 
-   image::images/clusterobservabilityoperator.png[]
+image::images/clusterobservabilityoperator.png[]
 
 This now makes the Operator available to all users and projects that use this
 OpenShift Container Platform cluster.

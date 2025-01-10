@@ -308,41 +308,24 @@ We haven't set a ruler so you should see `No members`
 
 #### Setting up collector’s
 
-d. Create a service account for the collector:
+In this section, we will configure the 'collector' service account with these commands to enable log collection for applications, audits, and infrastructure within the OpenShift cluster: 
 
 [source,bash,role="execute"]
 ----
 oc create sa collector -n openshift-logging
-----
-
-e. Allow the collector’s service account to write data to the LokiStack CR:
-
-[source,bash,role="execute"]
-----
 oc adm policy add-cluster-role-to-user logging-collector-logs-writer -z collector -n openshift-logging
-----
-
-Allow the collector’s service account to collect logs:
-
-[source,bash,role="execute"]
-----
 oc project openshift-logging
-----
-
-[source,bash,role="execute"]
-----
 oc adm policy add-cluster-role-to-user collect-application-logs -z collector
-----
-
-[source,bash,role="execute"]
-----
 oc adm policy add-cluster-role-to-user collect-audit-logs -z collector
-----
-
-[source,bash,role="execute"]
-----
 oc adm policy add-cluster-role-to-user collect-infrastructure-logs -z collector
 ----
+
+1. This is what each command does:
+  1. Create a service account for the collector
+  2. Allow the collector’s service account to write data to the LokiStack CR
+  3. Allow the collector’s service account to collect logs
+  4. Switch to the openshift-logging project
+  5. The last 3 commands assign the `collector` service account permissions to gather application, audit, and infrastructure logs in an OpenShift cluster.
 
 Now, head on over to the `console` and go to `Administration` and `CustomResourceDefinitions`. 
   

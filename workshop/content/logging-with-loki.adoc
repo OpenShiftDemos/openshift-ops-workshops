@@ -61,7 +61,7 @@ image::images/local-cluster.png[]
 
 then follow these steps:
 
-1. Install the `Cluster Logging Operator`:
+[start=1] 1. Install the `Cluster Logging Operator`:
 +
 [Note]
 ====

@@ -90,6 +90,7 @@ image::images/lokioperator.png[]
   c. On the `Create Operator Subscription` page, select *Update Channel `development`*. Leave all other defaults
      and click `Install`.
 image::images/clusterobservabilityoperator.png[]
+
 +
 This now makes the Operator available to all users and projects that use this
 OpenShift Container Platform cluster.

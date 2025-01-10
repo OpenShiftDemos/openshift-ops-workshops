@@ -61,7 +61,7 @@ image::images/local-cluster.png[]
 
 then follow these steps:
 
-Install the `Cluster Logging Operator`:
+1. Install the `Cluster Logging Operator`:
 +
 [Note]
 ====
@@ -76,7 +76,7 @@ namespace was created from the previous steps
 
 image::images/openshiftloggingoperator.png[]
 
-Install the `Loki Operator`:
+2. Install the `Loki Operator`:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Type `Loki Operator` in the search field and click the `Loki Operator` card from the list of available Operators (choose `stable-6.1 and Version '6.1.0') , and then click `Install`.
   c. On the `Create Operator Subscription` page, select *Update Channel `stable-6.1`*. You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults
@@ -84,7 +84,7 @@ Install the `Loki Operator`:
 
 image::images/lokioperator.png[]
 
-Install the `Cluster Observability Operator`:
+3. Install the `Cluster Observability Operator`:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Type `Cluster Observability Operator` in the search field and click the `Cluster Observability Operator` card from the list of available Operators (In this example we are using '0.4.1'), and then click `Install`.
   c. On the `Create Operator Subscription` page, select *Update Channel `development`*. Leave all other defaults

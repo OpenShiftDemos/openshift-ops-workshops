@@ -175,19 +175,22 @@ aws_secret_access_key = mshdyShDTYKWEywajsqpshdNSUWJDA+1+REXAMPLE
    
 If you want to use your `GUID` as your `bucket name` please do the following:
 
-to export we do the following:
+[start=6]
+6. To export we do the following
 
 [source,bash,role="execute"]
 export GUID=`hostname | cut -d. -f2`
 
-to view the GUID we do:
+[start=7]
+7. to view the GUID we do:
 
 [source,bash,role="execute"]
 echo $GUID
 
 The output of this command is your bucket name.
 
-Next, run the following command to `create` the bucket replace <pg2nw> with your own `GUID`
+[start=8]
+8. Next, run the following command to `create` the bucket replace <pg2nw> with your own `GUID`
  
 [source,bash,role="execute"]
 aws --profile default s3api create-bucket --bucket <pg2nw> --region us-east-1 

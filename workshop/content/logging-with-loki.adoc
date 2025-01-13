@@ -355,6 +355,7 @@ spec:
       name: logging-loki
 ----
 
+[start=3]
   3. Click Create.
 
 #### Verify that the UIPlugin CR is enabled

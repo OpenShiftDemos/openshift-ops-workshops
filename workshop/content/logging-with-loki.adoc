@@ -118,6 +118,8 @@ If either operator does not appear as installed, follow these steps to troublesh
 +
 * Switch to the `Workloads` → `Pods` page and check the logs in any Pods in the
   `openshift-logging` and `openshift-operators` projects that are reporting issues.
+
+image::images/installedloggingoperators.png[]
   
 #### Configuring a bucket with AWS
   

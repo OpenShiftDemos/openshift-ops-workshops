@@ -457,8 +457,7 @@ spec:
 set to `Applications`. change this instead to `infrastructure`
 
 You should now see all the `logs` for `Infrastructure`. The logs are split 
-into 3 sections: `application`, `infrastructure` and `audits`. We will set 
-up audits and the `log forwarder` in the next part, but lets have a 
+into 3 sections: `application`, `infrastructure` and `audits`. Lets have a 
 look through the different parts of this.
 
 image::images/appinfraaudit.png[]

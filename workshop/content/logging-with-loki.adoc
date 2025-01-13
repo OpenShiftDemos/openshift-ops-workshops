@@ -63,30 +63,27 @@ image::images/local-cluster.png[]
 [Note]
 ====
 The `Cluster Logging` operator needs to be installed in the
-`openshift-logging` namespace. You can check that the `openshift-logging`
-namespace was created from the previous steps
+`openshift-logging` namespace.
 ====
 
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators (choose 'stable-6.1'), and click `Install`.
-  c. On the `Install Operator` page, *select Update Channel `stable 6.1` and  and `Version 6.1.0` *.  Leave all other defaults unchanged and then click `Install`.
+  c. On the `Install Operator` page, *select Update Channel `stable 6.1` and  and `Version 6.1.0` *.  You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults and click `Install`. Please move onto the next step when you recieve a green completed icon.
 
 2. Install the `Loki Operator`:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Type `Loki Operator` in the search field and click the `Loki Operator` card from the list of available Operators (choose `stable-6.1 and Version '6.1.0') , and then click `Install`.
   c. On the `Create Operator Subscription` page, select *Update Channel `stable-6.1`*. You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults
-     and click `Install`. Please manually approve if asked.
+     and click `Install`. Please move onto the next step when you recieve a green completed icon.
 
 3. Install the `Cluster Observability Operator`:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Type `Cluster Observability Operator` in the search field and click the `Cluster Observability Operator` card from the list of available Operators (In this example we are using '0.4.1'), and then click `Install`.
   c. On the `Create Operator Subscription` page, select *Update Channel `development`*. Leave all other defaults
-     and click `Install`.
-+
-This now makes the Operator available to all users and projects that use this
-OpenShift Container Platform cluster.
+     and click `Install`. Please move onto the next step when you recieve a green completed icon.
 
-3. Verify the operator installations:
+[start=4]
+4. Verify the operator installations:
 
   a. Switch to the `Operators` → `Installed Operators` page.
 
@@ -102,7 +99,8 @@ operator then installs with an `InstallSucceeded` message, you can safely
 ignore the `Failed` message.
 ====
 
-4. Troubleshooting (optional/if needed)
+[start=5]
+5. Troubleshooting (optional/if needed)
 +
 If either operator does not appear as installed, follow these steps to troubleshoot further:
 +

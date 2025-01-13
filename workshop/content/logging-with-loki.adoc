@@ -408,9 +408,9 @@ image::images/Loki_refresh.png[]
 
 Now, head on over to the `console` and go to `Administration` and `CustomResourceDefinitions`. 
   
-  a. Select the `Create CustomResourceDefinition`
+  1. Select the `Create CustomResourceDefinition`
   
-  b. Create a ClusterLogForwarder CR to configure log forwarding. Remove the current YAML and replace it with this YAML:
+  2. Create a ClusterLogForwarder CR to configure log forwarding. Remove the current YAML and replace it with this YAML:
   
 [source,yaml]
 ----
@@ -446,7 +446,8 @@ spec:
     - default-lokistack
 ----
 
-  c. Click Create.
+[start=3]
+  3. Click Create.
 
 #### Observing The Logs
 

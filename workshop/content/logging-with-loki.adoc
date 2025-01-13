@@ -58,9 +58,6 @@ You may need to switch from `All-Clusters` to `local-cluster`.
 
 image::images/local-cluster.png[]
 
-
-then follow these steps:
-
 1. Install the `Cluster Logging Operator`:
 +
 [Note]

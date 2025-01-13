@@ -252,12 +252,11 @@ kubectl get secrets -n openshift-logging
 
 ```
 NAME                                       TYPE                      DATA   AGE
-builder-dockercfg-vppmj                    kubernetes.io/dockercfg   1      10m
-cluster-logging-operator-dockercfg-bc7nd   kubernetes.io/dockercfg   1      4m58s
-cluster-logging-operator-dockercfg-rr9kb   kubernetes.io/dockercfg   1      5m2s
-default-dockercfg-rtkcq                    kubernetes.io/dockercfg   1      10m
-deployer-dockercfg-t6pjc                   kubernetes.io/dockercfg   1      10m
-lokistack-dev-s3                           Opaque                    5      5s
+builder-dockercfg-7bhlp                    kubernetes.io/dockercfg   1      11m
+cluster-logging-operator-dockercfg-2g89w   kubernetes.io/dockercfg   1      10m
+default-dockercfg-2hvml                    kubernetes.io/dockercfg   1      11m
+deployer-dockercfg-d9565                   kubernetes.io/dockercfg   1      11m
+lokistack-dev-s3                           Opaque                    5      6s
 ```
 
 image::images/lokistack-s3.png[]

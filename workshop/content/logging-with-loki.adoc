@@ -11,7 +11,7 @@ The cluster logging components are based upon Vector and Loki. Vector is a high-
 [Note]
 ====
 More information may be found on the official
-link:https://docs.openshift.com/container-platform/4.16/logging/cluster-logging.html[OpenShift
+link:https://docs.openshift.com/container-platform/4.16/observability/logging/cluster-logging.html[OpenShift
 documentation site]
 ====
 

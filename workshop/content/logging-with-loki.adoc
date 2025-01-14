@@ -394,6 +394,8 @@ logging-loki-query-frontend-8587b5c8f9-fsgjx    1/1     Running   0          11m
 logging-loki-query-frontend-8587b5c8f9-wmfzr    1/1     Running   0          11m
 ----
 
+image::images/uipluginenabled.png[]
+
 You should see a box pop up in the top right corner after about 
 30 seconds to a minute. It will say `"Web console update is available"` 
 and will prompt you to refresh your browser. Go ahead and do that; 

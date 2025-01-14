@@ -215,7 +215,7 @@ You will know you have been successful when you see this:
  
 #### Creating a Secret within Openshift
   
-Next you need to `configure` your secrets. This `secret` will store the access credentials  
+1. Next you need to `configure` your secrets. This `secret` will store the access credentials  
   for the `s3 bucket` we just created. This will later be used by
   the `LokiStack` to store `logging data`.
   
@@ -240,10 +240,10 @@ stringData:
   region: us-east-1
 ----
 
-[start=4]
-4. Once you are happy, click `Create`.
+[start=2]
+2. Once you are happy, click `Create`.
   
-5. Check that the `lokistack-dev-s3 secret` has been created by running the following command:
+3. Check that the `lokistack-dev-s3 secret` has been created by running the following command:
 
 [source,bash,role="execute"]
 kubectl get secrets -n openshift-logging

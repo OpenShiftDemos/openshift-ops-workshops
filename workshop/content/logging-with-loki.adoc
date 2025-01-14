@@ -294,6 +294,8 @@ spec:
 [start=2]
 2. Click `Create`
 
+image::images/LokiStack.png[]
+
 [start=3]
 3. Switch to the `Operators` → `Installed Operators` page.
 

@@ -33,7 +33,7 @@ installed from the `Operator Hub` from within the cluster via the GUI.
 
 When using operators in OpenShift, however, it is firstly important to understand 
 the basics of some of the underlying principles that make up the Operators.
-`CustomResourceDefinion (CRD)` and `CustomResource (CR)` are two Kubernetes
+`CustomResourceDefinition (CRD)` and `CustomResource (CR)` are two Kubernetes
 objects. `CRDs` are generic pre-defined
 structures of data. The operator understands how to apply the data that is
 defined by the `CRD`. In terms of programming, `CRDs` can be thought as being

@@ -42,7 +42,7 @@ similar to a class. A `CustomResource (CR)` is an actual implementation of the
 operator will be used when configuring its service. Again, in programming terms,
 `CRs` would be similar to an instantiated object of the class.
 
-The general pattern for using Operators is to firstly, install the Operator, which
+The general pattern for using Operators is to firstly install the Operator which
 will create the necessary `CRDs`. After the `CRDs` have been created, we can
 create the `CR` which will tell the operator how to act, what to install,
 and/or what to configure. For installing `openshift-logging`, we will follow
@@ -68,18 +68,18 @@ The `Cluster Logging` operator needs to be installed in the
 
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators (choose 'stable-6.1'), and click `Install`.
-  c. On the `Install Operator` page, *select Update Channel `stable 6.1` and  and `Version 6.1.0` *.  You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults and click `Install`. Please move onto the next step when you receive a green completed icon.
+  c. On the `Install Operator` page, select Update Channel `stable 6.1` and  and `Version 6.1.0`.  You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults and click `Install`. Please move onto the next step when you receive a green completed icon.
 
 2. Install the `Loki Operator`:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Type `Loki Operator` in the search field and click the `Loki Operator` card from the list of available Operators (choose `stable-6.1 and Version '6.1.0') , and then click `Install`.
-  c. On the `Create Operator Subscription` page, select *Update Channel `stable-6.1`*. You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults
+  c. On the `Create Operator Subscription` page, select Update Channel `stable-6.1`. You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults
      and click `Install`. Please move onto the next step when you receive a green completed icon.
 
 3. Install the `Cluster Observability Operator`:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
   b. Type `Cluster Observability Operator` in the search field and click the `Cluster Observability Operator` card from the list of available Operators (In this example we are using '0.4.1'), and then click `Install`.
-  c. On the `Create Operator Subscription` page, select *Update Channel `development`*. Leave all other defaults
+  c. On the `Create Operator Subscription` page, select the Update Channel `development`. Leave all other defaults
      and click `Install`. Please move onto the next step when you receive a green completed icon.
 
 [start=4]
@@ -311,8 +311,6 @@ image::images/creatinglokistackcr.png[]
 It may take up to a minute to be up and running but it should eventually look like this:
 
 image::images/LokiStack.png[]
-
-_Figure 1: LokiStack +
 
 We haven't set a ruler so you should see `No members`
 

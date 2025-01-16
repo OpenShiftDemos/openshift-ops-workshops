@@ -314,7 +314,7 @@ image::images/LokiStack.png[]
 
 We haven't set a ruler so you should see `No members`
 
-#### Setting up collector’s
+#### Setting up collectors
 
 In this section, we will configure the 'collector' service account with these commands to enable log collection for applications, audits, and infrastructure within the OpenShift cluster: 
 
@@ -356,7 +356,7 @@ spec:
 ----
 
 [start=3]
-  3. Click Create.
+  3. Click `Create`.
 
 image::images/settingcollector.png[]
 
@@ -451,14 +451,14 @@ spec:
 ----
 
 [start=3]
-  3. Click Create.
+  3. Click `Create`.
 
 #### Observing The Logs
 
 1. At this point you can go to `Observe` -> `Logs` on the left hand menu. 
 
 2. Once you are inside you will notice a menu which is currently 
-set to `Applications`. change this instead to `infrastructure`
+set to `Applications`. Change this instead to `infrastructure`.
 
 You should now see all the `logs` for `Infrastructure`. The logs are split 
 into 3 sections: `application`, `infrastructure` and `audits`. Lets have a 

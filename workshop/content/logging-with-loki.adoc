@@ -1,7 +1,7 @@
 ## Summary - OpenShift Logging
 In this lab you will explore the logging capabilities of
 OpenShift 4.16. This module will break down all the new logging
-features within 4.16. This will use the link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/logging/logging-6-1#quick-start-viaq_logging-6x-6.1[ViaQ] data model. 
+features within 4.16. This will use the link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/logging/logging-6-1#quick-start-viaq_logging-6x-6.1[ViaQ] data model. ViaQ is the default data model when forwarding logs to LokiStack.
 
 An extremely important function of OpenShift is collecting and aggregating
 logs from the environments and the application pods it is running. 

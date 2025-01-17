@@ -494,4 +494,3 @@ image::images/histogram.png[]
 #### Congratulations, you have now completed the logging section!
 
 
-

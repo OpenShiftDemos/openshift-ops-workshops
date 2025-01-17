@@ -296,7 +296,7 @@ spec:
 
 image::images/creatinglokistackcr.png[]
 
-[Note]
+
 ====
 Ensure that the `lokistack-dev-s3` secret is created beforehand. The contents of this secret vary depending on the object storage in use.
 ====

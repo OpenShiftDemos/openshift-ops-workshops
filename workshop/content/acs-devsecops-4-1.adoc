@@ -165,7 +165,7 @@ You should see a pipeline labeled *rox-pipeline*. Let's run one.
 
 To run a pipeline, you can click the three dots to the left of the pipeline and click *start*, OR you can click on the *rox-pipeline* to be brought to a details page where you can select *actions -> start* 
 
-* You will need to add the image you wish to scan (quay.io/mfoster/log4shell-demo:0.1.0). In this case, we want to look at the image we know has the log4shell vulnerability.
+* You will need to add the image you wish to scan (quay.io/mfoster/log4shell:latest). In this case, we want to look at the image we know has the log4shell vulnerability.
 
 * Click start and ensure that the pipeline is in its running phase.
 

@@ -20,7 +20,7 @@ spec:
        app: log4shell-app
     spec:
       containers:
-      - image: quay.io/mfoster/log4shell-demo:0.1.0
+      - image: quay.io/mfoster/log4shell:latest
         imagePullPolicy: Always
         name: log4shell-app
         ports:

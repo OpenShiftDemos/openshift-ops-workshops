@@ -172,7 +172,7 @@ image::images/pipeline-2.png[]
 
 image::images/pipeline-3.png[]
 
-* You will need to add the image you wish to scan (quay.io/mfoster/log4shell-demo:0.1.0). In this case, we want to look at the image we know has the log4shell vulnerability.
+* You will need to add the image you wish to scan (quay.io/mfoster/log4shell:latest). In this case, we want to look at the image we know has the log4shell vulnerability.
 
 image::images/pipeline-4.png[]
 

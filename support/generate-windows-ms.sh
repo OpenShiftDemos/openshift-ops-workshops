@@ -21,8 +21,7 @@ echo -n "."
 
 #
 ## Check if various things are available
-for thing in ${awscli}
-do
+for thing in ${awscli} ${jqcli} ; do
         if [[ ! -e ${thing} ]] ; then
                 echo -e "\nFATAL: $(basename ${thing}) not found!"
                 exit 13
@@ -39,7 +38,7 @@ export AWS_ACCESS_KEY_ID=$(oc get secret aws-creds -n kube-system -o jsonpath='{
 export AWS_SECRET_ACCESS_KEY=$(oc get secret aws-creds -n kube-system -o jsonpath='{.data.aws_secret_access_key}' | base64 -d)
 export AWS_DEFAULT_REGION=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.placement.region}')
 export WAMI=$(aws ec2 describe-images \
-  --region $AWS_DEFAULT_REGION \
+  --region "$AWS_DEFAULT_REGION" \
   --owners amazon \
   --filters "Name=name,Values=Windows_Server-2019*English*Full*ECS_Optimized-*" \
   --query 'sort_by(Images, &CreationDate)[-1].ImageId' \
@@ -65,7 +64,7 @@ echo -n "."
 
 #
 ## Generate Windows machineset
-cat <<EOF > ${windowsmsfile}
+cat <<EOF > "${windowsmsfile}"
 apiVersion: machine.openshift.io/v1beta1
 kind: MachineSet
 metadata:
@@ -99,7 +98,6 @@ spec:
           apiVersion: awsproviderconfig.openshift.io/v1beta1
           blockDevices:
             - ebs:
-                iops: 0
                 volumeSize: 120
                 volumeType: gp2
           credentialsSecret:
@@ -127,7 +125,6 @@ spec:
               value: owned
           userDataSecret:
             name: windows-user-data
-            namespace: openshift-machine-api
 EOF
 
 #

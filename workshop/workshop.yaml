@@ -17,4 +17,3 @@ modules:
   - clusterresourcequota
   - taints-and-tolerations
   - gitops
-  - windows-containers

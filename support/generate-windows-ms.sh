@@ -1,4 +1,5 @@
 #!/bin/bash
+
 awscli=/usr/local/bin/aws
 jqcli=/usr/bin/jq
 windowsmsfile=${HOME}/windows-ms.yaml
@@ -9,9 +10,9 @@ echo -n "Generating Windows Machineset YAML"
 
 #
 ## Check to see if you're sysadmin. Kind of crude check but works for our usecase
-if ! oc get ns default  -o name >/dev/null 2>&1 ; then
-	echo -e "\nERROR: Please make sure you're kubeadmin"
-	exit 13
+if ! oc get ns default -o name >/dev/null 2>&1 ; then
+        echo -e "\nERROR: Please make sure you're kubeadmin"
+        exit 13
 fi
 
 #
@@ -22,16 +23,15 @@ echo -n "."
 ## Check if various things are available
 for thing in ${awscli}
 do
-	if [[ ! -e ${thing} ]] ; then
-		echo -e "\nFATAL: $(basename ${thing}) not found!"
-		exit 13
-	fi
+        if [[ ! -e ${thing} ]] ; then
+                echo -e "\nFATAL: $(basename ${thing}) not found!"
+                exit 13
+        fi
 done
 
 #
 ## Give status information to user
 echo -n "."
-
 
 #
 ## Export needed information
@@ -44,10 +44,24 @@ export WAMI=$(aws ec2 describe-images \
   --filters "Name=name,Values=Windows_Server-2019*English*Full*ECS_Optimized-*" \
   --query 'sort_by(Images, &CreationDate)[-1].ImageId' \
   --output text)
+
+#
+## Get the Windows machineset name
+WIN_MACHINESET=$(oc get -o jsonpath='{.status.infrastructureName}' infrastructure cluster)-windows-worker-$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.placement.availabilityZone}')
+
+# Get the worker name
+export WORKER_NAME=$(oc get machinesets -n openshift-machine-api | awk '/worker/ && !/windows/ {print $1}' | head -n 1)
+
+# Get the security group from the worker
+export SECURITY_GROUP=$(oc get machinesets -n openshift-machine-api -o jsonpath='{.items[?(@.metadata.name=="'$WORKER_NAME'")].spec.template.spec.providerSpec.value.securityGroups[0].filters[0].values[0]}')
+
+# Get the subnet from the worker
+export SUBNET=$(oc get machinesets -n openshift-machine-api -o jsonpath='{.items[?(@.metadata.name=="'$WORKER_NAME'")].spec.template.spec.providerSpec.value.subnet.filters[0].values[0]}')
+
+
 #
 ## Give status information to user
 echo -n "."
-
 
 #
 ## Generate Windows machineset
@@ -102,12 +116,12 @@ spec:
             - filters:
                 - name: tag:Name
                   values:
-                    - $(oc get -o jsonpath='{.status.infrastructureName}' infrastructure cluster)-worker-sg
+                    - ${SECURITY_GROUP}
           subnet:
             filters:
               - name: tag:Name
                 values:
-                  - $(oc get -o jsonpath='{.status.infrastructureName}' infrastructure cluster)-private-$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.placement.availabilityZone}')
+                  - ${SUBNET}
           tags:
             - name: kubernetes.io/cluster/$(oc get -o jsonpath='{.status.infrastructureName}' infrastructure cluster)
               value: owned

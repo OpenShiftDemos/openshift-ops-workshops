@@ -166,7 +166,7 @@ image::images/wmco-card.png[WMCO Install Card]
 On the overview page, select *Install*.
 
 .WMCO Operator Overview
-image::images/windows-containers/install-overview.png[WMCO Overview]
+image::images/windows-containers/install-overview-updated-2025.png[WMCO Overview]
 
 On the *Install Operator* overview page, make sure you have *stable*
 selected in the "Update channel" section. Also, in the "Installation mode"
@@ -176,17 +176,17 @@ on *Enable Cluster Monitoring*. Finally, leave the "Approval strategy"
 as *Automatic*. Then click *Install*. Use the below graphic to guide you.
 
 .WMCO Install Operator Overview
-image::images/windows-containers/wmco-install-operator-overivew-page.png[WMCO Install Overview]
+image::images/windows-containers/wmco-install-operator-overivew-page-updated-2025.png[WMCO Install Overview]
 
 The "Installing Operator" status page will come up.
 
 .WMCO Install Operator status page
-image::images/windows-containers/installing-the-wmco-status-operator.png[WMCO Installing]
+image::images/windows-containers/installing-the-wmco-status-operator-updated-2025.png[WMCO Installing]
 
 When the screen says "ready for use", the WMCO Operator is successfully installed.
 
 .WMCO Install Operator status page
-image::images/windows-containers/wmco-ready-for-use.png[WMCO Installing]
+image::images/windows-containers/wmco-ready-for-use-updated-2025.png[WMCO Installing]
 
 Back on the cli, you should now see the WMCO pod running.
 

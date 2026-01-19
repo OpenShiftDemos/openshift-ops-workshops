@@ -27,7 +27,7 @@ before you install the Red Hat OpenShift GitOps Operator.
 4. Search for `OpenShift GitOps`, click the `Red Hat OpenShift GitOps` tile, and then click `Install`.
    (Red Hat OpenShift GitOps will be installed in all namespaces of the cluster)
 
-5. Select the `Update channel` as `gitops-1.13`. Leave all defaults selected and click `Install`.
+5. Select the `Update channel` as `gitops-1.19` (version 1.19.0 was used when writing this module, but a later version may be available - use at your own discretion). Leave all defaults selected and click `Install`.
    
 image::images/gitops-images/gitops-tile-new.png[]
 
@@ -102,14 +102,12 @@ metadata:
   name: pipelines
 spec:
   destination:
-    name: ''
     namespace: openshift-operators
     server: 'https://kubernetes.default.svc'
   source:
     path: support/gitops-catalog/pipelines-new/base/
     repoURL: 'https://github.com/OpenShiftDemos/openshift-ops-workshops/'
     targetRevision: ocp4-dev
-  sources: []
   project: default
   syncPolicy:
     automated:
@@ -183,14 +181,12 @@ metadata:
   name: banner
 spec:
   destination:
-    name: ''
     namespace: argocd
     server: 'https://kubernetes.default.svc'
   source:
     path: support/cluster-config/components/configs/banner/base/
     repoURL: 'https://github.com/OpenShiftDemos/openshift-ops-workshops/'
     targetRevision: ocp4-dev
-  sources: []
   project: default
   syncPolicy:
     automated:

@@ -1,17 +1,17 @@
 ## Summary - OpenShift Logging
 In this lab you will explore the logging capabilities of
-OpenShift 4.16. This module will break down all the new logging
-features within 4.16. This will use the link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/logging/logging-6-1#quick-start-viaq_logging-6x-6.1[ViaQ] data model. ViaQ is the default data model when forwarding logs to LokiStack.
+OpenShift. This module will break down all the logging
+features using the link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/logging/logging-6-2[Logging 6.2] stack. This will use the link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/logging/logging-6-2#quick-start-viaq_logging-6x-6.2[ViaQ] data model. ViaQ is the default data model when forwarding logs to LokiStack.
 
 An extremely important function of OpenShift is collecting and aggregating
-logs from the environments and the application pods it is running. 
+logs from the environments and the application pods it is running.
 
 The cluster logging components are based upon Vector and Loki. Vector is a high-performance observability data pipeline that allows users to configure "log forwarders" to direct Openshift logs to different log collectors.  Loki is log storage built around the idea of only indexing metadata about your logs with labels (just like Prometheus labels). Log data itself is then compressed and stored in chunks in object stores, or even locally on the filesystem.
 
 [Note]
 ====
 More information may be found on the official
-link:https://docs.openshift.com/container-platform/4.16/observability/logging/cluster-logging.html[OpenShift
+link:https://docs.openshift.com/container-platform/latest/observability/logging/cluster-logging.html[OpenShift
 documentation site]
 ====
 
@@ -28,10 +28,10 @@ at this time.
 #### Install the `Loki`,  `Cluster Logging`, and `Cluster Observability` Operators in the cluster
 
 In order to install and configure the logging stack into the cluster,
-additional operators need to be installed. We'll cover below how these can be 
+additional operators need to be installed. We'll cover below how these can be
 installed from the `Operator Hub` from within the cluster via the GUI.
 
-When using operators in OpenShift, however, it is firstly important to understand 
+When using operators in OpenShift, however, it is firstly important to understand
 the basics of some of the underlying principles that make up the Operators.
 `CustomResourceDefinition (CRD)` and `CustomResource (CR)` are two Kubernetes
 objects. `CRDs` are generic pre-defined
@@ -49,7 +49,7 @@ and/or what to configure. For installing `openshift-logging`, we will follow
 this pattern.
 
 To begin, use the following link to log-in
-to the `OpenShift Cluster's GUI`. (note: do not use the built-in 
+to the `OpenShift Cluster's GUI`. (note: do not use the built-in
 console for these steps)
 `{{ MASTER_URL }}`
 
@@ -67,19 +67,19 @@ The `Cluster Logging` operator needs to be installed in the
 ====
 
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Type `OpenShift Logging` in the search box and click the  `Red Hat OpenShift Logging` card from the list of available Operators (choose 'stable-6.1'), and click `Install`.
-  c. On the `Install Operator` page, select Update Channel `stable 6.1` and  and `Version 6.1.0`.  You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults and click `Install`. Please move onto the next step when you receive a green completed icon.
+  b. Type `OpenShift Logging` in the search box and click the `Red Hat OpenShift Logging` card from the list of available Operators, and click `Install`.
+  c. On the `Install Operator` page, select Update Channel `stable-6.2`. You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults and click `Install`. Please move onto the next step when you receive a green completed icon.
 
 2. Install the `Loki Operator`:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Type `Loki Operator` in the search field and click the `Loki Operator` card from the list of available Operators (choose `stable-6.1 and Version '6.1.0') , and then click `Install`.
-  c. On the `Create Operator Subscription` page, select Update Channel `stable-6.1`. You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults
+  b. Type `Loki Operator` in the search field and click the `Loki Operator` card provided by Red Hat from the list of available Operators, and then click `Install`.
+  c. On the `Install Operator` page, select Update Channel `stable-6.2`. You should also select `'Enable Operator recommended cluster monitoring on this Namespace'`. Leave all other defaults
      and click `Install`. Please move onto the next step when you receive a green completed icon.
 
 3. Install the `Cluster Observability Operator`:
   a. In the OpenShift console, click `Operators` → `OperatorHub`.
-  b. Type `Cluster Observability Operator` in the search field and click the `Cluster Observability Operator` card from the list of available Operators (In this example we are using '0.4.1'), and then click `Install`.
-  c. On the `Create Operator Subscription` page, select the Update Channel `development`. Leave all other defaults
+  b. Type `Cluster Observability Operator` in the search field and click the `Cluster Observability Operator` card provided by Red Hat from the list of available Operators, and then click `Install`.
+  c. On the `Install Operator` page, select Update Channel `stable`. Leave all other defaults
      and click `Install`. Please move onto the next step when you receive a green completed icon.
 
 [start=4]
@@ -115,20 +115,20 @@ If either operator does not appear as installed, follow these steps to troublesh
   `openshift-logging` and `openshift-operators` projects that are reporting issues.
 
 image::images/installedloggingoperators2.png[]
-  
+
 #### Configuring a bucket with AWS
-  
-     1. You should have received some `AWS credentials`. You can remind yourself of these 
-    on the screen from which you originally accessed this workshop. You will need to use 
+
+     1. You should have received some `AWS credentials`. You can remind yourself of these
+    on the screen from which you originally accessed this workshop. You will need to use
     these credentials throughout the next few steps.
-    
-     2. Firstly use the `'aws configure'` command to set up your `s3 (storage) bucket`. 
+
+     2. Firstly use the `'aws configure'` command to set up your `s3 (storage) bucket`.
 +
 [source,bash,role="execute"]
 ----
 aws configure
 ----
-Fill out the `AWS Access Key ID` and the `AWS Secret Access Key` 
+Fill out the `AWS Access Key ID` and the `AWS Secret Access Key`
 from the credentials on the original access screen page mentioned above. Use
 `us-east-1` as region and `json` as default output.
 This is an example below:
@@ -137,14 +137,14 @@ This is an example below:
  AWS Secret Access Key [None]: mshdyShDTYKWEywajsqpshdREXAMPLE (PLEASE REPLACE)
  Default region name [None]: us-east-1
  Default output format [None]: json
- 
+
 3. Check the `contents` of the aws folder:
 
 [source,bash,role="execute"]
 ----
 ls .aws
 ----
-you should see two folders `'config'` and `'credentials'`. This will be the 
+you should see two folders `'config'` and `'credentials'`. This will be the
 location in which we will put the `s3 bucket config`.
 
 [start=4]
@@ -152,7 +152,7 @@ location in which we will put the `s3 bucket config`.
 
 [source,bash,role="execute"]
 ----
-cat .aws/credentials 
+cat .aws/credentials
 ----
 
 You should see that all the information is correct and matches
@@ -165,12 +165,12 @@ aws_secret_access_key = mshdyShDTYKWEywajsqpshdNSUWJDA+1+REXAMPLE
 ----
 
 [start=5]
-5. Now it is time to `create` the bucket with the information 
-   that you have provided. You can choose whatever bucket name you 
+5. Now it is time to `create` the bucket with the information
+   that you have provided. You can choose whatever bucket name you
    would like. Pick a name you will be able to recognize later.
    In this case we have named it pg2nw which is the `GUID` of the console.
-   
-   
+
+
 If you want to use your `GUID` as your `bucket name` please do the following:
 
 [start=6]
@@ -189,20 +189,20 @@ The output of this command is your bucket name.
 
 [start=8]
 8. Next, run the following command to `create` the bucket replace <pg2nw> with your own `GUID`
- 
-[source,bash,role="execute"]
-aws --profile default s3api create-bucket --bucket <pg2nw> --region us-east-1 
 
-This is creating an `aws bucket` from the `profile` called 
-`default` which we set up earlier. Please remember your 
+[source,bash,role="execute"]
+aws --profile default s3api create-bucket --bucket <pg2nw> --region us-east-1
+
+This is creating an `aws bucket` from the `profile` called
+`default` which we set up earlier. Please remember your
 bucket name as we will be using this later.
 
 You may get an error if you make the bucket name too generic. If you see something like this `error`, try another name:
 ----
-An error occurred (BucketAlreadyExists) when calling 
-the CreateBucket operation: The requested bucket name 
-is not available. The bucket namespace is shared by 
-all users of the system. Please select a different 
+An error occurred (BucketAlreadyExists) when calling
+the CreateBucket operation: The requested bucket name
+is not available. The bucket namespace is shared by
+all users of the system. Please select a different
 name and try again.
 ----
 
@@ -212,19 +212,19 @@ You will know you have been successful when you see this:
     "Location": "/pg2nw"
 }
 ----
- 
+
 #### Creating a Secret within Openshift
-  
-1. Next you need to `configure` your secrets. This `secret` will store the access credentials  
+
+1. Next you need to `configure` your secrets. This `secret` will store the access credentials
   for the `s3 bucket` we just created. This will later be used by
   the `LokiStack` to store `logging data`.
-  
+
   a. Navigate to the Console and click `Workloads` -> `Secrets`
-  
+
   b. Next, select `Create` and `from YAML`
-  
+
   c. Remove the current YAML and replace it with this YAML (Make sure to change to match your AWS creds):
-  
+
 [source,yaml]
 ----
 apiVersion: v1
@@ -242,12 +242,12 @@ stringData:
 
 [start=2]
 2. Once you are happy, click `Create`.
-  
+
 3. Check that the `lokistack-dev-s3 secret` has been created by running the following command:
 
 [source,bash,role="execute"]
 kubectl get secrets -n openshift-logging
- 
+
  You should see something like this:
 
 ```
@@ -263,12 +263,16 @@ image::images/lokistack-s3.png[]
 
 #### Creating the LokiStack custom resource (CR)
 
-1. Now, head on over to the `console` and go to `Administration` and `CustomResourceDefinitions`. 
-  
-  * Select the `Create CustomResourceDefinition`
-  
-  * Next you should remove the current YAML and replace it with this YAML:
-  
+1. In the OpenShift console, go to `Operators` → `Installed Operators`.
+
+2. Make sure you are in the `openshift-logging` project (or select `All Projects`).
+
+3. Click on `Loki Operator`.
+
+4. Navigate to the `LokiStack` tab and click `Create LokiStack`.
+
+5. Switch to the `YAML view` and replace the content with this YAML:
+
 [source,yaml]
 ----
 apiVersion: loki.grafana.com/v1
@@ -291,8 +295,8 @@ spec:
     mode: openshift-logging
 ----
 
-[start=2]
-2. Click `Create`
+[start=6]
+6. Click `Create`
 
 image::images/creatinglokistackcr.png[]
 
@@ -301,17 +305,8 @@ image::images/creatinglokistackcr.png[]
 Ensure that the `lokistack-dev-s3` secret is created beforehand. The contents of this secret vary depending on the object storage in use.
 ====
 
-[start=3]
-3. Switch to the `Operators` → `Installed Operators` page.
-
-[start=4]
-4. Make sure the `All Projects` project is selected.
-
-[start=5]
-5. Select the `Loki Operator`.
-
-[start=6]
-6. Navigate to the `LokiStack` tab and click on `lokistack-dev`. 
+[start=7]
+7. Navigate to the `LokiStack` tab and click on `logging-loki`.
 
 It may take up to a minute to be up and running but it should eventually look like this:
 
@@ -321,7 +316,7 @@ We haven't set a ruler so you should see `No members`
 
 #### Setting up collectors
 
-In this section, we will configure the 'collector' service account with these commands to enable log collection for applications, audits, and infrastructure within the OpenShift cluster: 
+In this section, we will configure the 'collector' service account with these commands to enable log collection for applications, audits, and infrastructure within the OpenShift cluster:
 
 [source,bash,role="execute"]
 ----
@@ -336,91 +331,24 @@ oc adm policy add-cluster-role-to-user collect-infrastructure-logs -z collector
 This is what each command does:
 
 * Create a service account for the collector
-* Allow the collector’s service account to write data to the LokiStack CR (The ClusterRole resource is created automatically during the Cluster Logging Operator installation and does not need to be created manually.)
-* Allow the collector’s service account to collect logs
+* Allow the collector's service account to write data to the LokiStack CR (The ClusterRole resource is created automatically during the Cluster Logging Operator installation and does not need to be created manually.)
 * Switch to the openshift-logging project
 * The last 3 commands assign the `collector` service account permissions to gather application, audit, and infrastructure logs in the OpenShift cluster.
 
-Now, head on over to the `console` and go to `Administration` and `CustomResourceDefinitions`. 
-  
-  1. Select the `Create CustomResourceDefinition`
-  
-  2. Create a UIPlugin CR to enable the Log section in the Observe tab. Remove the current YAML and replace it with this YAML:
-  
-[source,yaml]
-----
-apiVersion: observability.openshift.io/v1alpha1
-kind: UIPlugin
-metadata:
-  name: logging
-spec:
-  type: Logging
-  logging:
-    lokiStack:
-      name: logging-loki
-----
-
-[start=3]
-  3. Click `Create`.
-
-image::images/settingcollector.png[]
-
-#### Verify that the UIPlugin CR is enabled
-
-Now that Logging has been created, let's verify that things are working.
-
-1. Switch to the `Workloads` → `Pods` page.
-
-2. Select the `openshift-logging` project.
-
-You should see a variety of `logging-loki` pods
-
-Alternatively, you can verify from the command line by using the following command:
-
-[source,bash,role="execute"]
-----
-oc get pods -n openshift-logging
-----
-
-Which will eventually show you something like this:
-
-----
-cluster-logging-operator-7c8fdf7c6-8r4th        1/1     Running   0          24m
-logging-loki-compactor-0                        1/1     Running   0          11m
-logging-loki-distributor-56b5698d5b-pkvt7       1/1     Running   0          11m
-logging-loki-distributor-56b5698d5b-qrz76       1/1     Running   0          11m
-logging-loki-gateway-7d84bc5884-tfpf4           2/2     Running   0          11m
-logging-loki-gateway-7d84bc5884-wdn2j           2/2     Running   0          11m
-logging-loki-index-gateway-0                    1/1     Running   0          11m
-logging-loki-index-gateway-1                    1/1     Running   0          10m
-logging-loki-ingester-0                         1/1     Running   0          11m
-logging-loki-ingester-1                         1/1     Running   0          9m58s
-logging-loki-querier-7b9795965d-2vqzn           1/1     Running   0          11m
-logging-loki-querier-7b9795965d-9qqwx           1/1     Running   0          11m
-logging-loki-query-frontend-8587b5c8f9-fsgjx    1/1     Running   0          11m
-logging-loki-query-frontend-8587b5c8f9-wmfzr    1/1     Running   0          11m
-----
-
-image::images/uipluginenabled.png[]
-
-You should see a box pop up in the top right corner after about 
-30 seconds to a minute. It will say `"Web console update is available"` 
-and will prompt you to refresh your browser. Go ahead and do that; 
-this change will now allow you to access logs.
-
-If you come across any references to Fluentd status, 
-kindly disregard them, as they are not relevant to our current task.
-
-image::images/Loki_refresh.png[]
-
 #### ClusterLogForwarder Setup
 
-Now, head on over to the `console` and go to `Administration` and `CustomResourceDefinitions`. 
-  
-  1. Select the `Create CustomResourceDefinition`
-  
-  2. Create a ClusterLogForwarder CR to configure log forwarding. Remove the current YAML and replace it with this YAML:
-  
+The ClusterLogForwarder CR configures log collection and forwarding. This is a critical step - without it, no logs will be collected.
+
+1. In the OpenShift console, go to `Operators` → `Installed Operators`.
+
+2. Make sure you are in the `openshift-logging` project.
+
+3. Click on `Red Hat OpenShift Logging`.
+
+4. Navigate to the `ClusterLogForwarder` tab and click `Create ClusterLogForwarder`.
+
+5. Switch to the `YAML view` and replace the content with this YAML:
+
 [source,yaml]
 ----
 apiVersion: observability.openshift.io/v1
@@ -444,7 +372,7 @@ spec:
     tls:
       ca:
         key: service-ca.crt
-        configMapName: openshift-service-ca.crt
+        configMapName: logging-loki-gateway-ca-bundle
   pipelines:
   - name: default-logstore
     inputRefs:
@@ -455,34 +383,134 @@ spec:
     - default-lokistack
 ----
 
-[start=3]
-  3. Click `Create`.
+[start=6]
+6. Click `Create`.
+
+[Note]
+====
+The `tls.ca.configMapName` must reference `logging-loki-gateway-ca-bundle`, which is automatically created by the Loki Operator. This configmap contains the CA certificate needed to verify the TLS connection to the Loki gateway.
+====
 
 [Note]
 ====
 The `dataModel` field is optional and left unset (`dataModel: ""`) by default. This allows the Cluster Logging Operator (CLO) to automatically select a data model. Currently, the CLO defaults to the ViaQ model when the field is unset, but this will change in future releases. Specifying `dataModel: ViaQ` ensures the configuration remains compatible if the default changes.
 ====
 
+#### Creating the UIPlugin CR
+
+The UIPlugin CR enables the Logs section in the Observe tab of the OpenShift console.
+
+1. In the OpenShift console, go to `Operators` → `Installed Operators`.
+
+2. Make sure you are in the `All Projects` or `openshift-logging` project.
+
+3. Click on `Cluster Observability Operator`.
+
+4. Navigate to the `UIPlugin` tab and click `Create UIPlugin`.
+
+5. Switch to the `YAML view` and replace the content with this YAML:
+
+[source,yaml]
+----
+apiVersion: observability.openshift.io/v1alpha1
+kind: UIPlugin
+metadata:
+  name: logging
+spec:
+  type: Logging
+  logging:
+    lokiStack:
+      name: logging-loki
+----
+
+[start=6]
+6. Click `Create`.
+
+image::images/settingcollector.png[]
+
+#### Verify the Logging Stack
+
+Now that all components have been created, let's verify that things are working.
+
+1. Switch to the `Workloads` → `Pods` page.
+
+2. Select the `openshift-logging` project.
+
+You should see:
+* The `logging-loki-*` pods (compactor, distributor, gateway, index-gateway, ingester, querier, query-frontend)
+* The `collector-*` pods (one per node in your cluster)
+
+Alternatively, you can verify from the command line by using the following command:
+
+[source,bash,role="execute"]
+----
+oc get pods -n openshift-logging
+----
+
+Which will eventually show you something like this:
+
+----
+NAME                                           READY   STATUS    RESTARTS   AGE
+cluster-logging-operator-6ddf4466f4-wcghn      1/1     Running   0          14m
+collector-7fgbb                                1/1     Running   0          2m
+collector-hkjv8                                1/1     Running   0          2m
+collector-mfdd7                                1/1     Running   0          2m
+collector-rwqdl                                1/1     Running   0          2m
+collector-tfngd                                1/1     Running   0          2m
+logging-loki-compactor-0                       1/1     Running   0          11m
+logging-loki-distributor-9fd956cf8-dxpc4       1/1     Running   0          11m
+logging-loki-distributor-9fd956cf8-ncj6f       1/1     Running   0          11m
+logging-loki-gateway-665558f5d8-mcngj          2/2     Running   0          11m
+logging-loki-gateway-665558f5d8-zqglf          2/2     Running   0          11m
+logging-loki-index-gateway-0                   1/1     Running   0          11m
+logging-loki-index-gateway-1                   1/1     Running   0          10m
+logging-loki-ingester-0                        1/1     Running   0          11m
+logging-loki-ingester-1                        1/1     Running   0          9m
+logging-loki-querier-58fb7864b8-5rtsw          1/1     Running   0          11m
+logging-loki-querier-58fb7864b8-r8gh8          1/1     Running   0          11m
+logging-loki-query-frontend-7c7cd7b44c-8km2z   1/1     Running   0          11m
+logging-loki-query-frontend-7c7cd7b44c-wpv9x   1/1     Running   0          11m
+----
+
+[Important]
+====
+The `collector-*` pods are critical - these are the Vector pods that collect and forward logs. If you don't see collector pods, check that the ClusterLogForwarder CR was created correctly.
+====
+
+image::images/uipluginenabled.png[]
+
+You should see a box pop up in the top right corner after about
+30 seconds to a minute. It will say `"Web console update is available"`
+and will prompt you to refresh your browser. Go ahead and do that;
+this change will now allow you to access logs.
+
+image::images/Loki_refresh.png[]
+
 #### Observing The Logs
 
-1. At this point you can go to `Observe` -> `Logs` on the left hand menu. 
+1. At this point you can go to `Observe` -> `Logs` on the left hand menu.
 
-2. Once you are inside you will notice a menu which is currently 
-set to `Applications`. Change this instead to `infrastructure`.
+2. Once you are inside you will notice a menu which is currently
+set to `application`. Change this instead to `infrastructure`.
 
-You should now see all the `logs` for `Infrastructure`. The logs are split 
-into 3 sections: `application`, `infrastructure` and `audits`. Lets have a 
+[Note]
+====
+It may take 1-2 minutes for logs to start appearing after the collector pods are running. If you see "No datapoints found", wait a moment and refresh.
+====
+
+You should now see all the `logs` for `Infrastructure`. The logs are split
+into 3 sections: `application`, `infrastructure` and `audit`. Lets have a
 look through the different parts of this.
 
 image::images/appinfraaudit.png[]
 
-As we can see in the graphic below, you can filter by `Content`, `Namespaces`, `Pods`, and `Containers`. 
+As we can see in the graphic below, you can filter by `Content`, `Namespaces`, `Pods`, and `Containers`.
 This can be useful to narrow down searches when looking for something more specific.
 
 image::images/filterlogs.png[]
 
-You can further specify the logs you are looking for by using the other 
-drop down menu for `Severity`. This menu breaks the logs down into `critical`, 
+You can further specify the logs you are looking for by using the other
+drop down menu for `Severity`. This menu breaks the logs down into `critical`,
 `error`, `warning`, `debug`, `info`, `trace`, and `unknown` logging categories.
 
 image::images/severity.png[]
@@ -491,6 +519,37 @@ The final piece of this is the `histogram`. This gives the user a more visual lo
 
 image::images/histogram.png[]
 
-#### Congratulations, you have now completed the logging section!
+#### Troubleshooting
 
+If logs are not appearing, check the following:
+
+1. **Verify collector pods are running:**
++
+[source,bash,role="execute"]
+----
+oc get pods -n openshift-logging -l app.kubernetes.io/component=collector
+----
+
+2. **Check collector logs for errors:**
++
+[source,bash,role="execute"]
+----
+oc logs -n openshift-logging -l app.kubernetes.io/component=collector --tail=20
+----
++
+Common issues include:
++
+* `certificate verify failed` - The TLS CA configmap name is incorrect in the ClusterLogForwarder
+* `429 Too Many Requests` - Rate limiting from Loki; this is normal during initial ingestion and will clear up
+
+3. **Verify ClusterLogForwarder status:**
++
+[source,bash,role="execute"]
+----
+oc get clusterlogforwarder collector -n openshift-logging -o jsonpath='{.status.conditions[*]}' | jq .
+----
++
+You should see `Authorized` and `Valid` conditions with status `True`.
+
+#### Congratulations, you have now completed the logging section!
 

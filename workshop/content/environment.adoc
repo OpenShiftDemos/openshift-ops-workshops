@@ -146,21 +146,31 @@ throughout this workshop (application is not avaliable), you should try reopenin
 in an incognito window after a few minutes.
 ----
 
-Please also check that you can see the support directory
+[IMPORTANT]
+====
+*Check your terminal prompt before continuing!*
+
+Your prompt should show: `[~] $`
+
+If you see `[lab-user@bastion ~]$` you are on the bastion host - type `exit` first to return to the dashboard terminal.
+====
+
+Check that you can see the support directory:
 
 [source,bash,role="execute"]
 ----
 ls
 ----
 
-If you see the support directory please skip the next commands and move to the next module:
+If you see `support` in the output, skip ahead to the next module.
 
+*Only if the support directory is missing*, run these commands:
+
+[source,bash,role="execute"]
 ----
 git clone -b ocp4-prod https://github.com/OpenShiftDemos/openshift-ops-workshops.git
-
-bash openshift-ops-workshops/support/clone_support_folder.sh
-
-ls /opt/app-root/src/support/
+bash openshift-ops-workshops/support/clone_support_folder_v2.sh
+ls ~/support/
 ----
 
 

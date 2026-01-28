@@ -76,13 +76,19 @@ if [ ! -w "${TARGET_DIR}" ]; then
     sudo chown $(whoami) ${TARGET_DIR}
 fi
 
-# Clone the repo
 cd ${TARGET_DIR}
-git clone -b ocp4-prod https://github.com/OpenShiftDemos/openshift-ops-workshops.git
 
-if [ $? -ne 0 ]; then
-    echo "ERROR: Failed to clone repository"
-    exit 1
+# Check if repo directory already exists
+if [ -d "${TARGET_DIR}/openshift-ops-workshops" ]; then
+    echo "Repository already cloned. Extracting support folder..."
+else
+    # Clone the repo
+    git clone -b ocp4-prod https://github.com/OpenShiftDemos/openshift-ops-workshops.git
+
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to clone repository"
+        exit 1
+    fi
 fi
 
 # Move support folder to target

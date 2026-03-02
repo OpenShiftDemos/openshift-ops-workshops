@@ -1,14 +1,9 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  name: cluster-deployment-customimageset-template
+  name: netproj-template
 
 parameters:
-- name: IMAGE
-  displayName: Container Image
-  description: The container image to use for the deployment
-  required: true
-
 - name: NAMESPACE
   displayName: Namespace
   description: Namespace to deploy objects
@@ -22,62 +17,40 @@ objects:
       name: "${NAMESPACE}"
     name: "${NAMESPACE}"
 
-- apiVersion: v1
-  kind: DeploymentConfig
+- apiVersion: apps/v1
+  kind: Deployment
   metadata:
     name: ose
     labels:
       run: ose
   spec:
-    strategy:
-      type: Rolling
-      rollingParams:
-        updatePeriodSeconds: 1
-        intervalSeconds: 1
-        timeoutSeconds: 600
-        maxUnavailable: 25%
-        maxSurge: 25%
-      resources:
-    triggers:
-      - type: ConfigChange
     replicas: 1
-    test: false
     selector:
-      run: ose
+      matchLabels:
+        run: ose
     template:
       metadata:
-        creationTimestamp: null
         labels:
           run: ose
       spec:
         containers:
           - name: ose
-            image: '${IMAGE}'
-            env:
-            - name: REGISTRY_OPENSHIFT_SERVER_ADDR
-              value: 10.0.0.1
-            resources:
-            terminationMessagePath: /dev/termination-log
-            imagePullPolicy: IfNotPresent
+            image: registry.access.redhat.com/ubi9/ubi:latest
+            command: ["bash", "-c", "python3 -m http.server 5000"]
             ports:
             - containerPort: 5000
               protocol: TCP
             readinessProbe:
-              failureThreshold: 3
               tcpSocket:
                 port: 5000
               periodSeconds: 10
-              successThreshold: 1
-              timeoutSeconds: 5
+              failureThreshold: 3
             livenessProbe:
-              failureThreshold: 3
               tcpSocket:
                 port: 5000
-              initialDelaySeconds: 10
+              initialDelaySeconds: 5
               periodSeconds: 10
-              successThreshold: 1
-              timeoutSeconds: 5
+              failureThreshold: 3
         restartPolicy: Always
         terminationGracePeriodSeconds: 30
         dnsPolicy: ClusterFirst
-        securityContext:

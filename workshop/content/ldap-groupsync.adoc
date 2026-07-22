@@ -183,16 +183,26 @@ This command will create a Kubernetes secret named "ldap-secret" in the "openshi
 oc create secret generic ldap-secret --from-literal=bindPassword=b1ndP^ssword -n openshift-config
 ----
 
-Download the certificate and save it to the file 'ca.crt' with this command:
+Extract the CA certificate chain directly from the JumpCloud LDAP server and
+save it to the file 'ca.crt' with this command:
 
 [source,bash,role="execute"]
 ----
-wget https://certs.godaddy.com/repository/gd-class2-root.crt -O {{ HOME_PATH }}/support/ca.crt
+openssl s_client -connect ldap.jumpcloud.com:636 -showcerts </dev/null 2>/dev/null \
+  | awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/' \
+  | csplit -f {{ HOME_PATH }}/support/jc-cert- -b '%02d.pem' - '/BEGIN CERTIFICATE/' '{*}' 2>/dev/null \
+  && cat {{ HOME_PATH }}/support/jc-cert-02.pem {{ HOME_PATH }}/support/jc-cert-03.pem > {{ HOME_PATH }}/support/ca.crt \
+  && rm -f {{ HOME_PATH }}/support/jc-cert-*.pem
 ----
 
-----
-If you see `Unable to establish SSL connection.` please click the above command again before proceeding.
-----
+[NOTE]
+====
+Previous versions of this lab downloaded the GoDaddy Class 2 root certificate
+directly from GoDaddy's repository. That root is no longer part of the
+certificate chain served by JumpCloud's LDAP server, which now uses the GoDaddy
+G2 CA hierarchy. Extracting the chain from the server ensures the CA bundle
+always matches what the server presents.
+====
 
 Click this command to create a new ConfigMap named ca-config-map in the openshift-config namespace. The ConfigMap is populated with the contents of the file {{ HOME_PATH }}/support/ca.crt. It then applys the file.
 
